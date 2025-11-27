@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>跨文化管理课程多语言学习支持系统-学生端 · Cross-cultural Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top left, #243b6b 0, #0b1020 45%, #05060a 100%);
+      color: #e5e9f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: #88c0ff; text-decoration: none; }
+
+    header.course-header {
+      padding: 10px 20px 8px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(40,60,100,0.9), rgba(10,12,25,0.9));
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .course-header h1 {
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+    .course-header h2 {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    main.main-layout {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 12px 16px 16px;
+    }
+    .main-inner {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 主菜单 */
+    #main-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      justify-items: center;
+    }
+    .card-btn {
+      background: radial-gradient(circle at top left, #3b4252, #2e3440);
+      border-radius: 16px;
+      padding: 16px 14px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0) scale(1);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      width: 100%;
+      max-width: 220px;
+      text-align: left;
+    }
+    .card-btn::before {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -40%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 60%);
+      opacity: 0;
+      transform: translate3d(0,0,0);
+      transition: opacity 0.25s ease;
+    }
+    .card-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 16px 35px rgba(0,0,0,0.6);
+      border-color: rgba(136,192,255,0.5);
+    }
+    .card-btn:hover::before { opacity: 1; }
+    .card-btn-title { font-size: 1.1rem; margin-bottom: 4px; }
+    .card-btn-sub { font-size: 0.85rem; opacity: 0.85; }
+    .card-btn.coming-soon { opacity: 0.7; }
+
+    @media (max-width: 600px) {
+      #main-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card-btn { max-width: 100%; text-align: center; }
+      .card-btn-title { font-size: 1rem; }
+      .card-btn-sub { font-size: 0.8rem; }
+    }
+
+    #chapter-view { display: none; }
+    .chapter-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 16px;
+      align-items: stretch;
+    }
+    @media (max-width: 900px) {
+      .chapter-layout { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: rgba(15, 20, 35, 0.88);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+    }
+    .panel-thin {
+      min-height: auto;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .panel-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .panel-title { font-size: 1rem; font-weight: 600; }
+    .panel-subtitle { font-size: 0.8rem; opacity: 0.8; }
+    .panel-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .label-small { font-size: 0.78rem; opacity: 0.85; }
+    select.language-select {
+      background: rgba(46, 52, 64, 0.9);
+      border-radius: 999px;
+      border: 1px solid rgba(136,192,255,0.5);
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      color: #e5e9f0;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-ghost {
+      background: rgba(46,52,64,0.9);
+      border-radius: 999px;
+      border: 1px solid rgba(136,192,255,0.5);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      color: #e5e9f0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+    }
+    .btn-ghost:hover {
+      background: rgba(129,161,193,0.18);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+      transform: translateY(-1px);
+    }
+
+    .pdf-viewer {
+      flex: 1;
+      margin-top: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      background: radial-gradient(circle at top, rgba(76,86,106,0.6), rgba(15,16,25,0.95));
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+      height: 72vh;
+    }
+    @media (max-width: 900px) {
+      .pdf-viewer { height: 60vh; }
+    }
+    .pdf-placeholder-header {
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      background: linear-gradient(90deg, rgba(76,86,106,0.4), rgba(59,66,82,0.2));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pdf-header-right-text {
+      margin-left: auto;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .pdf-placeholder-body {
+      flex: 1;
+      padding: 12px;
+      overflow: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    #ppt-iframe {
+      flex: 1;
+      width: 100%;
+      border: 0;
+      display: none;
+      background: #1b1f2b;
+    }
+
+    .side-panel {
+      background: rgba(15, 20, 35, 0.88);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .side-title { font-size: 0.9rem; margin-bottom: 6px; opacity: 0.9; }
+    .side-buttons { display: flex; flex-direction: column; gap: 10px; }
+    .side-btn {
+      background: radial-gradient(circle at top left, #3b4252, #2e3440);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+    .side-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.6);
+      border-color: rgba(136,192,255,0.6);
+    }
+    .side-btn-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #88c0ff, #5e81ac);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    .side-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .side-btn-text span:nth-child(2) { font-size: 0.72rem; opacity: 0.8; }
+
+    .resource-list {
+      margin-top: 8px;
+      border-top: 1px dashed rgba(255,255,255,0.12);
+      padding-top: 6px;
+      font-size: 0.8rem;
+    }
+    .resource-list-title { opacity: 0.85; margin-bottom: 4px; }
+    .resource-node {
+      margin-left: 8px;
+      padding-left: 10px;
+      border-left: 1px dashed rgba(136,192,255,0.5);
+      margin-top: 4px;
+    }
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 4px 0;
+      border-radius: 6px;
+      transition: background 0.14s ease, transform 0.12s ease;
+    }
+    .resource-item:hover {
+      background: rgba(136,192,255,0.1);
+      transform: translateX(2px);
+    }
+    .resource-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #88c0ff;
+    }
+
+    .floating-window {
+      position: fixed;
+      top: 120px;
+      left: 120px;
+      width: 380px;
+      min-width: 260px;
+      min-height: 180px;
+      max-width: 90vw;
+      max-height: 80vh;
+      background: rgba(15,18,30,0.96);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1200;
+      resize: both;
+    }
+    .floating-header {
+      padding: 8px 10px;
+      background: linear-gradient(90deg, rgba(59,66,82,0.9), rgba(76,86,106,0.7));
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: move;
+      user-select: none;
+    }
+    .floating-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .floating-controls { display: flex; align-items: center; gap: 4px; }
+    .floating-body {
+      flex: 1;
+      padding: 8px 10px;
+      overflow: auto;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+    .floating-footer {
+      padding: 6px 10px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem;
+      opacity: 0.75;
+    }
+    .btn-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(15,18,30,0.9);
+      color: #eceff4;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+    }
+    .btn-icon:hover {
+      background: rgba(229,233,244,0.12);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+      transform: translateY(-1px);
+    }
+    .floating-lang-select {
+      background: rgba(46,52,64,0.95);
+      border-radius: 999px;
+      border: 1px solid rgba(136,192,255,0.6);
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      color: #eceff4;
+      outline: none;
+      cursor: pointer;
+      max-width: 200px;
+    }
+    .floating-window.fullscreen {
+      top: 8px !important;
+      left: 8px !important;
+      width: calc(100vw - 16px) !important;
+      height: calc(100vh - 16px) !important;
+      max-width: none;
+      max-height: none;
+      border-radius: 10px;
+    }
+
+    .hint { font-size: 0.78rem; opacity: 0.8; margin-top: 4px; }
+    .usage-note {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* 视频容器 & 自定义字幕样式 */
+    .floating-video-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .floating-video-wrapper video {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #000;
+    }
+    .video-subtitle-overlay {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      padding: 0.3em 0.8em;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 0 6px #000, 0 0 12px #000;
+      pointer-events: none;
+      line-height: 1.4;
+    }
+    .video-subtitle-overlay-top {
+      top: 12%;
+      width: 94%;
+      max-width: 94%;
+      border-radius: 6px;
+      font-size: clamp(14px, 2.6vw, 26px);
+    }
+    .video-subtitle-overlay-bottom {
+      bottom: 6%;
+      width: 100%;
+      max-width: 100%;
+      border-radius: 4px;
+      font-size: clamp(12px, 2.2vw, 20px);
+    }
+    .video-lang-note {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+<header class="course-header">
+  <h1>
+    跨文化管理课程多语言学习支持系统-学生端<br>
+    Cross-cultural Management Course Multilingual Learning Support System – Student Portal
+  </h1>
+  <h2>
+    程序开发/授课教师：重庆工商大学 鄢清华 副教授 · Program Developing / Instructor: Prof. Yan Qinghua, Chongqing Technology and Business University
+  </h2>
+</header>
+
+<main class="main-layout">
+  <div class="main-inner">
+
+    <section id="main-menu">
+      <div class="card-btn" data-chapter="1">
+        <div class="card-btn-title">第一章</div>
+        <div class="card-btn-sub">Chapter 1</div>
+      </div>
+      <div class="card-btn coming-soon" data-chapter="2">
+        <div class="card-btn-title">第二章</div>
+        <div class="card-btn-sub">Chapter 2</div>
+      </div>
+      <div class="card-btn coming-soon" data-chapter="3">
+        <div class="card-btn-title">第三章</div>
+        <div class="card-btn-sub">Chapter 3</div>
+      </div>
+      <div class="card-btn coming-soon" data-chapter="4">
+        <div class="card-btn-title">第四章</div>
+        <div class="card-btn-sub">Chapter 4</div>
+      </div>
+      <div class="card-btn" data-chapter="5">
+        <div class="card-btn-title">第五章</div>
+        <div class="card-btn-sub">Chapter 5 – Cross-cultural HRM</div>
+      </div>
+      <div class="card-btn coming-soon" data-chapter="6">
+        <div class="card-btn-title">第六章</div>
+        <div class="card-btn-sub">Chapter 6</div>
+      </div>
+      <div class="card-btn coming-soon" data-role="final-task">
+        <div class="card-btn-title">期末任务</div>
+        <div class="card-btn-sub">Final Task</div>
+      </div>
+      <div class="card-btn coming-soon" data-role="about-course">
+        <div class="card-btn-title">About this course</div>
+        <div class="card-btn-sub">课程简介</div>
+      </div>
+    </section>
+
+    <div class="usage-note">
+      建议在教师指导下使用本页面。上课时以教室屏幕和教师讲解为主，本页面主要用于阅读辅助与课后复习。<br>
+      Recommended: Use this page under the instructor’s guidance. During class, focus on the classroom screen and explanations.
+    </div>
+
+    <section id="chapter-view">
+      <div class="panel panel-thin" style="margin-bottom: 8px;">
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <div class="panel-title" id="chapter-title-main">第一章 · Chapter 1 (Demo)</div>
+            <div class="panel-subtitle" id="chapter-subtitle-main">双语课件 &amp; 章节资源 · Bilingual slides &amp; chapter resources</div>
+          </div>
+          <div class="panel-header-right">
+            <button class="btn-ghost" id="btn-reset-view">返回章节菜单 / Back to chapters</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chapter-layout">
+        <!-- 左：PPT -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-header-left">
+              <div class="panel-title">课件 PPT · Lecture Slides</div>
+              <div class="panel-subtitle" id="ppt-lang-label">当前版本：Chinese + English</div>
+            </div>
+            <div class="panel-header-right">
+              <span class="label-small">Language</span>
+              <select id="ppt-lang-select" class="language-select">
+                <option value="CN-EN">Chinese + English</option>
+                <option value="CN-TH">Chinese + Thai</option>
+                <option value="CN-ID">Chinese + Indonesian</option>
+                <option value="CN-LAO">Chinese + Lao</option>
+                <option value="CN-RU">Chinese + Russian</option>
+                <option value="CN-JP">Chinese + Japanese</option>
+                <option value="CN-KR">Chinese + Korean</option>
+                <option value="CN-MY">Chinese + Malay</option>
+                <option value="CN-AR">Chinese + Arabic</option>
+                <option value="CN-FR">Chinese + French</option>
+                <option value="EN">English only</option>
+              </select>
+              <button class="btn-ghost" id="ppt-download-btn">⬇ Download</button>
+            </div>
+          </div>
+
+          <div class="pdf-viewer">
+            <div class="pdf-placeholder-header">
+              <span id="ppt-placeholder-title">Chapter 1 PPT (Chinese + English)</span>
+              <span class="pdf-header-right-text">PDF viewer · scrollable</span>
+            </div>
+
+            <div class="pdf-placeholder-body" id="ppt-placeholder-body">
+              <p>
+                这里将显示本章 PPT 的 PDF 视图（当前语言版本：<span id="ppt-placeholder-lang">Chinese + English</span>）。<br>
+                In the real system, an embedded PDF viewer for this chapter will appear here (current language version: <span id="ppt-placeholder-lang2">Chinese + English</span>).
+              </p>
+              <p style="margin-top:8px;">
+                学生可以滚动浏览页面，并使用上方 Download 按钮下载当前语言版本的 PDF。<br>
+                Students can scroll through slides and use the Download button to get the current language version as a PDF.
+              </p>
+              <p style="margin-top:8px;font-size:0.78rem;opacity:0.8;">
+                说明：PPT 现通过 Google Docs Viewer 在线预览，不会自动下载；若学校网络限制 Google 服务，则可用 Download 按钮直接下载本地打开。<br>
+                Note: Slides use Google Docs Viewer for inline preview; if Google services are blocked on campus, use the Download button to open the file locally.
+              </p>
+            </div>
+
+            <!-- PDF iframe -->
+            <iframe id="ppt-iframe"></iframe>
+          </div>
+        </div>
+
+        <!-- 右：章节资源 -->
+        <div class="side-panel">
+          <div class="side-title">章节资源 · Chapter Resources</div>
+          <div class="side-buttons">
+            <button class="side-btn" id="btn-exercises">
+              <div class="side-btn-icon">📝</div>
+              <div class="side-btn-text">
+                <span>练习与任务</span>
+                <span>Exercises &amp; Tasks</span>
+              </div>
+            </button>
+            <button class="side-btn" id="btn-videos">
+              <div class="side-btn-icon">🎬</div>
+              <div class="side-btn-text">
+                <span>视频案例</span>
+                <span>Video Cases</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="resource-list" id="resource-list">
+            <div class="resource-list-title">
+              请选择右侧按钮以查看本章资源。<br>
+              Select a button above to view resources for this chapter.
+            </div>
+          </div>
+
+          <div class="hint">
+            提示：目前已开放第 1 章和第 5 章，其余章节暂未上线。<br>
+            Hint: Chapters 1 and 5 are currently available. Other chapters are not yet implemented.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+  const mainMenu = document.getElementById('main-menu');
+  const chapterView = document.getElementById('chapter-view');
+  const chapterButtons = document.querySelectorAll('.card-btn');
+
+  const pptLangSelect = document.getElementById('ppt-lang-select');
+  const pptLangLabel = document.getElementById('ppt-lang-label');
+  const pptPlaceholderTitle = document.getElementById('ppt-placeholder-title');
+  const pptPlaceholderLang = document.getElementById('ppt-placeholder-lang');
+  const pptPlaceholderLang2 = document.getElementById('ppt-placeholder-lang2');
+  const pptDownloadBtn = document.getElementById('ppt-download-btn');
+  const pptPlaceholderBody = document.getElementById('ppt-placeholder-body');
+  const pptIframe = document.getElementById('ppt-iframe');
+
+  const btnResetView = document.getElementById('btn-reset-view');
+  const resourceList = document.getElementById('resource-list');
+  const btnExercises = document.getElementById('btn-exercises');
+  const btnVideos = document.getElementById('btn-videos');
+
+  const chapterTitleMain = document.getElementById('chapter-title-main');
+  const chapterSubtitleMain = document.getElementById('chapter-subtitle-main');
+
+  let currentChapter = 1;
+  let currentZ = 1500;
+
+  const chapterConfigs = {
+    1: {
+      title: '第一章 · Chapter 1 (Demo)',
+      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      pptLabelPrefix: 'Chapter 1 PPT'
+    },
+    5: {
+      title: '第五章 · Chapter 5 – Cross-cultural HRM',
+      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      pptLabelPrefix: 'Chapter 5 PPT'
+    }
+  };
+
+  /* PPT 链接：第1章保持原有仓库，第5章用你提供的 GitHub 链接 */
+  const pptLinksByChapter = {
+    1: {
+      "CN-EN": "https://raw.githubusercontent.com/steven2025/CCM/4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+chn-Chapter%202.pdf",
+      "CN-TH": "https://raw.githubusercontent.com/steven2025/CCM/4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+thai-chapter%202.pdf",
+      "CN-ID": "#",
+      "CN-LAO": "#",
+      "CN-RU": "#",
+      "CN-JP": "#",
+      "CN-KR": "#",
+      "CN-MY": "#",
+      "CN-AR": "#",
+      "CN-FR": "#",
+      "EN": "#"
+    },
+    5: {
+      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
+      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/EN-Thai--Chapter%205-Cross-cultural%20HRM.pdf",
+      "CN-ID": "#",
+      "CN-LAO": "#",
+      "CN-RU": "#",
+      "CN-JP": "#",
+      "CN-KR": "#",
+      "CN-MY": "#",
+      "CN-AR": "#",
+      "CN-FR": "#",
+      "EN": "#"
+    }
+  };
+
+  /* 视频案例：第1章 + 第5章 */
+  const videoCases = [
+    {
+      id: "1",
+      chapter: 1,
+      title: "1. brag",
+      videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/%E7%AC%AC%E4%B8%80%E7%AB%A0%E8%A7%86%E9%A2%91/1.1brag.mp4",
+      subtitles: {
+        TH: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-thai.srt",
+        ID: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-ind.srt",
+        LAO: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Lao.srt",
+        BUR: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Bur.srt",
+        FR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Fra.srt",
+        RU:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Rus.srt",
+        JP:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Jap.srt",
+        KR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-kor.srt",
+        MY:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-mala.srt",
+        AR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-arab.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "5.1",
+      chapter: 5,
+      title: "5.1 Aoyou+Hyproca",
+      videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/5.1%20Aoyou%2BHyproca.mp4",
+      subtitles: {
+        EN:    "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.1%20en-Aoyou%2BHyproca.srt",
+        EN_TH: "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.1%20en%2Bthai-aoyou%2Bhyproca.srt"
+      },
+      subtitlePosition: "bottom",
+      subMode: "dualEnThai"
+    },
+    {
+      id: "5.2",
+      chapter: 5,
+      title: "5.2 TCL+Thomson",
+      videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/5.2%20TCL%2BTHOMSON%281%29.mp4",
+      subtitles: {
+        EN:    "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.2%20EN-TCL%2BTHOMSON%20.srt",
+        EN_TH: "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.2%20en%2Bthai-TCL%2BTHOMSON.srt"
+      },
+      subtitlePosition: "bottom",
+      subMode: "dualEnThai"
+    }
+  ];
+
+  /* 练习与任务资源列表 */
+  const exerciseResources = {
+    1: [
+      { id: "ex1", title: "Task 1A – 自我文化画像 / Cultural self-portrait" },
+      { id: "ex2", title: "Task 1B – Compare high/low context situations" }
+    ],
+    5: [
+      { id: "ch5-task1",      title: "Task 1 – Aoyou video case study" },
+      { id: "ch5-task2",      title: "Task 2 – TCL video case study" },
+      { id: "ch5-task3-case", title: "Task 3 – V company case (case text)" },
+      { id: "ch5-task3-task", title: "Task 3 – V company case analysis" }
+    ]
+  };
+
+  /* 练习与任务文件链接：全部使用你的 GitHub RAW 链接 */
+  const exerciseLinks = {
+    "ch5-task1": {
+      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.1%20en%2Bchn-aoyou%2Bhyproca%20.docx",
+      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.1%20EN%2BTHAI-aoyou%26hyproca.docx"
+    },
+    "ch5-task2": {
+      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.2-EN%2BCHN-TCL%26Thomson%20.docx",
+      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.2%20en%2Bthai%20TCL%26Thomson%20.docx"
+    },
+    "ch5-task3-case": {
+      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3%20(CSAE)en%2Bchn-V%20Company's%20Cross-border%20Acquisition.pdf",
+      "CN-TH": "#"
+    },
+    "ch5-task3-task": {
+      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BCHN-%20CASE%20ANALYSIS%20.docx",
+      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BTHAI-%20CASE%20ANALYSIS%20.docx"
+    }
+  };
+
+  const videoLanguageOptions = [
+    { value: "TH",  label: "泰语 Thai" },
+    { value: "ID",  label: "印尼语 Indonesian" },
+    { value: "LAO", label: "老挝语 Lao" },
+    { value: "BUR", label: "缅甸语 Burmese" },
+    { value: "FR",  label: "法语 French" },
+    { value: "RU",  label: "俄语 Russian" },
+    { value: "JP",  label: "日语 Japanese" },
+    { value: "KR",  label: "韩语 Korean" },
+    { value: "MY",  label: "马来语 Malay" },
+    { value: "AR",  label: "阿拉伯语 Arabic" }
+  ];
+
+  function getLangFullName(value) {
+    switch (value) {
+      case "CN-EN": return "Chinese + English";
+      case "CN-TH": return "Chinese + Thai";
+      case "CN-ID": return "Chinese + Indonesian";
+      case "CN-LAO": return "Chinese + Lao";
+      case "CN-RU": return "Chinese + Russian";
+      case "CN-JP": return "Chinese + Japanese";
+      case "CN-KR": return "Chinese + Korean";
+      case "CN-MY": return "Chinese + Malay";
+      case "CN-AR": return "Chinese + Arabic";
+      case "CN-FR": return "Chinese + French";
+      case "EN": return "English only";
+      default: return value;
+    }
+  }
+
+  function updateChapterHeader() {
+    const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
+    chapterTitleMain.textContent = cfg.title;
+    chapterSubtitleMain.textContent = cfg.subtitle;
+  }
+
+  function resetResourceListHint() {
+    resourceList.innerHTML = `
+      <div class="resource-list-title">
+        请选择右侧按钮以查看本章资源。<br>
+        Select a button above to view resources for this chapter.
+      </div>
+    `;
+  }
+
+  /* ✅ 改动的核心：通过 Google Docs Viewer 内嵌 PDF */
+  function updatePptView() {
+    const value = pptLangSelect.value;
+    const fullName = getLangFullName(value);
+    const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
+    const link = linksForChapter[value];
+
+    pptLangLabel.textContent = '当前版本：' + fullName;
+    pptPlaceholderLang.textContent = fullName;
+    pptPlaceholderLang2.textContent = fullName;
+
+    const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
+    pptPlaceholderTitle.textContent = cfg.pptLabelPrefix + ' (' + fullName + ')';
+
+    if (link && link !== '#') {
+      pptPlaceholderBody.style.display = 'none';
+      pptIframe.style.display = 'block';
+      // 用 Google Docs Viewer 来展示 PDF，避免浏览器强制下载
+      const viewerUrl = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(link);
+      pptIframe.src = viewerUrl;
+    } else {
+      pptIframe.style.display = 'none';
+      pptIframe.src = 'about:blank';
+      pptPlaceholderBody.style.display = 'block';
+    }
+  }
+
+  pptLangSelect.addEventListener('change', updatePptView);
+
+  pptDownloadBtn.addEventListener('click', () => {
+    const value = pptLangSelect.value;
+    const fullName = getLangFullName(value);
+    const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
+    const link = linksForChapter[value];
+    if (link && link !== '#') {
+      window.open(link, '_blank');
+    } else {
+      alert('当前语言版本的 PDF 尚未上传。\nPDF for ' + fullName + ' is not yet available.');
+    }
+  });
+
+  function closeAllFloatingWindows() {
+    document.querySelectorAll('.floating-window').forEach(w => w.remove());
+  }
+
+  chapterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chStr = btn.getAttribute('data-chapter');
+      const role = btn.getAttribute('data-role');
+      if (chStr === '1' || chStr === '5') {
+        currentChapter = parseInt(chStr, 10);
+        mainMenu.style.display = 'none';
+        chapterView.style.display = 'block';
+        closeAllFloatingWindows();
+        updateChapterHeader();
+        resetResourceListHint();
+        updatePptView();
+      } else if (role === 'final-task' || role === 'about-course') {
+        alert('该板块正在建设中，敬请期待。\nThis section is under construction.');
+      } else {
+        alert('当前仅开放第1章和第5章，其余章节尚未上线。\nOnly Chapters 1 and 5 are available at the moment.');
+      }
+    });
+  });
+
+  btnResetView.addEventListener('click', () => {
+    chapterView.style.display = 'none';
+    mainMenu.style.display = 'grid';
+    closeAllFloatingWindows();
+  });
+
+  function getVideoCasesForChapter(chapter) {
+    return videoCases.filter(vc => vc.chapter === chapter);
+  }
+
+  btnExercises.addEventListener('click', () => {
+    const list = exerciseResources[currentChapter] || [];
+    let html = `
+      <div class="resource-list-title">练习与任务 · Exercises &amp; Tasks</div>
+      <div class="resource-node">
+    `;
+    list.forEach(item => {
+      html += `
+        <div class="resource-item" data-type="exercise" data-id="${item.id}">
+          <div class="resource-bullet"></div>
+          <span>${item.title}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    resourceList.innerHTML = html;
+    attachResourceItemEvents();
+  });
+
+  btnVideos.addEventListener('click', () => {
+    const list = getVideoCasesForChapter(currentChapter);
+    let html = `
+      <div class="resource-list-title">视频案例 · Video Cases</div>
+      <div class="resource-node">
+    `;
+    list.forEach(vc => {
+      html += `
+        <div class="resource-item" data-type="video" data-id="${vc.id}">
+          <div class="resource-bullet"></div>
+          <span>${vc.title}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    resourceList.innerHTML = html;
+    attachResourceItemEvents();
+  });
+
+  function attachResourceItemEvents() {
+    resourceList.querySelectorAll('.resource-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const type = item.getAttribute('data-type');
+        const id = item.getAttribute('data-id');
+        const title = item.innerText.trim();
+        openFloatingWindow(type, id, title);
+      });
+    });
+  }
+
+  function populateLangSelectForResource(type, selectEl, resourceId) {
+    if (type === 'video') {
+      const meta = findVideoCase(resourceId);
+      if (meta && meta.subMode === 'dualEnThai') {
+        const opts = [
+          { value: "EN",    label: "English subtitles" },
+          { value: "EN_TH", label: "English + Thai subtitles" }
+        ];
+        opts.forEach(cfg => {
+          const opt = document.createElement('option');
+          opt.value = cfg.value;
+          opt.textContent = cfg.label;
+          selectEl.appendChild(opt);
+        });
+      } else {
+        videoLanguageOptions.forEach(cfg => {
+          const opt = document.createElement('option');
+          opt.value = cfg.value;
+          opt.textContent = cfg.label;
+          selectEl.appendChild(opt);
+        });
+      }
+    } else {
+      const opts = [
+        { value: "CN-EN", label: "Chinese + English" },
+        { value: "CN-TH", label: "Chinese + Thai" },
+        { value: "CN-ID", label: "Chinese + Indonesian" },
+        { value: "CN-LAO", label: "Chinese + Lao" },
+        { value: "CN-RU", label: "Chinese + Russian" },
+        { value: "CN-JP", label: "Chinese + Japanese" },
+        { value: "CN-KR", label: "Chinese + Korean" },
+        { value: "CN-MY", label: "Chinese + Malay" },
+        { value: "CN-AR", label: "Chinese + Arabic" },
+        { value: "CN-FR", label: "Chinese + French" },
+        { value: "EN",    label: "English only" }
+      ];
+      opts.forEach(cfg => {
+        const opt = document.createElement('option');
+        opt.value = cfg.value;
+        opt.textContent = cfg.label;
+        selectEl.appendChild(opt);
+      });
+    }
+  }
+
+  function findVideoCase(id) {
+    return videoCases.find(v => v.id === id) || null;
+  }
+
+  function srtTimeToSeconds(t) {
+    const parts = t.replace(',', '.').split(':');
+    const h = parseInt(parts[0], 10) || 0;
+    const m = parseInt(parts[1], 10) || 0;
+    const s = parseFloat(parts[2]) || 0;
+    return h * 3600 + m * 60 + s;
+  }
+
+  function parseSrt(text) {
+    const cues = [];
+    const blocks = text.replace(/\r/g, '').split('\n\n');
+    blocks.forEach(block => {
+      const lines = block.trim().split('\n');
+      if (lines.length < 2) return;
+      let idx = 0;
+      if (/^\d+$/.test(lines[0].trim())) idx = 1;
+      const timeLine = lines[idx].trim();
+      const m = timeLine.match(/(\d+:\d+:\d+[,\.]\d+)\s*-->\s*(\d+:\d+:\d+[,\.]\d+)/);
+      if (!m) return;
+      const start = srtTimeToSeconds(m[1]);
+      const end = srtTimeToSeconds(m[2]);
+      const textLines = lines.slice(idx + 1).join('<br>');
+      cues.push({ start, end, text: textLines });
+    });
+    cues.sort((a, b) => a.start - b.start);
+    return cues;
+  }
+
+  function openFloatingWindow(type, id, titleText) {
+    const existing = document.querySelectorAll('.floating-window');
+    if (existing.length >= 3) {
+      alert('Please close one window before opening another. (最多打开3个窗口)');
+      return;
+    }
+    const win = document.createElement('div');
+    win.className = 'floating-window';
+    win.style.zIndex = ++currentZ;
+
+    const header = document.createElement('div');
+    header.className = 'floating-header';
+
+    const title = document.createElement('div');
+    title.className = 'floating-title';
+    title.textContent = titleText;
+
+    const controls = document.createElement('div');
+    controls.className = 'floating-controls';
+
+    const langSelect = document.createElement('select');
+    langSelect.className = 'floating-lang-select';
+    populateLangSelectForResource(type, langSelect, id);
+
+    const btnFull = document.createElement('button');
+    btnFull.className = 'btn-icon';
+    btnFull.title = 'Full screen';
+    btnFull.textContent = '⛶';
+
+    const btnClose = document.createElement('button');
+    btnClose.className = 'btn-icon';
+    btnClose.title = 'Close';
+    btnClose.textContent = '✕';
+
+    controls.appendChild(langSelect);
+    controls.appendChild(btnFull);
+    controls.appendChild(btnClose);
+    header.appendChild(title);
+    header.appendChild(controls);
+
+    const body = document.createElement('div');
+    body.className = 'floating-body';
+
+    if (type === 'video') {
+      const meta = findVideoCase(id);
+      if (!meta) {
+        body.innerHTML = '<p>Video metadata not found.</p>';
+      } else {
+        const videoWrapper = document.createElement('div');
+        videoWrapper.className = 'floating-video-wrapper';
+
+        const videoEl = document.createElement('video');
+        videoEl.controls = true;
+        videoEl.playsInline = true;
+        videoEl.src = meta.videoUrl;
+        videoEl.preload = 'metadata';
+        videoWrapper.appendChild(videoEl);
+        body.appendChild(videoWrapper);
+
+        const subtitleOverlay = document.createElement('div');
+        const overlayClass = meta.subtitlePosition === 'bottom'
+          ? 'video-subtitle-overlay video-subtitle-overlay-bottom'
+          : 'video-subtitle-overlay video-subtitle-overlay-top';
+        subtitleOverlay.className = overlayClass;
+        subtitleOverlay.textContent = '';
+        videoWrapper.appendChild(subtitleOverlay);
+
+        const langNote = document.createElement('div');
+        langNote.className = 'video-lang-note';
+        if (meta.chapter === 5) {
+          langNote.innerHTML = `
+            本视频底部集中显示英文或英泰双语字幕（从 GitHub Raw SRT 自动加载）。<br>
+            请选择上方字幕语言（English / English + Thai）切换字幕版本。
+          `;
+        } else {
+          langNote.innerHTML = `
+            视频画面底部自带中英文字幕。<br>
+            这里选择的语言为屏幕中部/底部的辅助字幕（SRT 文件，随视频框大小自适应）。
+          `;
+        }
+        body.appendChild(langNote);
+
+        let currentCues = [];
+        let lastActiveIndex = -1;
+
+        function loadSubtitlesFor(langCode) {
+          const url = meta.subtitles[langCode];
+          const label = langSelect.options[langSelect.selectedIndex]?.textContent || langCode;
+          if (!url) {
+            currentCues = [];
+            lastActiveIndex = -1;
+            subtitleOverlay.innerHTML = `<span style="font-size:0.8em;opacity:0.85;">No subtitles for ${label}</span>`;
+            return;
+          }
+          subtitleOverlay.innerHTML = '<span style="font-size:0.8em;opacity:0.85;">Loading subtitles...</span>';
+          fetch(url)
+            .then(r => r.text())
+            .then(txt => {
+              currentCues = parseSrt(txt);
+              lastActiveIndex = -1;
+              subtitleOverlay.textContent = '';
+            })
+            .catch(err => {
+              console.error(err);
+              currentCues = [];
+              lastActiveIndex = -1;
+              subtitleOverlay.innerHTML = `<span style="font-size:0.8em;opacity:0.85;">无法加载字幕 (${label})</span>`;
+            });
+        }
+
+        function updateSubtitle() {
+          if (!currentCues.length) {
+            if (subtitleOverlay.innerHTML && subtitleOverlay.innerHTML.indexOf('Loading subtitles') === -1) {
+              // 保留“没有字幕/无法加载”提示
+            } else {
+              subtitleOverlay.textContent = '';
+            }
+            return;
+          }
+          const t = videoEl.currentTime;
+          let idx = lastActiveIndex;
+          let cue = null;
+
+          if (idx >= 0 && idx < currentCues.length) {
+            const c = currentCues[idx];
+            if (t >= c.start && t <= c.end) {
+              cue = c;
+            } else if (t > c.end && idx + 1 < currentCues.length) {
+              for (let i = idx + 1; i < currentCues.length; i++) {
+                const cc = currentCues[i];
+                if (t < cc.start) break;
+                if (t >= cc.start && t <= cc.end) {
+                  cue = cc;
+                  idx = i;
+                  break;
+                }
+              }
+            } else {
+              for (let i = 0; i < currentCues.length; i++) {
+                const cc = currentCues[i];
+                if (t < cc.start) break;
+                if (t >= cc.start && t <= cc.end) {
+                  cue = cc;
+                  idx = i;
+                  break;
+                }
+              }
+            }
+          } else {
+            for (let i = 0; i < currentCues.length; i++) {
+              const cc = currentCues[i];
+              if (t < cc.start) break;
+              if (t >= cc.start && t <= cc.end) {
+                cue = cc;
+                idx = i;
+                break;
+              }
+            }
+          }
+
+          if (cue) {
+            lastActiveIndex = idx;
+            subtitleOverlay.innerHTML = cue.text;
+          } else {
+            lastActiveIndex = -1;
+            subtitleOverlay.textContent = '';
+          }
+        }
+
+        videoEl.addEventListener('timeupdate', updateSubtitle);
+        videoEl.addEventListener('seeking', () => { lastActiveIndex = -1; });
+
+        langSelect.addEventListener('change', () => {
+          const currentLang = langSelect.value;
+          loadSubtitlesFor(currentLang);
+        });
+
+        if (!langSelect.value && langSelect.options.length > 0) {
+          langSelect.value = langSelect.options[0].value;
+        }
+        loadSubtitlesFor(langSelect.value);
+      }
+    } else {
+      const info = document.createElement('p');
+
+      if (type === 'exercise' && currentChapter === 5) {
+        info.innerHTML = `
+          <strong>第五章 · 任务与练习说明</strong><br>
+          本窗口主要提供任务文件的下载功能，文件格式为 Word/PDF。<br>
+          请点击下方 “Download task file” 按钮，将文件下载到电脑或手机中再打开阅读与填写。<br>
+          （系统本身不做在线预览，以保证在不同设备上的兼容性。）
+        `;
+      } else {
+        info.innerHTML = `
+          <strong>Demo content · 模拟内容</strong><br>
+          Type: <code>${type}</code>, ID: <code>${id}</code>.<br>
+          在这里将显示该资源的具体内容，例如文本案例的双语段落、练习说明，或嵌入视频播放器。<br>
+          Here you would see the actual content of this resource: bilingual text case, exercise description, or embedded video player.
+        `;
+      }
+
+      body.appendChild(info);
+
+      const langHint = document.createElement('p');
+      langHint.style.marginTop = '8px';
+      langHint.style.fontSize = '0.78rem';
+      langHint.style.opacity = '0.85';
+      langHint.innerHTML = `
+        当前语言版本：<span class="floating-lang-display">Chinese + English</span><br>
+        Current language version for this resource: <span class="floating-lang-display">Chinese + English</span>.
+      `;
+      body.appendChild(langHint);
+
+      if (type === 'exercise') {
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn-ghost';
+        dlBtn.style.marginTop = '8px';
+        dlBtn.textContent = '⬇ Download task file';
+        dlBtn.addEventListener('click', () => {
+          const langCode = langSelect.value;
+          const linksForId = exerciseLinks[id];
+          if (linksForId && linksForId[langCode] && linksForId[langCode] !== '#') {
+            window.open(linksForId[langCode], '_blank');
+          } else {
+            alert('当前语言版本的任务文件尚未上传或暂不可用。\nThis file for the selected language is not yet available.');
+          }
+        });
+        body.appendChild(dlBtn);
+      }
+
+      langSelect.addEventListener('change', () => {
+        const v = langSelect.value;
+        const full = getLangFullName(v);
+        win.querySelectorAll('.floating-lang-display').forEach(el => el.textContent = full);
+      });
+    }
+
+    const footer = document.createElement('div');
+    footer.className = 'floating-footer';
+    footer.textContent = '提示：窗口可拖动、可调整大小。再次点击 ⛶ 退出全屏 / The window is draggable and resizable.';
+
+    win.appendChild(header);
+    win.appendChild(body);
+    win.appendChild(footer);
+    document.body.appendChild(win);
+
+    btnClose.addEventListener('click', () => win.remove());
+    btnFull.addEventListener('click', () => {
+      win.classList.toggle('fullscreen');
+      win.style.zIndex = ++currentZ;
+    });
+
+    makeDraggable(win, header);
+  }
+
+  function makeDraggable(win, dragHandle) {
+    let isDown = false;
+    let offsetX = 0;
+    let offsetY = 0;
+    dragHandle.addEventListener('mousedown', (e) => {
+      if (e.target.tagName.toLowerCase() === 'button' ||
+          e.target.tagName.toLowerCase() === 'select') return;
+      isDown = true;
+      win.style.zIndex = ++currentZ;
+      const rect = win.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+    function onMouseMove(e) {
+      if (!isDown) return;
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      win.style.left = x + 'px';
+      win.style.top = y + 'px';
+    }
+    function onMouseUp() {
+      isDown = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+  }
+
+  // 初始化
+  chapterView.style.display = 'none';
+  updateChapterHeader();
+  resetResourceListHint();
+  updatePptView();
+</script>
+
+</body>
+</html>
