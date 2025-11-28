@@ -54,7 +54,6 @@
       gap: 12px;
     }
 
-    /* 主菜单 */
     #main-menu {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -222,7 +221,9 @@
       font-size: 0.85rem;
       line-height: 1.5;
     }
-    #ppt-iframe {
+
+    /* 用 embed 显示 PDF */
+    #ppt-embed {
       flex: 1;
       width: 100%;
       border: 0;
@@ -404,7 +405,6 @@
       text-align: center;
     }
 
-    /* 视频容器 & 自定义字幕样式 */
     .floating-video-wrapper {
       position: relative;
       width: 100%;
@@ -563,13 +563,13 @@
                 Students can scroll through slides and use the Download button to get the current language version as a PDF.
               </p>
               <p style="margin-top:8px;font-size:0.78rem;opacity:0.8;">
-                说明：PPT 现通过 Google Docs Viewer 在线预览，不会自动下载；若学校网络限制 Google 服务，则可用 Download 按钮直接下载本地打开。<br>
-                Note: Slides use Google Docs Viewer for inline preview; if Google services are blocked on campus, use the Download button to open the file locally.
+                说明：PPT 由浏览器自带的 PDF 阅读器直接打开，不依赖任何国外服务；如个别浏览器选择直接下载，也可通过 Download 按钮手动打开。<br>
+                Note: Slides are opened by the browser’s built-in PDF viewer (no external services). If your browser downloads instead of previewing, simply use the Download button.
               </p>
             </div>
 
-            <!-- PDF iframe -->
-            <iframe id="ppt-iframe"></iframe>
+            <!-- ✅ 用 embed 来内嵌 PDF -->
+            <embed id="ppt-embed" type="application/pdf" />
           </div>
         </div>
 
@@ -623,7 +623,7 @@
   const pptPlaceholderLang2 = document.getElementById('ppt-placeholder-lang2');
   const pptDownloadBtn = document.getElementById('ppt-download-btn');
   const pptPlaceholderBody = document.getElementById('ppt-placeholder-body');
-  const pptIframe = document.getElementById('ppt-iframe');
+  const pptEmbed = document.getElementById('ppt-embed');
 
   const btnResetView = document.getElementById('btn-reset-view');
   const resourceList = document.getElementById('resource-list');
@@ -649,11 +649,11 @@
     }
   };
 
-  /* PPT 链接：第1章保持原有仓库，第5章用你提供的 GitHub 链接 */
+  /* ✅ PPT 链接走 jsDelivr */
   const pptLinksByChapter = {
     1: {
-      "CN-EN": "https://raw.githubusercontent.com/steven2025/CCM/4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+chn-Chapter%202.pdf",
-      "CN-TH": "https://raw.githubusercontent.com/steven2025/CCM/4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+thai-chapter%202.pdf",
+      "CN-EN": "https://cdn.jsdelivr.net/gh/steven2025/CCM@4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+chn-Chapter%202.pdf",
+      "CN-TH": "https://cdn.jsdelivr.net/gh/steven2025/CCM@4f69b6b09d7ded928909c8a23f33626f8e191d99/pdf-en+thai-chapter%202.pdf",
       "CN-ID": "#",
       "CN-LAO": "#",
       "CN-RU": "#",
@@ -665,8 +665,8 @@
       "EN": "#"
     },
     5: {
-      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
-      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/EN-Thai--Chapter%205-Cross-cultural%20HRM.pdf",
+      "CN-EN": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
+      "CN-TH": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/EN-Thai--Chapter%205-Cross-cultural%20HRM.pdf",
       "CN-ID": "#",
       "CN-LAO": "#",
       "CN-RU": "#",
@@ -679,7 +679,8 @@
     }
   };
 
-  /* 视频案例：第1章 + 第5章 */
+  /* 视频案例和练习任务（保持你之前那一版不变） */
+
   const videoCases = [
     {
       id: "1",
@@ -687,16 +688,16 @@
       title: "1. brag",
       videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/%E7%AC%AC%E4%B8%80%E7%AB%A0%E8%A7%86%E9%A2%91/1.1brag.mp4",
       subtitles: {
-        TH: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-thai.srt",
-        ID: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-ind.srt",
-        LAO: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Lao.srt",
-        BUR: "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Bur.srt",
-        FR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Fra.srt",
-        RU:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Rus.srt",
-        JP:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-Jap.srt",
-        KR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-kor.srt",
-        MY:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-mala.srt",
-        AR:  "https://raw.githubusercontent.com/steven2025/CCM/refs/heads/main/1.brag-arab.srt"
+        TH:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-thai.srt",
+        ID:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-ind.srt",
+        LAO: "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-Lao.srt",
+        BUR: "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-Bur.srt",
+        FR:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-Fra.srt",
+        RU:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-Rus.srt",
+        JP:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-Jap.srt",
+        KR:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-kor.srt",
+        MY:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-mala.srt",
+        AR:  "https://cdn.jsdelivr.net/gh/steven2025/CCM@main/1.brag-arab.srt"
       },
       subtitlePosition: "top",
       subMode: "multiLang"
@@ -707,8 +708,8 @@
       title: "5.1 Aoyou+Hyproca",
       videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/5.1%20Aoyou%2BHyproca.mp4",
       subtitles: {
-        EN:    "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.1%20en-Aoyou%2BHyproca.srt",
-        EN_TH: "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.1%20en%2Bthai-aoyou%2Bhyproca.srt"
+        EN:    "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@main/5.1%20en-Aoyou%2BHyproca.srt",
+        EN_TH: "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@main/5.1%20en%2Bthai-aoyou%2Bhyproca.srt"
       },
       subtitlePosition: "bottom",
       subMode: "dualEnThai"
@@ -719,15 +720,14 @@
       title: "5.2 TCL+Thomson",
       videoUrl: "https://cro-cul-mgt1-1311686407.cos.ap-chongqing.myqcloud.com/5.2%20TCL%2BTHOMSON%281%29.mp4",
       subtitles: {
-        EN:    "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.2%20EN-TCL%2BTHOMSON%20.srt",
-        EN_TH: "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/refs/heads/main/5.2%20en%2Bthai-TCL%2BTHOMSON.srt"
+        EN:    "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@main/5.2%20EN-TCL%2BTHOMSON%20.srt",
+        EN_TH: "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@main/5.2%20en%2Bthai-TCL%2BTHOMSON.srt"
       },
       subtitlePosition: "bottom",
       subMode: "dualEnThai"
     }
   ];
 
-  /* 练习与任务资源列表 */
   const exerciseResources = {
     1: [
       { id: "ex1", title: "Task 1A – 自我文化画像 / Cultural self-portrait" },
@@ -741,23 +741,22 @@
     ]
   };
 
-  /* 练习与任务文件链接：全部使用你的 GitHub RAW 链接 */
   const exerciseLinks = {
     "ch5-task1": {
-      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.1%20en%2Bchn-aoyou%2Bhyproca%20.docx",
-      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.1%20EN%2BTHAI-aoyou%26hyproca.docx"
+      "CN-EN": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.1%20en%2Bchn-aoyou%2Bhyproca%20.docx",
+      "CN-TH": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.1%20EN%2BTHAI-aoyou%26hyproca.docx"
     },
     "ch5-task2": {
-      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.2-EN%2BCHN-TCL%26Thomson%20.docx",
-      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.2%20en%2Bthai%20TCL%26Thomson%20.docx"
+      "CN-EN": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.2-EN%2BCHN-TCL%26Thomson%20.docx",
+      "CN-TH": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.2%20en%2Bthai%20TCL%26Thomson%20.docx"
     },
     "ch5-task3-case": {
-      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3%20(CSAE)en%2Bchn-V%20Company's%20Cross-border%20Acquisition.pdf",
+      "CN-EN": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.3%20(CSAE)en%2Bchn-V%20Company's%20Cross-border%20Acquisition.pdf",
       "CN-TH": "#"
     },
     "ch5-task3-task": {
-      "CN-EN": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BCHN-%20CASE%20ANALYSIS%20.docx",
-      "CN-TH": "https://raw.githubusercontent.com/yanqinghua2023-creator/CCM/a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BTHAI-%20CASE%20ANALYSIS%20.docx"
+      "CN-EN": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BCHN-%20CASE%20ANALYSIS%20.docx",
+      "CN-TH": "https://cdn.jsdelivr.net/gh/yanqinghua2023-creator/CCM@a698485cc233812883e37864c147ba6a2a1e150e/5.3EN%2BTHAI-%20CASE%20ANALYSIS%20.docx"
     }
   };
 
@@ -806,7 +805,7 @@
     `;
   }
 
-  /* ✅ 改动的核心：通过 Google Docs Viewer 内嵌 PDF */
+  /* ✅ 使用 embed 显示 PDF，并在切换章节/语言时先清空旧内容 */
   function updatePptView() {
     const value = pptLangSelect.value;
     const fullName = getLangFullName(value);
@@ -820,15 +819,15 @@
     const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
     pptPlaceholderTitle.textContent = cfg.pptLabelPrefix + ' (' + fullName + ')';
 
+    // 先清空旧的 PDF（避免仍显示上一章）
+    pptEmbed.src = 'about:blank';
+
     if (link && link !== '#') {
       pptPlaceholderBody.style.display = 'none';
-      pptIframe.style.display = 'block';
-      // 用 Google Docs Viewer 来展示 PDF，避免浏览器强制下载
-      const viewerUrl = 'https://docs.google.com/gview?embedded=true&url=' + encodeURIComponent(link);
-      pptIframe.src = viewerUrl;
+      pptEmbed.style.display = 'block';
+      pptEmbed.src = link;  // 让浏览器用内置 PDF 插件/阅读器显示
     } else {
-      pptIframe.style.display = 'none';
-      pptIframe.src = 'about:blank';
+      pptEmbed.style.display = 'none';
       pptPlaceholderBody.style.display = 'block';
     }
   }
@@ -1078,7 +1077,7 @@
         langNote.className = 'video-lang-note';
         if (meta.chapter === 5) {
           langNote.innerHTML = `
-            本视频底部集中显示英文或英泰双语字幕（从 GitHub Raw SRT 自动加载）。<br>
+            本视频底部集中显示英文或英泰双语字幕（从 GitHub CDN SRT 自动加载）。<br>
             请选择上方字幕语言（English / English + Thai）切换字幕版本。
           `;
         } else {
@@ -1195,7 +1194,7 @@
       if (type === 'exercise' && currentChapter === 5) {
         info.innerHTML = `
           <strong>第五章 · 任务与练习说明</strong><br>
-          本窗口主要提供任务文件的下载功能，文件格式为 Word/PDF。<br>
+          本窗口主要提供任务文件的下载功能，文件格式为 Word/PDF（托管在 GitHub，经 jsDelivr 加速）。<br>
           请点击下方 “Download task file” 按钮，将文件下载到电脑或手机中再打开阅读与填写。<br>
           （系统本身不做在线预览，以保证在不同设备上的兼容性。）
         `;
