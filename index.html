@@ -309,9 +309,9 @@
       position: fixed;
       top: 120px;
       left: 120px;
-      width: 600px; /* 进一步增加宽度 */
+      width: 600px;
       min-width: 500px;
-      min-height: 500px; /* 增加最小高度 */
+      min-height: 500px;
       max-width: 90vw;
       max-height: 85vh;
       background: rgba(15,18,30,0.96);
@@ -332,7 +332,7 @@
       gap: 8px;
       cursor: move;
       user-select: none;
-      flex-shrink: 0; /* 防止header被压缩 */
+      flex-shrink: 0;
     }
     .floating-title {
       font-size: 0.85rem;
@@ -358,7 +358,7 @@
       border-top: 1px solid rgba(255,255,255,0.06);
       font-size: 0.75rem;
       opacity: 0.75;
-      flex-shrink: 0; /* 防止footer被压缩 */
+      flex-shrink: 0;
     }
     .btn-icon {
       width: 22px;
@@ -455,15 +455,15 @@
       opacity: 0.85;
     }
 
-    /* 文件预览样式 - 彻底优化 */
+    /* 文件预览样式 */
     .file-preview-container {
       width: 100%;
       flex: 1; /* 占据所有可用空间 */
-      min-height: 400px; /* 增加最小高度 */
+      min-height: 400px;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px;
       overflow: hidden;
-      background: transparent; /* 确保背景透明 */
+      background: transparent;
     }
     .preview-note {
       font-size: 0.75rem;
@@ -480,15 +480,9 @@
       border-radius: 4px;
       background: rgba(59,66,82,0.5);
     }
-    .subtitle-loading {
-      color: #88c0ff;
-    }
-    .subtitle-error {
-      color: #bf616a;
-    }
-    .subtitle-success {
-      color: #a3be8c;
-    }
+    .subtitle-loading { color: #88c0ff; }
+    .subtitle-error { color: #bf616a; }
+    .subtitle-success { color: #a3be8c; }
     
     /* 下载按钮样式 */
     .download-section {
@@ -496,51 +490,33 @@
       padding: 8px;
       border-top: 1px solid rgba(255,255,255,0.1);
       text-align: center;
-      flex-shrink: 0; /* 防止下载区域被压缩 */
+      flex-shrink: 0;
     }
 
-    /* 任务说明样式 */
-    .task-instructions {
-      font-size: 0.78rem;
-      opacity: 0.85;
-      margin-bottom: 8px;
-      padding: 6px;
-      background: rgba(59,66,82,0.3);
-      border-radius: 6px;
+    /* 练习窗口优化 */
+    .exercise-preview-window {
+      min-height: 80vh;
     }
-
-    /* 预览窗口内容区域 - 彻底优化 */
-    .preview-content-area {
+    .exercise-preview-window .floating-body {
+      padding: 0;
       flex: 1;
       display: flex;
       flex-direction: column;
-      min-height: 0; /* 重要：防止flex溢出 */
-    }
-
-    /* 专门为练习窗口优化的样式 - 修复空白问题 */
-    .exercise-preview-window {
-      min-height: 80vh; /* 增加最小高度，减少空白 */
-    }
-    .exercise-preview-window .floating-body {
-      padding: 0; /* 移除内边距，让iframe完全填充 */
-      flex: 1; /* 确保body占据所有空间 */
-      display: flex; /* 使用flex布局 */
-      flex-direction: column; /* 垂直排列 */
     }
     .exercise-preview-window .file-preview-container {
-      border-radius: 0; /* 移除边框圆角，完全填充 */
-      border: none; /* 移除边框 */
-      min-height: 0; /* 移除最小高度限制 */
-      flex: 1; /* 占据所有可用空间 */
-      display: flex; /* 使用flex布局 */
+      border-radius: 0;
+      border: none;
+      min-height: 0;
+      flex: 1;
+      display: flex;
     }
     .exercise-preview-window .file-preview-iframe {
-      flex: 1; /* 占据所有可用空间 */
-      min-height: 0; /* 移除最小高度限制 */
+      flex: 1;
+      min-height: 0;
     }
     .exercise-preview-window .download-section {
-      margin-top: 0; /* 移除顶部边距 */
-      padding: 6px 0; /* 减少上下内边距 */
+      margin-top: 0;
+      padding: 6px 0;
     }
   </style>
 </head>
@@ -580,11 +556,11 @@
         <div class="card-btn-title">第五章</div>
         <div class="card-btn-sub">Chapter 5 – Cross-cultural HRM</div>
       </div>
-      <div class="card-btn coming-soon" data-chapter="6">
+      <div class="card-btn" data-chapter="6">
         <div class="card-btn-title">第六章</div>
         <div class="card-btn-sub">Chapter 6</div>
       </div>
-      <div class="card-btn coming-soon" data-role="final-task">
+      <div class="card-btn" data-role="final-task">
         <div class="card-btn-title">期末任务</div>
         <div class="card-btn-sub">Final Task</div>
       </div>
@@ -690,8 +666,8 @@
           </div>
 
           <div class="hint">
-            提示：目前已开放第 1 章和第 5 章，其余章节暂未上线。<br>
-            Hint: Chapters 1 and 5 are currently available. Other chapters are not yet implemented.
+            提示：目前已开放第 1、5、6 章和期末任务，其余章节暂未上线。<br>
+            Hint: Chapters 1, 5, 6 and Final Assignment are currently available. Other chapters are not yet implemented.
           </div>
         </div>
       </div>
@@ -725,6 +701,32 @@
   let currentChapter = 1;
   let currentZ = 1500;
 
+  // 构建 COS 文档预览链接，统一用于 PDF / Word / Excel 等文件的在线预览
+  // dstType 通常可用：html / pdf / png 等（取决于 COS 文档预览能力与对象类型）
+  function buildCosPreviewUrl(rawUrl, dstType = 'html') {
+    if (!rawUrl) return '';
+    // 如果已经包含 COS 文档预览参数，则直接返回（但允许外部明确传入 dstType 时覆盖）
+    if (rawUrl.includes('ci-process=doc-preview')) {
+      // 如链接里已指定 dstType，则尊重原链接；否则按传入 dstType 补齐
+      if (rawUrl.includes('dstType=')) return rawUrl;
+      const sep0 = rawUrl.includes('?') ? '&' : '?';
+      return rawUrl + sep0 + 'dstType=' + encodeURIComponent(dstType);
+    }
+    const sep = rawUrl.includes('?') ? '&' : '?';
+    return rawUrl + sep + 'ci-process=doc-preview&dstType=' + encodeURIComponent(dstType);
+  }
+
+  // 构建“浏览器原生 PDF 预览”链接：通过 COS 的 response-* 参数尽量强制 inline 展示，避免部分浏览器直接下载
+  // 注意：若对象链接是预签名 URL，追加参数可能导致签名失效；当前页面使用的是公开对象链接，因此可用。
+  function buildInlinePdfUrl(rawUrl) {
+    if (!rawUrl) return '';
+    if (rawUrl.includes('response-content-disposition=')) return rawUrl;
+    const sep = rawUrl.includes('?') ? '&' : '?';
+    return rawUrl
+      + sep + 'response-content-disposition=' + encodeURIComponent('inline')
+      + '&response-content-type=' + encodeURIComponent('application/pdf');
+  }
+
   const chapterConfigs = {
     1: {
       title: '第一章 · Chapter 1',
@@ -735,46 +737,48 @@
       title: '第五章 · Chapter 5 – Cross-cultural HRM',
       subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
       pptLabelPrefix: 'Chapter 5 PPT'
+    },
+    6: {
+      title: '第六章 · Chapter 6',
+      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      pptLabelPrefix: 'Chapter 6 PPT'
+    },
+    'final': {
+      title: '期末任务 · Final Assignment',
+      subtitle: '双语课件 & 任务资源 · Bilingual slides & assignment resources',
+      pptLabelPrefix: 'Final Assignment PPT'
     }
   };
 
-  /* 更新第一章和第五章PPT链接到腾讯云 */
+  /* 更新PPT链接 (第6章和期末任务) */
   const pptLinksByChapter = {
     1: {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BCHN%20%E7%AC%AC%E4%B8%80%E7%AB%A0Chapter%201.pdf",
       "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BThai%20%E7%AC%AC%E4%B8%80%E7%AB%A0Chapter%201.pdf",
-      "CN-ID": "#",
-      "CN-LAO": "#",
-      "CN-RU": "#",
-      "CN-JP": "#",
-      "CN-KR": "#",
-      "CN-MY": "#",
-      "CN-AR": "#",
-      "CN-FR": "#",
-      "EN": "#"
+      "CN-ID": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BIndo%20%20Chapter%201.pdf", "CN-LAO": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BLao%20Chapter%201.pdf", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
     },
     5: {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
       "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/EN-Thai--Chapter%205-Cross-cultural%20HRM.pdf",
-      "CN-ID": "#",
-      "CN-LAO": "#",
-      "CN-RU": "#",
-      "CN-JP": "#",
-      "CN-KR": "#",
-      "CN-MY": "#",
-      "CN-AR": "#",
-      "CN-FR": "#",
-      "EN": "#"
+      "CN-ID": "#", "CN-LAO": "#", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
+    },
+    6: {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/en%2Bchn-Chapter%206-Cross-cultural%20HRM.pdf",
+      "CN-TH": "#", "CN-ID": "#", "CN-LAO": "#", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
+    },
+    'final': {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/en%2Bchn-Final%20Assignment.pdf",
+      "CN-TH": "#", "CN-ID": "#", "CN-LAO": "#", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
     }
   };
 
-  /* 更新视频案例数据 - 修复字幕URL */
+  /* 更新视频案例数据 */
   const videoCases = [
     {
       id: "1",
       chapter: 1,
       title: "1. brag",
-      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.brag.mp4",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.1brag.mp4",
       subtitles: {
         TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.brag-thai.srt",
         ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.brag-ind.srt",
@@ -789,6 +793,102 @@
       subtitlePosition: "top",
       subMode: "multiLang"
     },
+    {
+      id: "1.2",
+      chapter: 1,
+      title: "1.2 culture interpretor",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.2%20culture%20interpretor.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.2-en-culture%20interpretor_th.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.2-en-culture%20interpretor_id.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.2-en-culture%20interpretor_lo.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.3",
+      chapter: 1,
+      title: "1.3 work place - china vs europe",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.3-work%20place-china-vs-europe.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.3-en-work%20place-China-Europ_th.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.3-en-work%20place-China-Europ_id.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.3-en-work%20place-China-Europ_lo.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.4",
+      chapter: 1,
+      title: "1.4 Mosuo Culture",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.4-Mosuo%20Culture.mp4",
+      subtitles: {
+        CHN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.4-chn-mosuo.srt",
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.4-en-Mosuo_th.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.4-en-Mosuo_id.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.4-en-Mosuo_lo.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.5",
+      chapter: 1,
+      title: "1.5 American in Korea",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.5-American%20in%20Korea.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.5-th-American%20in%20Korea.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.5-id-American%20in%20Korea.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.5-lo-American%20in%20Korea.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.6",
+      chapter: 1,
+      title: "1.6 Movie1 - American Factory",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie1-American%20Factory.mp4",
+      subtitles: {
+        CHN: "#",
+        TH: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/american%20factory_thai_english.srt",
+        ID: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/american-facory_indonesian_english.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/american-factory_lao_english.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.7",
+      chapter: 1,
+      title: "1.7 Movie2 - Gung Ho",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie2-GungHo.mp4",
+      subtitles: {
+        CHN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/CHN-GUNGHO.srt",
+        TH: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/GUNGHO_TH_EN_merged.srt",
+        ID: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/GUNGHO_ID_EN_merged.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/GUNGHO_LO_EN_merged.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "1.8",
+      chapter: 1,
+      title: "1.8 Movie3 - Outsourced",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie3-Outsourced.mp4",
+      subtitles: {
+        CHN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/chn-%20Outsourced.srt",
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/thai-SRT.Outsourced.2006.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/indo-.Outsourced.2006.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/lao.Outsourced.2006.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+
     {
       id: "5.1",
       chapter: 5,
@@ -812,24 +912,89 @@
       },
       subtitlePosition: "bottom",
       subMode: "dualEnThai"
+    },
+    {
+      id: "5.4",
+      chapter: 5,
+      title: "5.4 Labor contract in German",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.4-Labor%20contract%20in%20German.mp4",
+      subtitles: {
+        EN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.4-en-employement%20contract%20in%20germany.srt"
+      },
+      subtitlePosition: "bottom",
+      subMode: "standard"
+    },
+    {
+      id: "5.5",
+      chapter: 5,
+      title: "5.5 Startimes",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.5-Startimes.mp4",
+      subtitles: {
+        EN:     "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.5-en-startimes.srt",
+        TH_EN:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.5-thai%2Ben-startimes.srt",
+        ID_EN:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.5-Indo%2Ben-startimes.srt",
+        LAO_EN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.5-lao%2Ben-startimes.srt"
+      },
+      subtitlePosition: "bottom",
+      subMode: "mix55"
     }
   ];
 
+  /* 练习资源列表 */
   const exerciseResources = {
     1: [
-      { id: "ex1", title: "Task 1A – 自我文化画像 / Cultural self-portrait" },
-      { id: "ex2", title: "Task 1B – Compare high/low context situations" }
+      { 
+        id: "ch1-task1",
+        title: "Task1 - CTBU international students culture adaptation analysis",
+        children: [
+          { id: "ch1-task1-attach1", title: "1.1 Attachment 1 - Group Task: Survey and Analysis on Cultural Adaptation of International Students at CTBU" },
+          { id: "ch1-task1-attach2", title: "1.2 Attachment 2 - Blank questionnaire" },
+          { id: "ch1-task1-attach3", title: "1.3 Attachment 3 - Raw data (Excel): CTBU international students culture survey" }
+        ]
+      }
     ],
     5: [
       { id: "ch5-task1",      title: "Task 1 – Aoyou video case study" },
       { id: "ch5-task2",      title: "Task 2 – TCL video case study" },
       { id: "ch5-task3-case", title: "Task 3 – V company case (case text)" },
-      { id: "ch5-task3-task", title: "Task 3 – V company case analysis" }
+      { id: "ch5-task3-task", title: "Task 3 – V company case analysis" },
+      { id: "ch5-task4-work", title: "Task 5.4 – Cross-cultural HRM work plan (Excel)" }
+    ],
+    6: [
+      { id: "ch6-1-case", title: "6.1 Haier+Sanyo (Case)" },
+      { id: "ch6-1-ques", title: "6.1 Haier+Sanyo (Questions)" },
+      { id: "ch6-2-case", title: "6.2 Sihe Technology (Case)" },
+      { id: "ch6-2-ques", title: "6.2 Sihe Technology (Questions)" },
+      { id: "ch6-3-data", title: "6.3 Raw Data for Expat Assignment (Excel)" },
+      { id: "ch6-3-web1", title: "6.3 Website: Cost of Living (numbeo)" },
+      { id: "ch6-3-web2", title: "6.3 App: Expat Compensation Package" }
+    ],
+    'final': [
+      { id: "final-assignment", title: "Final Assignment - Cross-Cultural Management Course" },
+      { id: "final-background", title: "Background Document - 2025 Annual Event Plan for Xiaomi US" },
+      { id: "final-data", title: "Document 6.MI - Raw data of questionnaires (Excel)" }
     ]
   };
 
-  /* 更新第五章任务文件链接到腾讯云 */
+  /* 练习文件链接 */
   const exerciseLinks = {
+    /* Chapter 1 Links */
+    "ch1-task1-attach1": {
+      "CHN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Chn-EN-Attachment1-Group%20Task%20--CTBU%20International%20Students%E2%80%99%20Cultural%20Shock%20%26%20Adaptation%20Survey.docx",
+      "TH-EN":  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Thai-EN-Attachment1-Group%20Task%20--CTBU%20International%20Students%E2%80%99%20Cultural%20Shock%20%26%20Adaptation%20Survey.docx",
+      "ID-EN":  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Indo-EN-Attachment1-Group%20Task%20--CTBU%20International%20Students%E2%80%99%20Cultural%20Shock%20%26%20Adaptation%20Survey.docx",
+      "LAO-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Laos-EN-Attachment1-Group%20Task%20--CTBU%20International%20Students%E2%80%99%20Cultural%20Shock%20%26%20Adaptation%20Survey.docx"
+    },
+    "ch1-task1-attach2": {
+      "CHN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Chn-EN-Attachment%202-questionnaire.docx",
+      "TH-EN":  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Thai-EN-Attachment2-questionnaire.docx",
+      "ID-EN":  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Indo-EN-Attachment%202-questionnaire.docx",
+      "LAO-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Laos-EN-Attachment%202-questionnaire.docx"
+    },
+    "ch1-task1-attach3": {
+      "DEFAULT": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Attachment%203-raw%20data%20-CTBU%20INTERNATIONAL%20STUDENTS%20SURVEY.xlsx"
+    },
+
     "ch5-task1": {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.1%20en%2Bchn-aoyou%2Bhyproca%20.docx",
       "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.1%20EN%2BTHAI-aoyou%26hyproca.docx"
@@ -845,10 +1010,46 @@
     "ch5-task3-task": {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.3EN%2BCHN-%20CASE%20ANALYSIS%20.docx",
       "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.3EN%2BTHAI-%20CASE%20ANALYSIS%20.docx"
+    },
+    "ch5-task4-work": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/5.4-EN%2BCHN-Cross-cultural%20HRM%20work%20plan.xlsx"
+    },
+    /* Chapter 6 Links */
+    "ch6-1-case": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/6.1-en%2Bchn-%20Haier%2BSanyo%28case%29.docx"
+    },
+    "ch6-1-ques": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/6.1-en%2Bchn-Haier%2BSanyo%28questions%29.docx"
+    },
+    "ch6-2-case": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/6.2-en%2Bchn-Sihe%20Technology%28case%29.docx"
+    },
+    "ch6-2-ques": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/6.2-en%2Bchn-%20Sihe%20Technology%28questions%29.docx"
+    },
+    "ch6-3-data": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/6.3%20en%2Bchn-Raw%20Data%20for%20Expat%20Assignment%20Compensation%20Package%20Design.xlsx"
+    },
+    "ch6-3-web1": {
+      "CN-EN": "https://www.numbeo.com"
+    },
+    "ch6-3-web2": {
+      "CN-EN": "https://steven2025.github.io/exprat-compenzation-package"
+    },
+    /* Final Assignment Links */
+    "final-assignment": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/Final%20Assignment-Cross-Cultural%20Management%E2%80%9D%20Course.pdf"
+    },
+    "final-background": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/Background%20Document-2025%20Annual%20Event%20Plan%20for%20Xiaomi%20US.pdf"
+    },
+    "final-data": {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/Document%206.MI-raw%20data%20of%20questionnaires.xlsx"
     }
   };
 
   const videoLanguageOptions = [
+    { value: "CHN", label: "中文字幕 Chinese" },
     { value: "TH",  label: "泰语 Thai" },
     { value: "ID",  label: "印尼语 Indonesian" },
     { value: "LAO", label: "老挝语 Lao" },
@@ -873,6 +1074,12 @@
       case "CN-AR": return "Chinese + Arabic";
       case "CN-FR": return "Chinese + French";
       case "EN": return "English only";
+      case "CHN-EN": return "Chinese + English";
+      case "TH-EN": return "Thai + English";
+      case "ID-EN": return "Indonesian + English";
+      case "LAO-EN": return "Lao + English";
+      case "CHN": return "Chinese subtitles"; 
+      case "DEFAULT": return "Default";
       default: return value;
     }
   }
@@ -892,9 +1099,9 @@
     `;
   }
 
-  /* 使用 iframe + Google Viewer 显示 PDF */
+  /* 使用 iframe + COS 预览服务显示 PDF */
   function updatePptView() {
-    const value = pptLangSelect.value;
+    const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
     const link = linksForChapter[value];
@@ -913,8 +1120,14 @@
       pdfIframe.style.height = '100%';
       pdfIframe.style.border = 'none';
       
-      // 使用 Google Docs Viewer 服务预览 PDF
-      pdfIframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(link)}&embedded=true`;
+      // 第一章：为避免“语言切换时直接下载/无法内嵌”的情况，统一使用 COS 文档预览；
+      // 同时，为尽量减少 PPT→PDF 中“文本框/字体”缺失的概率，第 1 章优先用 dstType=pdf（由 COS 侧渲染后再返回）。
+      // 其他章节保持原来的 HTML 预览方式不变。
+      if (currentChapter === 1) {
+        pdfIframe.src = buildCosPreviewUrl(link, 'html');  // Chapter 1：与第5/6章一致，使用 COS HTML 预览（避免 dstType=pdf 对 PDF 源文件报 FileTypeNotSupported）
+      } else {
+        pdfIframe.src = buildCosPreviewUrl(link, 'html');  // Others：COS HTML 预览
+      }
     } else {
       pdfIframe.style.display = 'none';
       pptPlaceholderBody.style.display = 'block';
@@ -934,7 +1147,7 @@
   pptLangSelect.addEventListener('change', updatePptView);
 
   pptDownloadBtn.addEventListener('click', () => {
-    const value = pptLangSelect.value;
+    const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
     const link = linksForChapter[value];
@@ -953,7 +1166,7 @@
     btn.addEventListener('click', () => {
       const chStr = btn.getAttribute('data-chapter');
       const role = btn.getAttribute('data-role');
-      if (chStr === '1' || chStr === '5') {
+      if (chStr === '1' || chStr === '5' || chStr === '6') {
         currentChapter = parseInt(chStr, 10);
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
@@ -961,10 +1174,18 @@
         updateChapterHeader();
         resetResourceListHint();
         updatePptView();
-      } else if (role === 'final-task' || role === 'about-course') {
+      } else if (role === 'final-task') {
+        currentChapter = 'final';
+        mainMenu.style.display = 'none';
+        chapterView.style.display = 'block';
+        closeAllFloatingWindows();
+        updateChapterHeader();
+        resetResourceListHint();
+        updatePptView();
+      } else if (role === 'about-course') {
         alert('该板块正在建设中，敬请期待。\nThis section is under construction.');
       } else {
-        alert('当前仅开放第1章和第5章，其余章节尚未上线。\nOnly Chapters 1 and 5 are available at the moment.');
+        alert('当前仅开放第1、5、6章和期末任务，其余章节尚未上线。\nOnly Chapters 1, 5, 6 and Final Assignment are available at the moment.');
       }
     });
   });
@@ -985,14 +1206,34 @@
       <div class="resource-list-title">练习与任务 · Exercises &amp; Tasks</div>
       <div class="resource-node">
     `;
-    list.forEach(item => {
-      html += `
-        <div class="resource-item" data-type="exercise" data-id="${item.id}">
-          <div class="resource-bullet"></div>
-          <span>${item.title}</span>
-        </div>
-      `;
-    });
+
+    function renderExerciseItems(items, level) {
+      const indent = Math.max(0, level) * 14;
+      items.forEach(it => {
+        const hasChildren = Array.isArray(it.children) && it.children.length > 0;
+        if (hasChildren) {
+          html += `
+            <div class="resource-item" data-type="exercise-group" data-id="${it.id}" style="margin-left:${indent}px;">
+              <div class="resource-bullet"></div>
+              <span>${it.title}</span>
+              <span style="margin-left:auto;opacity:0.7;">▸</span>
+            </div>
+            <div class="resource-node" data-parent="${it.id}" style="display:none;margin-left:${indent + 10}px;">
+          `;
+          renderExerciseItems(it.children, level + 1);
+          html += `</div>`;
+        } else {
+          html += `
+            <div class="resource-item" data-type="exercise" data-id="${it.id}" style="margin-left:${indent}px;">
+              <div class="resource-bullet"></div>
+              <span>${it.title}</span>
+            </div>
+          `;
+        }
+      });
+    }
+
+    renderExerciseItems(list, 0);
     html += `</div>`;
     resourceList.innerHTML = html;
     attachResourceItemEvents();
@@ -1023,6 +1264,20 @@
         const type = item.getAttribute('data-type');
         const id = item.getAttribute('data-id');
         const title = item.innerText.trim();
+
+        if (type === 'exercise-group') {
+          const childNode = resourceList.querySelector(`.resource-node[data-parent="${id}"]`);
+          if (!childNode) return;
+
+          const isOpen = childNode.style.display !== 'none';
+          childNode.style.display = isOpen ? 'none' : 'block';
+
+          // Update arrow
+          const arrow = item.querySelector('span:last-child');
+          if (arrow) arrow.textContent = isOpen ? '▸' : '▾';
+          return;
+        }
+
         openFloatingWindow(type, id, title);
       });
     });
@@ -1042,34 +1297,105 @@
           opt.textContent = cfg.label;
           selectEl.appendChild(opt);
         });
+      } else if (meta && meta.subMode === 'mix55') {
+        const opts = [
+          { value: "EN",     label: "English" },
+          { value: "TH_EN",  label: "Thai + English" },
+          { value: "ID_EN",  label: "Indonesian + English" },
+          { value: "LAO_EN", label: "Lao + English" }
+        ];
+        opts.forEach(cfg => {
+          const opt = document.createElement('option');
+          opt.value = cfg.value;
+          opt.textContent = cfg.label;
+          selectEl.appendChild(opt);
+        });
       } else {
-        videoLanguageOptions.forEach(cfg => {
+        // Standard video (like 5.4 or Ch1), try to use exact languages if provided
+        if (meta && meta.subtitles && Object.keys(meta.subtitles).length === 1 && meta.subtitles.EN) {
+             const opt = document.createElement('option');
+             opt.value = "EN";
+             opt.textContent = "English subtitles";
+             selectEl.appendChild(opt);
+        } else if (meta && meta.subtitles) {
+            // Prefer exact languages that exist for this video
+            const labelMap = {
+              CHN: "中文字幕 Chinese",
+              EN: "English subtitles",
+              TH: "泰语 Thai",
+              ID: "印尼语 Indonesian",
+              LAO: "老挝语 Lao",
+              FR: "法语 French",
+              RU: "俄语 Russian",
+              JP: "日语 Japanese",
+              KR: "韩语 Korean",
+              MY: "马来语 Malay",
+              AR: "阿拉伯语 Arabic"
+            };
+            const keys = Object.keys(meta.subtitles);
+            // Put CHN/EN first if present (nicer UX)
+            keys.sort((a,b) => {
+              const pri = (k) => (k === 'CHN' ? 0 : (k === 'EN' ? 1 : 5));
+              return pri(a) - pri(b);
+            });
+            keys.forEach(code => {
+              const opt = document.createElement('option');
+              opt.value = code;
+              opt.textContent = labelMap[code] || code;
+              selectEl.appendChild(opt);
+            });
+        } else {
+            // Fallback to standard language list
+            videoLanguageOptions.forEach(cfg => {
+              const opt = document.createElement('option');
+              opt.value = cfg.value;
+              opt.textContent = cfg.label;
+              selectEl.appendChild(opt);
+            });
+        }
+      }
+    } else {
+      // For exercise resources, only show available languages
+      const langMap = exerciseLinks[resourceId];
+      if (langMap) {
+        // Get all available language keys
+        const availableLangs = Object.keys(langMap);
+        availableLangs.forEach(langKey => {
+          const opt = document.createElement('option');
+          opt.value = langKey;
+          opt.textContent = getLangFullName(langKey);
+          selectEl.appendChild(opt);
+        });
+        
+        // If no languages available, show a default option
+        if (availableLangs.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = "CN-EN";
+          opt.textContent = "Chinese + English (默认)";
+          selectEl.appendChild(opt);
+        }
+      } else {
+        // Fallback to default language options
+        const opts = [
+          { value: "CN-EN", label: "Chinese + English" },
+          { value: "CN-TH", label: "Chinese + Thai" },
+          { value: "CN-ID", label: "Chinese + Indonesian" },
+          { value: "CN-LAO", label: "Chinese + Lao" },
+          { value: "CN-RU", label: "Chinese + Russian" },
+          { value: "CN-JP", label: "Chinese + Japanese" },
+          { value: "CN-KR", label: "Chinese + Korean" },
+          { value: "CN-MY", label: "Chinese + Malay" },
+          { value: "CN-AR", label: "Chinese + Arabic" },
+          { value: "CN-FR", label: "Chinese + French" },
+          { value: "EN",    label: "English only" }
+        ];
+        opts.forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
           opt.textContent = cfg.label;
           selectEl.appendChild(opt);
         });
       }
-    } else {
-      const opts = [
-        { value: "CN-EN", label: "Chinese + English" },
-        { value: "CN-TH", label: "Chinese + Thai" },
-        { value: "CN-ID", label: "Chinese + Indonesian" },
-        { value: "CN-LAO", label: "Chinese + Lao" },
-        { value: "CN-RU", label: "Chinese + Russian" },
-        { value: "CN-JP", label: "Chinese + Japanese" },
-        { value: "CN-KR", label: "Chinese + Korean" },
-        { value: "CN-MY", label: "Chinese + Malay" },
-        { value: "CN-AR", label: "Chinese + Arabic" },
-        { value: "CN-FR", label: "Chinese + French" },
-        { value: "EN",    label: "English only" }
-      ];
-      opts.forEach(cfg => {
-        const opt = document.createElement('option');
-        opt.value = cfg.value;
-        opt.textContent = cfg.label;
-        selectEl.appendChild(opt);
-      });
     }
   }
 
@@ -1134,6 +1460,10 @@
     const langSelect = document.createElement('select');
     langSelect.className = 'floating-lang-select';
     populateLangSelectForResource(type, langSelect, id);
+    // Hide language dropdown when there is only one available option
+    if (langSelect.options.length <= 1) {
+      langSelect.style.display = 'none';
+    }
 
     const btnFull = document.createElement('button');
     btnFull.className = 'btn-icon';
@@ -1217,10 +1547,8 @@
           subtitleStatus.textContent = `正在加载字幕: ${label}`;
           subtitleStatus.className = 'subtitle-status subtitle-loading';
           
-          // 使用 XMLHttpRequest 获取字幕文件 - 优化CORS处理
           const xhr = new XMLHttpRequest();
           xhr.open('GET', url, true);
-          // 添加CORS相关请求头
           xhr.setRequestHeader('Origin', window.location.origin);
           xhr.withCredentials = false;
           
@@ -1255,7 +1583,6 @@
             subtitleStatus.className = 'subtitle-status subtitle-error';
             console.error('字幕网络错误:', url);
             
-            // 显示手动下载链接
             const downloadLink = document.createElement('a');
             downloadLink.href = url;
             downloadLink.target = '_blank';
@@ -1266,13 +1593,11 @@
             subtitleStatus.appendChild(downloadLink);
           };
           
+          xhr.timeout = 10000;
           xhr.ontimeout = function() {
             subtitleStatus.textContent = `字幕加载超时: ${label}`;
             subtitleStatus.className = 'subtitle-status subtitle-error';
           };
-          
-          // 设置超时时间
-          xhr.timeout = 10000; // 10秒
           
           xhr.send();
         }
@@ -1280,7 +1605,7 @@
         function updateSubtitle() {
           if (!currentCues.length) {
             if (subtitleOverlay.innerHTML && subtitleOverlay.innerHTML.indexOf('Loading subtitles') === -1) {
-              // 保留"没有字幕/无法加载"提示
+              // 保留提示
             } else {
               subtitleOverlay.textContent = '';
             }
@@ -1353,7 +1678,7 @@
       // 练习与任务窗口 - 彻底优化布局
       body.innerHTML = ''; // 清空原有内容
 
-      // 添加文件预览功能 - 优化布局
+      // 添加文件预览功能
       const previewContainer = document.createElement('div');
       previewContainer.className = 'file-preview-container';
       
@@ -1374,31 +1699,49 @@
 
       function updateFileView() {
         const langCode = langSelect.value;
+        let fileUrl = '#';
+        
+        // 尝试获取具体语言的链接
         const linksForId = exerciseLinks[id];
-        if (linksForId && linksForId[langCode] && linksForId[langCode] !== '#') {
-          const fileUrl = linksForId[langCode];
-          
-          // 使用 Microsoft Office Online 预览 Word 文档
-          if (fileUrl.includes('.docx')) {
-            previewIframe.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`;
-          } 
-          // 使用 Google Docs 预览 PDF
-          else if (fileUrl.includes('.pdf')) {
-            previewIframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`;
-          } 
-          // 其他文件类型直接打开
-          else {
+        if (linksForId) {
+            // 如果有对应语言链接，使用它
+            if (linksForId[langCode]) {
+                fileUrl = linksForId[langCode];
+            } 
+            // 否则，如果存在默认的 CN-EN 链接且当前语言不是 CN-EN，回退到 CN-EN (提高资源可用性)
+            else if (linksForId["CN-EN"]) {
+                fileUrl = linksForId["CN-EN"];
+            }
+        }
+
+        if (fileUrl && fileUrl !== '#') {
+          // 判断文件类型进行预览
+          if (
+            fileUrl.includes('.doc') || fileUrl.includes('.docx') ||
+            fileUrl.includes('.xls') || fileUrl.includes('.xlsx') ||
+            fileUrl.includes('.ppt') || fileUrl.includes('.pptx') ||
+            fileUrl.includes('.pdf')
+          ) {
+            // 使用 COS 文档预览服务预览 Word / Excel / PPT / PDF 等文件
+            previewIframe.src = buildCosPreviewUrl(fileUrl);
+            dlBtn.textContent = '⬇ 下载文件 / Download File';
+            dlBtn.onclick = () => {
+              const a = document.createElement('a');
+              a.href = fileUrl;
+              a.download = '';
+              a.click();
+            };
+          } else {
+            // 假设是普通网页链接
             previewIframe.src = fileUrl;
+            dlBtn.textContent = '🔗 打开链接 / Open Link';
+            dlBtn.onclick = () => {
+              window.open(fileUrl, '_blank');
+            };
           }
-          
-          dlBtn.onclick = () => {
-            const a = document.createElement('a');
-            a.href = fileUrl;
-            a.download = '';
-            a.click();
-          };
         } else {
           previewIframe.src = 'about:blank';
+          dlBtn.textContent = '暂无资源 / Not Available';
           dlBtn.onclick = () => {
             alert('当前语言版本的文件尚未上传或暂不可用。\nThis file for the selected language is not yet available.');
           };
@@ -1410,7 +1753,6 @@
 
       // 语言切换时更新文件
       langSelect.addEventListener('change', () => {
-        const v = langSelect.value;
         updateFileView();
       });
     }
