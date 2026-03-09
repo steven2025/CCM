@@ -225,7 +225,10 @@
     #pdf-iframe, .file-preview-iframe {
       flex: 1;
       width: 100%;
+      height: 100%;
+      min-height: 0;
       border: 0;
+      display: block;
       background: #1b1f2b;
     }
 
@@ -459,7 +462,9 @@
     .file-preview-container {
       width: 100%;
       flex: 1; /* 占据所有可用空间 */
-      min-height: 400px;
+      min-height: 0;
+      height: 100%;
+      display: flex;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px;
       overflow: hidden;
@@ -514,9 +519,50 @@
       flex: 1;
       min-height: 0;
     }
+    .test-preview-scroll-container {
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      align-items: flex-start;
+    }
     .exercise-preview-window .download-section {
       margin-top: 0;
       padding: 6px 0;
+    }
+    .document-preview-window {
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      min-height: 80vh;
+    }
+    .document-preview-window .floating-body {
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+    .document-preview-window .file-preview-container {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: auto;
+      display: flex;
+      border: none;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .document-preview-window .file-preview-iframe {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: block;
+    }
+    .document-preview-window .download-section {
+      margin-top: 0;
+      padding: 6px 10px 8px;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -540,7 +586,7 @@
         <div class="card-btn-title">第一章</div>
         <div class="card-btn-sub">Chapter 1</div>
       </div>
-      <div class="card-btn coming-soon" data-chapter="2">
+      <div class="card-btn" data-chapter="2">
         <div class="card-btn-title">第二章</div>
         <div class="card-btn-sub">Chapter 2</div>
       </div>
@@ -666,8 +712,8 @@
           </div>
 
           <div class="hint">
-            提示：目前已开放第 1、5、6 章和期末任务，其余章节暂未上线。<br>
-            Hint: Chapters 1, 5, 6 and Final Assignment are currently available. Other chapters are not yet implemented.
+            提示：目前已开放第 1、2、5、6 章和期末任务，其余章节暂未上线。<br>
+            Hint: Chapters 1, 2, 5, 6 and Final Assignment are currently available. Other chapters are not yet implemented.
           </div>
         </div>
       </div>
@@ -733,6 +779,11 @@
       subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
       pptLabelPrefix: 'Chapter 1 PPT'
     },
+    2: {
+      title: '第二章 · Chapter 2',
+      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      pptLabelPrefix: 'Chapter 2 PPT'
+    },
     5: {
       title: '第五章 · Chapter 5 – Cross-cultural HRM',
       subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
@@ -756,6 +807,13 @@
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BCHN%20%E7%AC%AC%E4%B8%80%E7%AB%A0Chapter%201.pdf",
       "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BThai%20%E7%AC%AC%E4%B8%80%E7%AB%A0Chapter%201.pdf",
       "CN-ID": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BIndo%20%20Chapter%201.pdf", "CN-LAO": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/EN%2BLao%20Chapter%201.pdf", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
+    },
+    2: {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/Chn-en-Chapter%202.pdf",
+      "CN-TH": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/THAI-en-Chapter%202.pdf",
+      "CN-ID": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/Indo-en-Chapter%202.pdf",
+      "CN-LAO": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/LAO-en-Chapter%202.pdf",
+      "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
     },
     5: {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
@@ -846,10 +904,91 @@
       subtitlePosition: "top",
       subMode: "multiLang"
     },
+
+
     {
-      id: "1.6",
-      chapter: 1,
-      title: "1.6 Movie1 - American Factory",
+      id: "2.1",
+      chapter: 2,
+      title: "2.1-individualism-vs-collectivlism",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.1-individualism-vs-collectivlism.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.1-thai-individualism-vs-collectivlism.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.1-ido-individualism-vs-collectivlism.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.1-lao-individualism-vs-collectivlism.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "2.2",
+      chapter: 2,
+      title: "2.2-power distance",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.2-power%20distance.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.2-thai-power%20distance.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.2-indo-power%20distance.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.2-lao-power%20distance.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "2.3",
+      chapter: 2,
+      title: "2.3-masculinity&femininity",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.3-masculinity%26femininity.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.3-thai-feminine-vs-masculine.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.3-indo-feminine-vs-masculine.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.3-lao-feminine-vs-masculine.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "2.4",
+      chapter: 2,
+      title: "2.4-uncertainty avoidance",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.4-uncertainty%20avoidance.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.4-thai-uncertainty_avoidance.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.4-indo-uncertainty%20avoidance.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.4-laos-uncertainty%20avoidance.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "2.5",
+      chapter: 2,
+      title: "2.5-long-term-vs-short-term",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.5-long-term-vs-short-term.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.5-thai-lto.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.5-indo--lto.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.5-en-lto_lo.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+    {
+      id: "2.6",
+      chapter: 2,
+      title: "2.6-indulgence-vs-restraint",
+      videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.6-indulgence%20-vs-restraint.mp4",
+      subtitles: {
+        TH:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.6-thai-IVR.srt",
+        ID:  "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.6-indo-IVR.srt",
+        LAO: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/2.6-en-IVR_lo.srt"
+      },
+      subtitlePosition: "top",
+      subMode: "multiLang"
+    },
+
+    {
+      id: "2.7",
+      chapter: 2,
+      title: "2.7 Movie1-American Factory",
       videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie1-American%20Factory.mp4",
       subtitles: {
         CHN: "#",
@@ -861,9 +1000,9 @@
       subMode: "multiLang"
     },
     {
-      id: "1.7",
-      chapter: 1,
-      title: "1.7 Movie2 - Gung Ho",
+      id: "2.8",
+      chapter: 2,
+      title: "2.8 Movie2-Gung Ho",
       videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie2-GungHo.mp4",
       subtitles: {
         CHN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/CHN-GUNGHO.srt",
@@ -875,9 +1014,9 @@
       subMode: "multiLang"
     },
     {
-      id: "1.8",
-      chapter: 1,
-      title: "1.8 Movie3 - Outsourced",
+      id: "2.9",
+      chapter: 2,
+      title: "2.9 Movie3-Outsourced",
       videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Movie3-Outsourced.mp4",
       subtitles: {
         CHN: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/chn-%20Outsourced.srt",
@@ -939,6 +1078,18 @@
       subMode: "mix55"
     }
   ];
+
+  const videoTestLinks = {
+    "2.1": "https://ks.wjx.com/vm/rKPqqAo.aspx?width=760&source=iframe&s=t",
+    "2.2": "https://ks.wjx.com/vm/hsHRUj1.aspx?width=760&source=iframe&s=t",
+    "2.3": "https://ks.wjx.com/vm/rVAoPl3.aspx?width=760&source=iframe&s=t",
+    "2.4": "https://ks.wjx.com/vm/eGO0X44.aspx?width=760&source=iframe&s=t",
+    "2.5": "https://ks.wjx.com/vm/w8pelME.aspx?width=760&source=iframe&s=t",
+    "2.6": "https://ks.wjx.com/vm/tu1R9Nd.aspx?width=760&source=iframe&s=t",
+    "2.7": "https://ks.wjx.com/vm/tU7d1rQ.aspx?width=760&source=iframe&s=t",
+    "2.8": "https://ks.wjx.com/vm/mBmRNth.aspx?width=760&source=iframe&s=t",
+    "2.9": "https://ks.wjx.com/vm/QJm9UVn.aspx?width=760&source=iframe&s=t"
+};
 
   /* 练习资源列表 */
   const exerciseResources = {
@@ -1166,7 +1317,7 @@
     btn.addEventListener('click', () => {
       const chStr = btn.getAttribute('data-chapter');
       const role = btn.getAttribute('data-role');
-      if (chStr === '1' || chStr === '5' || chStr === '6') {
+      if (chStr === '1' || chStr === '2' || chStr === '5' || chStr === '6') {
         currentChapter = parseInt(chStr, 10);
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
@@ -1185,7 +1336,7 @@
       } else if (role === 'about-course') {
         alert('该板块正在建设中，敬请期待。\nThis section is under construction.');
       } else {
-        alert('当前仅开放第1、5、6章和期末任务，其余章节尚未上线。\nOnly Chapters 1, 5, 6 and Final Assignment are available at the moment.');
+        alert('当前仅开放第1、2、5、6章和期末任务，其余章节尚未上线。\nOnly Chapters 1, 2, 5, 6 and Final Assignment are available at the moment.');
       }
     });
   });
@@ -1252,6 +1403,16 @@
           <span>${vc.title}</span>
         </div>
       `;
+      if (currentChapter === 2) {
+        html += `
+          <div class="resource-node" style="margin-left:16px;">
+            <div class="resource-item" data-type="video-test" data-id="${vc.id}">
+              <div class="resource-bullet"></div>
+              <span>Test</span>
+            </div>
+          </div>
+        `;
+      }
     });
     html += `</div>`;
     resourceList.innerHTML = html;
@@ -1284,7 +1445,12 @@
   }
 
   function populateLangSelectForResource(type, selectEl, resourceId) {
-    if (type === 'video') {
+    if (type === 'video-test') {
+      const opt = document.createElement('option');
+      opt.value = 'DEFAULT';
+      opt.textContent = '问卷星 Test';
+      selectEl.appendChild(opt);
+    } else if (type === 'video') {
       const meta = findVideoCase(resourceId);
       if (meta && meta.subMode === 'dualEnThai') {
         const opts = [
@@ -1440,8 +1606,8 @@
     const win = document.createElement('div');
     win.className = 'floating-window';
     
-    // 为练习窗口添加特殊类名
-    if (type === 'exercise') {
+    // 为练习/测试预览窗口添加特殊类名
+    if (type === 'exercise' || type === 'video-test') {
       win.classList.add('exercise-preview-window');
     }
     
@@ -1549,7 +1715,6 @@
           
           const xhr = new XMLHttpRequest();
           xhr.open('GET', url, true);
-          xhr.setRequestHeader('Origin', window.location.origin);
           xhr.withCredentials = false;
           
           xhr.onload = function() {
@@ -1674,6 +1839,43 @@
         }
         loadSubtitlesFor(langSelect.value);
       }
+    } else if (type === 'video-test') {
+      body.innerHTML = '';
+      body.style.display = 'flex';
+      body.style.flexDirection = 'column';
+      body.style.minHeight = '0';
+      body.style.overflow = 'hidden';
+
+      const previewContainer = document.createElement('div');
+      previewContainer.className = 'file-preview-container test-preview-scroll-container';
+      previewContainer.style.flex = '1 1 auto';
+      previewContainer.style.minHeight = '0';
+      previewContainer.style.height = '100%';
+
+      const previewIframe = document.createElement('iframe');
+      previewIframe.className = 'file-preview-iframe';
+      previewIframe.style.display = 'block';
+      previewIframe.style.flex = '0 0 auto';
+      previewIframe.style.width = '100%';
+      previewIframe.style.height = '1400px';
+      previewIframe.style.minHeight = '1400px';
+      previewIframe.setAttribute('scrolling', 'yes');
+      previewContainer.appendChild(previewIframe);
+      body.appendChild(previewContainer);
+
+      const downloadSection = document.createElement('div');
+      downloadSection.className = 'download-section';
+      const openBtn = document.createElement('button');
+      openBtn.className = 'btn-ghost';
+      openBtn.textContent = '🔗 打开测试 / Open Test';
+      downloadSection.appendChild(openBtn);
+      body.appendChild(downloadSection);
+
+      const testUrl = videoTestLinks[id] || 'https://www.wjx.cn/';
+      previewIframe.src = testUrl;
+      openBtn.onclick = () => {
+        window.open(testUrl, '_blank');
+      };
     } else {
       // 练习与任务窗口 - 彻底优化布局
       body.innerHTML = ''; // 清空原有内容
@@ -1714,6 +1916,15 @@
             }
         }
 
+        const isPptFile = !!(fileUrl && /\.pptx?(\?|#|$)/i.test(fileUrl));
+        const useDocumentPreviewLayout = !!(fileUrl && fileUrl !== '#' && !isPptFile);
+        win.classList.toggle('document-preview-window', useDocumentPreviewLayout);
+        if (useDocumentPreviewLayout && !win.classList.contains('fullscreen')) {
+          win.style.height = '80vh';
+        } else if (!win.classList.contains('fullscreen')) {
+          win.style.height = '';
+        }
+
         if (fileUrl && fileUrl !== '#') {
           // 判断文件类型进行预览
           if (
@@ -1740,6 +1951,10 @@
             };
           }
         } else {
+          win.classList.remove('document-preview-window');
+          if (!win.classList.contains('fullscreen')) {
+            win.style.height = '';
+          }
           previewIframe.src = 'about:blank';
           dlBtn.textContent = '暂无资源 / Not Available';
           dlBtn.onclick = () => {
