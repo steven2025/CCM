@@ -642,6 +642,135 @@
       padding: 6px 10px 8px;
       flex-shrink: 0;
     }
+
+    .pdfjs-toolbar {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(19,24,40,0.95);
+      flex-wrap: wrap;
+    }
+    .pdfjs-toolbar.active { display: flex; }
+    .pdfjs-page-indicator {
+      font-size: 0.78rem;
+      opacity: 0.88;
+      min-width: 86px;
+      text-align: center;
+    }
+    .pdfjs-canvas-wrap {
+      flex: 1;
+      overflow: auto;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 14px;
+      background: radial-gradient(circle at top, rgba(76,86,106,0.35), rgba(15,16,25,0.98));
+    }
+    .pdfjs-canvas-wrap.active { display: flex; }
+    #pdfjs-canvas {
+      max-width: 100%;
+      height: auto;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+      border-radius: 6px;
+    }
+    .api-config-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 4px;
+    }
+    .api-config-form label {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .api-config-form input,
+    .api-config-form select,
+    .api-config-form textarea {
+      width: 100%;
+      background: rgba(46,52,64,0.95);
+      border: 1px solid rgba(136,192,255,0.35);
+      border-radius: 10px;
+      color: #eceff4;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .api-config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 700px) {
+      .api-config-grid { grid-template-columns: 1fr; }
+    }
+    .status-box {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      background: rgba(59,66,82,0.45);
+      min-height: 44px;
+      white-space: pre-wrap;
+    }
+    .status-success { color: #a3be8c; }
+    .status-error { color: #bf616a; }
+    .status-loading { color: #88c0ff; }
+    .glossary-window {
+      top: 120px;
+      right: 24px;
+      left: auto;
+      width: 360px;
+      min-width: 300px;
+      min-height: 320px;
+      max-width: min(420px, 92vw);
+      max-height: 84vh;
+    }
+    .glossary-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .glossary-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(136,192,255,0.14);
+      border: 1px solid rgba(136,192,255,0.28);
+      font-size: 0.72rem;
+      opacity: 0.92;
+    }
+    .glossary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .glossary-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(59,66,82,0.18);
+      line-height: 1.5;
+    }
+    .glossary-card strong {
+      color: #88c0ff;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+    .glossary-empty {
+      font-size: 0.8rem;
+      opacity: 0.82;
+      line-height: 1.6;
+    }
+
   </style>
 </head>
 <body>
@@ -668,11 +797,11 @@
         <div class="card-btn-title">第二章</div>
         <div class="card-btn-sub">Chapter 2</div>
       </div>
-      <div class="card-btn coming-soon" data-chapter="3">
+      <div class="card-btn" data-chapter="3">
         <div class="card-btn-title">第三章</div>
         <div class="card-btn-sub">Chapter 3</div>
       </div>
-      <div class="card-btn coming-soon" data-chapter="4">
+      <div class="card-btn" data-chapter="4">
         <div class="card-btn-title">第四章</div>
         <div class="card-btn-sub">Chapter 4</div>
       </div>
@@ -741,7 +870,7 @@
           <div class="pdf-viewer">
             <div class="pdf-placeholder-header">
               <span id="ppt-placeholder-title">Chapter 1 PPT (Chinese + English)</span>
-              <span class="pdf-header-right-text">PDF viewer · scrollable</span>
+              <span class="pdf-header-right-text" id="ppt-viewer-mode-label">PDF viewer · scrollable</span>
             </div>
 
             <div class="pdf-placeholder-body" id="ppt-placeholder-body">
@@ -759,6 +888,15 @@
               </p>
             </div>
 
+            <div id="pdfjs-toolbar" class="pdfjs-toolbar">
+              <button class="btn-ghost" id="pdf-prev-btn">◀ 上一页</button>
+              <div class="pdfjs-page-indicator" id="pdf-page-indicator">第 0 / 0 页</div>
+              <button class="btn-ghost" id="pdf-next-btn">下一页 ▶</button>
+              <button class="btn-ghost" id="pdf-glossary-btn">✨ AI词汇窗</button>
+            </div>
+            <div id="pdfjs-canvas-wrap" class="pdfjs-canvas-wrap">
+              <canvas id="pdfjs-canvas"></canvas>
+            </div>
             <iframe id="pdf-iframe" class="file-preview-iframe" style="display:none;" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
@@ -780,6 +918,13 @@
                 <span>Video Cases</span>
               </div>
             </button>
+            <button class="side-btn" id="btn-ai-glossary" style="display:none;">
+              <div class="side-btn-icon">✨</div>
+              <div class="side-btn-text">
+                <span>AI词汇窗</span>
+                <span>AI Glossary</span>
+              </div>
+            </button>
           </div>
 
           <div class="resource-list" id="resource-list">
@@ -790,8 +935,8 @@
           </div>
 
           <div class="hint">
-            提示：目前已开放第 1、2、5、6 章和期末任务，其余章节暂未上线。<br>
-            Hint: Chapters 1, 2, 5, 6 and Final Assignment are currently available. Other chapters are not yet implemented.
+            提示：目前第 3、4 章已切换为中英 PDF + AI 词汇窗试验模式。<br>
+            Hint: Chapters 3 and 4 are now in pilot mode with Chinese-English PDF + AI glossary.
           </div>
         </div>
       </div>
@@ -800,6 +945,7 @@
   </div>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
 <script>
   const mainMenu = document.getElementById('main-menu');
   const chapterView = document.getElementById('chapter-view');
@@ -813,17 +959,36 @@
   const pptDownloadBtn = document.getElementById('ppt-download-btn');
   const pptPlaceholderBody = document.getElementById('ppt-placeholder-body');
   const pdfIframe = document.getElementById('pdf-iframe');
+  const pptViewerModeLabel = document.getElementById('ppt-viewer-mode-label');
+  const pdfjsToolbar = document.getElementById('pdfjs-toolbar');
+  const pdfjsCanvasWrap = document.getElementById('pdfjs-canvas-wrap');
+  const pdfjsCanvas = document.getElementById('pdfjs-canvas');
+  const pdfPrevBtn = document.getElementById('pdf-prev-btn');
+  const pdfNextBtn = document.getElementById('pdf-next-btn');
+  const pdfPageIndicator = document.getElementById('pdf-page-indicator');
+  const pdfGlossaryBtn = document.getElementById('pdf-glossary-btn');
 
   const btnResetView = document.getElementById('btn-reset-view');
   const resourceList = document.getElementById('resource-list');
   const btnExercises = document.getElementById('btn-exercises');
   const btnVideos = document.getElementById('btn-videos');
+  const btnAiGlossary = document.getElementById('btn-ai-glossary');
 
   const chapterTitleMain = document.getElementById('chapter-title-main');
   const chapterSubtitleMain = document.getElementById('chapter-subtitle-main');
 
   let currentChapter = 1;
   let currentZ = 1500;
+  let pdfDoc = null;
+  let pdfCurrentPage = 1;
+  let pdfPageCount = 0;
+  let currentPdfUrl = '';
+  const pdfJsChapters = new Set([3, 4]);
+  const aiProviderDefaults = {
+    chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
+    deepseek: { baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
+    custom: { baseUrl: '', model: '' }
+  };
 
   // 构建 COS 文档预览链接，统一用于 PDF / Word / Excel 等文件的在线预览
   // dstType 通常可用：html / pdf / png 等（取决于 COS 文档预览能力与对象类型）
@@ -862,6 +1027,16 @@
       subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
       pptLabelPrefix: 'Chapter 2 PPT'
     },
+    3: {
+      title: '第三章 · Chapter 3',
+      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
+      pptLabelPrefix: 'Chapter 3 PPT'
+    },
+    4: {
+      title: '第四章 · Chapter 4',
+      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
+      pptLabelPrefix: 'Chapter 4 PPT'
+    },
     5: {
       title: '第五章 · Chapter 5 – Cross-cultural HRM',
       subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
@@ -892,6 +1067,14 @@
       "CN-ID": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/Indo-en-Chapter%202.pdf",
       "CN-LAO": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter2/LAO-en-Chapter%202.pdf",
       "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
+    },
+    3: {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/Students-chapter%203%20Cross-cultural%20Communication.pdf",
+      "CN-TH": "#", "CN-ID": "#", "CN-LAO": "#", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
+    },
+    4: {
+      "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/student-Chapter%204%20%20Cross-cultural%20Team.pdf",
+      "CN-TH": "#", "CN-ID": "#", "CN-LAO": "#", "CN-RU": "#", "CN-JP": "#", "CN-KR": "#", "CN-MY": "#", "CN-AR": "#", "CN-FR": "#", "EN": "#"
     },
     5: {
       "CN-EN": "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter5/EN-CHN--Chapter%205-Cross-cultural%20HRM.pdf",
@@ -1171,6 +1354,7 @@
 
 
   const aboutCourseApps = [
+    { id: "ai-api-config", title: "AI接口设置", subtitle: "ChatGPT / DeepSeek / Custom API", icon: "🤖", color: "linear-gradient(135deg, #0ea5e9, #2563eb)", mode: "api-config" },
     { id: "business-spss", title: "商务统计/Business-Spss", subtitle: "Business statistics tools", icon: "📊", color: "linear-gradient(135deg, #2563eb, #1d4ed8)", url: "https://steven2025.github.io/business-spss/" },
     { id: "hofstede-index", title: "文化指数", subtitle: "Culture dimensions reference", icon: "🌐", color: "linear-gradient(135deg, #7c3aed, #5b21b6)", url: "https://steven2025.github.io/Culture-dimention/" },
     { id: "belbin-test", title: "贝尔宾测试", subtitle: "Belbin team role test", icon: "🧩", color: "linear-gradient(135deg, #db2777, #be185d)", url: "https://steven2025.github.io/belbin-test/" },
@@ -1343,6 +1527,333 @@
     }
   }
 
+
+  function isPdfJsModeChapter(chapter) {
+    return pdfJsChapters.has(Number(chapter));
+  }
+
+  function getSavedAiConfig() {
+    try {
+      return JSON.parse(localStorage.getItem('ccm_ai_config') || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function saveAiConfig(config) {
+    localStorage.setItem('ccm_ai_config', JSON.stringify(config));
+  }
+
+  function getAiConfigSummary() {
+    const cfg = getSavedAiConfig();
+    if (!cfg.provider || !cfg.apiKey) return '未配置 AI 接口';
+    return (cfg.providerLabel || cfg.provider || 'Custom') + ' · 已配置';
+  }
+
+  async function testAiConnection(config) {
+    const base = (config.baseUrl || '').replace(/\/$/, '');
+    if (!base || !config.apiKey) throw new Error('请先填写 Base URL 和 API Key');
+    const resp = await fetch(base + '/models', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + config.apiKey }
+    });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error('测试失败：HTTP ' + resp.status + ' ' + txt.slice(0, 160));
+    }
+    const data = await resp.json();
+    return data;
+  }
+
+  async function callAiGlossary(pageText, targetLang) {
+    const cfg = getSavedAiConfig();
+    if (!cfg.apiKey || !cfg.baseUrl || !cfg.model) {
+      throw new Error('请先在“AI工具与APPs”中完成 AI 接口设置。');
+    }
+    const base = cfg.baseUrl.replace(/\/$/, '');
+    const payload = {
+      model: cfg.model,
+      temperature: 0.2,
+      messages: [
+        {
+          role: 'system',
+          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms；每项包含 term_en、term_zh、term_target、explanation_zh。term_target 使用用户目标语种翻译。不要输出 markdown。'
+        },
+        {
+          role: 'user',
+          content: '目标语种：' + targetLang + '\n当前页文本：\n' + pageText.slice(0, 6000)
+        }
+      ]
+    };
+    const resp = await fetch(base + '/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + cfg.apiKey
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error((data && (data.error?.message || data.message)) || 'AI 调用失败');
+    }
+    const content = data?.choices?.[0]?.message?.content || '';
+    const match = content.match(/\{[\s\S]*\}/);
+    if (!match) {
+      throw new Error('AI 返回内容无法解析为 JSON。');
+    }
+    return JSON.parse(match[0]);
+  }
+
+  async function extractPdfPageText(pageNum) {
+    if (!pdfDoc) return '';
+    const page = await pdfDoc.getPage(pageNum);
+    const textContent = await page.getTextContent();
+    return textContent.items.map(item => item.str).join(' ').replace(/\s+/g, ' ').trim();
+  }
+
+  async function renderPdfPage(pageNum) {
+    if (!pdfDoc) return;
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1.3 });
+    const ctx = pdfjsCanvas.getContext('2d');
+    const ratio = window.devicePixelRatio || 1;
+    pdfjsCanvas.width = Math.floor(viewport.width * ratio);
+    pdfjsCanvas.height = Math.floor(viewport.height * ratio);
+    pdfjsCanvas.style.width = viewport.width + 'px';
+    pdfjsCanvas.style.height = viewport.height + 'px';
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    pdfCurrentPage = pageNum;
+    pdfPageIndicator.textContent = '第 ' + pageNum + ' / ' + pdfPageCount + ' 页';
+    pdfPrevBtn.disabled = pageNum <= 1;
+    pdfNextBtn.disabled = pageNum >= pdfPageCount;
+  }
+
+  async function loadPdfJsDocument(url) {
+    currentPdfUrl = url || '';
+    pdfDoc = null;
+    pdfCurrentPage = 1;
+    pdfPageCount = 0;
+    if (!window.pdfjsLib) {
+      throw new Error('pdf.js 未加载成功');
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
+    const loadingTask = pdfjsLib.getDocument(url);
+    pdfDoc = await loadingTask.promise;
+    pdfPageCount = pdfDoc.numPages || 0;
+    await renderPdfPage(1);
+  }
+
+  function openAiConfigWindow() {
+    const existing = document.querySelector('.floating-window[data-tool="ai-config"]');
+    if (existing) {
+      existing.style.zIndex = ++currentZ;
+      return;
+    }
+    const saved = getSavedAiConfig();
+    const win = document.createElement('div');
+    win.className = 'floating-window';
+    win.setAttribute('data-tool', 'ai-config');
+    win.style.zIndex = ++currentZ;
+    win.style.width = '640px';
+    win.style.maxWidth = '92vw';
+    const header = document.createElement('div');
+    header.className = 'floating-header';
+    header.innerHTML = '<div class="floating-title">AI接口设置 · AI API Config</div><div class="floating-controls"><button class="btn-icon" title="Close">✕</button></div>';
+    const closeBtn = header.querySelector('button');
+    const body = document.createElement('div');
+    body.className = 'floating-body';
+    body.innerHTML = `
+      <div class="api-config-form">
+        <div class="api-config-grid">
+          <div>
+            <label>接口类型</label>
+            <select id="ai-provider-select">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div>
+            <label>模型名称</label>
+            <input id="ai-model-input" placeholder="例如 gpt-4.1-mini / deepseek-chat" />
+          </div>
+        </div>
+        <div>
+          <label>Base URL</label>
+          <input id="ai-base-input" placeholder="https://api.openai.com/v1" />
+        </div>
+        <div>
+          <label>API Key</label>
+          <input id="ai-key-input" type="password" placeholder="请输入你自己的 API Key" />
+        </div>
+        <div class="api-config-grid">
+          <button class="btn-ghost" id="ai-test-btn">测试连通性</button>
+          <button class="btn-ghost" id="ai-save-btn">保存设置</button>
+        </div>
+        <div class="status-box" id="ai-status-box">当前状态：${getAiConfigSummary()}</div>
+      </div>
+    `;
+    const footer = document.createElement('div');
+    footer.className = 'floating-footer';
+    footer.textContent = '说明：该设置仅保存在当前浏览器，用于试验版 AI 词汇辅助功能。';
+    win.appendChild(header);
+    win.appendChild(body);
+    win.appendChild(footer);
+    document.body.appendChild(win);
+    makeDraggable(win, header);
+    closeBtn.addEventListener('click', () => win.remove());
+
+    const providerSelect = body.querySelector('#ai-provider-select');
+    const modelInput = body.querySelector('#ai-model-input');
+    const baseInput = body.querySelector('#ai-base-input');
+    const keyInput = body.querySelector('#ai-key-input');
+    const statusBox = body.querySelector('#ai-status-box');
+
+    function applyDefaults(provider) {
+      const defaults = aiProviderDefaults[provider] || aiProviderDefaults.custom;
+      if (!baseInput.dataset.userEdited || !baseInput.value) baseInput.value = saved.baseUrl || defaults.baseUrl || '';
+      if (!modelInput.dataset.userEdited || !modelInput.value) modelInput.value = saved.model || defaults.model || '';
+      if (provider !== 'custom') baseInput.readOnly = true;
+      else baseInput.readOnly = false;
+    }
+
+    providerSelect.value = saved.provider || 'chatgpt';
+    modelInput.value = saved.model || aiProviderDefaults[providerSelect.value].model || '';
+    baseInput.value = saved.baseUrl || aiProviderDefaults[providerSelect.value].baseUrl || '';
+    keyInput.value = saved.apiKey || '';
+    baseInput.readOnly = providerSelect.value !== 'custom';
+
+    providerSelect.addEventListener('change', () => {
+      const defaults = aiProviderDefaults[providerSelect.value] || aiProviderDefaults.custom;
+      if (providerSelect.value !== 'custom') {
+        baseInput.value = defaults.baseUrl || '';
+      }
+      modelInput.value = defaults.model || modelInput.value;
+      baseInput.readOnly = providerSelect.value !== 'custom';
+    });
+    modelInput.addEventListener('input', () => { modelInput.dataset.userEdited = '1'; });
+    baseInput.addEventListener('input', () => { baseInput.dataset.userEdited = '1'; });
+
+    body.querySelector('#ai-save-btn').addEventListener('click', () => {
+      const config = {
+        provider: providerSelect.value,
+        providerLabel: providerSelect.options[providerSelect.selectedIndex].textContent,
+        model: modelInput.value.trim(),
+        baseUrl: baseInput.value.trim(),
+        apiKey: keyInput.value.trim()
+      };
+      saveAiConfig(config);
+      statusBox.textContent = '已保存：' + getAiConfigSummary();
+      statusBox.className = 'status-box status-success';
+    });
+
+    body.querySelector('#ai-test-btn').addEventListener('click', async () => {
+      const config = {
+        provider: providerSelect.value,
+        providerLabel: providerSelect.options[providerSelect.selectedIndex].textContent,
+        model: modelInput.value.trim(),
+        baseUrl: baseInput.value.trim(),
+        apiKey: keyInput.value.trim()
+      };
+      statusBox.textContent = '正在测试接口连通性...';
+      statusBox.className = 'status-box status-loading';
+      try {
+        const data = await testAiConnection(config);
+        const count = Array.isArray(data?.data) ? data.data.length : 0;
+        statusBox.textContent = '测试成功：已连接 ' + (config.providerLabel || config.provider) + '，可用模型数量 ' + count + '。';
+        statusBox.className = 'status-box status-success';
+        saveAiConfig(config);
+      } catch (err) {
+        statusBox.textContent = '测试失败：' + err.message;
+        statusBox.className = 'status-box status-error';
+      }
+    });
+  }
+
+  function openGlossaryWindow() {
+    const existing = document.querySelector('.floating-window[data-tool="ai-glossary"]');
+    if (existing) {
+      existing.style.zIndex = ++currentZ;
+      return;
+    }
+    const win = document.createElement('div');
+    win.className = 'floating-window glossary-window';
+    win.setAttribute('data-tool', 'ai-glossary');
+    win.style.zIndex = ++currentZ;
+    const header = document.createElement('div');
+    header.className = 'floating-header';
+    header.innerHTML = '<div class="floating-title">AI词汇窗 · AI Glossary</div><div class="floating-controls"><button class="btn-icon" title="Close">✕</button></div>';
+    const closeBtn = header.querySelector('button');
+    const body = document.createElement('div');
+    body.className = 'floating-body';
+    body.innerHTML = `
+      <div class="glossary-controls">
+        <span class="glossary-tag" id="glossary-page-tag">当前页：${pdfCurrentPage || 1}</span>
+        <select id="glossary-lang-select" class="floating-lang-select">
+          <option value="Thai">Thai</option>
+          <option value="Indonesian">Indonesian</option>
+          <option value="Lao">Lao</option>
+          <option value="Russian">Russian</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Korean">Korean</option>
+          <option value="Malay">Malay</option>
+          <option value="Arabic">Arabic</option>
+          <option value="French">French</option>
+        </select>
+        <button class="btn-ghost" id="glossary-generate-btn">生成本页词汇</button>
+      </div>
+      <div class="status-box" id="glossary-status-box">${getAiConfigSummary()}。点击“生成本页词汇”开始。</div>
+      <div class="glossary-list" id="glossary-result-list">
+        <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，调用你在“AI工具与APPs”里配置的接口，返回关键词与难点表达翻译。</div>
+      </div>
+    `;
+    const footer = document.createElement('div');
+    footer.className = 'floating-footer';
+    footer.textContent = '窗口可移动、可拉伸；建议在第3/4章 pdf.js 模式中配合使用。';
+    win.appendChild(header);
+    win.appendChild(body);
+    win.appendChild(footer);
+    document.body.appendChild(win);
+    makeDraggable(win, header);
+    closeBtn.addEventListener('click', () => win.remove());
+
+    const pageTag = body.querySelector('#glossary-page-tag');
+    const statusBox = body.querySelector('#glossary-status-box');
+    const resultList = body.querySelector('#glossary-result-list');
+    const langSelect = body.querySelector('#glossary-lang-select');
+    const generateBtn = body.querySelector('#glossary-generate-btn');
+
+    generateBtn.addEventListener('click', async () => {
+      pageTag.textContent = '当前页：' + (pdfCurrentPage || 1);
+      statusBox.textContent = '正在提取第 ' + (pdfCurrentPage || 1) + ' 页文本并调用 AI...';
+      statusBox.className = 'status-box status-loading';
+      resultList.innerHTML = '';
+      try {
+        const pageText = await extractPdfPageText(pdfCurrentPage || 1);
+        if (!pageText) throw new Error('当前页暂无可提取文本，或 PDF 尚未加载。');
+        const data = await callAiGlossary(pageText, langSelect.value);
+        statusBox.textContent = '生成成功：' + langSelect.value + ' 词汇辅助已更新。';
+        statusBox.className = 'status-box status-success';
+        const keywords = Array.isArray(data.keywords) ? data.keywords : [];
+        const difficult = Array.isArray(data.difficult_terms) ? data.difficult_terms : [];
+        const htmlParts = [];
+        keywords.forEach(item => {
+          htmlParts.push(`<div class="glossary-card"><strong>${item.term_en || ''}</strong><div>中文：${item.term_zh || ''}</div><div>目标语：${item.term_target || ''}</div><div>说明：${item.explanation_zh || ''}</div></div>`);
+        });
+        difficult.forEach(item => {
+          htmlParts.push(`<div class="glossary-card"><strong>${item.term_en || ''}</strong><div>中文：${item.term_zh || ''}</div><div>目标语：${item.term_target || ''}</div><div>说明：${item.explanation_zh || ''}</div></div>`);
+        });
+        resultList.innerHTML = htmlParts.length ? htmlParts.join('') : '<div class="glossary-empty">AI 已返回结果，但没有识别到可展示条目。</div>';
+      } catch (err) {
+        statusBox.textContent = '生成失败：' + err.message;
+        statusBox.className = 'status-box status-error';
+        resultList.innerHTML = '<div class="glossary-empty">请先确认 AI 接口已配置，并确保当前 PDF 页面可提取文本。</div>';
+      }
+    });
+  }
+
   function updateChapterHeader() {
     const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
     chapterTitleMain.textContent = cfg.title;
@@ -1358,12 +1869,13 @@
     `;
   }
 
-  /* 使用 iframe + COS 预览服务显示 PDF */
-  function updatePptView() {
+  /* 更新课件视图：第3/4章使用 pdf.js 单页翻页模式，其余保持原有 iframe 模式 */
+  async function updatePptView() {
     const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
     const link = linksForChapter[value];
+    const usePdfJs = isPdfJsModeChapter(currentChapter);
 
     pptLangLabel.textContent = '当前版本：' + fullName;
     pptPlaceholderLang.textContent = fullName;
@@ -1371,6 +1883,42 @@
 
     const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
     pptPlaceholderTitle.textContent = cfg.pptLabelPrefix + ' (' + fullName + ')';
+    btnAiGlossary.style.display = usePdfJs ? 'flex' : 'none';
+    pdfGlossaryBtn.style.display = usePdfJs ? 'inline-flex' : 'none';
+
+    if (usePdfJs) {
+      pptViewerModeLabel.textContent = 'pdf.js viewer · prev / next';
+      pdfIframe.style.display = 'none';
+      pdfjsToolbar.classList.add('active');
+      pdfjsCanvasWrap.classList.add('active');
+      if (link && link !== '#') {
+        pptPlaceholderBody.style.display = 'none';
+        try {
+          await loadPdfJsDocument(link);
+        } catch (err) {
+          pdfjsCanvasWrap.classList.remove('active');
+          pptPlaceholderBody.style.display = 'block';
+          pptPlaceholderBody.innerHTML = `
+            <p>pdf.js 加载失败：${err.message}</p>
+            <p style="margin-top:8px;">请检查 PDF 链接、COS 跨域设置，或稍后再试。</p>
+          `;
+          pdfPageIndicator.textContent = '第 0 / 0 页';
+        }
+      } else {
+        pdfjsCanvasWrap.classList.remove('active');
+        pptPlaceholderBody.style.display = 'block';
+        pptPlaceholderBody.innerHTML = `
+          <p>第三/四章试验版已切换为 pdf.js 单页翻页模式。</p>
+          <p style="margin-top:8px;">当前尚未上传本语言版本 PDF。上传中英版 PDF 后，即可使用上一页 / 下一页与 AI 词汇窗。</p>
+        `;
+        pdfPageIndicator.textContent = '第 0 / 0 页';
+      }
+      return;
+    }
+
+    pptViewerModeLabel.textContent = 'PDF viewer · scrollable';
+    pdfjsToolbar.classList.remove('active');
+    pdfjsCanvasWrap.classList.remove('active');
 
     if (link && link !== '#') {
       pptPlaceholderBody.style.display = 'none';
@@ -1378,15 +1926,7 @@
       pdfIframe.style.width = '100%';
       pdfIframe.style.height = '100%';
       pdfIframe.style.border = 'none';
-      
-      // 第一章：为避免“语言切换时直接下载/无法内嵌”的情况，统一使用 COS 文档预览；
-      // 同时，为尽量减少 PPT→PDF 中“文本框/字体”缺失的概率，第 1 章优先用 dstType=pdf（由 COS 侧渲染后再返回）。
-      // 其他章节保持原来的 HTML 预览方式不变。
-      if (currentChapter === 1) {
-        pdfIframe.src = buildCosPreviewUrl(link, 'html');  // Chapter 1：与第5/6章一致，使用 COS HTML 预览（避免 dstType=pdf 对 PDF 源文件报 FileTypeNotSupported）
-      } else {
-        pdfIframe.src = buildCosPreviewUrl(link, 'html');  // Others：COS HTML 预览
-      }
+      pdfIframe.src = buildCosPreviewUrl(link, 'html');
     } else {
       pdfIframe.style.display = 'none';
       pptPlaceholderBody.style.display = 'block';
@@ -1403,13 +1943,21 @@
     }
   }
 
-  pptLangSelect.addEventListener('change', updatePptView);
+  pptLangSelect.addEventListener('change', () => { updatePptView(); });
 
   pptDownloadBtn.addEventListener('click', () => {
     const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
     const link = linksForChapter[value];
+    if (isPdfJsModeChapter(currentChapter)) {
+      if (currentPdfUrl && currentPdfUrl !== '#') {
+        window.open(currentPdfUrl, '_blank');
+      } else {
+        alert('当前 pdf.js 试验版尚未绑定 PDF 链接。');
+      }
+      return;
+    }
     if (link && link !== '#') {
       window.open(link, '_blank');
     } else {
@@ -1425,7 +1973,7 @@
     btn.addEventListener('click', () => {
       const chStr = btn.getAttribute('data-chapter');
       const role = btn.getAttribute('data-role');
-      if (chStr === '1' || chStr === '2' || chStr === '5' || chStr === '6') {
+      if (chStr === '1' || chStr === '2' || chStr === '3' || chStr === '4' || chStr === '5' || chStr === '6') {
         currentChapter = parseInt(chStr, 10);
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
@@ -1444,7 +1992,7 @@
       } else if (role === 'about-course') {
         openAboutCourseApps();
       } else {
-        alert('当前仅开放第1、2、5、6章和期末任务，其余章节尚未上线。\nOnly Chapters 1, 2, 5, 6 and Final Assignment are available at the moment.');
+        alert('当前仅开放第1、2、3、4、5、6章和期末任务。\nChapters 1, 2, 3, 4, 5, 6 and Final Assignment are available at the moment.');
       }
     });
   });
@@ -1496,6 +2044,22 @@
     html += `</div>`;
     resourceList.innerHTML = html;
     attachResourceItemEvents();
+  });
+
+  btnAiGlossary.addEventListener('click', () => {
+    openGlossaryWindow();
+  });
+
+  pdfGlossaryBtn.addEventListener('click', () => {
+    openGlossaryWindow();
+  });
+
+  pdfPrevBtn.addEventListener('click', async () => {
+    if (pdfDoc && pdfCurrentPage > 1) await renderPdfPage(pdfCurrentPage - 1);
+  });
+
+  pdfNextBtn.addEventListener('click', async () => {
+    if (pdfDoc && pdfCurrentPage < pdfPageCount) await renderPdfPage(pdfCurrentPage + 1);
   });
 
   btnVideos.addEventListener('click', () => {
@@ -1821,7 +2385,13 @@
           <div class="about-app-sub">${app.subtitle}</div>
         </div>
       `;
-      btn.addEventListener('click', () => openExternalAppWindow(app));
+      btn.addEventListener('click', () => {
+        if (app.mode === 'api-config') {
+          openAiConfigWindow();
+        } else {
+          openExternalAppWindow(app);
+        }
+      });
       grid.appendChild(btn);
     });
 
