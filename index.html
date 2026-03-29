@@ -945,7 +945,13 @@
   </div>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+<script type="module">
+  import * as pdfjsLib from './pdfjs/pdf.mjs';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
+  window.pdfjsLib = pdfjsLib;
+  window.__pdfjsReady = true;
+  window.dispatchEvent(new CustomEvent('pdfjs-ready'));
+</script>
 <script>
   const mainMenu = document.getElementById('main-menu');
   const chapterView = document.getElementById('chapter-view');
@@ -1630,15 +1636,23 @@
     pdfNextBtn.disabled = pageNum >= pdfPageCount;
   }
 
+  async function ensurePdfJsReady() {
+    if (window.__pdfjsReady && window.pdfjsLib) return window.pdfjsLib;
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('pdf.js 加载超时')), 10000);
+      window.addEventListener('pdfjs-ready', () => {
+        clearTimeout(timeout);
+        resolve(window.pdfjsLib);
+      }, { once: true });
+    });
+  }
+
   async function loadPdfJsDocument(url) {
     currentPdfUrl = url || '';
     pdfDoc = null;
     pdfCurrentPage = 1;
     pdfPageCount = 0;
-    if (!window.pdfjsLib) {
-      throw new Error('pdf.js 未加载成功');
-    }
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
+    const pdfjsLib = await ensurePdfJsReady();
     const loadingTask = pdfjsLib.getDocument(url);
     pdfDoc = await loadingTask.promise;
     pdfPageCount = pdfDoc.numPages || 0;
