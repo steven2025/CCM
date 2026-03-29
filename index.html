@@ -945,12 +945,23 @@
   </div>
 </main>
 
-<script type="module">
-  import * as pdfjsLib from './pdfjs/pdf.mjs';
-  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
-  window.pdfjsLib = pdfjsLib;
-  window.__pdfjsReady = true;
-  window.dispatchEvent(new CustomEvent('pdfjs-ready'));
+<script>
+  (function () {
+    window.PDFJS_LOCAL_PATH = './pdfjs/';
+    function loadScript(src, onload, onerror) {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = onload;
+      s.onerror = onerror;
+      document.head.appendChild(s);
+    }
+    loadScript(window.PDFJS_LOCAL_PATH + 'pdf.min.js', function () {
+      console.log('pdf.js loaded from local folder:', window.PDFJS_LOCAL_PATH);
+    }, function () {
+      console.warn('Local pdf.js not found. Falling back to CDN.');
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js');
+    });
+  })();
 </script>
 <script>
   const mainMenu = document.getElementById('main-menu');
@@ -1583,7 +1594,7 @@
       messages: [
         {
           role: 'system',
-          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms；每项包含 term_en、term_zh、term_target、explanation_zh。term_target 使用用户目标语种翻译。不要输出 markdown。'
+          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms；每项只保留 term_en 和 term_target 两个字段。term_target 必须使用用户目标语种进行简洁准确的对应表达或解释，不要输出中文，不要输出额外说明，不要输出 markdown。'
         },
         {
           role: 'user',
@@ -1636,27 +1647,53 @@
     pdfNextBtn.disabled = pageNum >= pdfPageCount;
   }
 
-  async function ensurePdfJsReady() {
-    if (window.__pdfjsReady && window.pdfjsLib) return window.pdfjsLib;
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('pdf.js 加载超时')), 10000);
-      window.addEventListener('pdfjs-ready', () => {
-        clearTimeout(timeout);
-        resolve(window.pdfjsLib);
-      }, { once: true });
-    });
-  }
-
   async function loadPdfJsDocument(url) {
     currentPdfUrl = url || '';
     pdfDoc = null;
     pdfCurrentPage = 1;
     pdfPageCount = 0;
-    const pdfjsLib = await ensurePdfJsReady();
+    if (!window.pdfjsLib) {
+      throw new Error('pdf.js 未加载成功');
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window.PDFJS_LOCAL_PATH ? (window.PDFJS_LOCAL_PATH + 'pdf.worker.min.js') : 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
     const loadingTask = pdfjsLib.getDocument(url);
     pdfDoc = await loadingTask.promise;
     pdfPageCount = pdfDoc.numPages || 0;
     await renderPdfPage(1);
+  }
+
+  function getGlossaryLineLabel(targetLang, index) {
+    const labels = {
+      Thai: 'บรรทัดที่ ',
+      Indonesian: 'Baris ',
+      Lao: 'ແຖວທີ ',
+      Russian: 'Строка ',
+      Japanese: '第',
+      Korean: '줄 ',
+      Malay: 'Baris ',
+      Arabic: 'السطر ',
+      French: 'Ligne '
+    };
+    const suffix = {
+      Japanese: '行目',
+      Korean: '번째',
+      Arabic: ''
+    };
+    const base = labels[targetLang] || 'Line ';
+    return base + index + (suffix[targetLang] || '');
+  }
+
+  function renderGlossaryCards(items, targetLang) {
+    if (!Array.isArray(items) || !items.length) {
+      return '<div class="glossary-empty">AI 已返回结果，但没有识别到可展示条目。</div>';
+    }
+    return items.map((item, idx) => {
+      const lineNo = idx + 1;
+      const colorClass = 'glossary-line-' + ((idx % 4) + 1);
+      const term = (item.term_en || '').trim();
+      const target = (item.term_target || '').trim();
+      return `<div class="glossary-card"><div class="glossary-line ${colorClass}">${getGlossaryLineLabel(targetLang, lineNo)}</div><strong class="glossary-term">${term}</strong><div class="glossary-target">${target}</div></div>`;
+    }).join('');
   }
 
   function openAiConfigWindow() {
@@ -1820,12 +1857,12 @@
       </div>
       <div class="status-box" id="glossary-status-box">${getAiConfigSummary()}。点击“生成本页词汇”开始。</div>
       <div class="glossary-list" id="glossary-result-list">
-        <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，调用你在“AI工具与APPs”里配置的接口，返回关键词与难点表达翻译。</div>
+        <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，返回英文重点词及其目标语表达，便于快速对照阅读。</div>
       </div>
     `;
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
-    footer.textContent = '窗口可移动、可拉伸；建议在第3/4章 pdf.js 模式中配合使用。';
+    footer.textContent = '窗口可移动、可拉伸；建议在第3/4章阅读时快速对照本页重点词。';
     win.appendChild(header);
     win.appendChild(body);
     win.appendChild(footer);
@@ -1852,14 +1889,8 @@
         statusBox.className = 'status-box status-success';
         const keywords = Array.isArray(data.keywords) ? data.keywords : [];
         const difficult = Array.isArray(data.difficult_terms) ? data.difficult_terms : [];
-        const htmlParts = [];
-        keywords.forEach(item => {
-          htmlParts.push(`<div class="glossary-card"><strong>${item.term_en || ''}</strong><div>中文：${item.term_zh || ''}</div><div>目标语：${item.term_target || ''}</div><div>说明：${item.explanation_zh || ''}</div></div>`);
-        });
-        difficult.forEach(item => {
-          htmlParts.push(`<div class="glossary-card"><strong>${item.term_en || ''}</strong><div>中文：${item.term_zh || ''}</div><div>目标语：${item.term_target || ''}</div><div>说明：${item.explanation_zh || ''}</div></div>`);
-        });
-        resultList.innerHTML = htmlParts.length ? htmlParts.join('') : '<div class="glossary-empty">AI 已返回结果，但没有识别到可展示条目。</div>';
+        const mergedItems = keywords.concat(difficult).filter(item => (item.term_en || item.term_target));
+        resultList.innerHTML = renderGlossaryCards(mergedItems, langSelect.value);
       } catch (err) {
         statusBox.textContent = '生成失败：' + err.message;
         statusBox.className = 'status-box status-error';
