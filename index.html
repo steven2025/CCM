@@ -969,8 +969,8 @@
 
 <script type="module">
   // 给 pdf.js 主文件与 worker 同时加版本号，避免 Chrome 命中不同步缓存
-  const PDFJS_ASSET_VERSION = '20260331-1';
-  import * as pdfjsLib from './pdfjs/pdf.mjs?v=20260331-1';
+  const PDFJS_ASSET_VERSION = '5.6.205';
+  import * as pdfjsLib from './pdfjs/pdf.mjs?v=5.6.205';
   pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs?v=' + PDFJS_ASSET_VERSION;
   window.__pdfjsAssetVersion = PDFJS_ASSET_VERSION;
   window.pdfjsLib = pdfjsLib;
@@ -1730,7 +1730,7 @@
   }
 
   async function loadPdfJsDocument(url) {
-    const cacheSafeUrl = appendCacheBust(url, window.__pdfjsAssetVersion || '20260331-1');
+    const cacheSafeUrl = appendCacheBust(url, window.__pdfjsAssetVersion || '5.6.205');
     currentPdfUrl = cacheSafeUrl || '';
     pdfDoc = null;
     pdfCurrentPage = 1;
@@ -2002,7 +2002,7 @@
           console.error('pdf.js load failed:', err);
           pdfjsCanvasWrap.classList.remove('active');
           pptPlaceholderBody.style.display = 'block';
-          const fallbackUrl = buildCosPreviewUrl(appendCacheBust(link, window.__pdfjsAssetVersion || '20260331-1'), 'html');
+          const fallbackUrl = buildCosPreviewUrl(appendCacheBust(link, window.__pdfjsAssetVersion || '5.6.205'), 'html');
           pptPlaceholderBody.innerHTML = `
             <p>pdf.js 加载失败：${err.message}</p>
             <p style="margin-top:8px;">已保留第3/4章 pdf.js 试验模式；若当前浏览器缓存未刷新，可先强制刷新（Ctrl+F5）。</p>
