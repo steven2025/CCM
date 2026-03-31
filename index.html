@@ -968,11 +968,8 @@
 </main>
 
 <script type="module">
-  // 给 pdf.js 主文件与 worker 同时加版本号，避免 Chrome 命中不同步缓存
-  const PDFJS_ASSET_VERSION = '5.6.205';
-  import * as pdfjsLib from './pdfjs/pdf.mjs?v=5.6.205';
-  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs?v=' + PDFJS_ASSET_VERSION;
-  window.__pdfjsAssetVersion = PDFJS_ASSET_VERSION;
+  import * as pdfjsLib from './pdfjs/pdf.mjs';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
   window.pdfjsLib = pdfjsLib;
   window.__pdfjsReady = true;
   window.dispatchEvent(new CustomEvent('pdfjs-ready'));
@@ -1045,15 +1042,6 @@
     return rawUrl
       + sep + 'response-content-disposition=' + encodeURIComponent('inline')
       + '&response-content-type=' + encodeURIComponent('application/pdf');
-  }
-
-  // 为 PDF 地址追加版本号，减少浏览器命中旧缓存的概率
-  function appendCacheBust(url, version) {
-    if (!url || url === '#') return url || '';
-    if (!version) return url;
-    if (/[?&]v=/.test(url)) return url;
-    const sep = url.includes('?') ? '&' : '?';
-    return url + sep + 'v=' + encodeURIComponent(version);
   }
 
   const chapterConfigs = {
@@ -1721,7 +1709,7 @@
   async function ensurePdfJsReady() {
     if (window.__pdfjsReady && window.pdfjsLib) return window.pdfjsLib;
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('pdf.js 加载超时（请强制刷新浏览器缓存后再试）')), 10000);
+      const timeout = setTimeout(() => reject(new Error('pdf.js 加载超时')), 10000);
       window.addEventListener('pdfjs-ready', () => {
         clearTimeout(timeout);
         resolve(window.pdfjsLib);
@@ -1730,16 +1718,12 @@
   }
 
   async function loadPdfJsDocument(url) {
-    const cacheSafeUrl = appendCacheBust(url, window.__pdfjsAssetVersion || '5.6.205');
-    currentPdfUrl = cacheSafeUrl || '';
+    currentPdfUrl = url || '';
     pdfDoc = null;
     pdfCurrentPage = 1;
     pdfPageCount = 0;
     const pdfjsLib = await ensurePdfJsReady();
-    const loadingTask = pdfjsLib.getDocument({
-      url: cacheSafeUrl,
-      withCredentials: false
-    });
+    const loadingTask = pdfjsLib.getDocument(url);
     pdfDoc = await loadingTask.promise;
     pdfPageCount = pdfDoc.numPages || 0;
     await renderPdfPage(1);
@@ -1999,14 +1983,11 @@
         try {
           await loadPdfJsDocument(link);
         } catch (err) {
-          console.error('pdf.js load failed:', err);
           pdfjsCanvasWrap.classList.remove('active');
           pptPlaceholderBody.style.display = 'block';
-          const fallbackUrl = buildCosPreviewUrl(appendCacheBust(link, window.__pdfjsAssetVersion || '5.6.205'), 'html');
           pptPlaceholderBody.innerHTML = `
             <p>pdf.js 加载失败：${err.message}</p>
-            <p style="margin-top:8px;">已保留第3/4章 pdf.js 试验模式；若当前浏览器缓存未刷新，可先强制刷新（Ctrl+F5）。</p>
-            <p style="margin-top:8px;"><a href="${fallbackUrl}" target="_blank" rel="noopener noreferrer">若仍失败，点此改用 COS 在线预览打开当前 PDF</a></p>
+            <p style="margin-top:8px;">请检查 PDF 链接；若仍报 hashOriginal.toHex 等错误，请确认 /pdfjs/ 目录已替换为 legacy build（同版本的 pdf.mjs / pdf.worker.mjs / pdf.sandbox.mjs）。</p>
           `;
           pdfPageIndicator.textContent = '第 0 / 0 页';
         }
