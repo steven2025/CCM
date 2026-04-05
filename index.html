@@ -957,8 +957,8 @@
           </div>
 
           <div class="hint">
-            提示：目前第 3、4 章已切换为中英 PDF + AI 词汇窗试验模式。<br>
-            Hint: Chapters 3 and 4 are now in pilot mode with Chinese-English PDF + AI glossary.
+            提示：目前第 3、4、5、6 章及期末任务已切换为中英 PDF + AI 词汇窗试验模式。<br>
+            Hint: Chapters 3, 4, 5, 6 and Final Assignment are now in pilot mode with Chinese-English PDF + AI glossary.
           </div>
         </div>
       </div>
@@ -1011,7 +1011,7 @@
   let pdfCurrentPage = 1;
   let pdfPageCount = 0;
   let currentPdfUrl = '';
-  const pdfJsChapters = new Set([3, 4]);
+  const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
     deepseek: { baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
@@ -1067,17 +1067,17 @@
     },
     5: {
       title: '第五章 · Chapter 5 – Cross-cultural HRM',
-      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
       pptLabelPrefix: 'Chapter 5 PPT'
     },
     6: {
       title: '第六章 · Chapter 6',
-      subtitle: '双语课件 & 章节资源 · Bilingual slides & chapter resources',
+      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
       pptLabelPrefix: 'Chapter 6 PPT'
     },
     'final': {
       title: '期末任务 · Final Assignment',
-      subtitle: '双语课件 & 任务资源 · Bilingual slides & assignment resources',
+      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
       pptLabelPrefix: 'Final Assignment PPT'
     }
   };
@@ -1613,7 +1613,8 @@
 
 
   function isPdfJsModeChapter(chapter) {
-    return pdfJsChapters.has(Number(chapter));
+    const normalized = chapter === 'final' ? 'final' : Number(chapter);
+    return pdfJsChapters.has(normalized);
   }
 
   function getSavedAiConfig() {
@@ -1661,11 +1662,11 @@
       messages: [
         {
           role: 'system',
-          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms；每项仅包含 term_en、term_target。term_target 必须是用户目标语种下的简洁解释或对应表达，不要返回中文，不要返回说明，不要输出 markdown。'
+          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms。每项必须包含 3 个字段：term_en、translation_target、explanation_target。translation_target 必须是该英文词汇在目标语言中的准确简洁对应词或短语；explanation_target 必须用目标语言对该词汇做一句简短准确解释，便于学生理解。不要返回中文，不要返回说明，不要输出 markdown。'
         },
         {
           role: 'user',
-          content: '目标语种：' + targetLang + '\n当前页文本：\n' + pageText.slice(0, 6000)
+          content: '目标语种：' + targetLang + '\n任务要求：请同时给出每个英文词汇的目标语言翻译（translation_target）和目标语言简短解释（explanation_target）。\n当前页文本：\n' + pageText.slice(0, 6000)
         }
       ]
     };
@@ -1894,16 +1895,16 @@
           <option value="Arabic">Arabic</option>
           <option value="French">French</option>
         </select>
-        <button class="btn-ghost" id="glossary-generate-btn">生成本页词汇</button>
+        <button class="btn-ghost" id="glossary-generate-btn">生成本页词汇 / Generate Page Vocabulary</button>
       </div>
       <div class="status-box" id="glossary-status-box">${getAiConfigSummary()}。点击“生成本页词汇”开始。</div>
       <div class="glossary-list" id="glossary-result-list">
-        <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，只显示英文词汇和目标语言解释，便于快速阅读。</div>
+        <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，并为每个词汇显示目标语言翻译与简短解释，便于快速阅读。</div>
       </div>
     `;
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
-    footer.textContent = '窗口可移动、可拉伸；建议在第3/4章 pdf.js 模式中配合使用。';
+    footer.textContent = '窗口可移动、可拉伸；建议在第3/4/5/6章及期末任务的 pdf.js 模式中配合使用。';
     win.appendChild(header);
     win.appendChild(body);
     win.appendChild(footer);
@@ -1930,13 +1931,16 @@
         statusBox.className = 'status-box status-success';
         const keywords = Array.isArray(data.keywords) ? data.keywords : [];
         const difficult = Array.isArray(data.difficult_terms) ? data.difficult_terms : [];
-        const merged = [...keywords, ...difficult].filter(item => item && (item.term_en || item.term_target));
+        const merged = [...keywords, ...difficult].filter(item => item && (item.term_en || item.translation_target || item.explanation_target || item.term_target));
         const htmlParts = [];
         merged.forEach((item, idx) => {
+          const translation = item.translation_target || item.term_target || '';
+          const explanation = item.explanation_target || '';
           htmlParts.push(`
             <div class="glossary-card">
               <div><span class="glossary-line-badge">${langSelect.value} 第 ${idx + 1} 行</span><strong>${item.term_en || ''}</strong></div>
-              <div class="glossary-target-text">${item.term_target || ''}</div>
+              <div class="glossary-target-text"><strong>Translation:</strong> ${translation || '—'}</div>
+              <div class="glossary-target-text"><strong>Explanation:</strong> ${explanation || '—'}</div>
             </div>
           `);
         });
@@ -1964,7 +1968,7 @@
     `;
   }
 
-  /* 更新课件视图：第3/4章使用 pdf.js 单页翻页模式，其余保持原有 iframe 模式 */
+  /* 更新课件视图：第3/4/5/6章及期末任务使用 pdf.js 单页翻页模式，其余保持原有 iframe 模式 */
   async function updatePptView() {
     const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
@@ -2003,7 +2007,7 @@
         pdfjsCanvasWrap.classList.remove('active');
         pptPlaceholderBody.style.display = 'block';
         pptPlaceholderBody.innerHTML = `
-          <p>第三/四章试验版已切换为 pdf.js 单页翻页模式。</p>
+          <p>当前试验版章节/模块已切换为 pdf.js 单页翻页模式。</p>
           <p style="margin-top:8px;">当前尚未上传本语言版本 PDF。上传中英版 PDF 后，即可使用上一页 / 下一页与 AI 词汇窗。</p>
         `;
         pdfPageIndicator.textContent = '第 0 / 0 页';
