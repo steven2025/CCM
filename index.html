@@ -1011,6 +1011,8 @@
   let pdfCurrentPage = 1;
   let pdfPageCount = 0;
   let currentPdfUrl = '';
+  let pdfRenderTask = null;
+  let pdfRenderToken = 0;
   const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
@@ -1725,7 +1727,7 @@
 
   const AI_GLOSSARY_API_URL = 'https://1311686407-i1ii1q3243.ap-guangzhou.tencentscf.com';
 
-  function getSavedAiConfig() {
+  function getSavedSystemLogin() {
     try {
       return JSON.parse(localStorage.getItem('ccm_system_login') || '{}');
     } catch (err) {
@@ -1733,12 +1735,12 @@
     }
   }
 
-  function saveAiConfig(config) {
+  function saveSystemLogin(config) {
     localStorage.setItem('ccm_system_login', JSON.stringify(config));
   }
 
-  function getAiConfigSummary() {
-    return 'AI词汇窗已接入云函数';
+  function getGlossaryServiceSummary() {
+    return '词汇服务已连接';
   }
 
   async function callAiGlossary(pageText, targetLang) {
@@ -1779,7 +1781,22 @@
 
   async function renderPdfPage(pageNum) {
     if (!pdfDoc) return;
+
+    const token = ++pdfRenderToken;
+
+    if (pdfRenderTask) {
+      try {
+        pdfRenderTask.cancel();
+      } catch (e) {}
+      pdfRenderTask = null;
+    }
+
+    pdfPrevBtn.disabled = true;
+    pdfNextBtn.disabled = true;
+
     const page = await pdfDoc.getPage(pageNum);
+    if (token !== pdfRenderToken) return;
+
     const viewport = page.getViewport({ scale: 1.3 });
     const ctx = pdfjsCanvas.getContext('2d');
     const ratio = window.devicePixelRatio || 1;
@@ -1788,7 +1805,25 @@
     pdfjsCanvas.style.width = viewport.width + 'px';
     pdfjsCanvas.style.height = viewport.height + 'px';
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    await page.render({ canvasContext: ctx, viewport }).promise;
+    ctx.clearRect(0, 0, pdfjsCanvas.width, pdfjsCanvas.height);
+
+    pdfRenderTask = page.render({ canvasContext: ctx, viewport });
+
+    try {
+      await pdfRenderTask.promise;
+    } catch (err) {
+      if (!err || err.name !== 'RenderingCancelledException') {
+        throw err;
+      }
+      return;
+    } finally {
+      if (token === pdfRenderToken) {
+        pdfRenderTask = null;
+      }
+    }
+
+    if (token !== pdfRenderToken) return;
+
     pdfCurrentPage = pageNum;
     pdfPageIndicator.textContent = '第 ' + pageNum + ' / ' + pdfPageCount + ' 页';
     pdfPrevBtn.disabled = pageNum <= 1;
@@ -1808,6 +1843,12 @@
 
   async function loadPdfJsDocument(url) {
     currentPdfUrl = url || '';
+    if (pdfRenderTask) {
+      try {
+        pdfRenderTask.cancel();
+      } catch (e) {}
+      pdfRenderTask = null;
+    }
     pdfDoc = null;
     pdfCurrentPage = 1;
     pdfPageCount = 0;
@@ -1824,7 +1865,7 @@
       existing.style.zIndex = ++currentZ;
       return;
     }
-    const saved = getSavedAiConfig();
+    const saved = getSavedSystemLogin();
     const win = document.createElement('div');
     win.className = 'floating-window';
     win.setAttribute('data-tool', 'ai-config');
@@ -1846,7 +1887,7 @@
         <div class="api-config-grid">
           <button class="btn-ghost" id="invite-save-btn">确认</button>
         </div>
-        <div class="status-box" id="ai-status-box">邀请码功能暂时空白，后面补充。</div>
+        <div class="status-box" id="login-status-box">邀请码功能暂时空白，后面补充。</div>
       </div>
     `;
     const footer = document.createElement('div');
@@ -1860,11 +1901,11 @@
     closeBtn.addEventListener('click', () => win.remove());
 
     const inviteInput = body.querySelector('#invite-code-input');
-    const statusBox = body.querySelector('#ai-status-box');
+    const statusBox = body.querySelector('#login-status-box');
     inviteInput.value = saved.inviteCode || '';
 
     body.querySelector('#invite-save-btn').addEventListener('click', () => {
-      saveAiConfig({ inviteCode: inviteInput.value.trim() });
+      saveSystemLogin({ inviteCode: inviteInput.value.trim() });
       statusBox.textContent = '邀请码功能暂未启用，已保留输入内容。';
       statusBox.className = 'status-box status-success';
     });
@@ -1902,7 +1943,7 @@
         </select>
         <button class="btn-ghost" id="glossary-generate-btn">生成本页词汇 / Generate Page Vocabulary</button>
       </div>
-      <div class="status-box" id="glossary-status-box">${getAiConfigSummary()}。点击“生成本页词汇”开始。</div>
+      <div class="status-box" id="glossary-status-box">${getGlossaryServiceSummary()}。点击“生成本页词汇”开始。</div>
       <div class="glossary-list" id="glossary-result-list">
         <div class="glossary-empty">该试验版会读取当前 PDF 页面的英文文本，并为每个词汇显示目标语言翻译与简短解释，便于快速阅读。</div>
       </div>
@@ -1953,7 +1994,7 @@
       } catch (err) {
         statusBox.textContent = '生成失败：' + err.message;
         statusBox.className = 'status-box status-error';
-        resultList.innerHTML = '<div class="glossary-empty">请先确认 AI 接口已配置，并确保当前 PDF 页面可提取文本。</div>';
+        resultList.innerHTML = '<div class="glossary-empty">请检查词汇服务是否可用，并确保当前 PDF 页面可提取文本。</div>';
       }
     });
   }
