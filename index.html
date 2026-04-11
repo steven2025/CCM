@@ -1455,7 +1455,7 @@
 
 
   const aboutCourseApps = [
-    { id: "ai-api-config", title: "AI接口设置", subtitle: "ChatGPT / DeepSeek / Custom API", icon: "🤖", color: "linear-gradient(135deg, #0ea5e9, #2563eb)", mode: "api-config" },
+    { id: "ai-api-config", title: "系统登录", subtitle: "请输入邀请码", icon: "🤖", color: "linear-gradient(135deg, #0ea5e9, #2563eb)", mode: "api-config" },
     { id: "business-spss", title: "商务统计/Business-Spss", subtitle: "Business statistics tools", icon: "📊", color: "linear-gradient(135deg, #2563eb, #1d4ed8)", url: "https://steven2025.github.io/business-spss/" },
     { id: "hofstede-index", title: "文化指数", subtitle: "Culture dimensions reference", icon: "🌐", color: "linear-gradient(135deg, #7c3aed, #5b21b6)", url: "https://steven2025.github.io/Culture-dimention/" },
     { id: "belbin-test", title: "贝尔宾测试", subtitle: "Belbin team role test", icon: "🧩", color: "linear-gradient(135deg, #db2777, #be185d)", url: "https://steven2025.github.io/belbin-test/" },
@@ -1723,73 +1723,47 @@
     return pdfJsChapters.has(normalized);
   }
 
+  const AI_GLOSSARY_API_URL = 'https://1311686407-i1ii1q3243.ap-guangzhou.tencentscf.com';
+
   function getSavedAiConfig() {
     try {
-      return JSON.parse(localStorage.getItem('ccm_ai_config') || '{}');
+      return JSON.parse(localStorage.getItem('ccm_system_login') || '{}');
     } catch (err) {
       return {};
     }
   }
 
   function saveAiConfig(config) {
-    localStorage.setItem('ccm_ai_config', JSON.stringify(config));
+    localStorage.setItem('ccm_system_login', JSON.stringify(config));
   }
 
   function getAiConfigSummary() {
-    const cfg = getSavedAiConfig();
-    if (!cfg.provider || !cfg.apiKey) return '未配置 AI 接口';
-    return (cfg.providerLabel || cfg.provider || 'Custom') + ' · 已配置';
-  }
-
-  async function testAiConnection(config) {
-    const base = (config.baseUrl || '').replace(/\/$/, '');
-    if (!base || !config.apiKey) throw new Error('请先填写 Base URL 和 API Key');
-    const resp = await fetch(base + '/models', {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + config.apiKey }
-    });
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('测试失败：HTTP ' + resp.status + ' ' + txt.slice(0, 160));
-    }
-    const data = await resp.json();
-    return data;
+    return 'AI词汇窗已接入云函数';
   }
 
   async function callAiGlossary(pageText, targetLang) {
-    const cfg = getSavedAiConfig();
-    if (!cfg.apiKey || !cfg.baseUrl || !cfg.model) {
-      throw new Error('请先在“AI工具与APPs”中完成 AI 接口设置。');
-    }
-    const base = cfg.baseUrl.replace(/\/$/, '');
     const payload = {
-      model: cfg.model,
-      temperature: 0.2,
-      messages: [
-        {
-          role: 'system',
-          content: '你是跨文化管理课程的多语词汇助手。请从输入页面文本中提取 5 个最重要英文关键词和 3 个较难英文表达，输出 JSON，字段固定为 keywords 和 difficult_terms。每项必须包含 3 个字段：term_en、translation_target、explanation_target。translation_target 必须是该英文词汇在目标语言中的准确简洁对应词或短语；explanation_target 必须用目标语言对该词汇做一句简短准确解释，便于学生理解。不要返回中文，不要返回说明，不要输出 markdown。'
-        },
-        {
-          role: 'user',
-          content: '目标语种：' + targetLang + '\n任务要求：请同时给出每个英文词汇的目标语言翻译（translation_target）和目标语言简短解释（explanation_target）。\n当前页文本：\n' + pageText.slice(0, 6000)
-        }
-      ]
+      pageText: (pageText || '').slice(0, 6000),
+      targetLang,
+      chapter: currentChapter,
+      pageNum: pdfCurrentPage || 1
     };
-    const resp = await fetch(base + '/chat/completions', {
+    const resp = await fetch(AI_GLOSSARY_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + cfg.apiKey
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     });
-    const data = await resp.json();
+    const data = await resp.json().catch(() => ({}));
     if (!resp.ok) {
       throw new Error((data && (data.error?.message || data.message)) || 'AI 调用失败');
     }
-    const content = data?.choices?.[0]?.message?.content || '';
-    const match = content.match(/\{[\s\S]*\}/);
+    if (data && (Array.isArray(data.keywords) || Array.isArray(data.difficult_terms))) {
+      return data;
+    }
+    const content = data?.choices?.[0]?.message?.content || data?.content || '';
+    const match = typeof content === 'string' ? content.match(/\{[\s\S]*\}/) : null;
     if (!match) {
       throw new Error('AI 返回内容无法解析为 JSON。');
     }
@@ -1855,48 +1829,29 @@
     win.className = 'floating-window';
     win.setAttribute('data-tool', 'ai-config');
     win.style.zIndex = ++currentZ;
-    win.style.width = '640px';
+    win.style.width = '520px';
     win.style.maxWidth = '92vw';
     const header = document.createElement('div');
     header.className = 'floating-header';
-    header.innerHTML = '<div class="floating-title">AI接口设置 · AI API Config</div><div class="floating-controls"><button class="btn-icon" title="Close">✕</button></div>';
+    header.innerHTML = '<div class="floating-title">系统登录 · System Login</div><div class="floating-controls"><button class="btn-icon" title="Close">✕</button></div>';
     const closeBtn = header.querySelector('button');
     const body = document.createElement('div');
     body.className = 'floating-body';
     body.innerHTML = `
       <div class="api-config-form">
-        <div class="api-config-grid">
-          <div>
-            <label>接口类型</label>
-            <select id="ai-provider-select">
-              <option value="chatgpt">ChatGPT</option>
-              <option value="deepseek">DeepSeek</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-          <div>
-            <label>模型名称</label>
-            <input id="ai-model-input" placeholder="例如 gpt-4.1-mini / deepseek-chat" />
-          </div>
-        </div>
         <div>
-          <label>Base URL</label>
-          <input id="ai-base-input" placeholder="https://api.openai.com/v1" />
-        </div>
-        <div>
-          <label>API Key</label>
-          <input id="ai-key-input" type="password" placeholder="请输入你自己的 API Key" />
+          <label>请输入邀请码</label>
+          <input id="invite-code-input" type="password" placeholder="邀请码功能暂未开放，后续补充" />
         </div>
         <div class="api-config-grid">
-          <button class="btn-ghost" id="ai-test-btn">测试连通性</button>
-          <button class="btn-ghost" id="ai-save-btn">保存设置</button>
+          <button class="btn-ghost" id="invite-save-btn">确认</button>
         </div>
-        <div class="status-box" id="ai-status-box">当前状态：${getAiConfigSummary()}</div>
+        <div class="status-box" id="ai-status-box">邀请码功能暂时空白，后面补充。</div>
       </div>
     `;
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
-    footer.textContent = '说明：该设置仅保存在当前浏览器，用于试验版 AI 词汇辅助功能。';
+    footer.textContent = '当前版本仅保留登录入口，邀请码校验功能后续补充。';
     win.appendChild(header);
     win.appendChild(body);
     win.appendChild(footer);
@@ -1904,70 +1859,14 @@
     makeDraggable(win, header);
     closeBtn.addEventListener('click', () => win.remove());
 
-    const providerSelect = body.querySelector('#ai-provider-select');
-    const modelInput = body.querySelector('#ai-model-input');
-    const baseInput = body.querySelector('#ai-base-input');
-    const keyInput = body.querySelector('#ai-key-input');
+    const inviteInput = body.querySelector('#invite-code-input');
     const statusBox = body.querySelector('#ai-status-box');
+    inviteInput.value = saved.inviteCode || '';
 
-    function applyDefaults(provider) {
-      const defaults = aiProviderDefaults[provider] || aiProviderDefaults.custom;
-      if (!baseInput.dataset.userEdited || !baseInput.value) baseInput.value = saved.baseUrl || defaults.baseUrl || '';
-      if (!modelInput.dataset.userEdited || !modelInput.value) modelInput.value = saved.model || defaults.model || '';
-      if (provider !== 'custom') baseInput.readOnly = true;
-      else baseInput.readOnly = false;
-    }
-
-    providerSelect.value = saved.provider || 'chatgpt';
-    modelInput.value = saved.model || aiProviderDefaults[providerSelect.value].model || '';
-    baseInput.value = saved.baseUrl || aiProviderDefaults[providerSelect.value].baseUrl || '';
-    keyInput.value = saved.apiKey || '';
-    baseInput.readOnly = providerSelect.value !== 'custom';
-
-    providerSelect.addEventListener('change', () => {
-      const defaults = aiProviderDefaults[providerSelect.value] || aiProviderDefaults.custom;
-      if (providerSelect.value !== 'custom') {
-        baseInput.value = defaults.baseUrl || '';
-      }
-      modelInput.value = defaults.model || modelInput.value;
-      baseInput.readOnly = providerSelect.value !== 'custom';
-    });
-    modelInput.addEventListener('input', () => { modelInput.dataset.userEdited = '1'; });
-    baseInput.addEventListener('input', () => { baseInput.dataset.userEdited = '1'; });
-
-    body.querySelector('#ai-save-btn').addEventListener('click', () => {
-      const config = {
-        provider: providerSelect.value,
-        providerLabel: providerSelect.options[providerSelect.selectedIndex].textContent,
-        model: modelInput.value.trim(),
-        baseUrl: baseInput.value.trim(),
-        apiKey: keyInput.value.trim()
-      };
-      saveAiConfig(config);
-      statusBox.textContent = '已保存：' + getAiConfigSummary();
+    body.querySelector('#invite-save-btn').addEventListener('click', () => {
+      saveAiConfig({ inviteCode: inviteInput.value.trim() });
+      statusBox.textContent = '邀请码功能暂未启用，已保留输入内容。';
       statusBox.className = 'status-box status-success';
-    });
-
-    body.querySelector('#ai-test-btn').addEventListener('click', async () => {
-      const config = {
-        provider: providerSelect.value,
-        providerLabel: providerSelect.options[providerSelect.selectedIndex].textContent,
-        model: modelInput.value.trim(),
-        baseUrl: baseInput.value.trim(),
-        apiKey: keyInput.value.trim()
-      };
-      statusBox.textContent = '正在测试接口连通性...';
-      statusBox.className = 'status-box status-loading';
-      try {
-        const data = await testAiConnection(config);
-        const count = Array.isArray(data?.data) ? data.data.length : 0;
-        statusBox.textContent = '测试成功：已连接 ' + (config.providerLabel || config.provider) + '，可用模型数量 ' + count + '。';
-        statusBox.className = 'status-box status-success';
-        saveAiConfig(config);
-      } catch (err) {
-        statusBox.textContent = '测试失败：' + err.message;
-        statusBox.className = 'status-box status-error';
-      }
     });
   }
 
