@@ -1743,7 +1743,7 @@
 
   async function callAiGlossary(pageText, targetLang) {
     const payload = {
-      pageText: (pageText || '').slice(0, 6000),
+      pageText: (pageText || '').slice(0, 2500),
       targetLang,
       chapter: currentChapter,
       pageNum: pdfCurrentPage || 1
