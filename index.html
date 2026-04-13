@@ -1975,11 +1975,11 @@
         const data = await callAiGlossary(pageText, langSelect.value);
         statusBox.textContent = '生成成功：' + langSelect.value + ' 词汇辅助已更新。';
         statusBox.className = 'status-box status-success';
-        const keywords = Array.isArray(data.keywords) ? data.keywords : [];
         const difficult = Array.isArray(data.difficult_terms) ? data.difficult_terms : [];
-        const merged = [...keywords, ...difficult].filter(item => item && (item.term_en || item.translation_target || item.explanation_target || item.term_target));
         const htmlParts = [];
-        merged.forEach((item, idx) => {
+         difficult
+           .filter(item => item && (item.term_en || item.translation_target || item.explanation_target || item.term_target))
+           .forEach((item, idx) => {
           const translation = item.translation_target || item.term_target || '';
           const explanation = item.explanation_target || '';
           htmlParts.push(`
