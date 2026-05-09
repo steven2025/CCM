@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About This Platform</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #243b6b 0, #0b1020 45%, #05060a 100%);
+      color: #e5e9f0;
+      overflow-x: hidden;
+    }
+
+    a { color: #88c0ff; text-decoration: none; }
+
+    .about-page {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px 18px 48px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 42px 28px;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(136,192,255,0.25), transparent 36%),
+        linear-gradient(135deg, rgba(40,60,100,0.92), rgba(10,12,25,0.92));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      margin-bottom: 26px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(136,192,255,0.12);
+      border: 1px solid rgba(136,192,255,0.32);
+      font-size: 0.88rem;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.12;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero h2 {
+      max-width: 880px;
+      font-size: clamp(1rem, 2vw, 1.32rem);
+      line-height: 1.7;
+      opacity: 0.92;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .btn {
+      border: 1px solid rgba(136,192,255,0.45);
+      color: #e5e9f0;
+      background: rgba(46,52,64,0.82);
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.42);
+      background: rgba(129,161,193,0.20);
+    }
+
+    .language-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(15,20,35,0.72);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .language-strip span {
+      opacity: 0.9;
+      font-size: 0.92rem;
+    }
+
+    .language-select {
+      background: rgba(46,52,64,0.96);
+      color: #e5e9f0;
+      border: 1px solid rgba(136,192,255,0.5);
+      border-radius: 999px;
+      padding: 8px 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .module-grid { grid-template-columns: 1fr; }
+    }
+
+    .module-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 22px;
+      background:
+        radial-gradient(circle at top left, rgba(136,192,255,0.13), transparent 42%),
+        rgba(15,20,35,0.86);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 44px rgba(0,0,0,0.58);
+      border-color: rgba(136,192,255,0.48);
+    }
+
+    .module-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: 16px;
+    }
+
+    .module-card h3 {
+      font-size: 1.28rem;
+      margin-bottom: 10px;
+    }
+
+    .module-card p {
+      line-height: 1.7;
+      opacity: 0.88;
+      font-size: 0.94rem;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(136,192,255,0.12);
+      border: 1px solid rgba(136,192,255,0.24);
+      font-size: 0.76rem;
+      opacity: 0.9;
+    }
+
+    .floating-window {
+      position: fixed;
+      top: 80px;
+      left: 80px;
+      width: min(760px, calc(100vw - 28px));
+      height: min(680px, calc(100vh - 28px));
+      min-width: 310px;
+      min-height: 300px;
+      max-width: calc(100vw - 16px);
+      max-height: calc(100vh - 16px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      resize: both;
+      z-index: 1000;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(15,18,30,0.97);
+      box-shadow: 0 18px 54px rgba(0,0,0,0.75);
+    }
+
+    .floating-window.fullscreen {
+      top: 8px !important;
+      left: 8px !important;
+      width: calc(100vw - 16px) !important;
+      height: calc(100vh - 16px) !important;
+      max-width: none;
+      max-height: none;
+      border-radius: 12px;
+      resize: none;
+    }
+
+    .floating-window.minimized {
+      height: 48px !important;
+      min-height: 48px !important;
+      resize: none;
+    }
+
+    .floating-window.minimized .floating-body,
+    .floating-window.minimized .floating-footer {
+      display: none;
+    }
+
+    .floating-header {
+      flex-shrink: 0;
+      cursor: move;
+      user-select: none;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(90deg, rgba(59,66,82,0.94), rgba(76,86,106,0.76));
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .floating-title {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .floating-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 27px;
+      height: 27px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.45);
+      background: rgba(15,18,30,0.82);
+      color: #eceff4;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+    }
+
+    .icon-btn:hover { background: rgba(229,233,244,0.14); }
+
+    .floating-body {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+      line-height: 1.72;
+    }
+
+    .floating-footer {
+      flex-shrink: 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 8px 12px;
+      opacity: 0.72;
+      font-size: 0.76rem;
+    }
+
+    .content-hero {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .content-hero { grid-template-columns: 1fr; }
+    }
+
+    .instructor-photo {
+      width: 180px;
+      height: 220px;
+      border-radius: 24px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .photo-placeholder {
+      width: 180px;
+      height: 220px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      color: rgba(229,233,240,0.72);
+      background:
+        radial-gradient(circle at top, rgba(136,192,255,0.16), transparent 45%),
+        rgba(255,255,255,0.05);
+      border: 1px dashed rgba(136,192,255,0.38);
+    }
+
+    .photo-box {
+      position: relative;
+      width: 180px;
+      height: 220px;
+    }
+
+    .photo-zoom-btn {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      border: 1px solid rgba(255,255,255,0.48);
+      background: rgba(15,18,30,0.78);
+      color: #fff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .photo-zoom-btn:hover {
+      background: rgba(136,192,255,0.22);
+    }
+
+    .photo-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      background: rgba(0,0,0,0.76);
+      padding: 24px;
+    }
+
+    .photo-overlay.active {
+      display: flex;
+    }
+
+    .photo-overlay-inner {
+      position: relative;
+      max-width: min(88vw, 900px);
+      max-height: 88vh;
+    }
+
+    .photo-overlay img {
+      max-width: 100%;
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.82);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .photo-overlay-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(15,18,30,0.94);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .content-section {
+      margin-bottom: 22px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .content-section h3 {
+      color: #88c0ff;
+      margin-bottom: 10px;
+      font-size: 1.12rem;
+    }
+
+    .content-section ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .content-section li { margin-bottom: 7px; }
+
+    .highlight {
+      color: #ffd166;
+      font-weight: 700;
+    }
+
+    .quote {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-left: 4px solid #88c0ff;
+      background: rgba(136,192,255,0.08);
+      border-radius: 12px;
+      font-size: 1.02rem;
+    }
+
+    details {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15,20,35,0.42);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    summary {
+      cursor: pointer;
+      color: #88c0ff;
+      font-weight: 700;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .video-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .video-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(136,192,255,0.48);
+    }
+
+    .video-card h4 {
+      margin-bottom: 8px;
+      color: #e5e9f0;
+    }
+
+    .video-card p {
+      opacity: 0.82;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .video-player {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      background: #000;
+      border-radius: 14px;
+      display: block;
+    }
+
+    .empty-note {
+      color: rgba(229,233,240,0.78);
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="about-page">
+<section class="language-strip">
+      <span id="languageHint">选择语言：平台介绍与教师介绍支持多语言切换。</span>
+      <select class="language-select" id="globalLang">
+        <option value="zh">中文 Chinese</option>
+        <option value="en">English</option>
+        <option value="th">ไทย Thai</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="lo">ລາວ Lao</option>
+      </select>
+    </section>
+
+    <section class="module-grid">
+      <article class="module-card" data-open="platform">
+        <div class="module-icon">🌐</div>
+        <h3 id="cardPlatformTitle">About This Platform</h3>
+        <p id="cardPlatformText">了解这个AI支持的多语言跨文化管理学习平台。</p>
+        <div class="tag-row">
+          <span class="tag">AI-supported</span>
+          <span class="tag">Multilingual</span>
+          <span class="tag">Cross-cultural</span>
+        </div>
+      </article>
+
+      <article class="module-card" data-open="instructor">
+        <div class="module-icon">👨‍🏫</div>
+        <h3 id="cardInstructorTitle">About the Instructor</h3>
+        <p id="cardInstructorText">了解课程教师、国际化教学经历、研究方向与企业咨询实践。</p>
+        <div class="tag-row">
+          <span class="tag">AI + HRM</span>
+          <span class="tag">International Teaching</span>
+          <span class="tag">Consulting</span>
+        </div>
+      </article>
+
+      <article class="module-card" data-open="students">
+        <div class="module-icon">🎬</div>
+        <h3 id="cardStudentsTitle">What are the Students Saying?</h3>
+        <p id="cardStudentsText">观看国际学生和中国学生对课程与平台的学习体验反馈。</p>
+        <div class="tag-row">
+          <span class="tag">Thai Student 1</span>
+          <span class="tag">British Student 1</span>
+          <span class="tag">Chinese Student 1/2</span>
+        </div>
+      </article>
+    </section>
+  </main>
+
+
+  <div class="photo-overlay" id="photoOverlay" onclick="closeInstructorPhoto(event)">
+    <div class="photo-overlay-inner">
+      <button class="photo-overlay-close" type="button" onclick="closeInstructorPhoto(event)">✕</button>
+      <img id="photoOverlayImg" src="" alt="Instructor Photo Enlarged">
+    </div>
+  </div>
+
+  <script>
+    let currentZ = 1500;
+
+    const instructorPhotoUrl = "./assets/instructor-main.jpg"; 
+    // 若暂时没有照片，可保持该路径不变；上传后放在 about/assets/instructor-main.jpg 即可。
+
+    const platformContent = {
+      zh: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "跨文化管理课程多语言AI学习平台",
+        heroSubtitle: "一个面向国际学生与中国学生的跨文化管理学习平台，融合多语言学习支持、真实企业案例、学生视频反馈与AI辅助学习工具。",
+        languageHint: "选择语言：平台介绍与教师介绍支持多语言切换。",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "了解这个AI支持的多语言跨文化管理学习平台。",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "了解课程教师、国际化教学经历、研究方向与企业咨询实践。",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "观看国际学生和中国学生对课程与平台的学习体验反馈。",
+        platformTitle: "About This Platform｜平台介绍",
+        instructorTitle: "About the Instructor｜教师介绍",
+        studentsTitle: "What are the Students Saying｜学生怎么说",
+        platformHtml: `
+          <div class="content-section">
+            <h3>在全球化与AI时代，真正重要的不只是语言能力</h3>
+            <p>当你来到中国学习、生活、实习，或者未来进入国际企业工作时，你可能会发现：即使英语很好，跨文化沟通依然困难；同样一句话，在不同文化中可能有完全不同的含义；国际团队中的问题，很多时候并不是“语言问题”，而是“文化问题”。</p>
+            <div class="quote">本平台希望帮助学生建立 <span class="highlight">跨文化理解能力、国际协作能力与AI应用能力</span>。</div>
+          </div>
+
+          <div class="content-section">
+            <h3>这不仅是一门理论课程，更是一门真实国际商业环境训练课程</h3>
+            <p>课程围绕跨文化沟通、国际商务文化、国际团队合作、中国企业国际化、中国企业海外经营、外资企业在中国经营、国际人力资源管理、国际商务冲突与文化整合等内容展开。</p>
+            <ul>
+              <li>国际企业真实案例与中国企业国际化案例</li>
+              <li>视频案例分析与跨文化情景模拟</li>
+              <li>国际学生课堂互动与小组任务</li>
+              <li>AI辅助阅读、AI词汇解释与AI学习工具</li>
+            </ul>
+          </div>
+
+          <div class="content-section">
+            <h3>专门为国际学生设计的多语言学习支持</h3>
+            <p>很多国际学生在学习过程中同时面对中文学习压力、英文专业课程压力、商务术语理解困难和案例分析阅读困难。因此，本平台提供中英双语课件、多语言字幕视频、多语言案例材料、AI词汇解释系统、AI辅助阅读、多语言练习任务和视频字幕支持。</p>
+          </div>
+
+          <div class="content-section">
+            <h3>中国企业国际化是本课程的重要特色</h3>
+            <p>课程包含 Lenovo & IBM、Geely & Volvo、TCL & Thomson、中国企业海外团队管理、外资企业在中国的文化适应等案例，帮助学生理解中国企业如何在全球化背景下进行跨文化合作与国际管理。</p>
+          </div>
+
+          <div class="content-section">
+            <h3>AI时代：国际学生必须具备的新能力</h3>
+            <p>本平台集成AI跨文化沟通助手、AI商务回复生成器、AI谈判模拟器、AI案例分析助手、AI文化词汇窗、文化智商测试、贝尔宾团队角色测试、海外薪酬包设计系统、商务统计与SPSS辅助工具等功能。</p>
+            <p>我们希望学生获得的不只是课程知识，更是在未来全球化与AI时代，与不同文化背景的人高效合作的能力。</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-hero">
+            <div class="photo-box">
+              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" onerror="this.parentElement.replaceWith(createPhotoPlaceholder())">
+              <button class="photo-zoom-btn" type="button" onclick="openInstructorPhoto()">放大</button>
+            </div>
+            <div>
+              <h2>鄢清华 副教授</h2>
+              <p>重庆工商大学 工商管理学院 人力资源管理系</p>
+              <p>Email: yanqinghua@ctbu.edu.cn</p>
+              <p class="empty-note">研究方向：AI赋能人力资源管理体系、组织发展</p>
+            </div>
+          </div>
+
+          <div class="content-section">
+            <h3>教学与国际化课程</h3>
+            <ul>
+              <li>《跨文化管理》（全英文）：国际MBA、MBA、国际交换生、国际项目学生</li>
+              <li>《人力资源管理》（全英文）：国际交换生、国际项目学生</li>
+              <li>《工作分析与组织设计》：国内本科生</li>
+            </ul>
+          </div>
+
+          <div class="content-section">
+            <h3>国际化经历与教育背景</h3>
+            <ul>
+              <li>加拿大不列颠哥伦比亚大学（UBC）全英文教学培训</li>
+              <li>美国 Widener University 访问学者</li>
+              <li>重庆大学 工商管理硕士</li>
+              <li>重庆商学院（现重庆工商大学）经济学学士</li>
+            </ul>
+          </div>
+
+          <div class="content-section">
+            <h3>教材与专业方向</h3>
+            <p>2018年主编并出版《旅游业人力资源管理》全英文教材。长期关注AI赋能人力资源管理体系、组织发展、国际化教学与跨文化管理实践。</p>
+          </div>
+
+          <div class="content-section">
+            <h3>专业服务与企业咨询</h3>
+            <p>2002年至今，先后担任世界银行和亚洲开发银行中国项目人力资源开发、培训及机构改革资深专家，并为多家企业和政府机构提供组织建设、人力资源体系建设等咨询服务。</p>
+
+            <details>
+              <summary>展开：企业培训主题</summary>
+              <ul>
+                <li>AI赋能企业人力资源管理体系</li>
+                <li>人力资源管理专业人士能力素养提升</li>
+                <li>战略人力资源管理</li>
+                <li>HRBP的选拔与成长之路</li>
+                <li>职业倦怠及其有效干预</li>
+                <li>贝尔宾团队角色实务</li>
+                <li>团队建设的内核</li>
+              </ul>
+            </details>
+
+            <details>
+              <summary>展开：主要咨询项目示例</summary>
+              <ul>
+                <li>光大银行重庆分行大数据运用课程体系设计及实施咨询项目</li>
+                <li>国网重庆建设分公司基建管理能力评价服务</li>
+                <li>重庆市发改委效能型机关研究与绩效管理体系提升</li>
+                <li>亚洲开发银行贷款广西百色城市环境综合整治机构与能力建设咨询</li>
+                <li>世界银行贷款重庆城市环境项目人力资源咨询子项</li>
+              </ul>
+            </details>
+          </div>
+        `
+      },
+
+      en: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "AI-supported Multilingual Learning Platform for Cross-cultural Management",
+        heroSubtitle: "A learning platform for international and Chinese students, integrating multilingual learning support, real business cases, student voices, and AI-assisted tools.",
+        languageHint: "Select language: About This Platform and About the Instructor support multilingual display.",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "Learn about this AI-supported multilingual platform for cross-cultural management.",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "Learn about the instructor’s international teaching experience, research interests, and consulting practice.",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "Watch short videos from international and Chinese students.",
+        platformTitle: "About This Platform",
+        instructorTitle: "About the Instructor",
+        studentsTitle: "What are the Students Saying",
+        platformHtml: `
+          <div class="content-section">
+            <h3>In the age of globalization and AI, language ability is no longer enough.</h3>
+            <p>When students study, live, intern, or work in China and international companies, they may find that good English alone does not guarantee effective cross-cultural communication.</p>
+            <div class="quote">This platform helps students develop <span class="highlight">cross-cultural understanding, global collaboration skills, and practical AI competence</span>.</div>
+          </div>
+
+          <div class="content-section">
+            <h3>More than a theory course</h3>
+            <p>This course is designed as a practical training experience for real international business contexts, covering cross-cultural communication, international business culture, global teams, Chinese companies going abroad, foreign companies operating in China, international HRM, and cultural integration.</p>
+          </div>
+
+          <div class="content-section">
+            <h3>Multilingual learning support</h3>
+            <p>The platform provides bilingual slides, multilingual video support, multilingual cases, AI glossary, AI-assisted reading, multilingual exercises, and practical AI tools.</p>
+          </div>
+
+          <div class="content-section">
+            <h3>Chinese companies in global business</h3>
+            <p>The course includes cases such as Lenovo & IBM, Geely & Volvo, TCL & Thomson, Chinese companies overseas, and foreign companies operating in China.</p>
+          </div>
+
+          <div class="content-section">
+            <h3>AI + International Business + Cross-cultural Competence</h3>
+            <p>Students can explore AI communication assistants, AI negotiation simulation, AI case analysis, CQ test, Belbin team role test, expat compensation design, and business statistics tools.</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-hero">
+            <div class="photo-box">
+              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" onerror="this.parentElement.replaceWith(createPhotoPlaceholder())">
+              <button class="photo-zoom-btn" type="button" onclick="openInstructorPhoto()">放大</button>
+            </div>
+            <div>
+              <h2>Associate Professor Yan Qinghua</h2>
+              <p>Department of Human Resource Management, School of Business Administration, Chongqing Technology and Business University</p>
+              <p>Email: yanqinghua@ctbu.edu.cn</p>
+              <p class="empty-note">Research interests: AI-enabled HRM systems and organizational development.</p>
+            </div>
+          </div>
+
+          <div class="content-section">
+            <h3>Teaching</h3>
+            <ul>
+              <li>Cross-cultural Management, taught in English for International MBA, MBA, exchange students, and international program students.</li>
+              <li>Human Resource Management, taught in English for exchange students and international program students.</li>
+              <li>Job Analysis and Organizational Design for undergraduate students.</li>
+            </ul>
+          </div>
+
+          <div class="content-section">
+            <h3>International Experience</h3>
+            <ul>
+              <li>English-medium teaching training at the University of British Columbia, Canada.</li>
+              <li>Visiting Scholar at Widener University, USA.</li>
+              <li>MBA from Chongqing University.</li>
+            </ul>
+          </div>
+
+          <div class="content-section">
+            <h3>Professional Practice</h3>
+            <p>Professor Yan has long been involved in HRM consulting, organizational development, and capacity-building projects. Since 2002, he has served as a senior expert for human resource development, training, and institutional reform in World Bank and Asian Development Bank projects in China.</p>
+          </div>
+        `
+      },
+
+      th: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "แพลตฟอร์มการเรียนรู้พหุภาษาและ AI สำหรับการจัดการข้ามวัฒนธรรม",
+        heroSubtitle: "แพลตฟอร์มสำหรับนักศึกษาต่างชาติและนักศึกษาจีน ที่รวมการสนับสนุนหลายภาษา กรณีศึกษาธุรกิจจริง วิดีโอความคิดเห็นของนักศึกษา และเครื่องมือ AI",
+        languageHint: "เลือกภาษา: ส่วนแนะนำแพลตฟอร์มและอาจารย์รองรับหลายภาษา",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "เรียนรู้เกี่ยวกับแพลตฟอร์มพหุภาษาที่สนับสนุนด้วย AI",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "เรียนรู้เกี่ยวกับอาจารย์ ประสบการณ์การสอนนานาชาติ และงานวิจัย",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "ชมวิดีโอสั้นจากนักศึกษาต่างชาติและนักศึกษาจีน",
+        platformTitle: "About This Platform",
+        instructorTitle: "About the Instructor",
+        studentsTitle: "What are the Students Saying",
+        platformHtml: `
+          <div class="content-section">
+            <h3>ในยุคโลกาภิวัตน์และ AI ความสามารถด้านภาษาเพียงอย่างเดียวไม่เพียงพอ</h3>
+            <p>แพลตฟอร์มนี้ช่วยให้นักศึกษาพัฒนาความเข้าใจข้ามวัฒนธรรม ความสามารถในการทำงานร่วมกันในระดับสากล และทักษะการใช้ AI ในบริบทธุรกิจจริง</p>
+          </div>
+          <div class="content-section">
+            <h3>การสนับสนุนการเรียนรู้หลายภาษา</h3>
+            <p>มีสไลด์สองภาษา วิดีโอพร้อมคำบรรยายหลายภาษา กรณีศึกษา เครื่องมือ AI glossary และกิจกรรมฝึกปฏิบัติ</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-section">
+            <h3>Associate Professor Yan Qinghua</h3>
+            <p>Department of Human Resource Management, School of Business Administration, Chongqing Technology and Business University.</p>
+            <p>Research interests: AI-enabled HRM systems and organizational development.</p>
+          </div>
+        `
+      },
+
+      id: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "Platform Pembelajaran Multibahasa Berbasis AI untuk Manajemen Lintas Budaya",
+        heroSubtitle: "Platform untuk mahasiswa internasional dan mahasiswa Tiongkok, dengan dukungan multibahasa, studi kasus bisnis nyata, video pengalaman mahasiswa, dan alat bantu AI.",
+        languageHint: "Pilih bahasa: bagian platform dan instruktur mendukung tampilan multibahasa.",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "Pelajari platform pembelajaran multibahasa yang didukung AI.",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "Pelajari pengalaman mengajar internasional, minat riset, dan praktik konsultasi instruktur.",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "Tonton video singkat dari mahasiswa internasional dan mahasiswa Tiongkok.",
+        platformTitle: "About This Platform",
+        instructorTitle: "About the Instructor",
+        studentsTitle: "What are the Students Saying",
+        platformHtml: `
+          <div class="content-section">
+            <h3>Di era globalisasi dan AI, kemampuan bahasa saja tidak cukup.</h3>
+            <p>Platform ini membantu mahasiswa membangun pemahaman lintas budaya, kemampuan kolaborasi global, dan kompetensi penggunaan AI dalam konteks bisnis internasional.</p>
+          </div>
+          <div class="content-section">
+            <h3>Dukungan pembelajaran multibahasa</h3>
+            <p>Platform menyediakan slide bilingual, video dengan subtitle, materi kasus, AI glossary, latihan multibahasa, dan alat bantu AI.</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-section">
+            <h3>Associate Professor Yan Qinghua</h3>
+            <p>Department of Human Resource Management, School of Business Administration, Chongqing Technology and Business University.</p>
+            <p>Research interests: AI-enabled HRM systems and organizational development.</p>
+          </div>
+        `
+      },
+
+      vi: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "Nền tảng học tập đa ngôn ngữ hỗ trợ AI về Quản trị đa văn hóa",
+        heroSubtitle: "Nền tảng dành cho sinh viên quốc tế và sinh viên Trung Quốc, kết hợp hỗ trợ đa ngôn ngữ, tình huống doanh nghiệp thực tế, video phản hồi của sinh viên và công cụ AI.",
+        languageHint: "Chọn ngôn ngữ: phần giới thiệu nền tảng và giảng viên hỗ trợ đa ngôn ngữ.",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "Tìm hiểu nền tảng học tập đa ngôn ngữ được hỗ trợ bởi AI.",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "Tìm hiểu về giảng viên, kinh nghiệm giảng dạy quốc tế và hướng nghiên cứu.",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "Xem video ngắn từ sinh viên quốc tế và sinh viên Trung Quốc.",
+        platformTitle: "About This Platform",
+        instructorTitle: "About the Instructor",
+        studentsTitle: "What are the Students Saying",
+        platformHtml: `
+          <div class="content-section">
+            <h3>Trong thời đại toàn cầu hóa và AI, năng lực ngôn ngữ thôi là chưa đủ.</h3>
+            <p>Nền tảng này giúp sinh viên phát triển hiểu biết liên văn hóa, năng lực hợp tác quốc tế và kỹ năng ứng dụng AI trong bối cảnh kinh doanh thực tế.</p>
+          </div>
+          <div class="content-section">
+            <h3>Hỗ trợ học tập đa ngôn ngữ</h3>
+            <p>Nền tảng cung cấp slide song ngữ, video có phụ đề, tài liệu tình huống, AI glossary, bài tập đa ngôn ngữ và công cụ AI.</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-section">
+            <h3>Associate Professor Yan Qinghua</h3>
+            <p>Department of Human Resource Management, School of Business Administration, Chongqing Technology and Business University.</p>
+            <p>Research interests: AI-enabled HRM systems and organizational development.</p>
+          </div>
+        `
+      },
+
+      lo: {
+        heroBadge: "🌐 About This Platform",
+        heroTitle: "ແພລດຟອມຮຽນຮູ້ຫຼາຍພາສາທີ່ສະໜັບສະໜູນໂດຍ AI ສຳລັບການຈັດການຂ້າມວັດທະນະທຳ",
+        heroSubtitle: "ແພລດຟອມສຳລັບນັກສຶກສາຕ່າງຊາດແລະນັກສຶກສາຈີນ ທີ່ລວມການສະໜັບສະໜູນຫຼາຍພາສາ ກໍລະນີທຸລະກິດຈິງ ວິດີໂອຄຳເຫັນຂອງນັກສຶກສາ ແລະເຄື່ອງມື AI.",
+        languageHint: "ເລືອກພາສາ: ສ່ວນແນະນຳແພລດຟອມແລະອາຈານຮອງຮັບຫຼາຍພາສາ.",
+        cardPlatformTitle: "About This Platform",
+        cardPlatformText: "ຮຽນຮູ້ກ່ຽວກັບແພລດຟອມຫຼາຍພາສາທີ່ສະໜັບສະໜູນໂດຍ AI.",
+        cardInstructorTitle: "About the Instructor",
+        cardInstructorText: "ຮຽນຮູ້ກ່ຽວກັບອາຈານ ປະສົບການສອນນານາຊາດ ແລະທິດທາງການຄົ້ນຄວ້າ.",
+        cardStudentsTitle: "What are the Students Saying?",
+        cardStudentsText: "ຊົມວິດີໂອສັ້ນຈາກນັກສຶກສາຕ່າງຊາດແລະນັກສຶກສາຈີນ.",
+        platformTitle: "About This Platform",
+        instructorTitle: "About the Instructor",
+        studentsTitle: "What are the Students Saying",
+        platformHtml: `
+          <div class="content-section">
+            <h3>ໃນຍຸກໂລກາພິວັດແລະ AI, ຄວາມສາມາດທາງພາສາຢ່າງດຽວບໍ່ພຽງພໍ.</h3>
+            <p>ແພລດຟອມນີ້ຊ່ວຍໃຫ້ນັກສຶກສາພັດທະນາຄວາມເຂົ້າໃຈຂ້າມວັດທະນະທຳ ການຮ່ວມມືລະດັບສາກົນ ແລະທັກສະການໃຊ້ AI.</p>
+          </div>
+        `,
+        instructorHtml: `
+          <div class="content-section">
+            <h3>Associate Professor Yan Qinghua</h3>
+            <p>Department of Human Resource Management, School of Business Administration, Chongqing Technology and Business University.</p>
+            <p>Research interests: AI-enabled HRM systems and organizational development.</p>
+          </div>
+        `
+      }
+    };
+
+    const studentVideos = [
+      {
+        id: "thai-student-1",
+        titleZh: "泰国学生 1",
+        titleEn: "Thai Student 1",
+        subtitleType: "English  subtitles",
+        description: "分享跨文化管理课程学习的收获。",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/%E6%B3%B0-509.mp4"
+      },
+      {
+        id: "british-student-1",
+        titleZh: "英国学生 1",
+        titleEn: "British Student 1",
+        subtitleType: "Chinese + English subtitles",
+        description: "分享在中国学习跨文化管理课程的感受。",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/%E8%8B%B1%E5%9B%BD-509.mp4"
+      },
+      {
+        id: "chinese-student-1",
+        titleZh: "中国学生 1",
+        titleEn: "Chinese Student 1",
+        subtitleType: " English+Thai subtitles",
+        description: "分享与留学生一起学习跨文化管理课程的故事。",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/%E4%B8%AD%E5%9B%BD-509.mp4"
+      },
+      {
+        id: "chinese-student-2",
+        titleZh: "课程活动1",
+        titleEn: "Class Events1",
+        subtitleType: "Chinese+English",
+        description: "本课程的精彩活动",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/EVENTS.mp4"
+      },
+      {
+        id: "indonesian-student-1",
+        titleZh: "印尼学生 1",
+        titleEn: "Indonesian Student 1",
+        subtitleType: "Chinese + English subtitles",
+        description: "分享跨文化管理课程学习体验。",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/%E5%8D%B0%E5%B0%BC-509.mp4"
+      },
+      {
+        id: "lao-student-1",
+        titleZh: "老挝学生 1",
+        titleEn: "Lao Student 1",
+        subtitleType: " English subtitles",
+        description: "分享跨文化管理课程学习的感受。",
+        videoUrl: "https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/Final%20Assignment/%E8%80%81%E6%8C%9D.mp4"
+      }
+    ];
+
+    const langSelect = document.getElementById("globalLang");
+
+    function getLang() {
+      return langSelect.value || "zh";
+    }
+
+    function textSet(lang) {
+      return platformContent[lang] || platformContent.zh;
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function applyLanguage(lang) {
+      const t = textSet(lang);
+      setText("languageHint", t.languageHint);
+      setText("cardPlatformTitle", t.cardPlatformTitle);
+      setText("cardPlatformText", t.cardPlatformText);
+      setText("cardInstructorTitle", t.cardInstructorTitle);
+      setText("cardInstructorText", t.cardInstructorText);
+      setText("cardStudentsTitle", t.cardStudentsTitle);
+      setText("cardStudentsText", t.cardStudentsText);
+    }
+
+    function createPhotoPlaceholder() {
+      const div = document.createElement("div");
+      div.className = "photo-placeholder";
+      div.innerHTML = "Instructor Photo<br>请将照片放入<br>about/assets/instructor-main.jpg";
+      return div;
+    }
+
+
+    function openInstructorPhoto() {
+      const overlay = document.getElementById("photoOverlay");
+      const img = document.getElementById("photoOverlayImg");
+      img.src = instructorPhotoUrl;
+      overlay.classList.add("active");
+    }
+
+    function closeInstructorPhoto(event) {
+      if (event) event.stopPropagation();
+      const overlay = document.getElementById("photoOverlay");
+      overlay.classList.remove("active");
+      document.getElementById("photoOverlayImg").src = "";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeInstructorPhoto();
+    });
+
+    function makeDraggable(win, header) {
+      let dragging = false;
+      let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+      header.addEventListener("mousedown", (e) => {
+        if (e.target.closest("button") || win.classList.contains("fullscreen")) return;
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = win.offsetLeft;
+        startTop = win.offsetTop;
+        win.style.zIndex = ++currentZ;
+        document.body.style.userSelect = "none";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+        const newLeft = Math.max(4, Math.min(window.innerWidth - 60, startLeft + e.clientX - startX));
+        const newTop = Math.max(4, Math.min(window.innerHeight - 44, startTop + e.clientY - startY));
+        win.style.left = newLeft + "px";
+        win.style.top = newTop + "px";
+      });
+
+      window.addEventListener("mouseup", () => {
+        dragging = false;
+        document.body.style.userSelect = "";
+      });
+    }
+
+    function openFloatingWindow({ title, bodyHtml, footer = "窗口可移动、可缩放、可全屏、可缩回。" }) {
+      const win = document.createElement("div");
+      win.className = "floating-window";
+      win.style.zIndex = ++currentZ;
+
+      const header = document.createElement("div");
+      header.className = "floating-header";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "floating-title";
+      titleEl.textContent = title;
+
+      const controls = document.createElement("div");
+      controls.className = "floating-controls";
+
+      const btnMin = document.createElement("button");
+      btnMin.className = "icon-btn";
+      btnMin.title = "Minimize / Restore";
+      btnMin.textContent = "—";
+
+      const btnFull = document.createElement("button");
+      btnFull.className = "icon-btn";
+      btnFull.title = "Full screen";
+      btnFull.textContent = "⛶";
+
+      const btnClose = document.createElement("button");
+      btnClose.className = "icon-btn";
+      btnClose.title = "Close";
+      btnClose.textContent = "✕";
+
+      controls.appendChild(btnMin);
+      controls.appendChild(btnFull);
+      controls.appendChild(btnClose);
+
+      header.appendChild(titleEl);
+      header.appendChild(controls);
+
+      const body = document.createElement("div");
+      body.className = "floating-body";
+      body.innerHTML = bodyHtml;
+
+      const footerEl = document.createElement("div");
+      footerEl.className = "floating-footer";
+      footerEl.textContent = footer;
+
+      win.appendChild(header);
+      win.appendChild(body);
+      win.appendChild(footerEl);
+      document.body.appendChild(win);
+
+      makeDraggable(win, header);
+
+      btnMin.addEventListener("click", () => {
+        win.classList.toggle("minimized");
+      });
+
+      btnFull.addEventListener("click", () => {
+        win.classList.toggle("fullscreen");
+        win.classList.remove("minimized");
+      });
+
+      btnClose.addEventListener("click", () => {
+        win.remove();
+      });
+
+      return win;
+    }
+
+    function openPlatform() {
+      const t = textSet(getLang());
+      openFloatingWindow({
+        title: t.platformTitle,
+        bodyHtml: t.platformHtml
+      });
+    }
+
+    function openInstructor() {
+      const t = textSet(getLang());
+      openFloatingWindow({
+        title: t.instructorTitle,
+        bodyHtml: t.instructorHtml
+      });
+    }
+
+    function openStudents() {
+      const t = textSet(getLang());
+      const cards = studentVideos.map(v => `
+        <div class="video-card" data-video-id="${v.id}">
+          <h4>🎬 ${v.titleZh}<br><span style="opacity:.78;font-size:.88rem;">${v.titleEn}</span></h4>
+          <p>${v.description}</p>
+          <div class="tag-row">
+            <span class="tag">${v.subtitleType}</span>
+          </div>
+        </div>
+      `).join("");
+
+      const win = openFloatingWindow({
+        title: t.studentsTitle,
+        bodyHtml: `
+          <div class="content-section">
+            <h3>学生学习体验短视频</h3>
+            <p>以下视频字幕已经内置在视频中，因此无需额外切换字幕。后续可以继续增加 Thai Student 2、Chinese Student 3 等。</p>
+          </div>
+          <div class="video-grid">${cards}</div>
+        `
+      });
+
+      win.querySelectorAll(".video-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const id = card.getAttribute("data-video-id");
+          const video = studentVideos.find(v => v.id === id);
+          if (!video) return;
+          openVideo(video);
+        });
+      });
+    }
+
+    function openVideo(video) {
+      openFloatingWindow({
+        title: `${video.titleZh}｜${video.titleEn}`,
+        bodyHtml: `
+          <video class="video-player" src="${video.videoUrl}" controls playsinline preload="metadata"></video>
+          <div class="content-section" style="margin-top:14px;">
+            <h3>${video.titleZh}｜${video.titleEn}</h3>
+            <p>${video.description}</p>
+            <div class="tag-row"><span class="tag">${video.subtitleType}</span></div>
+            <p class="empty-note">当前视频 URL 为占位链接。请在 studentVideos 中替换为腾讯云 COS 视频地址。</p>
+          </div>
+        `,
+        footer: "学生视频字幕已内置在视频中。"
+      });
+    }
+
+    document.querySelectorAll("[data-open]").forEach(el => {
+      el.addEventListener("click", () => {
+        const target = el.getAttribute("data-open");
+        if (target === "platform") openPlatform();
+        if (target === "instructor") openInstructor();
+        if (target === "students") openStudents();
+      });
+    });
+
+    langSelect.addEventListener("change", () => applyLanguage(getLang()));
+    applyLanguage("zh");
+  </script>
+</body>
+</html>
