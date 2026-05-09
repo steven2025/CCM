@@ -55,10 +55,10 @@
 
     #main-menu {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
       gap: 16px;
       margin-top: 8px;
-      max-width: 900px;
+      max-width: 1180px;
       margin-left: auto;
       margin-right: auto;
       justify-items: center;
@@ -99,6 +99,63 @@
     .card-btn-title { font-size: 1.1rem; margin-bottom: 4px; }
     .card-btn-sub { font-size: 0.85rem; opacity: 0.85; }
     .card-btn.coming-soon { opacity: 0.7; }
+
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.62);
+      z-index: 2000;
+    }
+    .login-overlay.active { display: flex; }
+    .login-dialog {
+      width: min(420px, 94vw);
+      border-radius: 22px;
+      padding: 22px;
+      background: rgba(15,18,30,0.98);
+      border: 1px solid rgba(136,192,255,0.28);
+      box-shadow: 0 20px 54px rgba(0,0,0,0.72);
+    }
+    .login-dialog h3 {
+      font-size: 1.18rem;
+      margin-bottom: 8px;
+    }
+    .login-dialog p {
+      font-size: 0.84rem;
+      line-height: 1.55;
+      opacity: 0.82;
+      margin-bottom: 14px;
+    }
+    .login-field { margin-bottom: 12px; }
+    .login-field label {
+      display: block;
+      font-size: 0.82rem;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+    .login-field input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(136,192,255,0.45);
+      background: rgba(46,52,64,0.96);
+      color: #e5e9f0;
+      padding: 9px 11px;
+      outline: none;
+    }
+    .login-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      #main-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
 
     @media (max-width: 600px) {
       #main-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -811,6 +868,14 @@
   <div class="main-inner">
 
     <section id="main-menu">
+      <div class="card-btn" data-role="login">
+        <div class="card-btn-title">登录</div>
+        <div class="card-btn-sub">Login</div>
+      </div>
+      <div class="card-btn" data-role="about-page">
+        <div class="card-btn-title">关于这门课程</div>
+        <div class="card-btn-sub">About This Course</div>
+      </div>
       <div class="card-btn" data-chapter="1">
         <div class="card-btn-title">第一章</div>
         <div class="card-btn-sub">Chapter 1</div>
@@ -967,6 +1032,25 @@
   </div>
 </main>
 
+<div class="login-overlay" id="loginOverlay" aria-hidden="true">
+  <div class="login-dialog" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h3 id="loginTitle">登录 · Login</h3>
+    <p>请输入邀请码和姓名。当前版本暂不进行严格验证，仅用于课堂访问登记。<br>Please enter an invitation code and your name. This version does not strictly verify them yet.</p>
+    <div class="login-field">
+      <label for="inviteCode">邀请码 · Invitation Code</label>
+      <input id="inviteCode" type="text" autocomplete="off" placeholder="请输入邀请码 / Enter invitation code">
+    </div>
+    <div class="login-field">
+      <label for="studentName">姓名 · Name</label>
+      <input id="studentName" type="text" autocomplete="name" placeholder="请输入姓名 / Enter your name">
+    </div>
+    <div class="login-actions">
+      <button class="btn-ghost" type="button" id="loginCancelBtn">取消 / Cancel</button>
+      <button class="btn-ghost" type="button" id="loginSubmitBtn">进入 / Enter</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import * as pdfjsLib from './pdfjs/pdf.mjs';
   pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
@@ -978,6 +1062,11 @@
   const mainMenu = document.getElementById('main-menu');
   const chapterView = document.getElementById('chapter-view');
   const chapterButtons = document.querySelectorAll('.card-btn');
+  const loginOverlay = document.getElementById('loginOverlay');
+  const inviteCodeInput = document.getElementById('inviteCode');
+  const studentNameInput = document.getElementById('studentName');
+  const loginCancelBtn = document.getElementById('loginCancelBtn');
+  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
 
   const pptLangSelect = document.getElementById('ppt-lang-select');
   const pptLangLabel = document.getElementById('ppt-lang-label');
@@ -2138,15 +2227,53 @@
     }
   });
 
+  function openLoginDialog() {
+    if (!loginOverlay) return;
+    loginOverlay.classList.add('active');
+    loginOverlay.setAttribute('aria-hidden', 'false');
+    setTimeout(() => inviteCodeInput && inviteCodeInput.focus(), 0);
+  }
+
+  function closeLoginDialog() {
+    if (!loginOverlay) return;
+    loginOverlay.classList.remove('active');
+    loginOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  function submitLoginDialog() {
+    const inviteCode = inviteCodeInput ? inviteCodeInput.value.trim() : '';
+    const studentName = studentNameInput ? studentNameInput.value.trim() : '';
+    localStorage.setItem('ccm_invite_code', inviteCode);
+    localStorage.setItem('ccm_student_name', studentName);
+    closeLoginDialog();
+    alert('登录信息已记录。\nLogin information has been recorded.');
+  }
+
+  function openAboutCoursePage() {
+    window.location.href = './about.html';
+  }
+
   function closeAllFloatingWindows() {
     document.querySelectorAll('.floating-window').forEach(w => w.remove());
+  }
+
+  if (loginCancelBtn) loginCancelBtn.addEventListener('click', closeLoginDialog);
+  if (loginSubmitBtn) loginSubmitBtn.addEventListener('click', submitLoginDialog);
+  if (loginOverlay) {
+    loginOverlay.addEventListener('click', (e) => {
+      if (e.target === loginOverlay) closeLoginDialog();
+    });
   }
 
   chapterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const chStr = btn.getAttribute('data-chapter');
       const role = btn.getAttribute('data-role');
-      if (chStr === '1' || chStr === '2' || chStr === '3' || chStr === '4' || chStr === '5' || chStr === '6') {
+      if (role === 'login') {
+        openLoginDialog();
+      } else if (role === 'about-page') {
+        openAboutCoursePage();
+      } else if (chStr === '1' || chStr === '2' || chStr === '3' || chStr === '4' || chStr === '5' || chStr === '6') {
         currentChapter = parseInt(chStr, 10);
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';

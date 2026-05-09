@@ -91,6 +91,45 @@
       background: rgba(129,161,193,0.20);
     }
 
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(15,20,35,0.72);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .back-main-btn {
+      border: 1px solid rgba(136,192,255,0.45);
+      color: #e5e9f0;
+      background: rgba(46,52,64,0.82);
+      border-radius: 999px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .back-main-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.42);
+      background: rgba(129,161,193,0.20);
+    }
+
+    .top-nav-note {
+      font-size: 0.86rem;
+      opacity: 0.82;
+    }
+
     .language-strip {
       display: flex;
       align-items: center;
@@ -495,7 +534,12 @@
 
 <body>
   <main class="about-page">
-<section class="language-strip">
+    <section class="top-nav">
+      <button class="back-main-btn" type="button" onclick="goBackToMainMenu()">← 返回主菜单 / Back to Main Menu</button>
+      <span class="top-nav-note">About This Course · 关于这门课程</span>
+    </section>
+
+    <section class="language-strip">
       <span id="languageHint">选择语言：平台介绍与教师介绍支持多语言切换。</span>
       <select class="language-select" id="globalLang">
         <option value="zh">中文 Chinese</option>
@@ -554,8 +598,16 @@
   <script>
     let currentZ = 1500;
 
-    const instructorPhotoUrl = "./assets/instructor-main.jpg"; 
-    // 若暂时没有照片，可保持该路径不变；上传后放在 about/assets/instructor-main.jpg 即可。
+    const instructorPhotoCandidates = [
+      "./assets/instructor-main.jpg",
+      "./assets/instructor-main.JPG",
+      "./assets/instructor.jpg",
+      "./assets/teacher.jpg",
+      "./assets/yanqinghua.jpg",
+      "./assets/YanQinghua.jpg"
+    ];
+    let instructorPhotoUrl = instructorPhotoCandidates[0];
+    // GitHub Pages 区分大小写。建议把教师照片命名为 assets/instructor-main.jpg，并与 index.html、about.html 放在同一仓库下。
 
     const platformContent = {
       zh: {
@@ -609,7 +661,7 @@
         instructorHtml: `
           <div class="content-hero">
             <div class="photo-box">
-              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" onerror="this.parentElement.replaceWith(createPhotoPlaceholder())">
+              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" data-photo-index="0" onerror="handleInstructorPhotoError(this)">
               <button class="photo-zoom-btn" type="button" onclick="openInstructorPhoto()">放大</button>
             </div>
             <div>
@@ -719,7 +771,7 @@
         instructorHtml: `
           <div class="content-hero">
             <div class="photo-box">
-              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" onerror="this.parentElement.replaceWith(createPhotoPlaceholder())">
+              <img class="instructor-photo" src="${instructorPhotoUrl}" alt="Instructor Photo" data-photo-index="0" onerror="handleInstructorPhotoError(this)">
               <button class="photo-zoom-btn" type="button" onclick="openInstructorPhoto()">放大</button>
             </div>
             <div>
@@ -960,6 +1012,25 @@
       setText("cardStudentsTitle", t.cardStudentsTitle);
       setText("cardStudentsText", t.cardStudentsText);
     }
+    function goBackToMainMenu() {
+      if (window.history.length > 1 && document.referrer) {
+        window.history.back();
+      } else {
+        window.location.href = "./index.html";
+      }
+    }
+
+    function handleInstructorPhotoError(img) {
+      const nextIndex = Number(img.dataset.photoIndex || "0") + 1;
+      if (nextIndex < instructorPhotoCandidates.length) {
+        img.dataset.photoIndex = String(nextIndex);
+        instructorPhotoUrl = instructorPhotoCandidates[nextIndex];
+        img.src = instructorPhotoUrl;
+        return;
+      }
+      const box = img.closest(".photo-box");
+      if (box) box.replaceWith(createPhotoPlaceholder());
+    }
 
     function createPhotoPlaceholder() {
       const div = document.createElement("div");
@@ -972,7 +1043,8 @@
     function openInstructorPhoto() {
       const overlay = document.getElementById("photoOverlay");
       const img = document.getElementById("photoOverlayImg");
-      img.src = instructorPhotoUrl;
+      const visiblePhoto = document.querySelector(".instructor-photo[src]");
+      img.src = visiblePhoto ? visiblePhoto.src : instructorPhotoUrl;
       overlay.classList.add("active");
     }
 
