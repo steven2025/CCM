@@ -38,6 +38,22 @@
       line-height: 1.4;
       opacity: 0.9;
     }
+    .header-clock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(136,192,255,0.28);
+      background: rgba(15,23,42,0.45);
+      color: #dbeafe;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
 
     main.main-layout {
       flex: 1;
@@ -924,6 +940,7 @@
   <h2>
     程序开发/授课教师：重庆工商大学 鄢清华 副教授 · Program Developing / Instructor: Prof. Yan Qinghua, Chongqing Technology and Business University
   </h2>
+  <div class="header-clock" id="headerClock" aria-live="polite">Loading time...</div>
 </header>
 
 <main class="main-layout">
@@ -1125,6 +1142,7 @@
   const mainMenu = document.getElementById('main-menu');
   const chapterView = document.getElementById('chapter-view');
   const chapterButtons = document.querySelectorAll('.card-btn');
+  const headerClock = document.getElementById('headerClock');
   const loginOverlay = document.getElementById('loginOverlay');
   const inviteCodeInput = document.getElementById('inviteCode');
   const studentNameInput = document.getElementById('studentName');
@@ -1904,6 +1922,24 @@
       case "DEFAULT": return "Default";
       default: return value;
     }
+  }
+
+  function updateHeaderClock() {
+    if (!headerClock) return;
+    const now = new Date();
+    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const pad = (num) => String(num).padStart(2, '0');
+    const dateText = [
+      now.getFullYear(),
+      pad(now.getMonth() + 1),
+      pad(now.getDate())
+    ].join('-');
+    const timeText = [
+      pad(now.getHours()),
+      pad(now.getMinutes()),
+      pad(now.getSeconds())
+    ].join(':');
+    headerClock.textContent = dateText + ' ' + weekdays[now.getDay()] + ' ' + timeText;
   }
 
   function getCurrentAuth() {
@@ -3656,6 +3692,8 @@
 
   // 初始化
   chapterView.style.display = 'none';
+  updateHeaderClock();
+  setInterval(updateHeaderClock, 1000);
   updateAuthUi();
   updateChapterHeader();
   resetResourceListHint();
