@@ -99,6 +99,23 @@
     .card-btn-title { font-size: 1.1rem; margin-bottom: 4px; }
     .card-btn-sub { font-size: 0.85rem; opacity: 0.85; }
     .card-btn.coming-soon { opacity: 0.7; }
+    .card-btn.locked {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.35);
+    }
+    .card-btn.locked::after {
+      content: "Locked";
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      font-size: 0.72rem;
+      opacity: 0.78;
+    }
+    .card-btn.teacher-only {
+      background: radial-gradient(circle at top left, #14532d, #1f2937);
+      border-color: rgba(134,239,172,0.35);
+    }
 
     .login-overlay {
       position: fixed;
@@ -151,6 +168,51 @@
       gap: 10px;
       margin-top: 16px;
       flex-wrap: wrap;
+    }
+    .login-status-line {
+      min-height: 1.2em;
+      margin-top: 8px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #bfdbfe;
+    }
+    .login-status-line.error { color: #fecaca; }
+    .login-status-line.success { color: #bbf7d0; }
+    .settings-window .floating-body {
+      gap: 12px;
+    }
+    .settings-section {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(15,20,35,0.55);
+      margin-bottom: 10px;
+    }
+    .settings-section-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+    .settings-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      line-height: 1.35;
+      margin: 6px 0;
+    }
+    .settings-check input {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+    .settings-resource-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 14px;
+    }
+    @media (max-width: 700px) {
+      .settings-resource-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 900px) {
@@ -1045,6 +1107,7 @@
       <input id="studentName" type="text" autocomplete="name" placeholder="请输入姓名 / Enter your name">
     </div>
     <div class="login-actions">
+      <span class="login-status-line" id="loginStatusLine"></span>
       <button class="btn-ghost" type="button" id="loginCancelBtn">取消 / Cancel</button>
       <button class="btn-ghost" type="button" id="loginSubmitBtn">进入 / Enter</button>
     </div>
@@ -1067,6 +1130,7 @@
   const studentNameInput = document.getElementById('studentName');
   const loginCancelBtn = document.getElementById('loginCancelBtn');
   const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+  const loginStatusLine = document.getElementById('loginStatusLine');
 
   const pptLangSelect = document.getElementById('ppt-lang-select');
   const pptLangLabel = document.getElementById('ppt-lang-label');
@@ -1090,6 +1154,12 @@
   const btnExercises = document.getElementById('btn-exercises');
   const btnVideos = document.getElementById('btn-videos');
   const btnAiGlossary = document.getElementById('btn-ai-glossary');
+
+  const PINCODE_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/pincode.txt';
+  const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
+  const TEACHER_LOGIN = { name: '鄢清华', code: '2004059' };
+  const AUTH_STORAGE_KEY = 'ccm_auth_user';
+  const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
   const chapterTitleMain = document.getElementById('chapter-title-main');
   const chapterSubtitleMain = document.getElementById('chapter-subtitle-main');
@@ -1836,6 +1906,368 @@
     }
   }
 
+  function getCurrentAuth() {
+    try {
+      return JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function saveCurrentAuth(auth) {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(auth || {}));
+  }
+
+  function isTeacher() {
+    return getCurrentAuth().role === 'teacher';
+  }
+
+  function isLoggedIn() {
+    const auth = getCurrentAuth();
+    return auth && (auth.role === 'student' || auth.role === 'teacher');
+  }
+
+  function normalizeLoginText(value) {
+    return String(value || '').replace(/^\uFEFF/, '').trim();
+  }
+
+  function parsePincodeText(text) {
+    return String(text || '')
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+      .map(line => {
+        const parts = line.split(/[,，\t]/).map(normalizeLoginText).filter(Boolean);
+        if (parts.length < 2) return null;
+        return { code: parts[0], name: parts[1], altName: parts[0], altCode: parts[1] };
+      })
+      .filter(Boolean);
+  }
+
+  async function validateStudentLogin(name, code) {
+    const resp = await fetch(PINCODE_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('名单读取失败：' + resp.status);
+    const rows = parsePincodeText(await resp.text());
+    return rows.some(row =>
+      (row.name === name && row.code === code) ||
+      (row.altName === name && row.altCode === code)
+    );
+  }
+
+  function getModuleKeyFromChapter(chapter) {
+    return chapter === 'final' ? 'final-task' : 'chapter-' + chapter;
+  }
+
+  function getButtonModuleKey(btn) {
+    const role = btn.getAttribute('data-role');
+    const ch = btn.getAttribute('data-chapter');
+    if (role) return role;
+    if (ch) return 'chapter-' + ch;
+    return '';
+  }
+
+  function getModuleLabel(moduleKey) {
+    const labels = {
+      'chapter-1': '第一章 / Chapter 1',
+      'chapter-2': '第二章 / Chapter 2',
+      'chapter-3': '第三章 / Chapter 3',
+      'chapter-4': '第四章 / Chapter 4',
+      'chapter-5': '第五章 / Chapter 5',
+      'chapter-6': '第六章 / Chapter 6',
+      'final-task': '期末任务 / Final Task',
+      'about-course': 'AI工具与APPs / AI Tools & APPs'
+    };
+    return labels[moduleKey] || moduleKey;
+  }
+
+  function getDefaultAccessSettings() {
+    const modules = {};
+    ['chapter-1','chapter-2','chapter-3','chapter-4','chapter-5','chapter-6','final-task','about-course'].forEach(key => {
+      modules[key] = true;
+    });
+    const resources = {};
+    Object.keys(modules).forEach(key => {
+      resources[key + ':slides'] = true;
+      resources[key + ':ai-glossary'] = true;
+    });
+    Object.keys(exerciseResources).forEach(chapter => {
+      collectExerciseLeaves(exerciseResources[chapter]).forEach(item => {
+        resources['exercise:' + item.id] = true;
+      });
+    });
+    videoCases.forEach(video => {
+      resources['video:' + video.id] = true;
+      resources['video-test:' + video.id] = true;
+    });
+    return { modules, resources };
+  }
+
+  function getAccessSettings() {
+    const defaults = getDefaultAccessSettings();
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || '{}');
+      return {
+        modules: { ...defaults.modules, ...(saved.modules || {}) },
+        resources: { ...defaults.resources, ...(saved.resources || {}) }
+      };
+    } catch (err) {
+      return defaults;
+    }
+  }
+
+  function saveAccessSettings(settings) {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  }
+
+  async function loadCloudAccessSettings() {
+    if (!TEACHER_SETTINGS_API_URL) return null;
+    const resp = await fetch(TEACHER_SETTINGS_API_URL + '?t=' + Date.now(), {
+      method: 'GET',
+      cache: 'no-store'
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.settings) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    saveAccessSettings(payload.settings);
+    return payload.settings;
+  }
+
+  async function saveCloudAccessSettings(settings) {
+    if (!TEACHER_SETTINGS_API_URL) return null;
+    const auth = getCurrentAuth();
+    const teacherName = auth.name || localStorage.getItem('ccm_student_name') || TEACHER_LOGIN.name;
+    const teacherCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        teacherName,
+        teacherCode,
+        settings
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    if (payload.settings) saveAccessSettings(payload.settings);
+    return payload;
+  }
+
+  async function refreshCloudAccessSettings() {
+    try {
+      await loadCloudAccessSettings();
+      updateAuthUi();
+      applyChapterPermissions();
+    } catch (err) {
+      console.warn('Cloud settings unavailable, using local cache:', err);
+    }
+  }
+
+  function collectExerciseLeaves(items) {
+    const leaves = [];
+    (items || []).forEach(item => {
+      if (Array.isArray(item.children) && item.children.length) {
+        leaves.push(...collectExerciseLeaves(item.children));
+      } else {
+        leaves.push(item);
+      }
+    });
+    return leaves;
+  }
+
+  function isPublicModule(moduleKey) {
+    return moduleKey === 'login' || moduleKey === 'about-page';
+  }
+
+  function canUseModule(moduleKey) {
+    if (isPublicModule(moduleKey)) return true;
+    if (moduleKey === 'system-settings') return isTeacher();
+    if (isTeacher()) return true;
+    if (!isLoggedIn()) return false;
+    return getAccessSettings().modules[moduleKey] !== false;
+  }
+
+  function isResourceAllowed(type, id) {
+    if (isTeacher()) return true;
+    if (!isLoggedIn()) return false;
+    const moduleKey = getModuleKeyFromChapter(currentChapter);
+    const settings = getAccessSettings();
+    if (settings.modules[moduleKey] === false) return false;
+    let key = '';
+    if (type === 'slides') key = moduleKey + ':slides';
+    if (type === 'ai-glossary') key = moduleKey + ':ai-glossary';
+    if (type === 'exercise') key = 'exercise:' + id;
+    if (type === 'video') key = 'video:' + id;
+    if (type === 'video-test') key = 'video-test:' + id;
+    return key ? settings.resources[key] !== false : true;
+  }
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
+  function setLoginStatus(message, type) {
+    if (!loginStatusLine) return;
+    loginStatusLine.textContent = message || '';
+    loginStatusLine.className = 'login-status-line' + (type ? ' ' + type : '');
+  }
+
+  function ensureTeacherSettingsButton() {
+    let btn = mainMenu.querySelector('[data-role="system-settings"]');
+    if (!btn) {
+      btn = document.createElement('div');
+      btn.className = 'card-btn teacher-only';
+      btn.setAttribute('data-role', 'system-settings');
+      btn.innerHTML = '<div class="card-btn-title">系统设置</div><div class="card-btn-sub">System Settings</div>';
+      btn.addEventListener('click', () => {
+        if (!canUseModule('system-settings')) {
+          alert('仅教师账号可以进入系统设置。');
+          return;
+        }
+        openSystemSettingsWindow();
+      });
+      mainMenu.appendChild(btn);
+    }
+    btn.style.display = isTeacher() ? '' : 'none';
+  }
+
+  function updateAuthUi() {
+    ensureTeacherSettingsButton();
+    mainMenu.querySelectorAll('.card-btn').forEach(btn => {
+      const moduleKey = getButtonModuleKey(btn);
+      const allowed = canUseModule(moduleKey);
+      btn.classList.toggle('locked', !allowed);
+    });
+  }
+
+  function getResourceEntriesForModule(moduleKey) {
+    const entries = [{ key: moduleKey + ':slides', label: '课件 PPT / Lecture Slides' }];
+    const chapter = moduleKey === 'final-task' ? 'final' : Number((moduleKey || '').replace('chapter-', ''));
+    if (chapter && exerciseResources[chapter]) {
+      collectExerciseLeaves(exerciseResources[chapter]).forEach(item => {
+        entries.push({ key: 'exercise:' + item.id, label: item.title });
+      });
+    }
+    if (chapter && chapter !== 'final') {
+      videoCases.filter(video => video.chapter === chapter).forEach(video => {
+        entries.push({ key: 'video:' + video.id, label: video.title });
+        if (chapter === 2) entries.push({ key: 'video-test:' + video.id, label: video.title + ' - Test' });
+      });
+    }
+    if (isPdfJsModeChapter(chapter)) {
+      entries.push({ key: moduleKey + ':ai-glossary', label: 'AI词汇窗 / AI Glossary' });
+    }
+    return entries;
+  }
+
+  function openSystemSettingsWindow() {
+    const existing = document.querySelector('.floating-window[data-tool="system-settings"]');
+    if (existing) {
+      existing.style.zIndex = ++currentZ;
+      return;
+    }
+    const settings = getAccessSettings();
+    const moduleKeys = ['chapter-1','chapter-2','chapter-3','chapter-4','chapter-5','chapter-6','final-task','about-course'];
+    const win = document.createElement('div');
+    win.className = 'floating-window settings-window';
+    win.setAttribute('data-tool', 'system-settings');
+    win.style.zIndex = ++currentZ;
+    win.style.width = '760px';
+    win.style.maxWidth = '94vw';
+
+    const header = document.createElement('div');
+    header.className = 'floating-header';
+    header.innerHTML = '<div class="floating-title">系统设置 · Student Access</div><div class="floating-controls"><button class="btn-icon" title="Close">×</button></div>';
+    const closeBtn = header.querySelector('button');
+
+    const body = document.createElement('div');
+    body.className = 'floating-body';
+    let html = '<div class="settings-section"><div class="settings-section-title">开放模块</div>';
+    moduleKeys.forEach(key => {
+      html += '<label class="settings-check"><input type="checkbox" data-setting-type="module" data-key="' + key + '"' + (settings.modules[key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(getModuleLabel(key)) + '</span></label>';
+    });
+    html += '</div>';
+
+    moduleKeys.filter(key => key !== 'about-course').forEach(key => {
+      const entries = getResourceEntriesForModule(key);
+      html += '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(getModuleLabel(key)) + '：资料开放</div><div class="settings-resource-grid">';
+      entries.forEach(entry => {
+        html += '<label class="settings-check"><input type="checkbox" data-setting-type="resource" data-key="' + escapeHtml(entry.key) + '"' + (settings.resources[entry.key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(entry.label) + '</span></label>';
+      });
+      html += '</div></div>';
+    });
+    html += '<div class="login-status-line">当前版本先保存到本机；接入腾讯云函数后，可把同一份设置同步给所有学生。</div>';
+    body.innerHTML = html;
+
+    const footer = document.createElement('div');
+    footer.className = 'floating-footer';
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn-ghost';
+    saveBtn.textContent = '保存设置 / Save';
+    footer.appendChild(saveBtn);
+
+    win.appendChild(header);
+    win.appendChild(body);
+    win.appendChild(footer);
+    document.body.appendChild(win);
+    makeDraggable(win, header);
+    closeBtn.addEventListener('click', () => win.remove());
+    saveBtn.addEventListener('click', async () => {
+      const next = getAccessSettings();
+      body.querySelectorAll('input[data-setting-type="module"]').forEach(input => {
+        next.modules[input.getAttribute('data-key')] = input.checked;
+      });
+      body.querySelectorAll('input[data-setting-type="resource"]').forEach(input => {
+        next.resources[input.getAttribute('data-key')] = input.checked;
+      });
+      saveAccessSettings(next);
+      updateAuthUi();
+      applyChapterPermissions();
+      saveBtn.disabled = true;
+      saveBtn.textContent = '正在同步...';
+      try {
+        await saveCloudAccessSettings(next);
+        alert('设置已保存并同步到云端。学生端刷新页面后生效。');
+      } catch (err) {
+        alert('设置已保存到本机，但同步云端失败：' + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '保存设置 / Save';
+      }
+      return;
+      alert('设置已保存。学生端刷新或重新进入模块后生效。');
+    });
+  }
+
+  function applyChapterPermissions() {
+    const moduleKey = getModuleKeyFromChapter(currentChapter);
+    const slidesAllowed = isResourceAllowed('slides', moduleKey);
+    const slidePanel = document.querySelector('.chapter-layout > .panel');
+    if (slidePanel) slidePanel.style.display = slidesAllowed ? '' : 'none';
+    const exercisesAllowed = (exerciseResources[currentChapter] || []).some(item => filterExerciseItems([item]).length > 0);
+    const videosAllowed = getVideoCasesForChapter(currentChapter).some(video => isResourceAllowed('video', video.id));
+    btnExercises.disabled = !exercisesAllowed;
+    btnVideos.disabled = !videosAllowed;
+    btnExercises.style.opacity = exercisesAllowed ? '' : '0.45';
+    btnVideos.style.opacity = videosAllowed ? '' : '0.45';
+    btnExercises.style.cursor = exercisesAllowed ? '' : 'not-allowed';
+    btnVideos.style.cursor = videosAllowed ? '' : 'not-allowed';
+  }
+
+  function filterExerciseItems(items) {
+    return (items || []).map(item => {
+      if (Array.isArray(item.children) && item.children.length) {
+        const children = filterExerciseItems(item.children);
+        return children.length ? { ...item, children } : null;
+      }
+      return isResourceAllowed('exercise', item.id) ? item : null;
+    }).filter(Boolean);
+  }
+
 
   function isPdfJsModeChapter(chapter) {
     const normalized = chapter === 'final' ? 'final' : Number(chapter);
@@ -1977,6 +2409,8 @@
   }
 
   function openAiConfigWindow() {
+    openLoginDialog();
+    return;
     const existing = document.querySelector('.floating-window[data-tool="ai-config"]');
     if (existing) {
       existing.style.zIndex = ++currentZ;
@@ -2145,8 +2579,9 @@
 
     const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
     pptPlaceholderTitle.textContent = cfg.pptLabelPrefix + ' (' + fullName + ')';
-    btnAiGlossary.style.display = usePdfJs ? 'flex' : 'none';
-    pdfGlossaryBtn.style.display = usePdfJs ? 'inline-flex' : 'none';
+    const glossaryAllowed = isResourceAllowed('ai-glossary', getModuleKeyFromChapter(currentChapter));
+    btnAiGlossary.style.display = (usePdfJs && glossaryAllowed) ? 'flex' : 'none';
+    pdfGlossaryBtn.style.display = (usePdfJs && glossaryAllowed) ? 'inline-flex' : 'none';
 
     if (usePdfJs) {
       pptViewerModeLabel.textContent = 'pdf.js viewer · prev / next';
@@ -2208,6 +2643,10 @@
   pptLangSelect.addEventListener('change', () => { updatePptView(); });
 
   pptDownloadBtn.addEventListener('click', () => {
+    if (!isResourceAllowed('slides', getModuleKeyFromChapter(currentChapter))) {
+      alert('该课件暂未向学生开放。');
+      return;
+    }
     const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
@@ -2229,6 +2668,9 @@
 
   function openLoginDialog() {
     if (!loginOverlay) return;
+    const auth = getCurrentAuth();
+    if (studentNameInput && auth.name) studentNameInput.value = auth.name;
+    setLoginStatus(auth.role ? ('当前登录身份：' + auth.name + '（' + (auth.role === 'teacher' ? '教师' : '学生') + '）') : '', auth.role ? 'success' : '');
     loginOverlay.classList.add('active');
     loginOverlay.setAttribute('aria-hidden', 'false');
     setTimeout(() => inviteCodeInput && inviteCodeInput.focus(), 0);
@@ -2240,9 +2682,43 @@
     loginOverlay.setAttribute('aria-hidden', 'true');
   }
 
-  function submitLoginDialog() {
+  async function submitLoginDialog() {
     const inviteCode = inviteCodeInput ? inviteCodeInput.value.trim() : '';
     const studentName = studentNameInput ? studentNameInput.value.trim() : '';
+    if (!inviteCode || !studentName) {
+      setLoginStatus('请输入登录名和邀请码。', 'error');
+      return;
+    }
+    if (loginSubmitBtn) loginSubmitBtn.disabled = true;
+    setLoginStatus('正在验证登录信息...', '');
+    try {
+      if (studentName === TEACHER_LOGIN.name && inviteCode === TEACHER_LOGIN.code) {
+        saveCurrentAuth({ role: 'teacher', name: studentName, loginAt: Date.now() });
+        localStorage.setItem('ccm_invite_code', inviteCode);
+        localStorage.setItem('ccm_student_name', studentName);
+        updateAuthUi();
+        closeLoginDialog();
+        alert('教师登录成功，已进入教师模式。');
+        return;
+      }
+      const ok = await validateStudentLogin(studentName, inviteCode);
+      if (!ok) {
+        setLoginStatus('登录名或邀请码不匹配，请检查后重试。', 'error');
+        return;
+      }
+      saveCurrentAuth({ role: 'student', name: studentName, loginAt: Date.now() });
+      localStorage.setItem('ccm_invite_code', inviteCode);
+      localStorage.setItem('ccm_student_name', studentName);
+      updateAuthUi();
+      closeLoginDialog();
+      alert('学生登录成功。');
+      return;
+    } catch (err) {
+      setLoginStatus('暂时无法读取腾讯云名单：' + err.message, 'error');
+      return;
+    } finally {
+      if (loginSubmitBtn) loginSubmitBtn.disabled = false;
+    }
     localStorage.setItem('ccm_invite_code', inviteCode);
     localStorage.setItem('ccm_student_name', studentName);
     closeLoginDialog();
@@ -2269,6 +2745,12 @@
     btn.addEventListener('click', () => {
       const chStr = btn.getAttribute('data-chapter');
       const role = btn.getAttribute('data-role');
+      const moduleKey = getButtonModuleKey(btn);
+      if (!canUseModule(moduleKey)) {
+        alert(isLoggedIn() ? '该模块暂未向学生开放。' : '请先登录后再进入该模块。');
+        if (!isLoggedIn()) openLoginDialog();
+        return;
+      }
       if (role === 'login') {
         openLoginDialog();
       } else if (role === 'about-page') {
@@ -2281,6 +2763,7 @@
         updateChapterHeader();
         resetResourceListHint();
         updatePptView();
+        applyChapterPermissions();
       } else if (role === 'final-task') {
         currentChapter = 'final';
         mainMenu.style.display = 'none';
@@ -2289,6 +2772,7 @@
         updateChapterHeader();
         resetResourceListHint();
         updatePptView();
+        applyChapterPermissions();
       } else if (role === 'about-course') {
         openAboutCourseApps();
       } else {
@@ -2308,7 +2792,11 @@
   }
 
   btnExercises.addEventListener('click', () => {
-    const list = exerciseResources[currentChapter] || [];
+    const list = filterExerciseItems(exerciseResources[currentChapter] || []);
+    if (!list.length) {
+      resourceList.innerHTML = '<div class="resource-list-title">当前模块的练习资料暂未开放。<br>Exercises are not open yet.</div>';
+      return;
+    }
     let html = `
       <div class="resource-list-title">练习与任务 · Exercises &amp; Tasks</div>
       <div class="resource-node">
@@ -2347,10 +2835,18 @@
   });
 
   btnAiGlossary.addEventListener('click', () => {
+    if (!isResourceAllowed('ai-glossary', getModuleKeyFromChapter(currentChapter))) {
+      alert('AI词汇窗暂未向学生开放。');
+      return;
+    }
     openGlossaryWindow();
   });
 
   pdfGlossaryBtn.addEventListener('click', () => {
+    if (!isResourceAllowed('ai-glossary', getModuleKeyFromChapter(currentChapter))) {
+      alert('AI词汇窗暂未向学生开放。');
+      return;
+    }
     openGlossaryWindow();
   });
 
@@ -2363,7 +2859,11 @@
   });
 
   btnVideos.addEventListener('click', () => {
-    const list = getVideoCasesForChapter(currentChapter);
+    const list = getVideoCasesForChapter(currentChapter).filter(vc => isResourceAllowed('video', vc.id));
+    if (!list.length) {
+      resourceList.innerHTML = '<div class="resource-list-title">当前模块的视频资料暂未开放。<br>Videos are not open yet.</div>';
+      return;
+    }
     let html = `
       <div class="resource-list-title">视频案例 · Video Cases</div>
       <div class="resource-node">
@@ -2375,7 +2875,7 @@
           <span>${vc.title}</span>
         </div>
       `;
-      if (currentChapter === 2) {
+      if (currentChapter === 2 && isResourceAllowed('video-test', vc.id)) {
         html += `
           <div class="resource-node" style="margin-left:16px;">
             <div class="resource-item" data-type="video-test" data-id="${vc.id}">
@@ -2411,6 +2911,10 @@
           return;
         }
 
+        if (!isResourceAllowed(type, id)) {
+          alert('该资料暂未向学生开放。');
+          return;
+        }
         openFloatingWindow(type, id, title);
       });
     });
@@ -3152,9 +3656,12 @@
 
   // 初始化
   chapterView.style.display = 'none';
+  updateAuthUi();
   updateChapterHeader();
   resetResourceListHint();
   updatePptView();
+  applyChapterPermissions();
+  refreshCloudAccessSettings();
 </script>
 
 </body>
