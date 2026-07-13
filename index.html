@@ -2633,6 +2633,8 @@
   }
 
   function renderAdminMaterialsTree(catalog, objectMap, siblingMap) {
+    objectMap = objectMap || new Map();
+    siblingMap = siblingMap || new Map();
     objectMap.clear();
     siblingMap.clear();
     const chapters = Array.isArray(catalog && catalog.chapters) ? catalog.chapters : [];
@@ -2690,6 +2692,7 @@
   }
 
   function renderMaterialAccessTree(catalog, objectMap) {
+    objectMap = objectMap || new Map();
     objectMap.clear();
     const isOpen = item => !item || item.status !== 'hidden';
     const itemHtml = (item, path, label, icon, childrenHtml, badge) => {
