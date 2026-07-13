@@ -1173,9 +1173,7 @@
   const btnVideos = document.getElementById('btn-videos');
   const btnAiGlossary = document.getElementById('btn-ai-glossary');
 
-  const PINCODE_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/pincode.txt';
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
-  const TEACHER_LOGIN = { name: '鄢清华', code: '2004059' };
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -1963,31 +1961,19 @@
     return auth && (auth.role === 'student' || auth.role === 'teacher');
   }
 
-  function normalizeLoginText(value) {
-    return String(value || '').replace(/^\uFEFF/, '').trim();
-  }
-
-  function parsePincodeText(text) {
-    return String(text || '')
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(line => line && !line.startsWith('#'))
-      .map(line => {
-        const parts = line.split(/[,，\t]/).map(normalizeLoginText).filter(Boolean);
-        if (parts.length < 2) return null;
-        return { code: parts[0], name: parts[1], altName: parts[0], altCode: parts[1] };
-      })
-      .filter(Boolean);
-  }
-
-  async function validateStudentLogin(name, code) {
-    const resp = await fetch(PINCODE_URL + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('名单读取失败：' + resp.status);
-    const rows = parsePincodeText(await resp.text());
-    return rows.some(row =>
-      (row.name === name && row.code === code) ||
-      (row.altName === name && row.altCode === code)
-    );
+  async function validateCloudLogin(id, inviteCode) {
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', id, inviteCode })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.isLoginRejected = resp.status === 401;
+      throw err;
+    }
+    return payload;
   }
 
   function getModuleKeyFromChapter(chapter) {
@@ -2072,7 +2058,7 @@
   async function saveCloudAccessSettings(settings) {
     if (!TEACHER_SETTINGS_API_URL) return null;
     const auth = getCurrentAuth();
-    const teacherName = auth.name || localStorage.getItem('ccm_student_name') || TEACHER_LOGIN.name;
+    const teacherName = auth.name || localStorage.getItem('ccm_student_name') || '';
     const teacherCode = localStorage.getItem('ccm_invite_code') || '';
     const resp = await fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
@@ -2728,29 +2714,16 @@
     if (loginSubmitBtn) loginSubmitBtn.disabled = true;
     setLoginStatus('正在验证登录信息...', '');
     try {
-      if (studentName === TEACHER_LOGIN.name && inviteCode === TEACHER_LOGIN.code) {
-        saveCurrentAuth({ role: 'teacher', name: studentName, loginAt: Date.now() });
-        localStorage.setItem('ccm_invite_code', inviteCode);
-        localStorage.setItem('ccm_student_name', studentName);
-        updateAuthUi();
-        closeLoginDialog();
-        alert('教师登录成功，已进入教师模式。');
-        return;
-      }
-      const ok = await validateStudentLogin(studentName, inviteCode);
-      if (!ok) {
-        setLoginStatus('登录名或邀请码不匹配，请检查后重试。', 'error');
-        return;
-      }
-      saveCurrentAuth({ role: 'student', name: studentName, loginAt: Date.now() });
+      const result = await validateCloudLogin(studentName, inviteCode);
+      saveCurrentAuth({ role: result.role, name: result.id || studentName, loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
       updateAuthUi();
       closeLoginDialog();
-      alert('学生登录成功。');
+      alert(result.role === 'teacher' ? '管理员登录成功，已进入教师模式。' : '学生登录成功。');
       return;
     } catch (err) {
-      setLoginStatus('暂时无法读取腾讯云名单：' + err.message, 'error');
+      setLoginStatus(err.isLoginRejected ? 'ID或邀请码不匹配，请检查后重试。' : '暂时无法通过腾讯云验证：' + err.message, 'error');
       return;
     } finally {
       if (loginSubmitBtn) loginSubmitBtn.disabled = false;
