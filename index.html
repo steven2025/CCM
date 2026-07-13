@@ -1343,6 +1343,7 @@
   let pdfRenderToken = 0;
   let materialsCatalogReady = false;
   let availableCatalogModules = new Set();
+  let catalogAssetLabels = { slides: {}, exercises: {} };
   const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
@@ -2463,7 +2464,8 @@
     languages.forEach(language => {
       const option = document.createElement('option');
       option.value = language;
-      option.textContent = getLangFullName(language);
+      const chapterLabels = catalogAssetLabels.slides[String(currentChapter)] || {};
+      option.textContent = chapterLabels[language] || getLangFullName(language);
       pptLangSelect.appendChild(option);
     });
     if (languages.includes(previous)) pptLangSelect.value = previous;
@@ -2481,6 +2483,7 @@
     availableCatalogModules = new Set(chapters.map(chapter =>
       String(chapter.id) === 'final' ? 'final-task' : 'chapter-' + chapter.id
     ));
+    catalogAssetLabels = { slides: {}, exercises: {} };
 
     ['1','2','3','4','5','6','final'].forEach(chapterId => {
       pptLinksByChapter[chapterId] = {};
@@ -2495,10 +2498,16 @@
         return { id: node.id, title: node.title, children: convertExerciseNodes(node.children) };
       }
       const links = {};
+      const labels = {};
       sortCatalogItems(node.assets).forEach(asset => {
-        if (asset && asset.url) links[asset.language || 'DEFAULT'] = asset.url;
+        if (asset && asset.url) {
+          const language = asset.language || 'DEFAULT';
+          links[language] = asset.url;
+          labels[language] = asset.label || getLangFullName(language);
+        }
       });
       exerciseLinks[node.id] = links;
+      catalogAssetLabels.exercises[node.id] = labels;
       return { id: node.id, title: node.title };
     });
 
@@ -2509,10 +2518,16 @@
         const nodes = sortCatalogItems(section.nodes);
         if (section.id === 'slides') {
           const links = {};
+          const labels = {};
           nodes.forEach(node => sortCatalogItems(node.assets).forEach(asset => {
-            if (asset && asset.url) links[asset.language || 'DEFAULT'] = asset.url;
+            if (asset && asset.url) {
+              const language = asset.language || 'DEFAULT';
+              links[language] = asset.url;
+              labels[language] = asset.label || getLangFullName(language);
+            }
           }));
           pptLinksByChapter[chapterKey] = links;
+          catalogAssetLabels.slides[chapterId] = labels;
         } else if (section.id === 'exercises') {
           exerciseResources[chapterKey] = convertExerciseNodes(nodes);
         } else if (section.id === 'videos') {
@@ -2522,8 +2537,11 @@
             if (!videoAsset) return;
             const legacyId = String(node.legacyId || node.id || '').replace(/^video-/, '');
             const subtitles = {};
+            const subtitleLabels = {};
             assets.filter(asset => asset.type === 'subtitle' && asset.url).forEach(asset => {
-              subtitles[asset.language || asset.label] = asset.url;
+              const language = asset.language || asset.label;
+              subtitles[language] = asset.url;
+              subtitleLabels[language] = asset.label || language;
             });
             const testAsset = assets.find(asset => asset.type === 'test-link' && asset.url);
             if (testAsset) videoTestLinks[legacyId] = testAsset.url;
@@ -2533,6 +2551,7 @@
               title: node.title,
               videoUrl: videoAsset.url,
               subtitles,
+              subtitleLabels,
               subtitlePosition: node.subtitlePosition || 'top',
               subMode: node.subtitleMode || 'multiLang'
             });
@@ -2799,7 +2818,7 @@
         '<button class="settings-tab" data-settings-tab="analytics">3. 用户行为看板</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
-        '<div class="material-tree-note">当前为只读核对版：显示学生端材料名称及其关联文件。上传、插入和排序将在下一步启用。</div>' +
+        '<div class="material-tree-note">可重命名学生端显示名称，并使用 ↑ ↓ 调整同级材料或关联文件顺序。点击底部保存后同步云端；上传与新增将在下一步启用。</div>' +
         '<div id="admin-material-tree"><div class="login-status-line">正在从腾讯云读取完整材料目录...</div></div>' +
       '</section>' +
       '<section class="settings-tab-panel" data-settings-panel="access">' +
@@ -2816,9 +2835,8 @@
     footer.className = 'floating-footer';
     const saveBtn = document.createElement('button');
     saveBtn.className = 'btn-ghost';
-    saveBtn.textContent = '保存设置 / Save';
+    saveBtn.textContent = '保存名称与排序';
     footer.appendChild(saveBtn);
-    footer.style.display = 'none';
 
     win.appendChild(header);
     win.appendChild(body);
@@ -2841,22 +2859,30 @@
         body.querySelectorAll('.settings-tab-panel').forEach(panel => {
           panel.classList.toggle('active', panel.getAttribute('data-settings-panel') === tabName);
         });
-        footer.style.display = tabName === 'access' ? '' : 'none';
+        footer.style.display = (tabName === 'files' || tabName === 'access') ? '' : 'none';
+        saveBtn.textContent = tabName === 'files' ? '保存名称与排序' : '保存开放设置';
       });
     });
     const treeContainer = body.querySelector('#admin-material-tree');
     const accessTreeContainer = body.querySelector('#material-access-tree');
+    const fileObjectMap = new Map();
+    const fileSiblingMap = new Map();
     const materialObjectMap = new Map();
     let adminMaterialsCatalog = null;
-    loadAdminMaterialsCatalog().then(catalog => {
-      adminMaterialsCatalog = catalog;
+    const renderCatalogViews = () => {
+      if (!adminMaterialsCatalog) return;
       if (treeContainer && treeContainer.isConnected) {
-        treeContainer.innerHTML = renderAdminMaterialsTree(catalog);
+        treeContainer.innerHTML = renderAdminMaterialsTree(adminMaterialsCatalog, fileObjectMap, fileSiblingMap);
+        bindMaterialFileTree(treeContainer, fileObjectMap, fileSiblingMap, renderCatalogViews);
       }
       if (accessTreeContainer && accessTreeContainer.isConnected) {
-        accessTreeContainer.innerHTML = renderMaterialAccessTree(catalog, materialObjectMap);
+        accessTreeContainer.innerHTML = renderMaterialAccessTree(adminMaterialsCatalog, materialObjectMap);
         bindMaterialAccessTree(accessTreeContainer, materialObjectMap);
       }
+    };
+    loadAdminMaterialsCatalog().then(catalog => {
+      adminMaterialsCatalog = catalog;
+      renderCatalogViews();
     }).catch(err => {
       if (treeContainer && treeContainer.isConnected) {
         treeContainer.innerHTML = '<div class="login-status-line error">材料目录读取失败：' + escapeHtml(err.message) + '</div>';
@@ -2889,12 +2915,16 @@
         ]);
         const materialResult = results[1];
         adminMaterialsCatalog = materialResult.catalog;
+        renderCatalogViews();
         alert('开放设置与材料目录已同步。旧目录备份：' + materialResult.backupKey);
       } catch (err) {
         alert((err.status === 409 ? '材料目录已被更新，请关闭窗口后重新打开再操作：' : '设置同步失败：') + err.message);
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = '保存设置 / Save';
+        const activeTab = body.querySelector('.settings-tab.active');
+        saveBtn.textContent = activeTab && activeTab.getAttribute('data-settings-tab') === 'files'
+          ? '保存名称与排序'
+          : '保存开放设置';
       }
       return;
       alert('设置已保存。学生端刷新或重新进入模块后生效。');
@@ -3607,7 +3637,7 @@
         opts.filter(cfg => meta.subtitles && meta.subtitles[cfg.value]).forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
-          opt.textContent = cfg.label;
+          opt.textContent = (meta.subtitleLabels && meta.subtitleLabels[cfg.value]) || cfg.label;
           selectEl.appendChild(opt);
         });
       } else if (meta && meta.subMode === 'multiChapter5') {
@@ -3621,7 +3651,7 @@
         opts.forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
-          opt.textContent = cfg.label;
+          opt.textContent = (meta.subtitleLabels && meta.subtitleLabels[cfg.value]) || cfg.label;
           selectEl.appendChild(opt);
         });
       } else if (meta && meta.subMode === 'mix55') {
@@ -3634,7 +3664,7 @@
         opts.filter(cfg => meta.subtitles && meta.subtitles[cfg.value]).forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
-          opt.textContent = cfg.label;
+          opt.textContent = (meta.subtitleLabels && meta.subtitleLabels[cfg.value]) || cfg.label;
           selectEl.appendChild(opt);
         });
       } else {
@@ -3642,7 +3672,7 @@
         if (meta && meta.subtitles && Object.keys(meta.subtitles).length === 1 && meta.subtitles.EN) {
              const opt = document.createElement('option');
              opt.value = "EN";
-             opt.textContent = "English subtitles";
+             opt.textContent = (meta.subtitleLabels && meta.subtitleLabels.EN) || "English subtitles";
              selectEl.appendChild(opt);
         } else if (meta && meta.subtitles) {
             // Prefer exact languages that exist for this video
@@ -3668,7 +3698,7 @@
             keys.forEach(code => {
               const opt = document.createElement('option');
               opt.value = code;
-              opt.textContent = labelMap[code] || code;
+              opt.textContent = (meta.subtitleLabels && meta.subtitleLabels[code]) || labelMap[code] || code;
               selectEl.appendChild(opt);
             });
         } else {
@@ -3690,7 +3720,8 @@
         availableLangs.forEach(langKey => {
           const opt = document.createElement('option');
           opt.value = langKey;
-          opt.textContent = getLangFullName(langKey);
+          const labels = catalogAssetLabels.exercises[resourceId] || {};
+          opt.textContent = labels[langKey] || getLangFullName(langKey);
           selectEl.appendChild(opt);
         });
         
