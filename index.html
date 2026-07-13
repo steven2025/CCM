@@ -2214,6 +2214,10 @@
 
   function ensureTeacherSettingsButton() {
     let btn = mainMenu.querySelector('[data-role="system-settings"]');
+    if (!isTeacher()) {
+      if (btn) btn.remove();
+      return;
+    }
     if (!btn) {
       btn = document.createElement('div');
       btn.className = 'card-btn teacher-only';
@@ -2228,7 +2232,6 @@
       });
       mainMenu.appendChild(btn);
     }
-    btn.style.display = isTeacher() ? '' : 'none';
   }
 
   function updateAuthUi() {
