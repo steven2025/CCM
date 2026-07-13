@@ -227,8 +227,82 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px 14px;
     }
+    .settings-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding-bottom: 4px;
+      background: rgba(15,18,30,0.98);
+    }
+    .settings-tab {
+      border: 1px solid rgba(136,192,255,0.3);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(46,52,64,0.82);
+      color: #e5e9f0;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    .settings-tab.active {
+      background: rgba(37,99,235,0.42);
+      border-color: rgba(147,197,253,0.8);
+      box-shadow: 0 5px 16px rgba(0,0,0,0.28);
+    }
+    .settings-tab-panel { display: none; }
+    .settings-tab-panel.active { display: block; }
+    .material-tree-note {
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: rgba(30,64,175,0.16);
+      border: 1px solid rgba(96,165,250,0.22);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .material-tree details {
+      margin: 5px 0;
+      border-left: 1px dashed rgba(136,192,255,0.28);
+      padding-left: 10px;
+    }
+    .material-tree > details {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 11px;
+      padding: 7px 9px;
+      background: rgba(15,23,42,0.48);
+      margin-bottom: 8px;
+    }
+    .material-tree summary {
+      cursor: pointer;
+      line-height: 1.5;
+      user-select: none;
+    }
+    .material-node-title { font-weight: 600; }
+    .material-tree-badge {
+      display: inline-block;
+      margin-left: 7px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.17);
+      color: #cbd5e1;
+      font-size: 0.68rem;
+      vertical-align: middle;
+    }
+    .material-asset {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 5px 0 5px 18px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(51,65,85,0.45);
+    }
+    .material-asset-icon { width: 18px; text-align: center; }
+    .material-empty { opacity: 0.68; padding: 8px 4px; }
     @media (max-width: 700px) {
       .settings-resource-grid { grid-template-columns: 1fr; }
+      .settings-tabs { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 900px) {
@@ -2186,6 +2260,69 @@
     return entries;
   }
 
+  async function loadAdminMaterialsCatalog() {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'get-materials-admin',
+        id: auth.name || '',
+        inviteCode
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    return payload.catalog;
+  }
+
+  function getMaterialAssetIcon(type) {
+    if (type === 'video') return '🎬';
+    if (type === 'subtitle') return '💬';
+    if (type === 'test-link') return '🔗';
+    return '📄';
+  }
+
+  function renderMaterialNodes(nodes) {
+    if (!Array.isArray(nodes) || !nodes.length) {
+      return '<div class="material-empty">暂无材料</div>';
+    }
+    return nodes.map(node => {
+      if (node.kind === 'group') {
+        return '<details><summary><span class="material-node-title">📁 ' + escapeHtml(node.title) + '</span>' +
+          '<span class="material-tree-badge">分组</span></summary>' +
+          renderMaterialNodes(node.children) + '</details>';
+      }
+      const assets = Array.isArray(node.assets) ? node.assets : [];
+      let assetHtml = assets.map(asset =>
+        '<div class="material-asset"><span class="material-asset-icon">' + getMaterialAssetIcon(asset.type) + '</span>' +
+        '<span>' + escapeHtml(asset.label || asset.language || '文件') + '</span>' +
+        '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span></div>'
+      ).join('');
+      if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
+      return '<details><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
+        '<span class="material-tree-badge">' + assets.length + ' 个文件</span></summary>' + assetHtml + '</details>';
+    }).join('');
+  }
+
+  function renderAdminMaterialsTree(catalog) {
+    const chapters = Array.isArray(catalog && catalog.chapters) ? catalog.chapters : [];
+    if (!chapters.length) return '<div class="material-empty">材料目录为空。</div>';
+    return '<div class="material-tree">' + chapters.map((chapter, chapterIndex) => {
+      const sections = Array.isArray(chapter.sections) ? chapter.sections : [];
+      const sectionHtml = sections.map(section =>
+        '<details><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
+        '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span></summary>' +
+        renderMaterialNodes(section.nodes) + '</details>'
+      ).join('');
+      return '<details' + (chapterIndex === 0 ? ' open' : '') + '><summary><span class="material-node-title">📚 ' +
+        escapeHtml(chapter.title) + '</span></summary>' + sectionHtml + '</details>';
+    }).join('') + '</div>';
+  }
+
   function openSystemSettingsWindow() {
     const existing = document.querySelector('.floating-window[data-tool="system-settings"]');
     if (existing) {
@@ -2203,27 +2340,41 @@
 
     const header = document.createElement('div');
     header.className = 'floating-header';
-    header.innerHTML = '<div class="floating-title">系统设置 · Student Access</div><div class="floating-controls"><button class="btn-icon" title="Close">×</button></div>';
+    header.innerHTML = '<div class="floating-title">系统设置 · System Settings</div><div class="floating-controls"><button class="btn-icon" title="Close">×</button></div>';
     const closeBtn = header.querySelector('button');
 
     const body = document.createElement('div');
     body.className = 'floating-body';
-    let html = '<div class="settings-section"><div class="settings-section-title">开放模块</div>';
+    let accessHtml = '<div class="settings-section"><div class="settings-section-title">开放模块</div>';
     moduleKeys.forEach(key => {
-      html += '<label class="settings-check"><input type="checkbox" data-setting-type="module" data-key="' + key + '"' + (settings.modules[key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(getModuleLabel(key)) + '</span></label>';
+      accessHtml += '<label class="settings-check"><input type="checkbox" data-setting-type="module" data-key="' + key + '"' + (settings.modules[key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(getModuleLabel(key)) + '</span></label>';
     });
-    html += '</div>';
+    accessHtml += '</div>';
 
     moduleKeys.filter(key => key !== 'about-course').forEach(key => {
       const entries = getResourceEntriesForModule(key);
-      html += '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(getModuleLabel(key)) + '：资料开放</div><div class="settings-resource-grid">';
+      accessHtml += '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(getModuleLabel(key)) + '：资料开放</div><div class="settings-resource-grid">';
       entries.forEach(entry => {
-        html += '<label class="settings-check"><input type="checkbox" data-setting-type="resource" data-key="' + escapeHtml(entry.key) + '"' + (settings.resources[entry.key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(entry.label) + '</span></label>';
+        accessHtml += '<label class="settings-check"><input type="checkbox" data-setting-type="resource" data-key="' + escapeHtml(entry.key) + '"' + (settings.resources[entry.key] !== false ? ' checked' : '') + '> <span>' + escapeHtml(entry.label) + '</span></label>';
       });
-      html += '</div></div>';
+      accessHtml += '</div></div>';
     });
-    html += '<div class="login-status-line">当前版本先保存到本机；接入腾讯云函数后，可把同一份设置同步给所有学生。</div>';
-    body.innerHTML = html;
+    accessHtml += '<div class="login-status-line">保存后同步至腾讯云，学生刷新页面后生效。</div>';
+    body.innerHTML =
+      '<div class="settings-tabs">' +
+        '<button class="settings-tab active" data-settings-tab="files">1. 文件与排序</button>' +
+        '<button class="settings-tab" data-settings-tab="access">2. 开放与关闭</button>' +
+        '<button class="settings-tab" data-settings-tab="analytics">3. 用户行为看板</button>' +
+      '</div>' +
+      '<section class="settings-tab-panel active" data-settings-panel="files">' +
+        '<div class="material-tree-note">当前为只读核对版：显示学生端材料名称及其关联文件。上传、插入和排序将在下一步启用。</div>' +
+        '<div id="admin-material-tree"><div class="login-status-line">正在从腾讯云读取完整材料目录...</div></div>' +
+      '</section>' +
+      '<section class="settings-tab-panel" data-settings-panel="access">' + accessHtml + '</section>' +
+      '<section class="settings-tab-panel" data-settings-panel="analytics">' +
+        '<div class="settings-section"><div class="settings-section-title">用户行为看板</div>' +
+        '<div class="material-empty">本模块将在材料管理稳定后接入登录、章节访问、材料打开和视频观看数据。</div></div>' +
+      '</section>';
 
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
@@ -2231,6 +2382,7 @@
     saveBtn.className = 'btn-ghost';
     saveBtn.textContent = '保存设置 / Save';
     footer.appendChild(saveBtn);
+    footer.style.display = 'none';
 
     win.appendChild(header);
     win.appendChild(body);
@@ -2238,6 +2390,26 @@
     document.body.appendChild(win);
     makeDraggable(win, header);
     closeBtn.addEventListener('click', () => win.remove());
+    body.querySelectorAll('.settings-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-settings-tab');
+        body.querySelectorAll('.settings-tab').forEach(item => item.classList.toggle('active', item === tab));
+        body.querySelectorAll('.settings-tab-panel').forEach(panel => {
+          panel.classList.toggle('active', panel.getAttribute('data-settings-panel') === tabName);
+        });
+        footer.style.display = tabName === 'access' ? '' : 'none';
+      });
+    });
+    const treeContainer = body.querySelector('#admin-material-tree');
+    loadAdminMaterialsCatalog().then(catalog => {
+      if (treeContainer && treeContainer.isConnected) {
+        treeContainer.innerHTML = renderAdminMaterialsTree(catalog);
+      }
+    }).catch(err => {
+      if (treeContainer && treeContainer.isConnected) {
+        treeContainer.innerHTML = '<div class="login-status-line error">材料目录读取失败：' + escapeHtml(err.message) + '</div>';
+      }
+    });
     saveBtn.addEventListener('click', async () => {
       const next = getAccessSettings();
       body.querySelectorAll('input[data-setting-type="module"]').forEach(input => {
