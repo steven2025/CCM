@@ -300,6 +300,33 @@
     }
     .material-asset-icon { width: 18px; text-align: center; }
     .material-empty { opacity: 0.68; padding: 8px 4px; }
+    .material-access-item {
+      margin: 5px 0;
+      padding-left: 8px;
+      border-left: 1px dashed rgba(136,192,255,0.28);
+    }
+    .material-access-item > label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 7px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .material-access-item > label:hover { background: rgba(136,192,255,0.08); }
+    .material-access-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+    .material-access-children { margin-left: 15px; }
+    .material-access-root > .material-access-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 11px;
+      padding: 7px 9px;
+      margin-bottom: 9px;
+      background: rgba(15,23,42,0.42);
+    }
     @media (max-width: 700px) {
       .settings-resource-grid { grid-template-columns: 1fr; }
       .settings-tabs { grid-template-columns: 1fr; }
@@ -2282,6 +2309,29 @@
     return payload.catalog;
   }
 
+  async function saveAdminMaterialsCatalog(catalog) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save-materials-catalog',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        catalog
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
   function getMaterialAssetIcon(type) {
     if (type === 'video') return '🎬';
     if (type === 'subtitle') return '💬';
@@ -2326,6 +2376,86 @@
     }).join('') + '</div>';
   }
 
+  function renderMaterialAccessTree(catalog, objectMap) {
+    objectMap.clear();
+    const isOpen = item => !item || item.status !== 'hidden';
+    const itemHtml = (item, path, label, icon, childrenHtml, badge) => {
+      objectMap.set(path, item);
+      return '<div class="material-access-item" data-material-path="' + escapeHtml(path) + '">' +
+        '<label><input type="checkbox" data-material-toggle="' + escapeHtml(path) + '"' + (isOpen(item) ? ' checked' : '') + '>' +
+        '<span>' + icon + ' ' + escapeHtml(label) + '</span>' +
+        (badge ? '<span class="material-tree-badge">' + escapeHtml(badge) + '</span>' : '') + '</label>' +
+        (childrenHtml ? '<div class="material-access-children">' + childrenHtml + '</div>' : '') + '</div>';
+    };
+    const renderNodes = (nodes, parentPath) => (Array.isArray(nodes) ? nodes : []).map(node => {
+      const nodePath = parentPath + '/node:' + node.id;
+      if (node.kind === 'group') {
+        return itemHtml(node, nodePath, node.title, '📁', renderNodes(node.children, nodePath), '分组');
+      }
+      const assets = (Array.isArray(node.assets) ? node.assets : []).map(asset => {
+        const assetPath = nodePath + '/asset:' + asset.id;
+        return itemHtml(asset, assetPath, asset.label || asset.language || '文件', getMaterialAssetIcon(asset.type), '', asset.type || 'file');
+      }).join('');
+      return itemHtml(node, nodePath, node.title, '📌', assets, (node.assets || []).length + ' 个文件');
+    }).join('');
+    const chapters = Array.isArray(catalog && catalog.chapters) ? catalog.chapters : [];
+    return '<div class="material-access-root">' + chapters.map(chapter => {
+      const chapterPath = 'chapter:' + chapter.id;
+      const sections = (Array.isArray(chapter.sections) ? chapter.sections : []).map(section => {
+        const sectionPath = chapterPath + '/section:' + section.id;
+        return itemHtml(section, sectionPath, section.title, '📂', renderNodes(section.nodes, sectionPath), '功能区');
+      }).join('');
+      return itemHtml(chapter, chapterPath, chapter.title, '📚', sections, '章节');
+    }).join('') + '</div>';
+  }
+
+  function bindMaterialAccessTree(container, objectMap) {
+    const refreshParents = startItem => {
+      let parentItem = startItem.parentElement && startItem.parentElement.closest('.material-access-item');
+      while (parentItem) {
+        const childContainer = parentItem.querySelector(':scope > .material-access-children');
+        const childInputs = childContainer
+          ? Array.from(childContainer.querySelectorAll(':scope > .material-access-item > label > input[data-material-toggle]'))
+          : [];
+        const parentInput = parentItem.querySelector(':scope > label > input[data-material-toggle]');
+        if (parentInput && childInputs.length) {
+          const checkedCount = childInputs.filter(input => input.checked).length;
+          parentInput.checked = checkedCount === childInputs.length;
+          parentInput.indeterminate = checkedCount > 0 && checkedCount < childInputs.length;
+          const parentObject = objectMap.get(parentInput.getAttribute('data-material-toggle'));
+          if (parentObject) parentObject.status = checkedCount > 0 ? 'published' : 'hidden';
+        }
+        parentItem = parentItem.parentElement && parentItem.parentElement.closest('.material-access-item');
+      }
+    };
+    container.querySelectorAll('input[data-material-toggle]').forEach(input => {
+      input.addEventListener('change', () => {
+        const item = input.closest('.material-access-item');
+        const checked = input.checked;
+        input.indeterminate = false;
+        item.querySelectorAll('input[data-material-toggle]').forEach(childInput => {
+          childInput.checked = checked;
+          childInput.indeterminate = false;
+          const target = objectMap.get(childInput.getAttribute('data-material-toggle'));
+          if (target) target.status = checked ? 'published' : 'hidden';
+        });
+        refreshParents(item);
+      });
+    });
+    Array.from(container.querySelectorAll('.material-access-item')).reverse().forEach(item => {
+      const childContainer = item.querySelector(':scope > .material-access-children');
+      const childInputs = childContainer
+        ? Array.from(childContainer.querySelectorAll(':scope > .material-access-item > label > input[data-material-toggle]'))
+        : [];
+      const input = item.querySelector(':scope > label > input[data-material-toggle]');
+      if (input && childInputs.length) {
+        const checkedCount = childInputs.filter(child => child.checked || child.indeterminate).length;
+        input.checked = checkedCount === childInputs.length && childInputs.every(child => child.checked);
+        input.indeterminate = checkedCount > 0 && !input.checked;
+      }
+    });
+  }
+
   function openSystemSettingsWindow() {
     const existing = document.querySelector('.floating-window[data-tool="system-settings"]');
     if (existing) {
@@ -2343,8 +2473,13 @@
 
     const header = document.createElement('div');
     header.className = 'floating-header';
-    header.innerHTML = '<div class="floating-title">系统设置 · System Settings</div><div class="floating-controls"><button class="btn-icon" title="Close">×</button></div>';
-    const closeBtn = header.querySelector('button');
+    header.innerHTML = '<div class="floating-title">系统设置 · System Settings</div><div class="floating-controls">' +
+      '<button class="btn-icon" data-window-action="fullscreen" title="全屏 / Full screen">⛶</button>' +
+      '<button class="btn-icon" data-window-action="restore" title="恢复 / Restore">↙</button>' +
+      '<button class="btn-icon" data-window-action="close" title="关闭 / Close">×</button></div>';
+    const fullBtn = header.querySelector('[data-window-action="fullscreen"]');
+    const restoreBtn = header.querySelector('[data-window-action="restore"]');
+    const closeBtn = header.querySelector('[data-window-action="close"]');
 
     const body = document.createElement('div');
     body.className = 'floating-body';
@@ -2373,7 +2508,11 @@
         '<div class="material-tree-note">当前为只读核对版：显示学生端材料名称及其关联文件。上传、插入和排序将在下一步启用。</div>' +
         '<div id="admin-material-tree"><div class="login-status-line">正在从腾讯云读取完整材料目录...</div></div>' +
       '</section>' +
-      '<section class="settings-tab-panel" data-settings-panel="access">' + accessHtml + '</section>' +
+      '<section class="settings-tab-panel" data-settings-panel="access">' +
+        '<div class="material-tree-note">按目录树开放或隐藏章节、功能区、材料及单个文件。保存后写入材料目录并自动备份旧版本。</div>' +
+        '<div id="material-access-tree"><div class="login-status-line">正在读取开放状态...</div></div>' +
+        '<details class="settings-section"><summary class="settings-section-title">现有平台权限（过渡兼容）</summary>' + accessHtml + '</details>' +
+      '</section>' +
       '<section class="settings-tab-panel" data-settings-panel="analytics">' +
         '<div class="settings-section"><div class="settings-section-title">用户行为看板</div>' +
         '<div class="material-empty">本模块将在材料管理稳定后接入登录、章节访问、材料打开和视频观看数据。</div></div>' +
@@ -2393,6 +2532,14 @@
     document.body.appendChild(win);
     makeDraggable(win, header);
     closeBtn.addEventListener('click', () => win.remove());
+    fullBtn.addEventListener('click', () => {
+      win.classList.add('fullscreen');
+      win.style.zIndex = ++currentZ;
+    });
+    restoreBtn.addEventListener('click', () => {
+      win.classList.remove('fullscreen');
+      win.style.zIndex = ++currentZ;
+    });
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
@@ -2404,16 +2551,31 @@
       });
     });
     const treeContainer = body.querySelector('#admin-material-tree');
+    const accessTreeContainer = body.querySelector('#material-access-tree');
+    const materialObjectMap = new Map();
+    let adminMaterialsCatalog = null;
     loadAdminMaterialsCatalog().then(catalog => {
+      adminMaterialsCatalog = catalog;
       if (treeContainer && treeContainer.isConnected) {
         treeContainer.innerHTML = renderAdminMaterialsTree(catalog);
+      }
+      if (accessTreeContainer && accessTreeContainer.isConnected) {
+        accessTreeContainer.innerHTML = renderMaterialAccessTree(catalog, materialObjectMap);
+        bindMaterialAccessTree(accessTreeContainer, materialObjectMap);
       }
     }).catch(err => {
       if (treeContainer && treeContainer.isConnected) {
         treeContainer.innerHTML = '<div class="login-status-line error">材料目录读取失败：' + escapeHtml(err.message) + '</div>';
       }
+      if (accessTreeContainer && accessTreeContainer.isConnected) {
+        accessTreeContainer.innerHTML = '<div class="login-status-line error">开放状态读取失败：' + escapeHtml(err.message) + '</div>';
+      }
     });
     saveBtn.addEventListener('click', async () => {
+      if (!adminMaterialsCatalog) {
+        alert('材料目录尚未加载完成，请稍后再保存。');
+        return;
+      }
       const next = getAccessSettings();
       body.querySelectorAll('input[data-setting-type="module"]').forEach(input => {
         next.modules[input.getAttribute('data-key')] = input.checked;
@@ -2427,10 +2589,15 @@
       saveBtn.disabled = true;
       saveBtn.textContent = '正在同步...';
       try {
-        await saveCloudAccessSettings(next);
-        alert('设置已保存并同步到云端。学生端刷新页面后生效。');
+        const results = await Promise.all([
+          saveCloudAccessSettings(next),
+          saveAdminMaterialsCatalog(adminMaterialsCatalog)
+        ]);
+        const materialResult = results[1];
+        adminMaterialsCatalog = materialResult.catalog;
+        alert('开放设置与材料目录已同步。旧目录备份：' + materialResult.backupKey);
       } catch (err) {
-        alert('设置已保存到本机，但同步云端失败：' + err.message);
+        alert((err.status === 409 ? '材料目录已被更新，请关闭窗口后重新打开再操作：' : '设置同步失败：') + err.message);
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = '保存设置 / Save';
