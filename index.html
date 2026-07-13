@@ -344,6 +344,50 @@
     }
     .material-mini-btn:hover { background: rgba(37,99,235,0.35); }
     .material-mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .material-register-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.68);
+    }
+    .material-register-dialog {
+      width: min(560px, 96vw);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 16px;
+      padding: 18px;
+      background: #111827;
+      border: 1px solid rgba(147,197,253,0.35);
+      box-shadow: 0 22px 60px rgba(0,0,0,0.72);
+    }
+    .material-register-dialog h3 { margin-bottom: 12px; }
+    .material-register-field { margin-bottom: 11px; }
+    .material-register-field label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .material-register-field input,
+    .material-register-field select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(136,192,255,0.32);
+      background: rgba(30,41,59,0.94);
+      color: #f1f5f9;
+      outline: none;
+    }
+    .material-register-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
     .material-access-item {
       margin: 5px 0;
       padding-left: 8px;
@@ -2399,6 +2443,90 @@
     return payload;
   }
 
+  async function registerCosVideoLink(catalog, data) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'register-video-link',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        ...data
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  function openCosVideoRegistrationDialog(chapter, videoSection, catalog, onComplete) {
+    const overlay = document.createElement('div');
+    overlay.className = 'material-register-overlay';
+    const nodes = sortCatalogItems(videoSection && videoSection.nodes);
+    const insertOptions = ['<option value="">添加到末尾</option>'].concat(nodes.map(node =>
+      '<option value="' + escapeHtml(node.id) + '">在“' + escapeHtml(node.title) + '”后插入</option>'
+    )).join('');
+    overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true">' +
+      '<h3>登记已有 COS 视频</h3>' +
+      '<div class="material-tree-note">章节：' + escapeHtml(chapter.title) + '。请先在 COS 控制台完成视频上传，再粘贴该对象的永久访问链接。新视频登记后默认隐藏。</div>' +
+      '<div class="material-register-field"><label>学生端显示名称</label><input type="text" data-video-field="title" maxlength="160" placeholder="例如：跨文化沟通案例"></div>' +
+      '<div class="material-register-field"><label>COS 视频永久链接</label><input type="url" data-video-field="url" placeholder="https://ccm2025-...myqcloud.com/.../video.mp4"></div>' +
+      '<div class="material-register-field"><label>插入位置</label><select data-video-field="insertAfterId">' + insertOptions + '</select></div>' +
+      '<div class="material-register-field"><label>字幕默认位置</label><select data-video-field="subtitlePosition"><option value="top">顶部</option><option value="bottom">底部</option></select></div>' +
+      '<div class="login-status-line" data-video-status></div>' +
+      '<div class="material-register-actions"><button class="btn-ghost" type="button" data-video-cancel>取消</button>' +
+      '<button class="btn-ghost" type="button" data-video-confirm>验证并登记</button></div></div>';
+    document.body.appendChild(overlay);
+    const dialog = overlay.querySelector('.material-register-dialog');
+    const titleInput = overlay.querySelector('[data-video-field="title"]');
+    const urlInput = overlay.querySelector('[data-video-field="url"]');
+    const insertSelect = overlay.querySelector('[data-video-field="insertAfterId"]');
+    const subtitleSelect = overlay.querySelector('[data-video-field="subtitlePosition"]');
+    const status = overlay.querySelector('[data-video-status]');
+    const confirmBtn = overlay.querySelector('[data-video-confirm]');
+    const close = () => overlay.remove();
+    overlay.querySelector('[data-video-cancel]').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    dialog.addEventListener('click', event => event.stopPropagation());
+    confirmBtn.addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      const url = urlInput.value.trim();
+      if (!title || !url) {
+        status.textContent = '请填写学生端显示名称和 COS 视频链接。';
+        status.className = 'login-status-line error';
+        return;
+      }
+      confirmBtn.disabled = true;
+      status.textContent = '正在验证 COS 对象并登记...';
+      status.className = 'login-status-line';
+      try {
+        const payload = await registerCosVideoLink(catalog, {
+          chapterId: String(chapter.id),
+          title,
+          url,
+          insertAfterId: insertSelect.value,
+          subtitlePosition: subtitleSelect.value
+        });
+        close();
+        onComplete(payload);
+        alert('视频已登记并默认隐藏。旧目录备份：' + payload.backupKey);
+      } catch (err) {
+        status.textContent = (err.status === 409 ? '目录已更新，请关闭窗口重新进入后再试。' : '登记失败：') + err.message;
+        status.className = 'login-status-line error';
+      } finally {
+        confirmBtn.disabled = false;
+      }
+    });
+    setTimeout(() => titleInput.focus(), 0);
+  }
+
   async function loadStudentMaterialsCatalog() {
     let apiError = null;
     try {
@@ -2641,17 +2769,29 @@
     if (!chapters.length) return '<div class="material-empty">材料目录为空。</div>';
     return '<div class="material-tree">' + chapters.map((chapter, chapterIndex) => {
       const sections = Array.isArray(chapter.sections) ? chapter.sections : [];
-      const sectionHtml = sections.map(section =>
-        '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '/section:' + escapeHtml(section.id) + '"><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
-        '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span></summary>' +
-        renderMaterialNodes(section.nodes, objectMap, siblingMap, 'chapter:' + chapter.id + '/section:' + section.id) + '</details>'
-      ).join('');
+      const sectionHtml = sections.map(section => {
+        const registerButton = section.id === 'videos'
+          ? '<button type="button" class="material-mini-btn" data-register-cos-video="' + escapeHtml(chapter.id) + '">＋登记 COS 视频</button>'
+          : '';
+        return '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '/section:' + escapeHtml(section.id) + '"><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
+          '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span>' + registerButton + '</summary>' +
+          renderMaterialNodes(section.nodes, objectMap, siblingMap, 'chapter:' + chapter.id + '/section:' + section.id) + '</details>';
+      }).join('');
       return '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '"' + (chapterIndex === 0 ? ' open' : '') + '><summary><span class="material-node-title">📚 ' +
         escapeHtml(chapter.title) + '</span></summary>' + sectionHtml + '</details>';
     }).join('') + '</div>';
   }
 
-  function bindMaterialFileTree(container, objectMap, siblingMap, rerender) {
+  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo) {
+    container.querySelectorAll('[data-register-cos-video]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof onRegisterVideo === 'function') {
+          onRegisterVideo(button.getAttribute('data-register-cos-video'));
+        }
+      });
+    });
     container.querySelectorAll('[data-material-rename]').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
@@ -2897,7 +3037,23 @@
             else fileOpenTreeKeys.delete(key);
           });
         });
-        bindMaterialFileTree(treeContainer, fileObjectMap, fileSiblingMap, renderCatalogViews);
+        bindMaterialFileTree(treeContainer, fileObjectMap, fileSiblingMap, renderCatalogViews, chapterId => {
+          const chapters = Array.isArray(adminMaterialsCatalog.chapters) ? adminMaterialsCatalog.chapters : [];
+          const chapter = chapters.find(item => item.id === chapterId);
+          const videoSection = chapter && Array.isArray(chapter.sections)
+            ? chapter.sections.find(section => section.id === 'videos')
+            : null;
+          if (!chapter || !videoSection) {
+            alert('未找到该章节的视频案例区域。');
+            return;
+          }
+          openCosVideoRegistrationDialog(chapter, videoSection, adminMaterialsCatalog, payload => {
+            if (payload && payload.catalog) {
+              adminMaterialsCatalog = payload.catalog;
+              renderCatalogViews();
+            }
+          });
+        });
       }
       if (accessTreeContainer && accessTreeContainer.isConnected) {
         accessTreeContainer.innerHTML = renderMaterialAccessTree(adminMaterialsCatalog, materialObjectMap);
