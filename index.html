@@ -2610,7 +2610,7 @@
       siblingMap.set(nodePath, nodes);
       const controls = renderMaterialEditControls(nodePath, index, nodes.length);
       if (node.kind === 'group') {
-        return '<details><summary><span class="material-node-title">📁 ' + escapeHtml(node.title) + '</span>' +
+        return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📁 ' + escapeHtml(node.title) + '</span>' +
           '<span class="material-tree-badge">分组</span>' + controls + '</summary>' +
           renderMaterialNodes(node.children, objectMap, siblingMap, nodePath) + '</details>';
       }
@@ -2627,7 +2627,7 @@
         );
       }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
-      return '<details><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
+      return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
         '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
@@ -2642,11 +2642,11 @@
     return '<div class="material-tree">' + chapters.map((chapter, chapterIndex) => {
       const sections = Array.isArray(chapter.sections) ? chapter.sections : [];
       const sectionHtml = sections.map(section =>
-        '<details><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
+        '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '/section:' + escapeHtml(section.id) + '"><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
         '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span></summary>' +
         renderMaterialNodes(section.nodes, objectMap, siblingMap, 'chapter:' + chapter.id + '/section:' + section.id) + '</details>'
       ).join('');
-      return '<details' + (chapterIndex === 0 ? ' open' : '') + '><summary><span class="material-node-title">📚 ' +
+      return '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '"' + (chapterIndex === 0 ? ' open' : '') + '><summary><span class="material-node-title">📚 ' +
         escapeHtml(chapter.title) + '</span></summary>' + sectionHtml + '</details>';
     }).join('') + '</div>';
   }
@@ -2874,14 +2874,28 @@
     let adminMaterialsCatalog = null;
     const renderCatalogViews = () => {
       if (!adminMaterialsCatalog) return;
+      const hadFileTree = !!(treeContainer && treeContainer.querySelector('.material-tree'));
+      const openTreeKeys = new Set(
+        treeContainer
+          ? Array.from(treeContainer.querySelectorAll('details[open][data-tree-key]'))
+              .map(detail => detail.getAttribute('data-tree-key'))
+          : []
+      );
+      const savedScrollTop = body.scrollTop;
       if (treeContainer && treeContainer.isConnected) {
         treeContainer.innerHTML = renderAdminMaterialsTree(adminMaterialsCatalog, fileObjectMap, fileSiblingMap);
+        if (hadFileTree) {
+          treeContainer.querySelectorAll('details[data-tree-key]').forEach(detail => {
+            detail.open = openTreeKeys.has(detail.getAttribute('data-tree-key'));
+          });
+        }
         bindMaterialFileTree(treeContainer, fileObjectMap, fileSiblingMap, renderCatalogViews);
       }
       if (accessTreeContainer && accessTreeContainer.isConnected) {
         accessTreeContainer.innerHTML = renderMaterialAccessTree(adminMaterialsCatalog, materialObjectMap);
         bindMaterialAccessTree(accessTreeContainer, materialObjectMap);
       }
+      requestAnimationFrame(() => { body.scrollTop = savedScrollTop; });
     };
     loadAdminMaterialsCatalog().then(catalog => {
       adminMaterialsCatalog = catalog;
