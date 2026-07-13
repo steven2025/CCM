@@ -2871,24 +2871,32 @@
     const fileObjectMap = new Map();
     const fileSiblingMap = new Map();
     const materialObjectMap = new Map();
+    const fileOpenTreeKeys = new Set();
+    let fileTreeInitialized = false;
     let adminMaterialsCatalog = null;
     const renderCatalogViews = () => {
       if (!adminMaterialsCatalog) return;
-      const hadFileTree = !!(treeContainer && treeContainer.querySelector('.material-tree'));
-      const openTreeKeys = new Set(
-        treeContainer
-          ? Array.from(treeContainer.querySelectorAll('details[open][data-tree-key]'))
-              .map(detail => detail.getAttribute('data-tree-key'))
-          : []
-      );
       const savedScrollTop = body.scrollTop;
       if (treeContainer && treeContainer.isConnected) {
         treeContainer.innerHTML = renderAdminMaterialsTree(adminMaterialsCatalog, fileObjectMap, fileSiblingMap);
-        if (hadFileTree) {
-          treeContainer.querySelectorAll('details[data-tree-key]').forEach(detail => {
-            detail.open = openTreeKeys.has(detail.getAttribute('data-tree-key'));
+        const details = Array.from(treeContainer.querySelectorAll('details[data-tree-key]'));
+        if (!fileTreeInitialized) {
+          details.filter(detail => detail.open).forEach(detail => {
+            fileOpenTreeKeys.add(detail.getAttribute('data-tree-key'));
+          });
+          fileTreeInitialized = true;
+        } else {
+          details.forEach(detail => {
+            detail.open = fileOpenTreeKeys.has(detail.getAttribute('data-tree-key'));
           });
         }
+        details.forEach(detail => {
+          detail.addEventListener('toggle', () => {
+            const key = detail.getAttribute('data-tree-key');
+            if (detail.open) fileOpenTreeKeys.add(key);
+            else fileOpenTreeKeys.delete(key);
+          });
+        });
         bindMaterialFileTree(treeContainer, fileObjectMap, fileSiblingMap, renderCatalogViews);
       }
       if (accessTreeContainer && accessTreeContainer.isConnected) {
