@@ -54,6 +54,32 @@
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+    .header-auth {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 7px;
+      flex-wrap: wrap;
+    }
+    .header-auth.active { display: flex; }
+    .header-user-info {
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(134,239,172,0.35);
+      background: rgba(20,83,45,0.34);
+      color: #dcfce7;
+      font-size: 0.82rem;
+    }
+    .header-logout-btn {
+      border: 1px solid rgba(252,165,165,0.45);
+      border-radius: 999px;
+      padding: 5px 11px;
+      background: rgba(127,29,29,0.3);
+      color: #fee2e2;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
 
     main.main-layout {
       flex: 1;
@@ -1042,6 +1068,10 @@
     程序开发/授课教师：重庆工商大学 鄢清华 副教授 · Program Developing / Instructor: Prof. Yan Qinghua, Chongqing Technology and Business University
   </h2>
   <div class="header-clock" id="headerClock" aria-live="polite">Loading time...</div>
+  <div class="header-auth" id="headerAuth" aria-live="polite">
+    <span class="header-user-info" id="headerUserInfo"></span>
+    <button class="header-logout-btn" id="headerLogoutBtn" type="button">退出登录 / Log out</button>
+  </div>
 </header>
 
 <main class="main-layout">
@@ -1244,6 +1274,9 @@
   const chapterView = document.getElementById('chapter-view');
   const chapterButtons = document.querySelectorAll('.card-btn');
   const headerClock = document.getElementById('headerClock');
+  const headerAuth = document.getElementById('headerAuth');
+  const headerUserInfo = document.getElementById('headerUserInfo');
+  const headerLogoutBtn = document.getElementById('headerLogoutBtn');
   const loginOverlay = document.getElementById('loginOverlay');
   const inviteCodeInput = document.getElementById('inviteCode');
   const studentNameInput = document.getElementById('studentName');
@@ -1275,6 +1308,7 @@
   const btnAiGlossary = document.getElementById('btn-ai-glossary');
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
+  const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -2269,6 +2303,14 @@
 
   function updateAuthUi() {
     ensureTeacherSettingsButton();
+    const auth = getCurrentAuth();
+    const loggedIn = auth && (auth.role === 'student' || auth.role === 'teacher');
+    if (headerAuth) headerAuth.classList.toggle('active', !!loggedIn);
+    if (headerUserInfo) {
+      headerUserInfo.textContent = loggedIn
+        ? ('👤 ' + (auth.name || '') + ' · ' + (auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
+        : '';
+    }
     mainMenu.querySelectorAll('.card-btn').forEach(btn => {
       const moduleKey = getButtonModuleKey(btn);
       const allowed = canUseModule(moduleKey);
@@ -2339,16 +2381,54 @@
   }
 
   async function loadStudentMaterialsCatalog() {
-    const separator = TEACHER_SETTINGS_API_URL.includes('?') ? '&' : '?';
-    const resp = await fetch(TEACHER_SETTINGS_API_URL + separator + 'action=materials&t=' + Date.now(), {
-      method: 'GET',
-      cache: 'no-store'
-    });
-    const payload = await resp.json().catch(() => null);
-    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
-      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    let apiError = null;
+    try {
+      const separator = TEACHER_SETTINGS_API_URL.includes('?') ? '&' : '?';
+      const resp = await fetch(TEACHER_SETTINGS_API_URL + separator + 'action=materials&t=' + Date.now(), {
+        method: 'GET',
+        cache: 'no-store'
+      });
+      const payload = await resp.json().catch(() => null);
+      if (resp.ok && payload && payload.ok === true && payload.catalog) {
+        return payload.catalog;
+      }
+      apiError = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    } catch (err) {
+      apiError = err;
     }
-    return payload.catalog;
+    const fallbackResp = await fetch(MATERIALS_CATALOG_COS_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!fallbackResp.ok) {
+      throw apiError || new Error('材料目录读取失败：HTTP ' + fallbackResp.status);
+    }
+    const fallbackCatalog = await fallbackResp.json();
+    return filterPublishedCatalogForStudent(fallbackCatalog);
+  }
+
+  function filterPublishedCatalogForStudent(catalog) {
+    const clone = JSON.parse(JSON.stringify(catalog || {}));
+    const filterNodes = nodes => (Array.isArray(nodes) ? nodes : []).map(node => {
+      if (!node || node.status !== 'published') return null;
+      if (node.kind === 'group') {
+        const children = filterNodes(node.children);
+        return children.length ? { ...node, children } : null;
+      }
+      const originalAssets = Array.isArray(node.assets) ? node.assets : [];
+      const assets = originalAssets.filter(asset => asset && asset.status === 'published');
+      const isVideo = originalAssets.some(asset => asset && asset.type === 'video');
+      if (isVideo && !assets.some(asset => asset.type === 'video')) return null;
+      return assets.length ? { ...node, assets } : null;
+    }).filter(Boolean);
+    clone.chapters = (Array.isArray(clone.chapters) ? clone.chapters : [])
+      .filter(chapter => chapter && chapter.status !== 'hidden')
+      .map(chapter => ({
+        ...chapter,
+        sections: (Array.isArray(chapter.sections) ? chapter.sections : [])
+          .filter(section => section && section.status !== 'hidden')
+          .map(section => ({ ...section, nodes: filterNodes(section.nodes) }))
+          .filter(section => section.nodes.length)
+      }))
+      .filter(chapter => chapter.sections.length);
+    return clone;
   }
 
   function sortCatalogItems(items) {
@@ -3229,8 +3309,26 @@
     document.querySelectorAll('.floating-window').forEach(w => w.remove());
   }
 
+  function logoutCurrentUser() {
+    saveCurrentAuth({});
+    localStorage.removeItem('ccm_invite_code');
+    localStorage.removeItem('ccm_student_name');
+    closeAllFloatingWindows();
+    chapterView.style.display = 'none';
+    mainMenu.style.display = 'grid';
+    currentChapter = 1;
+    resetResourceListHint();
+    updateAuthUi();
+    applyChapterPermissions();
+    if (inviteCodeInput) inviteCodeInput.value = '';
+    if (studentNameInput) studentNameInput.value = '';
+    setLoginStatus('', '');
+    refreshMaterialsCatalogForRole('').catch(() => {});
+  }
+
   if (loginCancelBtn) loginCancelBtn.addEventListener('click', closeLoginDialog);
   if (loginSubmitBtn) loginSubmitBtn.addEventListener('click', submitLoginDialog);
+  if (headerLogoutBtn) headerLogoutBtn.addEventListener('click', logoutCurrentUser);
   if (loginOverlay) {
     loginOverlay.addEventListener('click', (e) => {
       if (e.target === loginOverlay) closeLoginDialog();
