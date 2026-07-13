@@ -326,6 +326,24 @@
     }
     .material-asset-icon { width: 18px; text-align: center; }
     .material-empty { opacity: 0.68; padding: 8px 4px; }
+    .material-edit-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 8px;
+      flex-wrap: wrap;
+    }
+    .material-mini-btn {
+      border: 1px solid rgba(136,192,255,0.32);
+      border-radius: 7px;
+      padding: 2px 6px;
+      background: rgba(30,41,59,0.8);
+      color: #dbeafe;
+      font-size: 0.68rem;
+      cursor: pointer;
+    }
+    .material-mini-btn:hover { background: rgba(37,99,235,0.35); }
+    .material-mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .material-access-item {
       margin: 5px 0;
       padding-left: 8px;
@@ -2556,29 +2574,48 @@
     return '📄';
   }
 
-  function renderMaterialNodes(nodes) {
+  function renderMaterialEditControls(path, index, total) {
+    return '<span class="material-edit-controls">' +
+      '<button type="button" class="material-mini-btn" data-material-rename="' + escapeHtml(path) + '">重命名</button>' +
+      '<button type="button" class="material-mini-btn" data-material-move="up" data-material-path="' + escapeHtml(path) + '"' + (index <= 0 ? ' disabled' : '') + '>↑</button>' +
+      '<button type="button" class="material-mini-btn" data-material-move="down" data-material-path="' + escapeHtml(path) + '"' + (index >= total - 1 ? ' disabled' : '') + '>↓</button></span>';
+  }
+
+  function renderMaterialNodes(nodes, objectMap, siblingMap, parentPath) {
     if (!Array.isArray(nodes) || !nodes.length) {
       return '<div class="material-empty">暂无材料</div>';
     }
-    return nodes.map(node => {
+    return nodes.map((node, index) => {
+      const nodePath = parentPath + '/node:' + node.id;
+      objectMap.set(nodePath, { object: node, field: 'title' });
+      siblingMap.set(nodePath, nodes);
+      const controls = renderMaterialEditControls(nodePath, index, nodes.length);
       if (node.kind === 'group') {
         return '<details><summary><span class="material-node-title">📁 ' + escapeHtml(node.title) + '</span>' +
-          '<span class="material-tree-badge">分组</span></summary>' +
-          renderMaterialNodes(node.children) + '</details>';
+          '<span class="material-tree-badge">分组</span>' + controls + '</summary>' +
+          renderMaterialNodes(node.children, objectMap, siblingMap, nodePath) + '</details>';
       }
       const assets = Array.isArray(node.assets) ? node.assets : [];
-      let assetHtml = assets.map(asset =>
+      let assetHtml = assets.map((asset, assetIndex) => {
+        const assetPath = nodePath + '/asset:' + asset.id;
+        objectMap.set(assetPath, { object: asset, field: 'label' });
+        siblingMap.set(assetPath, assets);
+        return (
         '<div class="material-asset"><span class="material-asset-icon">' + getMaterialAssetIcon(asset.type) + '</span>' +
         '<span>' + escapeHtml(asset.label || asset.language || '文件') + '</span>' +
-        '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span></div>'
-      ).join('');
+        '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span>' +
+        renderMaterialEditControls(assetPath, assetIndex, assets.length) + '</div>'
+        );
+      }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
       return '<details><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
-        '<span class="material-tree-badge">' + assets.length + ' 个文件</span></summary>' + assetHtml + '</details>';
+        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
 
-  function renderAdminMaterialsTree(catalog) {
+  function renderAdminMaterialsTree(catalog, objectMap, siblingMap) {
+    objectMap.clear();
+    siblingMap.clear();
     const chapters = Array.isArray(catalog && catalog.chapters) ? catalog.chapters : [];
     if (!chapters.length) return '<div class="material-empty">材料目录为空。</div>';
     return '<div class="material-tree">' + chapters.map((chapter, chapterIndex) => {
@@ -2586,11 +2623,51 @@
       const sectionHtml = sections.map(section =>
         '<details><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
         '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span></summary>' +
-        renderMaterialNodes(section.nodes) + '</details>'
+        renderMaterialNodes(section.nodes, objectMap, siblingMap, 'chapter:' + chapter.id + '/section:' + section.id) + '</details>'
       ).join('');
       return '<details' + (chapterIndex === 0 ? ' open' : '') + '><summary><span class="material-node-title">📚 ' +
         escapeHtml(chapter.title) + '</span></summary>' + sectionHtml + '</details>';
     }).join('') + '</div>';
+  }
+
+  function bindMaterialFileTree(container, objectMap, siblingMap, rerender) {
+    container.querySelectorAll('[data-material-rename]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-material-rename'));
+        if (!entry) return;
+        const currentValue = String(entry.object[entry.field] || '');
+        const nextValue = window.prompt('请输入学生端显示名称：', currentValue);
+        if (nextValue === null) return;
+        const normalized = nextValue.trim();
+        if (!normalized) {
+          alert('显示名称不能为空。');
+          return;
+        }
+        entry.object[entry.field] = normalized;
+        rerender();
+      });
+    });
+    container.querySelectorAll('[data-material-move]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (button.disabled) return;
+        const path = button.getAttribute('data-material-path');
+        const entry = objectMap.get(path);
+        const siblings = siblingMap.get(path);
+        if (!entry || !Array.isArray(siblings)) return;
+        const currentIndex = siblings.indexOf(entry.object);
+        const targetIndex = button.getAttribute('data-material-move') === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (currentIndex < 0 || targetIndex < 0 || targetIndex >= siblings.length) return;
+        const temp = siblings[currentIndex];
+        siblings[currentIndex] = siblings[targetIndex];
+        siblings[targetIndex] = temp;
+        siblings.forEach((item, index) => { item.order = (index + 1) * 1000; });
+        rerender();
+      });
+    });
   }
 
   function renderMaterialAccessTree(catalog, objectMap) {
