@@ -1289,6 +1289,8 @@
   let currentPdfUrl = '';
   let pdfRenderTask = null;
   let pdfRenderToken = 0;
+  let materialsCatalogReady = false;
+  let availableCatalogModules = new Set();
   const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
@@ -2209,6 +2211,10 @@
     if (moduleKey === 'system-settings') return isTeacher();
     if (isTeacher()) return true;
     if (!isLoggedIn()) return false;
+    if (/^chapter-[1-6]$/.test(moduleKey) || moduleKey === 'final-task') {
+      if (!materialsCatalogReady) return false;
+      if (!availableCatalogModules.has(moduleKey)) return false;
+    }
     return getAccessSettings().modules[moduleKey] !== false;
   }
 
@@ -2330,6 +2336,137 @@
       throw err;
     }
     return payload;
+  }
+
+  async function loadStudentMaterialsCatalog() {
+    const separator = TEACHER_SETTINGS_API_URL.includes('?') ? '&' : '?';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL + separator + 'action=materials&t=' + Date.now(), {
+      method: 'GET',
+      cache: 'no-store'
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    return payload.catalog;
+  }
+
+  function sortCatalogItems(items) {
+    return (Array.isArray(items) ? items.slice() : []).sort((a, b) =>
+      Number(a && a.order || 0) - Number(b && b.order || 0)
+    );
+  }
+
+  function syncPptLanguageOptions() {
+    const links = pptLinksByChapter[currentChapter] || {};
+    const previous = pptLangSelect.value;
+    const languages = Object.keys(links).filter(language => links[language] && links[language] !== '#');
+    pptLangSelect.innerHTML = '';
+    languages.forEach(language => {
+      const option = document.createElement('option');
+      option.value = language;
+      option.textContent = getLangFullName(language);
+      pptLangSelect.appendChild(option);
+    });
+    if (languages.includes(previous)) pptLangSelect.value = previous;
+    else if (languages.length) pptLangSelect.value = languages[0];
+    else {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = '暂无开放版本 / Not available';
+      pptLangSelect.appendChild(option);
+    }
+  }
+
+  function applyMaterialsCatalog(catalog) {
+    const chapters = sortCatalogItems(catalog && catalog.chapters);
+    availableCatalogModules = new Set(chapters.map(chapter =>
+      String(chapter.id) === 'final' ? 'final-task' : 'chapter-' + chapter.id
+    ));
+
+    ['1','2','3','4','5','6','final'].forEach(chapterId => {
+      pptLinksByChapter[chapterId] = {};
+      exerciseResources[chapterId] = [];
+    });
+    Object.keys(exerciseLinks).forEach(key => delete exerciseLinks[key]);
+    Object.keys(videoTestLinks).forEach(key => delete videoTestLinks[key]);
+    videoCases.splice(0, videoCases.length);
+
+    const convertExerciseNodes = nodes => sortCatalogItems(nodes).map(node => {
+      if (node.kind === 'group') {
+        return { id: node.id, title: node.title, children: convertExerciseNodes(node.children) };
+      }
+      const links = {};
+      sortCatalogItems(node.assets).forEach(asset => {
+        if (asset && asset.url) links[asset.language || 'DEFAULT'] = asset.url;
+      });
+      exerciseLinks[node.id] = links;
+      return { id: node.id, title: node.title };
+    });
+
+    chapters.forEach(chapter => {
+      const chapterId = String(chapter.id);
+      const chapterKey = chapterId === 'final' ? 'final' : Number(chapterId);
+      sortCatalogItems(chapter.sections).forEach(section => {
+        const nodes = sortCatalogItems(section.nodes);
+        if (section.id === 'slides') {
+          const links = {};
+          nodes.forEach(node => sortCatalogItems(node.assets).forEach(asset => {
+            if (asset && asset.url) links[asset.language || 'DEFAULT'] = asset.url;
+          }));
+          pptLinksByChapter[chapterKey] = links;
+        } else if (section.id === 'exercises') {
+          exerciseResources[chapterKey] = convertExerciseNodes(nodes);
+        } else if (section.id === 'videos') {
+          nodes.forEach(node => {
+            const assets = sortCatalogItems(node.assets);
+            const videoAsset = assets.find(asset => asset.type === 'video' && asset.url);
+            if (!videoAsset) return;
+            const legacyId = String(node.legacyId || node.id || '').replace(/^video-/, '');
+            const subtitles = {};
+            assets.filter(asset => asset.type === 'subtitle' && asset.url).forEach(asset => {
+              subtitles[asset.language || asset.label] = asset.url;
+            });
+            const testAsset = assets.find(asset => asset.type === 'test-link' && asset.url);
+            if (testAsset) videoTestLinks[legacyId] = testAsset.url;
+            videoCases.push({
+              id: legacyId,
+              chapter: chapterKey,
+              title: node.title,
+              videoUrl: videoAsset.url,
+              subtitles,
+              subtitlePosition: node.subtitlePosition || 'top',
+              subMode: node.subtitleMode || 'multiLang'
+            });
+          });
+        }
+      });
+    });
+    materialsCatalogReady = true;
+    syncPptLanguageOptions();
+    updateAuthUi();
+    applyChapterPermissions();
+    if (chapterView.style.display !== 'none') {
+      resetResourceListHint();
+      updatePptView();
+    }
+  }
+
+  async function refreshMaterialsCatalogForRole(role) {
+    try {
+      const catalog = role === 'teacher'
+        ? await loadAdminMaterialsCatalog()
+        : await loadStudentMaterialsCatalog();
+      applyMaterialsCatalog(catalog);
+      return catalog;
+    } catch (err) {
+      materialsCatalogReady = false;
+      availableCatalogModules = new Set();
+      updateAuthUi();
+      applyChapterPermissions();
+      console.error('Materials catalog unavailable; protected modules remain closed:', err);
+      throw err;
+    }
   }
 
   function getMaterialAssetIcon(type) {
@@ -2610,8 +2747,10 @@
   function applyChapterPermissions() {
     const moduleKey = getModuleKeyFromChapter(currentChapter);
     const slidesAllowed = isResourceAllowed('slides', moduleKey);
+    const slideLinks = pptLinksByChapter[currentChapter] || {};
+    const hasSlides = Object.values(slideLinks).some(url => url && url !== '#');
     const slidePanel = document.querySelector('.chapter-layout > .panel');
-    if (slidePanel) slidePanel.style.display = slidesAllowed ? '' : 'none';
+    if (slidePanel) slidePanel.style.display = (slidesAllowed && hasSlides) ? '' : 'none';
     const exercisesAllowed = (exerciseResources[currentChapter] || []).some(item => filterExerciseItems([item]).length > 0);
     const videosAllowed = getVideoCasesForChapter(currentChapter).some(video => isResourceAllowed('video', video.id));
     btnExercises.disabled = !exercisesAllowed;
@@ -2918,6 +3057,7 @@
     const cfg = chapterConfigs[currentChapter] || chapterConfigs[1];
     chapterTitleMain.textContent = cfg.title;
     chapterSubtitleMain.textContent = cfg.subtitle;
+    syncPptLanguageOptions();
   }
 
   function resetResourceListHint() {
@@ -3060,6 +3200,11 @@
       saveCurrentAuth({ role: result.role, name: result.id || studentName, loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
+      try {
+        await refreshMaterialsCatalogForRole(result.role);
+      } catch (catalogError) {
+        console.warn('登录成功，但材料目录暂时不可用：', catalogError);
+      }
       updateAuthUi();
       closeLoginDialog();
       alert(result.role === 'teacher' ? '管理员登录成功，已进入教师模式。' : '学生登录成功。');
@@ -3226,7 +3371,7 @@
           <span>${vc.title}</span>
         </div>
       `;
-      if (currentChapter === 2 && isResourceAllowed('video-test', vc.id)) {
+      if (currentChapter === 2 && videoTestLinks[vc.id] && isResourceAllowed('video-test', vc.id)) {
         html += `
           <div class="resource-node" style="margin-left:16px;">
             <div class="resource-item" data-type="video-test" data-id="${vc.id}">
@@ -3284,7 +3429,7 @@
           { value: "EN",    label: "English subtitles" },
           { value: "EN_TH", label: "English + Thai subtitles" }
         ];
-        opts.forEach(cfg => {
+        opts.filter(cfg => meta.subtitles && meta.subtitles[cfg.value]).forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
           opt.textContent = cfg.label;
@@ -3311,7 +3456,7 @@
           { value: "ID_EN",  label: "Indonesian + English" },
           { value: "LAO_EN", label: "Lao + English" }
         ];
-        opts.forEach(cfg => {
+        opts.filter(cfg => meta.subtitles && meta.subtitles[cfg.value]).forEach(cfg => {
           const opt = document.createElement('option');
           opt.value = cfg.value;
           opt.textContent = cfg.label;
@@ -4015,6 +4160,7 @@
   updatePptView();
   applyChapterPermissions();
   refreshCloudAccessSettings();
+  refreshMaterialsCatalogForRole(getCurrentAuth().role).catch(() => {});
 </script>
 
 </body>
