@@ -970,6 +970,115 @@
       font-size: 0.78rem;
       opacity: 0.85;
     }
+    .video-quiz-card {
+      margin-top: 8px;
+      padding: 11px;
+      border-radius: 10px;
+      border: 1px solid rgba(251,191,36,0.28);
+      background:
+        radial-gradient(circle at 0 0, rgba(251,191,36,0.12), transparent 35%),
+        rgba(15,23,42,0.76);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      display: none;
+      flex-shrink: 0;
+    }
+    .video-quiz-card.active { display: block; }
+    .video-quiz-kicker {
+      font-size: 0.72rem;
+      color: #fde68a;
+      margin-bottom: 5px;
+      letter-spacing: 0;
+    }
+    .video-quiz-title {
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+    .video-quiz-question {
+      color: #dbeafe;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      white-space: pre-line;
+    }
+    .video-quiz-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+    .video-quiz-option {
+      text-align: left;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.22);
+      background: rgba(30,41,59,0.78);
+      color: #e5e7eb;
+      padding: 8px 9px;
+      cursor: pointer;
+      line-height: 1.35;
+      white-space: pre-line;
+      transition: transform 0.12s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+    .video-quiz-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.64);
+      background: rgba(30,64,175,0.34);
+    }
+    .video-quiz-option:disabled {
+      cursor: default;
+      transform: none;
+      opacity: 0.92;
+    }
+    .video-quiz-option.correct {
+      border-color: rgba(134,239,172,0.78);
+      background: rgba(22,101,52,0.52);
+    }
+    .video-quiz-option.wrong {
+      border-color: rgba(252,165,165,0.78);
+      background: rgba(127,29,29,0.48);
+    }
+    .video-quiz-feedback {
+      min-height: 1.3em;
+      margin-top: 8px;
+      color: #bfdbfe;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+    .video-quiz-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 9px;
+      flex-wrap: wrap;
+    }
+    .video-quiz-summary {
+      margin-top: 8px;
+      padding: 8px 9px;
+      border-radius: 9px;
+      border: 1px solid rgba(147,197,253,0.18);
+      background: rgba(15,23,42,0.58);
+      color: #cbd5e1;
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+    .video-quiz-review-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .video-quiz-review-item {
+      padding: 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.16);
+      background: rgba(15,23,42,0.54);
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    .video-quiz-review-item strong { color: #bfdbfe; }
+    .video-quiz-review-item .correct { color: #bbf7d0; }
+    .video-quiz-review-item .wrong { color: #fecaca; }
+    @media (max-width: 700px) {
+      .video-quiz-options { grid-template-columns: 1fr; }
+    }
 
     /* 文件预览样式 */
     .file-preview-container {
@@ -1491,7 +1600,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-07-14-v15';
+  const PLATFORM_VERSION = 'frontend-2026-07-14-v17';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -1938,6 +2047,131 @@
       subMode: "mix55"
     }
   ];
+
+  const videoQuizCheckpoints = {
+    "2.1": [
+      {
+        id: "2.1-q1-definition",
+        time: 113,
+        points: 1,
+        title: "第 1 题 · Individualist Society",
+        question: "根据视频，如何定义“个人主义”社会？\nAccording to the video, how is an \"Individualist\" society defined?",
+        options: [
+          "个体从出生起就融入强大的内部群体。\nIndividuals from birth onwards are part of strong in-groups.",
+          "个体之间的联系松散，只照顾自己和小家庭。\nThe ties between individuals are loose; everyone looks after oneself and the immediate family.",
+          "社会内部存在严格的等级制度。\nThere is a strict hierarchy within the society.",
+          "人们强烈规避不确定性和模糊性。\nPeople have a strong aversion to uncertainty and ambiguity."
+        ],
+        answer: 1,
+        explanation: "正确答案是 B。The correct answer is B.\n视频定义 individualism 为个体之间联系松散，每个人照顾自己和直系亲属。The video defines individualism as loose ties between individuals, with people looking after themselves and the immediate family."
+      },
+      {
+        id: "2.1-q2-we-identity",
+        time: 166,
+        points: 1,
+        title: "第 2 题 · We Identity",
+        question: "在“集体主义社会”中，人们通常如何认同自己？\nIn a \"Collectivist society\", how do people typically identify themselves?",
+        options: [
+          "拥有“我”的身份认同。\nHave an \"I\" identity.",
+          "拥有“我们”的身份认同。\nHave a \"we\" identity.",
+          "根据个人特质来认同自己。\nIdentify themselves by their individual characteristics.",
+          "认同于全球化的社区。\nIdentify with a global community."
+        ],
+        answer: 1,
+        explanation: "正确答案是 B。The correct answer is B.\n视频指出，在集体主义社会中，人们认同“我们”，拥有 we identity。In collectivist societies people identify with “we”; they have a we identity."
+      },
+      {
+        id: "2.1-q3-task-relationship",
+        time: 224,
+        points: 1,
+        title: "第 3 题 · Relationship and Task",
+        question: "当涉及到“完成任务”和“维护关系”时，集体主义社会和个人主义社会的优先顺序是什么？\nWhen it comes to \"carrying out a task\" and \"maintaining a relationship\", what is the priority in Collectivist versus Individualist societies?",
+        options: [
+          "集体主义：任务第一；个人主义：关系第一。\nCollectivist: Task first; Individualist: Relationship first.",
+          "集体主义：关系第一；个人主义：任务第一。\nCollectivist: Relationship first; Individualist: Task first.",
+          "两种社会都认为任务优先于关系。\nBoth societies prioritize task over relationship.",
+          "两种社会都认为关系优先于任务。\nBoth societies prioritize relationship over task."
+        ],
+        answer: 1,
+        explanation: "正确答案是 B。The correct answer is B.\n视频说，集体主义社会关系第一、任务第二；个人主义社会任务第一，关系之后才来。The video says relationship comes first in collectivist societies, while task comes first in individualist societies."
+      },
+      {
+        id: "2.1-q5-harmony",
+        time: 293,
+        points: 1,
+        title: "第 5 题 · Harmony",
+        question: "根据视频，集体主义社会中的一个关键词是什么，即使在存在分歧时也应维护？\nAccording to the video, what is a key word in Collectivist societies that should be maintained even when people disagree?",
+        options: [
+          "竞争\nCompetition",
+          "对抗\nConfrontation",
+          "和谐\nHarmony",
+          "创新\nInnovation"
+        ],
+        answer: 2,
+        explanation: "正确答案是 C。The correct answer is C.\n视频指出，集体主义社会的关键词是 harmony，即使有分歧，也要维护群体内部的表面和谐。A key word in collectivist society is harmony, even when people disagree."
+      },
+      {
+        id: "2.1-q4-context",
+        time: 260,
+        points: 1,
+        title: "第 4 题 · Communication Style",
+        question: "视频中提到，个人主义社会和集体主义社会在“沟通方式”上有什么主要区别？\nWhat main difference in \"communication style\" does the video mention between Individualist and Collectivist societies?",
+        options: [
+          "集体主义社会需要更长的沟通来解释一切。\nCollectivist societies need longer communication where everything is specified.",
+          "个人主义社会的沟通可以很简短，因为很多事不言自明。\nIn Individualist societies, communication can be short as many things are obvious.",
+          "集体主义社会的沟通可以很简短，因为很多事不言自明（高语境）。\nIn Collectivist societies, communication can be short as many things are obvious (high-context).",
+          "两种社会在沟通方式上没有显著差异。\nThere is no significant difference in communication style between the two societies."
+        ],
+        answer: 2,
+        explanation: "正确答案是 C。The correct answer is C.\n视频把 high-context communication 与集体主义社会联系起来，因为很多事情在群体语境中已经明显，所以沟通可以更简短。In high-context collectivist societies, many things are obvious, so communication can be shorter."
+      },
+      {
+        id: "2.1-q6-country",
+        time: 369,
+        points: 1,
+        title: "第 6 题 · Country Example",
+        question: "根据视频中提到的国家列表，以下哪个国家具有最高的个人主义指数（IDV）？\nAccording to the list of countries mentioned in the video, which country has the highest Individualism Index (IDV) score?",
+        options: [
+          "中国\nChina",
+          "美国\nUnited States of America",
+          "日本\nJapan",
+          "墨西哥\nMexico"
+        ],
+        answer: 1,
+        explanation: "正确答案是 B。The correct answer is B.\n视频明确指出，所列国家中个人主义指数最高的是美国。The video states that the highest score for individualism is found in the United States of America."
+      },
+      {
+        id: "2.1-q7-wealth",
+        time: 413,
+        points: 1,
+        title: "第 7 题 · Wealth Correlation",
+        question: "视频中提到，个人主义指数（IDV）与一个国家的什么因素有很强的相关性？\nWhat factor does the video mention as being strongly correlated with a country's Individualism Index (IDV)?",
+        options: [
+          "地理位置\nGeographical location",
+          "宗教信仰\nReligious beliefs",
+          "财富水平\nWealth",
+          "人口规模\nPopulation size"
+        ],
+        answer: 2,
+        explanation: "正确答案是 C。The correct answer is C.\n视频强调 individualism is strongly correlated with wealth，通常是财富先出现，个人主义随后增强。The video emphasizes that individualism is strongly correlated with wealth."
+      },
+      {
+        id: "2.1-q8-divorce",
+        time: 463,
+        points: 1,
+        title: "第 8 题 · Divorce Rates",
+        question: "关于“离婚率”，视频中描述的个人主义社会和集体主义社会之间有什么差异？\nRegarding \"divorce rates\", what difference does the video describe between Individualist and Collectivist societies?",
+        options: [
+          "个人主义社会的离婚率较低。\nIndividualist societies have lower divorce rates.",
+          "集体主义社会的离婚率较高。\nCollectivist societies have higher divorce rates.",
+          "个人主义社会的离婚率较高。\nIndividualist societies have higher divorce rates.",
+          "离婚率与个人主义/集体主义维度无关。\nDivorce rates are unrelated to the Individualism/Collectivism dimension."
+        ],
+        answer: 2,
+        explanation: "正确答案是 C。The correct answer is C.\n视频说，个人主义社会离婚率较高，集体主义社会离婚率较低。The video says individualist societies have higher divorce rates, while collectivist societies have lower divorce rates."
+      }
+    ]
+  };
 
   const videoTestLinks = {
     "2.1": "https://ks.wjx.com/vm/rKPqqAo.aspx?width=760&source=iframe&s=t",
@@ -5098,8 +5332,23 @@
         }
         body.appendChild(langNote);
 
+        const quizCard = document.createElement('div');
+        quizCard.className = 'video-quiz-card';
+        body.appendChild(quizCard);
+
         let currentCues = [];
         let lastActiveIndex = -1;
+        const checkpoints = Array.isArray(videoQuizCheckpoints[meta.id]) ? videoQuizCheckpoints[meta.id] : [];
+        const passedCheckpoints = new Set();
+        const quizAttempts = {};
+        let activeCheckpoint = null;
+        let checkpointResumePending = false;
+        let lastAllowedVideoTime = 0;
+        const quizStatus = document.createElement('div');
+        if (checkpoints.length) {
+          quizStatus.className = 'video-quiz-summary';
+          body.insertBefore(quizStatus, quizCard);
+        }
 
         function loadSubtitlesFor(langCode) {
           const url = meta.subtitles[langCode];
@@ -5229,8 +5478,191 @@
           }
         }
 
+        function hideVideoQuizCard() {
+          quizCard.classList.remove('active');
+          quizCard.innerHTML = '';
+          activeCheckpoint = null;
+          checkpointResumePending = false;
+        }
+
+        function getVideoQuizStats() {
+          const totalPoints = checkpoints.reduce((sum, item) => sum + (Number(item.points) || 1), 0);
+          const attempts = checkpoints.map(item => quizAttempts[item.id]).filter(Boolean);
+          const earnedPoints = attempts.reduce((sum, item) => sum + (Number(item.earned) || 0), 0);
+          return {
+            answered: attempts.length,
+            total: checkpoints.length,
+            earnedPoints,
+            totalPoints
+          };
+        }
+
+        function renderQuizProgressLine() {
+          if (!checkpoints.length) return '';
+          const stats = getVideoQuizStats();
+          return '学习状态：已完成 ' + stats.answered + ' / ' + stats.total +
+            ' 题，得分 ' + stats.earnedPoints + ' / ' + stats.totalPoints + '。';
+        }
+
+        function refreshVideoQuizStatus() {
+          if (!checkpoints.length) return;
+          quizStatus.innerHTML = '<span>' + escapeHtml(renderQuizProgressLine()) + '</span> ' +
+            '<button type="button" class="btn-ghost" data-quiz-status-review>闯关记录 / Review</button>';
+          const reviewBtn = quizStatus.querySelector('[data-quiz-status-review]');
+          if (reviewBtn) reviewBtn.addEventListener('click', renderVideoQuizReview);
+        }
+
+        function renderVideoQuizReview() {
+          if (!checkpoints.length) return;
+          const stats = getVideoQuizStats();
+          const reviewCheckpoints = [...checkpoints].sort((a, b) => (Number(a.time) || 0) - (Number(b.time) || 0));
+          const rows = reviewCheckpoints.map((checkpoint, index) => {
+            const attempt = quizAttempts[checkpoint.id];
+            if (!attempt) {
+              return '<div class="video-quiz-review-item"><strong>第 ' + (index + 1) + ' 题</strong>：尚未作答。</div>';
+            }
+            const selectedText = checkpoint.options[attempt.selected] || '—';
+            const answerText = checkpoint.options[checkpoint.answer] || '—';
+            return '<div class="video-quiz-review-item">' +
+              '<strong>' + escapeHtml(checkpoint.title || ('第 ' + (index + 1) + ' 题')) + '</strong><br>' +
+              escapeHtml(checkpoint.question || '') + '<br>' +
+              '你的选择 / Your answer：<span class="' + (attempt.correct ? 'correct' : 'wrong') + '">' + escapeHtml(selectedText) + '</span><br>' +
+              '正确答案 / Correct answer：<span class="correct">' + escapeHtml(answerText) + '</span><br>' +
+              '得分 / Score：' + attempt.earned + ' / ' + (Number(checkpoint.points) || 1) + '<br>' +
+              '解析 / Explanation：' + escapeHtml(checkpoint.explanation || '') +
+              '</div>';
+          }).join('');
+          quizCard.innerHTML =
+            '<div class="video-quiz-kicker">闯关记录 · Quiz Review</div>' +
+            '<div class="video-quiz-title">2.1 学习状态 · Learning Status</div>' +
+            '<div class="video-quiz-summary">已完成 ' + stats.answered + ' / ' + stats.total +
+            ' 题，得分 ' + stats.earnedPoints + ' / ' + stats.totalPoints +
+            '。已作答题目可回看解析，但不能重新答题。</div>' +
+            '<div class="video-quiz-review-list">' + rows + '</div>' +
+            '<div class="video-quiz-actions"><button type="button" class="btn-ghost" data-quiz-close-review>关闭记录 / Close</button></div>';
+          quizCard.classList.add('active');
+          quizCard.querySelector('[data-quiz-close-review]').addEventListener('click', hideVideoQuizCard);
+        }
+
+        function getPendingCheckpointsByTime() {
+          return checkpoints
+            .filter(item => item && !passedCheckpoints.has(item.id))
+            .sort((a, b) => (Number(a.time) || 0) - (Number(b.time) || 0));
+        }
+
+        function showVideoQuizCard(checkpoint) {
+          activeCheckpoint = checkpoint;
+          checkpointResumePending = false;
+          videoEl.pause();
+          const existingAttempt = quizAttempts[checkpoint.id];
+          const optionsHtml = checkpoint.options.map((option, index) =>
+            '<button type="button" class="video-quiz-option' +
+            (existingAttempt && index === checkpoint.answer ? ' correct' : '') +
+            (existingAttempt && index === existingAttempt.selected && !existingAttempt.correct ? ' wrong' : '') +
+            '" data-quiz-option="' + index + '"' + (existingAttempt ? ' disabled' : '') + '>' +
+            escapeHtml(option) + '</button>'
+          ).join('');
+          quizCard.innerHTML =
+            '<div class="video-quiz-kicker">视频闯关 · Video Checkpoint</div>' +
+            '<div class="video-quiz-title">' + escapeHtml(checkpoint.title || 'Checkpoint') + '</div>' +
+            '<div class="video-quiz-question">' + escapeHtml(checkpoint.question || '') + '</div>' +
+            '<div class="video-quiz-options">' + optionsHtml + '</div>' +
+            '<div class="video-quiz-feedback">' + (existingAttempt
+              ? escapeHtml((existingAttempt.correct ? '回答正确。' : '本题未答对。') + '\n' + (checkpoint.explanation || ''))
+              : '请选择一个答案。第一次作答会计分并锁定。\nChoose one answer. Your first answer will be scored and locked.') + '</div>' +
+            '<div class="video-quiz-summary">' + escapeHtml(renderQuizProgressLine()) + '</div>' +
+            '<div class="video-quiz-actions">' +
+              '<button type="button" class="btn-ghost" data-quiz-review>闯关记录 / Review</button>' +
+              '<button type="button" class="btn-ghost" data-quiz-continue' + (existingAttempt ? '' : ' style="display:none;"') + '>继续播放 / Continue</button>' +
+            '</div>';
+          quizCard.classList.add('active');
+          const feedback = quizCard.querySelector('.video-quiz-feedback');
+          const summary = quizCard.querySelector('.video-quiz-summary');
+          const continueBtn = quizCard.querySelector('[data-quiz-continue]');
+          const reviewBtn = quizCard.querySelector('[data-quiz-review]');
+          if (reviewBtn) reviewBtn.addEventListener('click', renderVideoQuizReview);
+          quizCard.querySelectorAll('[data-quiz-option]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (quizAttempts[checkpoint.id]) return;
+              const selected = Number(btn.getAttribute('data-quiz-option'));
+              const correct = selected === checkpoint.answer;
+              const points = Number(checkpoint.points) || 1;
+              quizAttempts[checkpoint.id] = {
+                selected,
+                correct,
+                points,
+                earned: correct ? points : 0,
+                answeredAt: new Date().toISOString()
+              };
+              passedCheckpoints.add(checkpoint.id);
+              quizCard.querySelectorAll('[data-quiz-option]').forEach(item => {
+                item.disabled = true;
+                item.classList.remove('correct', 'wrong');
+                if (Number(item.getAttribute('data-quiz-option')) === checkpoint.answer) {
+                  item.classList.add('correct');
+                }
+              });
+              if (!correct) {
+                btn.classList.add('wrong');
+              }
+              feedback.textContent = (correct ? '回答正确，得 1 分。' : '本题未答对，得 0 分。') +
+                '\n' + (checkpoint.explanation || '');
+              feedback.style.color = correct ? '#bbf7d0' : '#fecaca';
+              summary.textContent = renderQuizProgressLine();
+              refreshVideoQuizStatus();
+              continueBtn.style.display = 'inline-flex';
+              checkpointResumePending = true;
+            });
+          });
+          continueBtn.addEventListener('click', () => {
+            passedCheckpoints.add(checkpoint.id);
+            hideVideoQuizCard();
+            videoEl.currentTime = Math.max(videoEl.currentTime, checkpoint.time + 0.35);
+            lastAllowedVideoTime = videoEl.currentTime;
+            videoEl.play().catch(() => {});
+          });
+          trackPlatformEvent('material-open', {
+            resourceType: 'video-quiz',
+            resourceId: checkpoint.id,
+            title: checkpoint.title || checkpoint.id
+          });
+        }
+
+        function updateVideoCheckpoints() {
+          if (!checkpoints.length || activeCheckpoint || checkpointResumePending) return;
+          const current = videoEl.currentTime || 0;
+          const checkpoint = getPendingCheckpointsByTime().find(item => current >= item.time);
+          if (checkpoint) showVideoQuizCard(checkpoint);
+          else lastAllowedVideoTime = Math.max(lastAllowedVideoTime, current);
+        }
+
+        function enforceVideoQuizGate() {
+          if (!checkpoints.length) return;
+          const current = videoEl.currentTime || 0;
+          const nextCheckpoint = getPendingCheckpointsByTime()[0];
+          if (nextCheckpoint && current >= nextCheckpoint.time + 0.35) {
+            videoEl.currentTime = nextCheckpoint.time;
+            lastAllowedVideoTime = nextCheckpoint.time;
+            showVideoQuizCard(nextCheckpoint);
+            return;
+          }
+          if (current <= lastAllowedVideoTime || !nextCheckpoint || current < nextCheckpoint.time) {
+            lastAllowedVideoTime = Math.max(lastAllowedVideoTime, current);
+          }
+        }
+
         videoEl.addEventListener('timeupdate', updateSubtitle);
-        videoEl.addEventListener('seeking', () => { lastActiveIndex = -1; });
+        videoEl.addEventListener('timeupdate', updateVideoCheckpoints);
+        videoEl.addEventListener('seeking', () => {
+          lastActiveIndex = -1;
+          if (activeCheckpoint) {
+            if ((videoEl.currentTime || 0) <= activeCheckpoint.time) hideVideoQuizCard();
+            return;
+          }
+          enforceVideoQuizGate();
+        });
+        videoEl.addEventListener('seeked', enforceVideoQuizGate);
+        refreshVideoQuizStatus();
 
         langSelect.addEventListener('change', () => {
           const currentLang = langSelect.value;
