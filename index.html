@@ -2550,7 +2550,7 @@
     return payload;
   }
 
-  function openSrtUploadDialog(videoNode, catalog, onComplete) {
+  function openSrtUploadDialog(videoNode, catalog, onComplete, initialLanguage) {
     const languages = [
       ['EN', '英语字幕'], ['ZH', '中文字幕'], ['TH', '泰语字幕'],
       ['ID', '印尼语字幕'], ['LAO', '老挝语字幕'], ['FR', '法语字幕'],
@@ -2586,6 +2586,11 @@
     const status = overlay.querySelector('[data-srt-status]');
     const confirmBtn = overlay.querySelector('[data-srt-confirm]');
     const close = () => overlay.remove();
+    if (initialLanguage && Array.from(languageSelect.options).some(option => option.value === initialLanguage)) {
+      languageSelect.value = initialLanguage;
+      const selected = languageSelect.options[languageSelect.selectedIndex];
+      labelInput.value = selected ? selected.getAttribute('data-default-label') || '' : '';
+    }
     languageSelect.addEventListener('change', () => {
       const option = languageSelect.options[languageSelect.selectedIndex];
       labelInput.value = option ? option.getAttribute('data-default-label') || '' : '';
@@ -2639,6 +2644,117 @@
       }
     });
     setTimeout(() => fileInput.focus(), 0);
+  }
+
+  async function replaceRegisteredVideoLink(catalog, resourceId, url) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'replace-registered-video',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        resourceId,
+        url
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  function openRegisteredVideoReplaceDialog(videoNode, catalog, onComplete) {
+    const videoAsset = (Array.isArray(videoNode.assets) ? videoNode.assets : [])
+      .find(asset => asset && asset.type === 'video');
+    const overlay = document.createElement('div');
+    overlay.className = 'material-register-overlay';
+    overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true">' +
+      '<h3>更换已登记视频</h3>' +
+      '<div class="material-tree-note">视频：' + escapeHtml(videoNode.title || videoNode.id) +
+      '。更换后主视频文件默认关闭，需要重新开放。原 COS 文件会保留。</div>' +
+      '<div class="material-register-field"><label>新 COS 视频永久链接</label><input type="url" data-replace-video-url value="' +
+      escapeHtml(videoAsset && videoAsset.url || '') + '"></div>' +
+      '<div class="login-status-line" data-replace-video-status></div>' +
+      '<div class="material-register-actions"><button class="btn-ghost" type="button" data-replace-video-cancel>取消</button>' +
+      '<button class="btn-ghost" type="button" data-replace-video-confirm>验证并更换</button></div></div>';
+    document.body.appendChild(overlay);
+    const dialog = overlay.querySelector('.material-register-dialog');
+    const urlInput = overlay.querySelector('[data-replace-video-url]');
+    const status = overlay.querySelector('[data-replace-video-status]');
+    const confirmBtn = overlay.querySelector('[data-replace-video-confirm]');
+    const close = () => overlay.remove();
+    overlay.querySelector('[data-replace-video-cancel]').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    dialog.addEventListener('click', event => event.stopPropagation());
+    confirmBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      if (!url) {
+        status.textContent = '请填写新的 COS 视频链接。';
+        status.className = 'login-status-line error';
+        return;
+      }
+      confirmBtn.disabled = true;
+      status.textContent = '正在验证 COS 对象并更换...';
+      status.className = 'login-status-line';
+      try {
+        const payload = await replaceRegisteredVideoLink(catalog, String(videoNode.id), url);
+        close();
+        onComplete(payload);
+        alert('视频链接已更换，主视频默认关闭。旧目录备份：' + payload.backupKey);
+      } catch (err) {
+        status.textContent = (err.status === 409 ? '目录已更新，请重新进入后再试。' : '更换失败：') + err.message;
+        status.className = 'login-status-line error';
+      } finally {
+        confirmBtn.disabled = false;
+      }
+    });
+    setTimeout(() => urlInput.focus(), 0);
+  }
+
+  async function removeVideoMaterialFromCatalog(catalog, data) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'remove-video-material',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        ...data
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  async function confirmAndRemoveVideoMaterial(catalog, data, displayName, onComplete) {
+    if (!window.confirm('确定要从课程目录移除“' + displayName + '”吗？\nCOS 原文件会保留。')) return;
+    const confirmation = window.prompt('这是第二次确认。请输入“删除”后继续：', '');
+    if (confirmation !== '删除') {
+      if (confirmation !== null) alert('未输入正确的确认文字，已取消。');
+      return;
+    }
+    try {
+      const payload = await removeVideoMaterialFromCatalog(catalog, data);
+      onComplete(payload);
+      alert('已从课程目录移除“' + displayName + '”。COS 原文件已保留，旧目录备份：' + payload.backupKey);
+    } catch (err) {
+      alert((err.status === 409 ? '目录已更新，请重新进入后再试：' : '移除失败：') + err.message);
+    }
   }
 
   async function loadStudentMaterialsCatalog() {
@@ -2860,20 +2976,28 @@
       const uploadSubtitleButton = parentPath.includes('/section:videos') && assets.some(asset => asset && asset.type === 'video')
         ? '<button type="button" class="material-mini-btn" data-upload-srt="' + escapeHtml(nodePath) + '">＋上传 SRT</button>'
         : '';
+      const customVideoControls = parentPath.includes('/section:videos') && String(node.legacyId || '').startsWith('custom-')
+        ? '<button type="button" class="material-mini-btn" data-replace-custom-video="' + escapeHtml(nodePath) + '">更换视频</button>' +
+          '<button type="button" class="material-mini-btn" data-delete-custom-video="' + escapeHtml(nodePath) + '">删除视频</button>'
+        : '';
       let assetHtml = assets.map((asset, assetIndex) => {
         const assetPath = nodePath + '/asset:' + asset.id;
         objectMap.set(assetPath, { object: asset, field: 'label' });
         siblingMap.set(assetPath, assets);
+        const subtitleActions = asset.type === 'subtitle'
+          ? '<button type="button" class="material-mini-btn" data-replace-srt-node="' + escapeHtml(nodePath) + '" data-replace-srt-language="' + escapeHtml(asset.language || '') + '">替换</button>' +
+            '<button type="button" class="material-mini-btn" data-delete-subtitle="' + escapeHtml(assetPath) + '" data-delete-subtitle-node="' + escapeHtml(nodePath) + '">删除</button>'
+          : '';
         return (
         '<div class="material-asset"><span class="material-asset-icon">' + getMaterialAssetIcon(asset.type) + '</span>' +
         '<span>' + escapeHtml(asset.label || asset.language || '文件') + '</span>' +
         '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span>' +
-        renderMaterialEditControls(assetPath, assetIndex, assets.length) + '</div>'
+        renderMaterialEditControls(assetPath, assetIndex, assets.length) + subtitleActions + '</div>'
         );
       }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
       return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
-        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + '</summary>' + assetHtml + '</details>';
+        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + customVideoControls + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
 
@@ -2899,7 +3023,7 @@
     }).join('') + '</div>';
   }
 
-  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle) {
+  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle, onReplaceSubtitle, onReplaceVideo, onDeleteMaterial) {
     container.querySelectorAll('[data-register-cos-video]').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
@@ -2916,6 +3040,52 @@
         const entry = objectMap.get(button.getAttribute('data-upload-srt'));
         if (entry && typeof onUploadSubtitle === 'function') {
           onUploadSubtitle(entry.object);
+        }
+      });
+    });
+    container.querySelectorAll('[data-replace-srt-node]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-replace-srt-node'));
+        if (entry && typeof onReplaceSubtitle === 'function') {
+          onReplaceSubtitle(entry.object, button.getAttribute('data-replace-srt-language'));
+        }
+      });
+    });
+    container.querySelectorAll('[data-replace-custom-video]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-replace-custom-video'));
+        if (entry && typeof onReplaceVideo === 'function') onReplaceVideo(entry.object);
+      });
+    });
+    container.querySelectorAll('[data-delete-subtitle]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const assetEntry = objectMap.get(button.getAttribute('data-delete-subtitle'));
+        const nodeEntry = objectMap.get(button.getAttribute('data-delete-subtitle-node'));
+        if (assetEntry && nodeEntry && typeof onDeleteMaterial === 'function') {
+          onDeleteMaterial({
+            targetType: 'subtitle',
+            resourceId: String(nodeEntry.object.id),
+            assetId: String(assetEntry.object.id)
+          }, assetEntry.object.label || assetEntry.object.language || assetEntry.object.id);
+        }
+      });
+    });
+    container.querySelectorAll('[data-delete-custom-video]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-delete-custom-video'));
+        if (entry && typeof onDeleteMaterial === 'function') {
+          onDeleteMaterial({
+            targetType: 'custom-video',
+            resourceId: String(entry.object.id)
+          }, entry.object.title || entry.object.id);
         }
       });
     });
@@ -3182,6 +3352,27 @@
           });
         }, videoNode => {
           openSrtUploadDialog(videoNode, adminMaterialsCatalog, payload => {
+            if (payload && payload.catalog) {
+              adminMaterialsCatalog = payload.catalog;
+              renderCatalogViews();
+            }
+          });
+        }, (videoNode, language) => {
+          openSrtUploadDialog(videoNode, adminMaterialsCatalog, payload => {
+            if (payload && payload.catalog) {
+              adminMaterialsCatalog = payload.catalog;
+              renderCatalogViews();
+            }
+          }, language);
+        }, videoNode => {
+          openRegisteredVideoReplaceDialog(videoNode, adminMaterialsCatalog, payload => {
+            if (payload && payload.catalog) {
+              adminMaterialsCatalog = payload.catalog;
+              renderCatalogViews();
+            }
+          });
+        }, (data, displayName) => {
+          confirmAndRemoveVideoMaterial(adminMaterialsCatalog, data, displayName, payload => {
             if (payload && payload.catalog) {
               adminMaterialsCatalog = payload.catalog;
               renderCatalogViews();
