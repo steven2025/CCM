@@ -17,26 +17,29 @@
     a { color: #88c0ff; text-decoration: none; }
 
     header.course-header {
-      padding: 10px 20px 8px;
+      padding: 12px 20px 10px;
       text-align: center;
-      background: linear-gradient(135deg, rgba(40,60,100,0.9), rgba(10,12,25,0.9));
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background:
+        radial-gradient(circle at 18% 0, rgba(96,165,250,0.2), transparent 32%),
+        linear-gradient(135deg, rgba(15,23,42,0.96), rgba(2,6,23,0.92));
+      box-shadow: 0 12px 32px rgba(0,0,0,0.46);
+      border-bottom: 1px solid rgba(148,163,184,0.16);
       position: sticky;
       top: 0;
       z-index: 100;
       backdrop-filter: blur(12px);
     }
     .course-header h1 {
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
+      font-size: clamp(1.12rem, 2vw, 1.42rem);
+      letter-spacing: 0;
       margin-bottom: 4px;
       line-height: 1.35;
+      color: #f8fafc;
     }
     .course-header h2 {
       font-size: 0.9rem;
       line-height: 1.4;
-      opacity: 0.9;
+      color: #cbd5e1;
     }
     .header-clock {
       display: inline-flex;
@@ -46,8 +49,8 @@
       margin-top: 6px;
       padding: 4px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(136,192,255,0.28);
-      background: rgba(15,23,42,0.45);
+      border: 1px solid rgba(147,197,253,0.28);
+      background: rgba(15,23,42,0.68);
       color: #dbeafe;
       font-size: 0.82rem;
       line-height: 1.35;
@@ -64,21 +67,28 @@
     }
     .header-auth.active { display: flex; }
     .header-user-info {
-      padding: 5px 11px;
+      padding: 6px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(134,239,172,0.35);
-      background: rgba(20,83,45,0.34);
+      border: 1px solid rgba(134,239,172,0.42);
+      background: linear-gradient(180deg, rgba(22,101,52,0.52), rgba(20,83,45,0.34));
       color: #dcfce7;
       font-size: 0.82rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
     }
     .header-logout-btn {
       border: 1px solid rgba(252,165,165,0.45);
       border-radius: 999px;
-      padding: 5px 11px;
-      background: rgba(127,29,29,0.3);
+      padding: 6px 12px;
+      background: linear-gradient(180deg, rgba(127,29,29,0.42), rgba(69,10,10,0.32));
       color: #fee2e2;
       cursor: pointer;
       font-size: 0.8rem;
+      transition: transform 0.14s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+    .header-logout-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(254,202,202,0.75);
+      background: rgba(153,27,27,0.44);
     }
 
     main.main-layout {
@@ -98,19 +108,21 @@
     #main-menu {
       display: grid;
       grid-template-columns: repeat(5, minmax(150px, 1fr));
-      gap: 16px;
-      margin-top: 8px;
+      gap: 14px;
+      margin-top: 10px;
       max-width: 1180px;
       margin-left: auto;
       margin-right: auto;
       justify-items: center;
     }
     .card-btn {
-      background: radial-gradient(circle at top left, #3b4252, #2e3440);
-      border-radius: 16px;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(96,165,250,0.18), transparent 34%),
+        linear-gradient(180deg, rgba(30,41,59,0.94), rgba(15,23,42,0.94));
+      border-radius: 14px;
       padding: 16px 14px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.04);
+      border: 1px solid rgba(148,163,184,0.13);
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -119,6 +131,7 @@
       width: 100%;
       max-width: 220px;
       text-align: left;
+      min-height: 88px;
     }
     .card-btn::before {
       content: "";
@@ -135,11 +148,11 @@
     .card-btn:hover {
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 16px 35px rgba(0,0,0,0.6);
-      border-color: rgba(136,192,255,0.5);
+      border-color: rgba(147,197,253,0.6);
     }
     .card-btn:hover::before { opacity: 1; }
-    .card-btn-title { font-size: 1.1rem; margin-bottom: 4px; }
-    .card-btn-sub { font-size: 0.85rem; opacity: 0.85; }
+    .card-btn-title { font-size: 1.06rem; margin-bottom: 5px; color: #f8fafc; }
+    .card-btn-sub { font-size: 0.82rem; color: #cbd5e1; line-height: 1.35; }
     .card-btn.coming-soon { opacity: 0.7; }
     .card-btn.locked {
       opacity: 0.45;
@@ -155,8 +168,22 @@
       opacity: 0.78;
     }
     .card-btn.teacher-only {
-      background: radial-gradient(circle at top left, #14532d, #1f2937);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(134,239,172,0.2), transparent 34%),
+        linear-gradient(180deg, rgba(20,83,45,0.78), rgba(15,23,42,0.94));
       border-color: rgba(134,239,172,0.35);
+    }
+    .card-btn[data-role="login"] {
+      border-color: rgba(251,191,36,0.32);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(251,191,36,0.18), transparent 34%),
+        linear-gradient(180deg, rgba(30,41,59,0.94), rgba(15,23,42,0.94));
+    }
+    .card-btn[data-role="final-task"] {
+      border-color: rgba(216,180,254,0.26);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(168,85,247,0.16), transparent 34%),
+        linear-gradient(180deg, rgba(30,41,59,0.94), rgba(15,23,42,0.94));
     }
 
     .login-overlay {
@@ -172,10 +199,12 @@
     .login-overlay.active { display: flex; }
     .login-dialog {
       width: min(420px, 94vw);
-      border-radius: 22px;
+      border-radius: 18px;
       padding: 22px;
-      background: rgba(15,18,30,0.98);
-      border: 1px solid rgba(136,192,255,0.28);
+      background:
+        radial-gradient(circle at 20% 0, rgba(96,165,250,0.16), transparent 36%),
+        rgba(15,18,30,0.98);
+      border: 1px solid rgba(147,197,253,0.28);
       box-shadow: 0 20px 54px rgba(0,0,0,0.72);
     }
     .login-dialog h3 {
@@ -222,18 +251,23 @@
     .login-status-line.success { color: #bbf7d0; }
     .settings-window .floating-body {
       gap: 12px;
+      background:
+        radial-gradient(circle at 0 0, rgba(59,130,246,0.08), transparent 28%),
+        rgba(2,6,23,0.2);
     }
     .settings-section {
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 10px;
-      background: rgba(15,20,35,0.55);
-      margin-bottom: 10px;
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 10px;
+      padding: 11px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.7), rgba(15,23,42,0.46));
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .settings-section-title {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.92rem;
       margin-bottom: 8px;
+      color: #bfdbfe;
     }
     .settings-check {
       display: flex;
@@ -256,43 +290,59 @@
     .settings-tabs {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
       position: sticky;
       top: 0;
       z-index: 2;
-      padding-bottom: 4px;
-      background: rgba(15,18,30,0.98);
+      padding-bottom: 8px;
+      background: rgba(2,6,23,0.86);
+      backdrop-filter: blur(10px);
     }
     .settings-tab {
-      border: 1px solid rgba(136,192,255,0.3);
-      border-radius: 10px;
-      padding: 8px 10px;
-      background: rgba(46,52,64,0.82);
-      color: #e5e9f0;
+      border: 1px solid rgba(147,197,253,0.24);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: linear-gradient(180deg, rgba(30,41,59,0.92), rgba(15,23,42,0.86));
+      color: #dbeafe;
       cursor: pointer;
       font-size: 0.82rem;
+      text-align: left;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: transform 0.14s ease, border-color 0.16s ease, background 0.16s ease;
     }
     .settings-tab.active {
-      background: rgba(37,99,235,0.42);
-      border-color: rgba(147,197,253,0.8);
+      background: linear-gradient(180deg, rgba(37,99,235,0.42), rgba(30,64,175,0.3));
+      border-color: rgba(191,219,254,0.72);
+      color: #fff;
       box-shadow: 0 5px 16px rgba(0,0,0,0.28);
+    }
+    .settings-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.56);
     }
     .settings-tab-panel { display: none; }
     .settings-tab-panel.active { display: block; }
     .analytics-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
     .analytics-toolbar select { padding: 7px 9px; border-radius: 8px; background: #1e293b; color: #f8fafc; border: 1px solid rgba(147,197,253,0.35); }
     .analytics-cards { display: grid; grid-template-columns: repeat(5, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px; }
-    .analytics-card { padding: 10px; border-radius: 10px; background: rgba(30,64,175,0.18); border: 1px solid rgba(96,165,250,0.22); }
-    .analytics-card strong { display: block; font-size: 1.25rem; color: #bfdbfe; }
+    .analytics-card {
+      padding: 11px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(30,64,175,0.24), rgba(15,23,42,0.42));
+      border: 1px solid rgba(96,165,250,0.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .analytics-card strong { display: block; font-size: 1.28rem; color: #bfdbfe; font-variant-numeric: tabular-nums; }
     .analytics-card span { font-size: 0.72rem; color: #cbd5e1; }
-    .analytics-table-wrap { overflow: auto; max-height: 280px; }
+    .analytics-table-wrap { overflow: auto; max-height: 280px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.12); }
     .analytics-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-    .analytics-table th, .analytics-table td { padding: 6px 7px; border-bottom: 1px solid rgba(148,163,184,0.16); text-align: left; white-space: nowrap; }
+    .analytics-table th, .analytics-table td { padding: 7px 8px; border-bottom: 1px solid rgba(148,163,184,0.14); text-align: left; white-space: nowrap; }
+    .analytics-table th { position: sticky; top: 0; background: rgba(15,23,42,0.96); color: #bfdbfe; z-index: 1; }
     .material-tree-note {
       padding: 9px 11px;
       border-radius: 10px;
-      background: rgba(30,64,175,0.16);
-      border: 1px solid rgba(96,165,250,0.22);
+      background: linear-gradient(180deg, rgba(30,64,175,0.2), rgba(15,23,42,0.28));
+      border: 1px solid rgba(96,165,250,0.24);
       line-height: 1.55;
       margin-bottom: 10px;
     }
@@ -1441,7 +1491,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-07-14-v14';
+  const PLATFORM_VERSION = 'frontend-2026-07-14-v15';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3639,9 +3689,9 @@
     accessHtml += '<div class="login-status-line">保存后同步至腾讯云，学生刷新页面后生效。</div>';
     body.innerHTML =
       '<div class="settings-tabs">' +
-        '<button class="settings-tab active" data-settings-tab="files">1. 文件与排序</button>' +
-        '<button class="settings-tab" data-settings-tab="access">2. 开放与关闭</button>' +
-        '<button class="settings-tab" data-settings-tab="analytics">3. 用户行为看板</button>' +
+        '<button class="settings-tab active" data-settings-tab="files">① 文件与排序</button>' +
+        '<button class="settings-tab" data-settings-tab="access">② 开放与关闭</button>' +
+        '<button class="settings-tab" data-settings-tab="analytics">③ 用户行为看板</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
         '<div class="material-tree-note">可登记 COS 文件、为已有材料增加语言版本，以及重命名、替换、删除和调整顺序。新增或替换后请到“开放与关闭”发布。</div>' +
