@@ -338,6 +338,72 @@
     .analytics-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
     .analytics-table th, .analytics-table td { padding: 7px 8px; border-bottom: 1px solid rgba(148,163,184,0.14); text-align: left; white-space: nowrap; }
     .analytics-table th { position: sticky; top: 0; background: rgba(15,23,42,0.96); color: #bfdbfe; z-index: 1; }
+    .analytics-subnav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 7px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.56);
+      border: 1px solid rgba(148,163,184,0.16);
+    }
+    .analytics-subnav button {
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 8px 13px;
+      color: #cbd5e1;
+      background: transparent;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    .analytics-subnav button:hover { color: #fff; background: rgba(59,130,246,0.14); }
+    .analytics-subnav button.active {
+      color: #fff;
+      border-color: rgba(96,165,250,0.42);
+      background: linear-gradient(135deg, rgba(37,99,235,0.86), rgba(14,165,233,0.72));
+      box-shadow: 0 5px 16px rgba(37,99,235,0.2);
+    }
+    .analytics-shared-view { min-height: 420px; }
+    .analytics-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .analytics-panel {
+      padding: 13px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(30,41,59,0.72), rgba(15,23,42,0.66));
+      border: 1px solid rgba(148,163,184,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+    }
+    .analytics-panel-title { margin-bottom: 11px; color: #dbeafe; font-weight: 700; font-size: 0.88rem; }
+    .analytics-bar-list { display: grid; gap: 9px; }
+    .analytics-bar-row { display: grid; grid-template-columns: minmax(110px, 1.25fr) minmax(120px, 3fr) 58px; gap: 8px; align-items: center; }
+    .analytics-bar-label { color: #cbd5e1; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .analytics-bar-track { height: 10px; border-radius: 999px; overflow: hidden; background: rgba(148,163,184,0.13); }
+    .analytics-bar-fill { height: 100%; min-width: 2px; border-radius: inherit; box-shadow: 0 0 12px currentColor; }
+    .analytics-bar-value { text-align: right; color: #e2e8f0; font-size: 0.74rem; font-variant-numeric: tabular-nums; }
+    .analytics-ring-grid { display: grid; grid-template-columns: repeat(3, minmax(105px, 1fr)); gap: 9px; }
+    .analytics-ring-card { text-align: center; padding: 10px 7px; border-radius: 11px; background: rgba(15,23,42,0.48); border: 1px solid rgba(148,163,184,0.12); }
+    .analytics-ring {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 7px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .analytics-ring::after { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: #111c31; }
+    .analytics-ring strong { position: relative; z-index: 1; font-size: 0.82rem; color: #f8fafc; }
+    .analytics-ring-card span { display: block; color: #bfdbfe; font-size: 0.72rem; }
+    .analytics-ring-card small { color: #94a3b8; font-size: 0.65rem; }
+    .analytics-view-toolbar { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 11px; }
+    .analytics-view-toolbar select { padding: 7px 9px; border-radius: 8px; background: #1e293b; color: #f8fafc; border: 1px solid rgba(147,197,253,0.35); }
+    .analytics-source-note { margin-top: 10px; color: #94a3b8; font-size: 0.68rem; line-height: 1.55; }
+    .analytics-empty { padding: 24px; text-align: center; color: #94a3b8; }
     .material-tree-note {
       padding: 9px 11px;
       border-radius: 10px;
@@ -478,6 +544,9 @@
       .settings-resource-grid { grid-template-columns: 1fr; }
       .settings-tabs { grid-template-columns: 1fr; }
       .analytics-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .analytics-dashboard-grid { grid-template-columns: 1fr; }
+      .analytics-ring-grid { grid-template-columns: repeat(2, minmax(100px, 1fr)); }
+      .analytics-bar-row { grid-template-columns: minmax(80px, 1fr) minmax(90px, 2fr) 50px; }
     }
 
     @media (max-width: 900px) {
@@ -1600,7 +1669,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-07-14-v24';
+  const PLATFORM_VERSION = 'frontend-2026-07-14-v25';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3223,58 +3292,196 @@
 
   function renderAnalyticsDashboard(container, payload) {
     const summary = payload.summary || {};
-    const cards = [
-      ['事件总数', summary.totalEvents || 0],
-      ['活跃用户', summary.uniqueUsers || 0],
-      ['登录次数', summary.logins || 0],
-      ['章节访问', summary.chapterOpens || 0],
-      ['材料打开', summary.materialOpens || 0]
-    ];
-    const chapterRows = Object.entries(payload.byChapter || {})
-      .sort((a, b) => b[1] - a[1])
-      .map(([chapter, count]) => '<tr><td>' + escapeHtml(chapter === 'final' ? '期末任务' : '第 ' + chapter + ' 章') + '</td><td>' + count + '</td></tr>')
-      .join('') || '<tr><td colspan="2">暂无数据</td></tr>';
-    const resourceRows = (payload.topResources || []).map(item =>
-      '<tr><td>' + escapeHtml(item.title || item.resourceId) + '</td><td>' + escapeHtml(item.resourceType || '') + '</td><td>' + item.count + '</td></tr>'
-    ).join('') || '<tr><td colspan="3">暂无数据</td></tr>';
-    const recentRows = (payload.recentEvents || []).map(item =>
-      '<tr><td>' + escapeHtml(new Date(item.createdAt).toLocaleString()) + '</td><td>' + escapeHtml(item.id) + '</td><td>' +
-      escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
-    ).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
     const quizReports = Array.isArray(payload.quizReports) ? payload.quizReports : [];
-    const quizSections = quizReports.map((report, reportIndex) => {
-      const questions = Array.isArray(report.questions) ? report.questions : [];
+    const palette = ['#38bdf8', '#2dd4bf', '#a78bfa', '#f59e0b', '#fb7185', '#60a5fa'];
+    const clampPercent = value => Math.max(0, Math.min(100, Number(value) || 0));
+    const reportStats = quizReports.map((report, reportIndex) => {
       const participants = Array.isArray(report.participants) ? report.participants : [];
-      const questionHeaders = questions.map(question => '<th>' + escapeHtml(question.label || question.id) + '</th>').join('');
-      const participantRows = participants.map(student => {
-        const answerCells = questions.map(question => {
+      const questions = Array.isArray(report.questions) ? report.questions : [];
+      const completed = participants.filter(student => Number(student.answered) >= Number(report.totalQuestions || questions.length)).length;
+      const possible = participants.reduce((sum, student) => sum + (Number(student.totalPoints) || Number(report.totalPoints) || 0), 0);
+      const earned = participants.reduce((sum, student) => sum + (Number(student.score) || 0), 0);
+      return {
+        report,
+        reportIndex,
+        participants,
+        questions,
+        completed,
+        completionRate: participants.length ? completed / participants.length * 100 : 0,
+        averageRate: possible ? earned / possible * 100 : 0,
+        color: palette[reportIndex % palette.length]
+      };
+    });
+    const allParticipations = reportStats.flatMap(item => item.participants);
+    const uniqueQuizStudents = new Set(allParticipations.map(item => item.id)).size;
+    const completedTests = reportStats.reduce((sum, item) => sum + item.completed, 0);
+    const totalEarned = allParticipations.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+    const totalPossible = allParticipations.reduce((sum, item) => sum + (Number(item.totalPoints) || 0), 0);
+    const answeredAnswers = allParticipations.flatMap(student => Object.values(student.answers || {}));
+    const correctAnswers = answeredAnswers.filter(answer => answer && answer.correct === true).length;
+    const averageScoreRate = totalPossible ? totalEarned / totalPossible * 100 : 0;
+    const answerAccuracy = answeredAnswers.length ? correctAnswers / answeredAnswers.length * 100 : 0;
+    let selectedQuizIndex = Math.max(0, reportStats.findIndex(item => item.participants.length));
+
+    const renderMetricCards = cards => '<div class="analytics-cards">' + cards.map((card, index) =>
+      '<div class="analytics-card" style="border-color:' + palette[index % palette.length] + '55;box-shadow:inset 0 2px 0 ' + palette[index % palette.length] + '88;">' +
+      '<strong>' + escapeHtml(card.value) + '</strong><span>' + escapeHtml(card.label) + '</span></div>'
+    ).join('') + '</div>';
+
+    const renderBars = items => '<div class="analytics-bar-list">' + (items.length ? items.map((item, index) => {
+      const color = item.color || palette[index % palette.length];
+      return '<div class="analytics-bar-row"><div class="analytics-bar-label" title="' + escapeHtml(item.label) + '">' + escapeHtml(item.label) +
+        '</div><div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:' + clampPercent(item.percent).toFixed(1) + '%;background:' + color + ';color:' + color + ';"></div></div>' +
+        '<div class="analytics-bar-value">' + escapeHtml(item.value) + '</div></div>';
+    }).join('') : '<div class="analytics-empty">暂无数据</div>') + '</div>';
+
+    const renderOverview = () => {
+      const averageBars = reportStats.map(item => ({
+        label: item.report.quizId + ' ' + String(item.report.title || '').replace(/^\S+\s*/, ''),
+        percent: item.averageRate,
+        value: item.averageRate.toFixed(0) + '%',
+        color: item.color
+      }));
+      const rings = reportStats.map(item =>
+        '<div class="analytics-ring-card"><div class="analytics-ring" style="background:conic-gradient(' + item.color + ' ' + clampPercent(item.completionRate).toFixed(1) + '%,rgba(148,163,184,0.15) 0);">' +
+        '<strong>' + item.completionRate.toFixed(0) + '%</strong></div><span>' + escapeHtml(item.report.quizId) + '</span>' +
+        '<small>' + item.completed + ' / ' + item.participants.length + ' 人完成</small></div>'
+      ).join('') || '<div class="analytics-empty">暂无测试数据</div>';
+      const maxPoints = Math.max(8, ...allParticipations.map(item => Number(item.totalPoints) || 0));
+      const distribution = Array.from({ length: maxPoints + 1 }, (_, score) => ({ score, count: 0 }));
+      allParticipations.forEach(student => {
+        const score = Math.max(0, Math.min(maxPoints, Math.round(Number(student.score) || 0)));
+        distribution[score].count += 1;
+      });
+      const maxCount = Math.max(1, ...distribution.map(item => item.count));
+      const distributionBars = distribution.map(item => ({
+        label: item.score + ' 分',
+        percent: item.count / maxCount * 100,
+        value: item.count + ' 人次',
+        color: item.score >= 7 ? '#2dd4bf' : item.score >= 5 ? '#38bdf8' : item.score >= 3 ? '#f59e0b' : '#fb7185'
+      }));
+      return renderMetricCards([
+        { label: '参与测试学生', value: String(uniqueQuizStudents) },
+        { label: '测试参与人次', value: String(allParticipations.length) },
+        { label: '完整测试人次', value: String(completedTests) },
+        { label: '平均累计得分率', value: averageScoreRate.toFixed(1) + '%' },
+        { label: '已答题正确率', value: answerAccuracy.toFixed(1) + '%' }
+      ]) + '<div class="analytics-dashboard-grid">' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">2.1—2.6 平均得分率</div>' + renderBars(averageBars) + '</div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">各测试完成率</div><div class="analytics-ring-grid">' + rings + '</div></div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">成绩分布（测试人次）</div>' + renderBars(distributionBars) + '</div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">指标口径</div><div class="analytics-source-note">平均累计得分率：学生当前累计得分 ÷ 测试满分；未完成测试仍计入。<br>已答题正确率：所有已提交题目中回答正确的比例。<br>完成率：已回答该测试全部题目的参与人数比例。</div></div>' +
+        '</div><div class="analytics-source-note">数据源：腾讯云 COS system/quiz-results/。统计学生首次提交答案，排除教师试答；测试成绩为全部历史记录。</div>';
+    };
+
+    const renderResults = () => reportStats.map(item => {
+      const questionHeaders = item.questions.map(question => '<th>' + escapeHtml(question.label || question.id) + '</th>').join('');
+      const rows = item.participants.map(student => {
+        const cells = item.questions.map(question => {
           const answer = student.answers && student.answers[question.id];
           return '<td>' + (answer ? escapeHtml(String(answer.earned)) : '—') + '</td>';
         }).join('');
         const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) : 0;
         return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
-          '</td><td>' + student.score + ' / ' + student.totalPoints + '</td><td>' + percent + '%</td>' + answerCells +
+          '</td><td>' + student.score + ' / ' + student.totalPoints + '</td><td>' + percent + '%</td>' + cells +
           '<td>' + escapeHtml(student.lastAnsweredAt ? new Date(student.lastAnsweredAt).toLocaleString() : '—') + '</td></tr>';
-      }).join('') || '<tr><td colspan="' + (5 + questions.length) + '">所选时间范围内暂无学生答题数据</td></tr>';
-      return '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(report.title || report.quizId) +
-        '（' + participants.length + ' 人） <button type="button" class="btn-ghost" data-quiz-download="' + reportIndex +
-        '">下载 CSV</button></div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr>' +
-        '<th>学生 ID</th><th>完成度</th><th>总分</th><th>正确率</th>' + questionHeaders + '<th>最后作答</th></tr></thead><tbody>' +
-        participantRows + '</tbody></table></div></div>';
-    }).join('');
-    container.innerHTML = '<div class="analytics-cards">' + cards.map(([label, value]) =>
-      '<div class="analytics-card"><strong>' + value + '</strong><span>' + label + '</span></div>'
-    ).join('') + '</div>' +
-      '<div class="settings-section"><div class="settings-section-title">章节访问排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>章节</th><th>次数</th></tr></thead><tbody>' + chapterRows + '</tbody></table></div></div>' +
-      '<div class="settings-section"><div class="settings-section-title">材料打开排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>材料</th><th>类型</th><th>次数</th></tr></thead><tbody>' + resourceRows + '</tbody></table></div></div>' +
-      '<div class="settings-section-title">测试结果统计</div>' + (quizSections || '<div class="material-empty">暂无测试数据</div>') +
-      '<div class="settings-section"><div class="settings-section-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>用户</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div>';
-    container.querySelectorAll('[data-quiz-download]').forEach(button => {
-      button.addEventListener('click', () => {
-        const report = quizReports[Number(button.getAttribute('data-quiz-download'))];
-        if (report) downloadQuizReportCsv(report);
+      }).join('') || '<tr><td colspan="' + (5 + item.questions.length) + '">暂无学生答题数据</td></tr>';
+      return '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(item.report.title || item.report.quizId) +
+        '（' + item.participants.length + ' 人） <button type="button" class="btn-ghost" data-quiz-download="' + item.reportIndex + '">下载 CSV</button></div>' +
+        '<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学生 ID</th><th>完成度</th><th>总分</th><th>得分率</th>' +
+        questionHeaders + '<th>最后作答</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+    }).join('') || '<div class="analytics-empty">暂无测试数据</div>';
+
+    const renderQuestions = () => {
+      const item = reportStats[selectedQuizIndex] || reportStats[0];
+      if (!item) return '<div class="analytics-empty">暂无测试数据</div>';
+      const stats = item.questions.map(question => {
+        const answers = item.participants.map(student => student.answers && student.answers[question.id]).filter(Boolean);
+        const correct = answers.filter(answer => answer.correct === true).length;
+        return {
+          label: question.label || question.id,
+          answered: answers.length,
+          correct,
+          rate: answers.length ? correct / answers.length * 100 : 0
+        };
       });
+      const options = reportStats.map((entry, index) => '<option value="' + index + '"' + (index === selectedQuizIndex ? ' selected' : '') + '>' +
+        escapeHtml(entry.report.title || entry.report.quizId) + '</option>').join('');
+      const bars = stats.map(stat => ({
+        label: stat.label,
+        percent: stat.rate,
+        value: stat.answered ? stat.correct + '/' + stat.answered + ' · ' + stat.rate.toFixed(0) + '%' : '暂无',
+        color: stat.rate >= 80 ? '#2dd4bf' : stat.rate >= 60 ? '#38bdf8' : stat.rate >= 40 ? '#f59e0b' : '#fb7185'
+      }));
+      const weakest = [...stats].filter(stat => stat.answered).sort((a, b) => a.rate - b.rate).slice(0, 3);
+      const weakRows = weakest.map((stat, index) => '<tr><td>' + (index + 1) + '</td><td>' + escapeHtml(stat.label) + '</td><td>' +
+        stat.rate.toFixed(1) + '%</td><td>' + (stat.answered - stat.correct) + '</td></tr>').join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+      return '<div class="analytics-view-toolbar"><label for="analytics-quiz-select">选择测试：</label><select id="analytics-quiz-select">' + options + '</select></div>' +
+        '<div class="analytics-dashboard-grid"><div class="analytics-panel"><div class="analytics-panel-title">逐题正确率</div>' + renderBars(bars) + '</div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">易错题排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>排名</th><th>题目</th><th>正确率</th><th>答错人数</th></tr></thead><tbody>' + weakRows + '</tbody></table></div>' +
+        '<div class="analytics-source-note">正确率分母为该题已有首次答案的人数，尚未作答者不计入。</div></div></div>';
+    };
+
+    const renderActivity = () => {
+      const cards = [
+        { label: '事件总数', value: String(summary.totalEvents || 0) },
+        { label: '活跃用户', value: String(summary.uniqueUsers || 0) },
+        { label: '登录次数', value: String(summary.logins || 0) },
+        { label: '章节访问', value: String(summary.chapterOpens || 0) },
+        { label: '材料打开', value: String(summary.materialOpens || 0) }
+      ];
+      const chapterRows = Object.entries(payload.byChapter || {}).sort((a, b) => b[1] - a[1]).map(([chapter, count]) =>
+        '<tr><td>' + escapeHtml(chapter === 'final' ? '期末任务' : '第 ' + chapter + ' 章') + '</td><td>' + count + '</td></tr>'
+      ).join('') || '<tr><td colspan="2">暂无数据</td></tr>';
+      const resourceRows = (payload.topResources || []).map(item => '<tr><td>' + escapeHtml(item.title || item.resourceId) + '</td><td>' +
+        escapeHtml(item.resourceType || '') + '</td><td>' + item.count + '</td></tr>').join('') || '<tr><td colspan="3">暂无数据</td></tr>';
+      const recentRows = (payload.recentEvents || []).map(item => '<tr><td>' + escapeHtml(new Date(item.createdAt).toLocaleString()) + '</td><td>' +
+        escapeHtml(item.id) + '</td><td>' + escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
+      ).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+      const dayEntries = Object.entries(payload.byDay || {}).sort((a, b) => a[0].localeCompare(b[0]));
+      const maxDay = Math.max(1, ...dayEntries.map(item => Number(item[1]) || 0));
+      const dayBars = dayEntries.map(([day, count]) => ({ label: day.slice(5), percent: count / maxDay * 100, value: String(count), color: '#38bdf8' }));
+      return renderMetricCards(cards) + '<div class="analytics-dashboard-grid">' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">每日行为量（最近 ' + Number(payload.days || 30) + ' 天）</div>' + renderBars(dayBars) + '</div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">章节访问排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>章节</th><th>次数</th></tr></thead><tbody>' + chapterRows + '</tbody></table></div></div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">材料打开排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>材料</th><th>类型</th><th>次数</th></tr></thead><tbody>' + resourceRows + '</tbody></table></div></div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>用户</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div></div>' +
+        '<div class="analytics-source-note">行为数据按上方最近 7/30/90 天筛选；测试成绩为全部历史首次答案，不受该筛选影响。</div>';
+    };
+
+    container.innerHTML = '<div class="analytics-subnav" role="tablist" aria-label="用户行为看板子导航">' +
+      '<button type="button" class="active" data-analytics-subview="overview">综合概览</button>' +
+      '<button type="button" data-analytics-subview="results">测试成绩</button>' +
+      '<button type="button" data-analytics-subview="questions">题目分析</button>' +
+      '<button type="button" data-analytics-subview="activity">学习行为</button></div>' +
+      '<div class="analytics-shared-view" data-analytics-shared-view></div>';
+    const sharedView = container.querySelector('[data-analytics-shared-view]');
+    const renderView = view => {
+      container.querySelectorAll('[data-analytics-subview]').forEach(button => {
+        const active = button.getAttribute('data-analytics-subview') === view;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      if (view === 'results') sharedView.innerHTML = renderResults();
+      else if (view === 'questions') sharedView.innerHTML = renderQuestions();
+      else if (view === 'activity') sharedView.innerHTML = renderActivity();
+      else sharedView.innerHTML = renderOverview();
+      sharedView.querySelectorAll('[data-quiz-download]').forEach(button => {
+        button.addEventListener('click', () => {
+          const report = quizReports[Number(button.getAttribute('data-quiz-download'))];
+          if (report) downloadQuizReportCsv(report);
+        });
+      });
+      const quizSelect = sharedView.querySelector('#analytics-quiz-select');
+      if (quizSelect) quizSelect.addEventListener('change', () => {
+        selectedQuizIndex = Number(quizSelect.value) || 0;
+        renderView('questions');
+      });
+    };
+    container.querySelectorAll('[data-analytics-subview]').forEach(button => {
+      button.addEventListener('click', () => renderView(button.getAttribute('data-analytics-subview')));
     });
+    renderView('overview');
   }
 
   function downloadQuizReportCsv(report) {
