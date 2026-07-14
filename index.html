@@ -2527,6 +2527,120 @@
     setTimeout(() => titleInput.focus(), 0);
   }
 
+  async function uploadVideoSubtitleFile(catalog, data) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'upload-video-subtitle',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        ...data
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  function openSrtUploadDialog(videoNode, catalog, onComplete) {
+    const languages = [
+      ['EN', '英语字幕'], ['ZH', '中文字幕'], ['TH', '泰语字幕'],
+      ['ID', '印尼语字幕'], ['LAO', '老挝语字幕'], ['FR', '法语字幕'],
+      ['RU', '俄语字幕'], ['JP', '日语字幕'], ['KR', '韩语字幕'],
+      ['MY', '马来语字幕'], ['AR', '阿拉伯语字幕'], ['VI', '越南语字幕'],
+      ['ES', '西班牙语字幕'], ['DE', '德语字幕']
+    ];
+    const assets = Array.isArray(videoNode && videoNode.assets) ? videoNode.assets : [];
+    const existingLanguages = new Set(assets
+      .filter(asset => asset && asset.type === 'subtitle')
+      .map(asset => String(asset.language || '').toUpperCase()));
+    const languageOptions = languages.map(([code, label]) =>
+      '<option value="' + code + '" data-default-label="' + escapeHtml(label) + '">' +
+      escapeHtml(label + ' (' + code + ')' + (existingLanguages.has(code) ? ' （将替换现有字幕）' : '')) + '</option>'
+    ).join('');
+    const overlay = document.createElement('div');
+    overlay.className = 'material-register-overlay';
+    overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true">' +
+      '<h3>上传 SRT 字幕</h3>' +
+      '<div class="material-tree-note">视频：' + escapeHtml(videoNode.title || videoNode.id) +
+      '。文件由云函数写入 COS，上传后默认隐藏。选择已存在的语言会替换该语言的目录记录。</div>' +
+      '<div class="material-register-field"><label>字幕语言</label><select data-srt-field="language">' + languageOptions + '</select></div>' +
+      '<div class="material-register-field"><label>学生端显示名称</label><input type="text" data-srt-field="label" maxlength="80" value="英语字幕"></div>' +
+      '<div class="material-register-field"><label>SRT 文件（UTF-8，最大 2 MB）</label><input type="file" data-srt-field="file" accept=".srt,application/x-subrip,text/plain"></div>' +
+      '<div class="login-status-line" data-srt-status></div>' +
+      '<div class="material-register-actions"><button class="btn-ghost" type="button" data-srt-cancel>取消</button>' +
+      '<button class="btn-ghost" type="button" data-srt-confirm>验证并上传</button></div></div>';
+    document.body.appendChild(overlay);
+    const dialog = overlay.querySelector('.material-register-dialog');
+    const languageSelect = overlay.querySelector('[data-srt-field="language"]');
+    const labelInput = overlay.querySelector('[data-srt-field="label"]');
+    const fileInput = overlay.querySelector('[data-srt-field="file"]');
+    const status = overlay.querySelector('[data-srt-status]');
+    const confirmBtn = overlay.querySelector('[data-srt-confirm]');
+    const close = () => overlay.remove();
+    languageSelect.addEventListener('change', () => {
+      const option = languageSelect.options[languageSelect.selectedIndex];
+      labelInput.value = option ? option.getAttribute('data-default-label') || '' : '';
+    });
+    overlay.querySelector('[data-srt-cancel]').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    dialog.addEventListener('click', event => event.stopPropagation());
+    confirmBtn.addEventListener('click', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      const label = labelInput.value.trim();
+      if (!file || !label) {
+        status.textContent = '请选择 SRT 文件并填写学生端显示名称。';
+        status.className = 'login-status-line error';
+        return;
+      }
+      if (!/\.srt$/i.test(file.name) || file.size <= 0 || file.size > 2 * 1024 * 1024) {
+        status.textContent = '只能上传大小不超过 2 MB 的 .srt 文件。';
+        status.className = 'login-status-line error';
+        return;
+      }
+      confirmBtn.disabled = true;
+      status.textContent = '正在校验字幕并上传...';
+      status.className = 'login-status-line';
+      try {
+        const buffer = await file.arrayBuffer();
+        let content;
+        try {
+          content = new TextDecoder('utf-8', { fatal: true }).decode(buffer).replace(/^\uFEFF/, '');
+        } catch (_) {
+          throw new Error('字幕不是有效的 UTF-8 编码，请转换编码后重试。');
+        }
+        if (!/\d{1,2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}/.test(content)) {
+          throw new Error('文件中未找到有效的 SRT 时间轴。');
+        }
+        const payload = await uploadVideoSubtitleFile(catalog, {
+          resourceId: String(videoNode.id),
+          language: languageSelect.value,
+          label,
+          filename: file.name,
+          content
+        });
+        close();
+        onComplete(payload);
+        alert((payload.replaced ? '字幕已替换' : '字幕已上传') +
+          '并默认隐藏。旧目录备份：' + payload.backupKey);
+      } catch (err) {
+        status.textContent = (err.status === 409 ? '目录已更新，请关闭窗口重新进入后再试。' : '上传失败：') + err.message;
+        status.className = 'login-status-line error';
+      } finally {
+        confirmBtn.disabled = false;
+      }
+    });
+    setTimeout(() => fileInput.focus(), 0);
+  }
+
   async function loadStudentMaterialsCatalog() {
     let apiError = null;
     try {
@@ -2743,6 +2857,9 @@
           renderMaterialNodes(node.children, objectMap, siblingMap, nodePath) + '</details>';
       }
       const assets = Array.isArray(node.assets) ? node.assets : [];
+      const uploadSubtitleButton = parentPath.includes('/section:videos') && assets.some(asset => asset && asset.type === 'video')
+        ? '<button type="button" class="material-mini-btn" data-upload-srt="' + escapeHtml(nodePath) + '">＋上传 SRT</button>'
+        : '';
       let assetHtml = assets.map((asset, assetIndex) => {
         const assetPath = nodePath + '/asset:' + asset.id;
         objectMap.set(assetPath, { object: asset, field: 'label' });
@@ -2756,7 +2873,7 @@
       }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
       return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
-        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + '</summary>' + assetHtml + '</details>';
+        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
 
@@ -2782,13 +2899,23 @@
     }).join('') + '</div>';
   }
 
-  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo) {
+  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle) {
     container.querySelectorAll('[data-register-cos-video]').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
         event.stopPropagation();
         if (typeof onRegisterVideo === 'function') {
           onRegisterVideo(button.getAttribute('data-register-cos-video'));
+        }
+      });
+    });
+    container.querySelectorAll('[data-upload-srt]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-upload-srt'));
+        if (entry && typeof onUploadSubtitle === 'function') {
+          onUploadSubtitle(entry.object);
         }
       });
     });
@@ -3048,6 +3175,13 @@
             return;
           }
           openCosVideoRegistrationDialog(chapter, videoSection, adminMaterialsCatalog, payload => {
+            if (payload && payload.catalog) {
+              adminMaterialsCatalog = payload.catalog;
+              renderCatalogViews();
+            }
+          });
+        }, videoNode => {
+          openSrtUploadDialog(videoNode, adminMaterialsCatalog, payload => {
             if (payload && payload.catalog) {
               adminMaterialsCatalog = payload.catalog;
               renderCatalogViews();
