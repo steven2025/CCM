@@ -1600,7 +1600,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-07-14-v17';
+  const PLATFORM_VERSION = 'frontend-2026-07-14-v18';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -2548,6 +2548,49 @@
     }).catch(() => {});
   }
 
+  async function submitCloudQuizAnswer(quizId, checkpointId, selected) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'submit-quiz-answer',
+        id: auth.name || '',
+        inviteCode,
+        quizId,
+        checkpointId,
+        selected
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.attempt) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    return payload.attempt;
+  }
+
+  async function loadCloudQuizProgress(quizId) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    if (!auth.name || !inviteCode) return [];
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'get-quiz-progress',
+        id: auth.name,
+        inviteCode,
+        quizId
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    return Array.isArray(payload.attempts) ? payload.attempts : [];
+  }
+
   async function loadAnalyticsDashboard(days) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
@@ -2588,12 +2631,65 @@
       '<tr><td>' + escapeHtml(new Date(item.createdAt).toLocaleString()) + '</td><td>' + escapeHtml(item.id) + '</td><td>' +
       escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
     ).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+    const quizReports = Array.isArray(payload.quizReports) ? payload.quizReports : [];
+    const quizSections = quizReports.map((report, reportIndex) => {
+      const questions = Array.isArray(report.questions) ? report.questions : [];
+      const participants = Array.isArray(report.participants) ? report.participants : [];
+      const questionHeaders = questions.map(question => '<th>' + escapeHtml(question.label || question.id) + '</th>').join('');
+      const participantRows = participants.map(student => {
+        const answerCells = questions.map(question => {
+          const answer = student.answers && student.answers[question.id];
+          return '<td>' + (answer ? escapeHtml(String(answer.earned)) : '—') + '</td>';
+        }).join('');
+        const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) : 0;
+        return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
+          '</td><td>' + student.score + ' / ' + student.totalPoints + '</td><td>' + percent + '%</td>' + answerCells +
+          '<td>' + escapeHtml(student.lastAnsweredAt ? new Date(student.lastAnsweredAt).toLocaleString() : '—') + '</td></tr>';
+      }).join('') || '<tr><td colspan="' + (5 + questions.length) + '">所选时间范围内暂无学生答题数据</td></tr>';
+      return '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(report.title || report.quizId) +
+        '（' + participants.length + ' 人） <button type="button" class="btn-ghost" data-quiz-download="' + reportIndex +
+        '">下载 CSV</button></div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr>' +
+        '<th>学生 ID</th><th>完成度</th><th>总分</th><th>正确率</th>' + questionHeaders + '<th>最后作答</th></tr></thead><tbody>' +
+        participantRows + '</tbody></table></div></div>';
+    }).join('');
     container.innerHTML = '<div class="analytics-cards">' + cards.map(([label, value]) =>
       '<div class="analytics-card"><strong>' + value + '</strong><span>' + label + '</span></div>'
     ).join('') + '</div>' +
       '<div class="settings-section"><div class="settings-section-title">章节访问排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>章节</th><th>次数</th></tr></thead><tbody>' + chapterRows + '</tbody></table></div></div>' +
       '<div class="settings-section"><div class="settings-section-title">材料打开排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>材料</th><th>类型</th><th>次数</th></tr></thead><tbody>' + resourceRows + '</tbody></table></div></div>' +
+      '<div class="settings-section-title">测试结果统计</div>' + (quizSections || '<div class="material-empty">暂无测试数据</div>') +
       '<div class="settings-section"><div class="settings-section-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>用户</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div>';
+    container.querySelectorAll('[data-quiz-download]').forEach(button => {
+      button.addEventListener('click', () => {
+        const report = quizReports[Number(button.getAttribute('data-quiz-download'))];
+        if (report) downloadQuizReportCsv(report);
+      });
+    });
+  }
+
+  function downloadQuizReportCsv(report) {
+    const questions = Array.isArray(report.questions) ? report.questions : [];
+    const participants = Array.isArray(report.participants) ? report.participants : [];
+    const csvCell = value => '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+    const header = ['测试', '学生ID', '完成题数', '总题数', '得分', '总分', '正确率']
+      .concat(questions.map(question => question.label || question.id), ['最后作答时间']);
+    const rows = participants.map(student => {
+      const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) + '%' : '0%';
+      return [report.title || report.quizId, student.id, student.answered, student.totalQuestions, student.score, student.totalPoints, percent]
+        .concat(questions.map(question => {
+          const answer = student.answers && student.answers[question.id];
+          return answer ? answer.earned : '';
+        }), [student.lastAnsweredAt || '']);
+    });
+    const csv = '\uFEFF' + [header].concat(rows).map(row => row.map(csvCell).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'quiz-' + String(report.quizId || 'results').replace(/[^a-zA-Z0-9._-]+/g, '-') + '-results.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   function getModuleKeyFromChapter(chapter) {
@@ -5344,6 +5440,7 @@
         let activeCheckpoint = null;
         let checkpointResumePending = false;
         let lastAllowedVideoTime = 0;
+        let quizProgressReady = !checkpoints.length;
         const quizStatus = document.createElement('div');
         if (checkpoints.length) {
           quizStatus.className = 'video-quiz-summary';
@@ -5582,36 +5679,44 @@
           const reviewBtn = quizCard.querySelector('[data-quiz-review]');
           if (reviewBtn) reviewBtn.addEventListener('click', renderVideoQuizReview);
           quizCard.querySelectorAll('[data-quiz-option]').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
               if (quizAttempts[checkpoint.id]) return;
               const selected = Number(btn.getAttribute('data-quiz-option'));
-              const correct = selected === checkpoint.answer;
-              const points = Number(checkpoint.points) || 1;
-              quizAttempts[checkpoint.id] = {
-                selected,
-                correct,
-                points,
-                earned: correct ? points : 0,
-                answeredAt: new Date().toISOString()
-              };
-              passedCheckpoints.add(checkpoint.id);
               quizCard.querySelectorAll('[data-quiz-option]').forEach(item => {
                 item.disabled = true;
-                item.classList.remove('correct', 'wrong');
-                if (Number(item.getAttribute('data-quiz-option')) === checkpoint.answer) {
-                  item.classList.add('correct');
-                }
               });
-              if (!correct) {
-                btn.classList.add('wrong');
+              feedback.textContent = '正在保存首次答案… / Saving your first answer…';
+              feedback.style.color = '#bfdbfe';
+              try {
+                const saved = await submitCloudQuizAnswer(meta.id, checkpoint.id, selected);
+                const attempt = {
+                  selected: Number(saved.selected),
+                  correct: saved.correct === true,
+                  points: Number(saved.points) || 1,
+                  earned: Number(saved.earned) || 0,
+                  answeredAt: saved.answeredAt || saved.createdAt || new Date().toISOString()
+                };
+                quizAttempts[checkpoint.id] = attempt;
+                passedCheckpoints.add(checkpoint.id);
+                quizCard.querySelectorAll('[data-quiz-option]').forEach(item => {
+                  item.disabled = true;
+                  item.classList.remove('correct', 'wrong');
+                  const optionIndex = Number(item.getAttribute('data-quiz-option'));
+                  if (optionIndex === checkpoint.answer) item.classList.add('correct');
+                  if (optionIndex === attempt.selected && !attempt.correct) item.classList.add('wrong');
+                });
+                feedback.textContent = (attempt.correct ? '回答正确，得 1 分。' : '本题未答对，得 0 分。') +
+                  '\n' + (checkpoint.explanation || '');
+                feedback.style.color = attempt.correct ? '#bbf7d0' : '#fecaca';
+                summary.textContent = renderQuizProgressLine();
+                refreshVideoQuizStatus();
+                continueBtn.style.display = 'inline-flex';
+                checkpointResumePending = true;
+              } catch (err) {
+                quizCard.querySelectorAll('[data-quiz-option]').forEach(item => { item.disabled = false; });
+                feedback.textContent = '答案保存失败，请检查网络后重试：' + err.message;
+                feedback.style.color = '#fecaca';
               }
-              feedback.textContent = (correct ? '回答正确，得 1 分。' : '本题未答对，得 0 分。') +
-                '\n' + (checkpoint.explanation || '');
-              feedback.style.color = correct ? '#bbf7d0' : '#fecaca';
-              summary.textContent = renderQuizProgressLine();
-              refreshVideoQuizStatus();
-              continueBtn.style.display = 'inline-flex';
-              checkpointResumePending = true;
             });
           });
           continueBtn.addEventListener('click', () => {
@@ -5663,6 +5768,29 @@
         });
         videoEl.addEventListener('seeked', enforceVideoQuizGate);
         refreshVideoQuizStatus();
+        if (checkpoints.length) {
+          videoEl.addEventListener('play', () => {
+            if (!quizProgressReady) videoEl.pause();
+          });
+          loadCloudQuizProgress(meta.id).then(attempts => {
+            attempts.forEach(saved => {
+              if (!saved || !saved.checkpointId) return;
+              quizAttempts[saved.checkpointId] = {
+                selected: Number(saved.selected),
+                correct: saved.correct === true,
+                points: Number(saved.points) || 1,
+                earned: Number(saved.earned) || 0,
+                answeredAt: saved.answeredAt || saved.createdAt || ''
+              };
+              passedCheckpoints.add(saved.checkpointId);
+            });
+          }).catch(err => {
+            console.warn('答题进度读取失败，将在提交答案时再次核验：', err);
+          }).finally(() => {
+            quizProgressReady = true;
+            refreshVideoQuizStatus();
+          });
+        }
 
         langSelect.addEventListener('change', () => {
           const currentLang = langSelect.value;
