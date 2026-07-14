@@ -279,6 +279,15 @@
     }
     .settings-tab-panel { display: none; }
     .settings-tab-panel.active { display: block; }
+    .analytics-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .analytics-toolbar select { padding: 7px 9px; border-radius: 8px; background: #1e293b; color: #f8fafc; border: 1px solid rgba(147,197,253,0.35); }
+    .analytics-cards { display: grid; grid-template-columns: repeat(5, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .analytics-card { padding: 10px; border-radius: 10px; background: rgba(30,64,175,0.18); border: 1px solid rgba(96,165,250,0.22); }
+    .analytics-card strong { display: block; font-size: 1.25rem; color: #bfdbfe; }
+    .analytics-card span { font-size: 0.72rem; color: #cbd5e1; }
+    .analytics-table-wrap { overflow: auto; max-height: 280px; }
+    .analytics-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .analytics-table th, .analytics-table td { padding: 6px 7px; border-bottom: 1px solid rgba(148,163,184,0.16); text-align: left; white-space: nowrap; }
     .material-tree-note {
       padding: 9px 11px;
       border-radius: 10px;
@@ -418,6 +427,7 @@
     @media (max-width: 700px) {
       .settings-resource-grid { grid-template-columns: 1fr; }
       .settings-tabs { grid-template-columns: 1fr; }
+      .analytics-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 900px) {
@@ -2176,6 +2186,71 @@
     return payload;
   }
 
+  function trackPlatformEvent(eventType, details) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    if (!auth.name || !inviteCode) return;
+    fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'track-event',
+        id: auth.name,
+        inviteCode,
+        eventType,
+        ...(details || {})
+      })
+    }).catch(() => {});
+  }
+
+  async function loadAnalyticsDashboard(days) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'get-analytics',
+        id: auth.name || '',
+        inviteCode,
+        days
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true) {
+      throw new Error((payload && payload.message) || ('HTTP ' + resp.status));
+    }
+    return payload;
+  }
+
+  function renderAnalyticsDashboard(container, payload) {
+    const summary = payload.summary || {};
+    const cards = [
+      ['事件总数', summary.totalEvents || 0],
+      ['活跃用户', summary.uniqueUsers || 0],
+      ['登录次数', summary.logins || 0],
+      ['章节访问', summary.chapterOpens || 0],
+      ['材料打开', summary.materialOpens || 0]
+    ];
+    const chapterRows = Object.entries(payload.byChapter || {})
+      .sort((a, b) => b[1] - a[1])
+      .map(([chapter, count]) => '<tr><td>' + escapeHtml(chapter === 'final' ? '期末任务' : '第 ' + chapter + ' 章') + '</td><td>' + count + '</td></tr>')
+      .join('') || '<tr><td colspan="2">暂无数据</td></tr>';
+    const resourceRows = (payload.topResources || []).map(item =>
+      '<tr><td>' + escapeHtml(item.title || item.resourceId) + '</td><td>' + escapeHtml(item.resourceType || '') + '</td><td>' + item.count + '</td></tr>'
+    ).join('') || '<tr><td colspan="3">暂无数据</td></tr>';
+    const recentRows = (payload.recentEvents || []).map(item =>
+      '<tr><td>' + escapeHtml(new Date(item.createdAt).toLocaleString()) + '</td><td>' + escapeHtml(item.id) + '</td><td>' +
+      escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
+    ).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+    container.innerHTML = '<div class="analytics-cards">' + cards.map(([label, value]) =>
+      '<div class="analytics-card"><strong>' + value + '</strong><span>' + label + '</span></div>'
+    ).join('') + '</div>' +
+      '<div class="settings-section"><div class="settings-section-title">章节访问排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>章节</th><th>次数</th></tr></thead><tbody>' + chapterRows + '</tbody></table></div></div>' +
+      '<div class="settings-section"><div class="settings-section-title">材料打开排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>材料</th><th>类型</th><th>次数</th></tr></thead><tbody>' + resourceRows + '</tbody></table></div></div>' +
+      '<div class="settings-section"><div class="settings-section-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>用户</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div>';
+  }
+
   function getModuleKeyFromChapter(chapter) {
     return chapter === 'final' ? 'final-task' : 'chapter-' + chapter;
   }
@@ -2757,6 +2832,162 @@
     }
   }
 
+  async function registerDocumentCosLink(catalog, data) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'register-document-link',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        ...data
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  function openDocumentRegistrationDialog(config, catalog, onComplete) {
+    const chapter = config.chapter;
+    const section = config.section;
+    const resource = config.resource || null;
+    const asset = config.asset || null;
+    const isNewResource = !resource;
+    const languageOptions = [
+      ['CN-EN', '中文+英文'], ['CN-TH', '中文+泰语'], ['CN-ID', '中文+印尼语'],
+      ['CN-LAO', '中文+老挝语'], ['CN-FR', '中文+法语'], ['CN-RU', '中文+俄语'],
+      ['CN-JP', '中文+日语'], ['CN-KR', '中文+韩语'], ['CN-MY', '中文+马来语'],
+      ['CN-AR', '中文+阿拉伯语'], ['EN', '英文'], ['ZH', '中文'], ['DEFAULT', '默认版本']
+    ];
+    const selectedLanguage = String(asset && asset.language || 'CN-EN').toUpperCase();
+    if (selectedLanguage && !languageOptions.some(item => item[0] === selectedLanguage)) {
+      languageOptions.push([selectedLanguage, asset && asset.label || selectedLanguage]);
+    }
+    const languageHtml = languageOptions.map(([code, label]) =>
+      '<option value="' + escapeHtml(code) + '" data-default-label="' + escapeHtml(label) + '"' +
+      (code === selectedLanguage ? ' selected' : '') + '>' + escapeHtml(label + ' (' + code + ')') + '</option>'
+    ).join('');
+    const sectionNodes = sortCatalogItems(section && section.nodes);
+    const positionHtml = ['<option value="">添加到末尾</option>'].concat(sectionNodes.map(node =>
+      '<option value="' + escapeHtml(node.id) + '">在“' + escapeHtml(node.title) + '”后插入</option>'
+    )).join('');
+    const overlay = document.createElement('div');
+    overlay.className = 'material-register-overlay';
+    overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true">' +
+      '<h3>' + (asset ? '替换 COS 文件' : (resource ? '向材料添加 COS 文件' : '登记新 COS 材料')) + '</h3>' +
+      '<div class="material-tree-note">位置：' + escapeHtml(chapter.title) + ' / ' + escapeHtml(section.title) +
+      (resource ? ' / ' + escapeHtml(resource.title) : '') + '。登记或替换后默认关闭，COS 原文件保留。</div>' +
+      (isNewResource ? '<div class="material-register-field"><label>学生端材料名称</label><input type="text" data-doc-field="title" maxlength="160" placeholder="例如：第三章案例练习"></div>' : '') +
+      '<div class="material-register-field"><label>语言版本</label><select data-doc-field="language">' + languageHtml + '</select></div>' +
+      '<div class="material-register-field"><label>学生端文件名称</label><input type="text" data-doc-field="label" maxlength="80" value="' +
+      escapeHtml(asset && asset.label || languageOptions.find(item => item[0] === selectedLanguage)?.[1] || '中文+英文') + '"></div>' +
+      '<div class="material-register-field"><label>COS 文件永久链接</label><input type="url" data-doc-field="url" value="' +
+      escapeHtml(asset && asset.url || '') + '" placeholder="https://ccm2025-...myqcloud.com/.../file.pdf"></div>' +
+      (isNewResource ? '<div class="material-register-field"><label>插入位置</label><select data-doc-field="insertAfterId">' + positionHtml + '</select></div>' : '') +
+      '<div class="login-status-line" data-doc-status></div>' +
+      '<div class="material-register-actions"><button class="btn-ghost" type="button" data-doc-cancel>取消</button>' +
+      '<button class="btn-ghost" type="button" data-doc-confirm>验证并保存</button></div></div>';
+    document.body.appendChild(overlay);
+    const dialog = overlay.querySelector('.material-register-dialog');
+    const titleInput = overlay.querySelector('[data-doc-field="title"]');
+    const languageSelect = overlay.querySelector('[data-doc-field="language"]');
+    const labelInput = overlay.querySelector('[data-doc-field="label"]');
+    const urlInput = overlay.querySelector('[data-doc-field="url"]');
+    const positionSelect = overlay.querySelector('[data-doc-field="insertAfterId"]');
+    const status = overlay.querySelector('[data-doc-status]');
+    const confirmBtn = overlay.querySelector('[data-doc-confirm]');
+    const close = () => overlay.remove();
+    languageSelect.addEventListener('change', () => {
+      const option = languageSelect.options[languageSelect.selectedIndex];
+      labelInput.value = option ? option.getAttribute('data-default-label') || '' : '';
+    });
+    overlay.querySelector('[data-doc-cancel]').addEventListener('click', close);
+    overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+    dialog.addEventListener('click', event => event.stopPropagation());
+    confirmBtn.addEventListener('click', async () => {
+      const title = titleInput ? titleInput.value.trim() : '';
+      const label = labelInput.value.trim();
+      const url = urlInput.value.trim();
+      if ((isNewResource && !title) || !label || !url) {
+        status.textContent = '请完整填写材料名称、文件名称和 COS 链接。';
+        status.className = 'login-status-line error';
+        return;
+      }
+      confirmBtn.disabled = true;
+      status.textContent = '正在验证 COS 对象并保存...';
+      status.className = 'login-status-line';
+      try {
+        const payload = await registerDocumentCosLink(catalog, {
+          chapterId: String(chapter.id),
+          sectionId: String(section.id),
+          resourceId: resource ? String(resource.id) : '',
+          assetId: asset ? String(asset.id) : '',
+          title,
+          language: languageSelect.value,
+          label,
+          url,
+          insertAfterId: positionSelect ? positionSelect.value : ''
+        });
+        close();
+        onComplete(payload);
+        alert((payload.replaced ? '文件已替换' : '文件已登记') + '并默认关闭。旧目录备份：' + payload.backupKey);
+      } catch (err) {
+        status.textContent = (err.status === 409 ? '目录已更新，请重新进入后再试。' : '保存失败：') + err.message;
+        status.className = 'login-status-line error';
+      } finally {
+        confirmBtn.disabled = false;
+      }
+    });
+    setTimeout(() => (titleInput || urlInput).focus(), 0);
+  }
+
+  async function removeDocumentMaterialFromCatalog(catalog, data) {
+    const auth = getCurrentAuth();
+    const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    const resp = await fetch(TEACHER_SETTINGS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'remove-document-material',
+        id: auth.name || '',
+        inviteCode,
+        expectedRevision: Number(catalog && catalog.revision || 0),
+        ...data
+      })
+    });
+    const payload = await resp.json().catch(() => null);
+    if (!resp.ok || !payload || payload.ok !== true || !payload.catalog) {
+      const err = new Error((payload && payload.message) || ('HTTP ' + resp.status));
+      err.status = resp.status;
+      throw err;
+    }
+    return payload;
+  }
+
+  async function confirmAndRemoveDocumentMaterial(catalog, data, displayName, onComplete) {
+    if (!window.confirm('确定要从课程目录移除“' + displayName + '”吗？\nCOS 原文件会保留。')) return;
+    const confirmation = window.prompt('这是第二次确认。请输入“删除”后继续：', '');
+    if (confirmation !== '删除') {
+      if (confirmation !== null) alert('未输入正确的确认文字，已取消。');
+      return;
+    }
+    try {
+      const payload = await removeDocumentMaterialFromCatalog(catalog, data);
+      onComplete(payload);
+      alert('已从课程目录移除“' + displayName + '”。COS 原文件已保留，旧目录备份：' + payload.backupKey);
+    } catch (err) {
+      alert((err.status === 409 ? '目录已更新，请重新进入后再试：' : '移除失败：') + err.message);
+    }
+  }
+
   async function loadStudentMaterialsCatalog() {
     let apiError = null;
     try {
@@ -2973,8 +3204,15 @@
           renderMaterialNodes(node.children, objectMap, siblingMap, nodePath) + '</details>';
       }
       const assets = Array.isArray(node.assets) ? node.assets : [];
+      const isDocumentSection = parentPath.includes('/section:slides') || parentPath.includes('/section:exercises');
       const uploadSubtitleButton = parentPath.includes('/section:videos') && assets.some(asset => asset && asset.type === 'video')
         ? '<button type="button" class="material-mini-btn" data-upload-srt="' + escapeHtml(nodePath) + '">＋上传 SRT</button>'
+        : '';
+      const addDocumentButton = isDocumentSection
+        ? '<button type="button" class="material-mini-btn" data-add-document-file="' + escapeHtml(nodePath) + '">＋添加文件</button>'
+        : '';
+      const customDocumentControls = isDocumentSection && String(node.legacyId || '').startsWith('custom-doc-')
+        ? '<button type="button" class="material-mini-btn" data-delete-custom-document="' + escapeHtml(nodePath) + '">删除材料</button>'
         : '';
       const customVideoControls = parentPath.includes('/section:videos') && String(node.legacyId || '').startsWith('custom-')
         ? '<button type="button" class="material-mini-btn" data-replace-custom-video="' + escapeHtml(nodePath) + '">更换视频</button>' +
@@ -2988,16 +3226,20 @@
           ? '<button type="button" class="material-mini-btn" data-replace-srt-node="' + escapeHtml(nodePath) + '" data-replace-srt-language="' + escapeHtml(asset.language || '') + '">替换</button>' +
             '<button type="button" class="material-mini-btn" data-delete-subtitle="' + escapeHtml(assetPath) + '" data-delete-subtitle-node="' + escapeHtml(nodePath) + '">删除</button>'
           : '';
+        const documentActions = asset.type === 'document'
+          ? '<button type="button" class="material-mini-btn" data-replace-document="' + escapeHtml(assetPath) + '" data-replace-document-node="' + escapeHtml(nodePath) + '">替换</button>' +
+            '<button type="button" class="material-mini-btn" data-delete-document="' + escapeHtml(assetPath) + '" data-delete-document-node="' + escapeHtml(nodePath) + '">删除</button>'
+          : '';
         return (
         '<div class="material-asset"><span class="material-asset-icon">' + getMaterialAssetIcon(asset.type) + '</span>' +
         '<span>' + escapeHtml(asset.label || asset.language || '文件') + '</span>' +
         '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span>' +
-        renderMaterialEditControls(assetPath, assetIndex, assets.length) + subtitleActions + '</div>'
+        renderMaterialEditControls(assetPath, assetIndex, assets.length) + subtitleActions + documentActions + '</div>'
         );
       }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
       return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
-        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + customVideoControls + '</summary>' + assetHtml + '</details>';
+        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + customVideoControls + addDocumentButton + customDocumentControls + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
 
@@ -3013,7 +3255,9 @@
       const sectionHtml = sections.map(section => {
         const registerButton = section.id === 'videos'
           ? '<button type="button" class="material-mini-btn" data-register-cos-video="' + escapeHtml(chapter.id) + '">＋登记 COS 视频</button>'
-          : '';
+          : (section.id === 'slides' || section.id === 'exercises')
+            ? '<button type="button" class="material-mini-btn" data-register-cos-document="' + escapeHtml(chapter.id) + '" data-document-section="' + escapeHtml(section.id) + '">＋登记 COS 文件</button>'
+            : '';
         return '<details data-tree-key="chapter:' + escapeHtml(chapter.id) + '/section:' + escapeHtml(section.id) + '"><summary><span class="material-node-title">📂 ' + escapeHtml(section.title) + '</span>' +
           '<span class="material-tree-badge">' + (Array.isArray(section.nodes) ? section.nodes.length : 0) + ' 项</span>' + registerButton + '</summary>' +
           renderMaterialNodes(section.nodes, objectMap, siblingMap, 'chapter:' + chapter.id + '/section:' + section.id) + '</details>';
@@ -3023,7 +3267,29 @@
     }).join('') + '</div>';
   }
 
-  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle, onReplaceSubtitle, onReplaceVideo, onDeleteMaterial) {
+  function findCatalogResourceContext(catalog, targetResource) {
+    const visit = nodes => {
+      for (const node of (Array.isArray(nodes) ? nodes : [])) {
+        if (node === targetResource || String(node.id) === String(targetResource && targetResource.id)) return node;
+        if (node.kind === 'group') {
+          const found = visit(node.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    for (const chapter of (Array.isArray(catalog && catalog.chapters) ? catalog.chapters : [])) {
+      for (const section of (Array.isArray(chapter.sections) ? chapter.sections : [])) {
+        if (section.id !== 'slides' && section.id !== 'exercises') continue;
+        const resource = visit(section.nodes);
+        if (resource) return { chapter, section, resource };
+      }
+    }
+    return null;
+  }
+
+  function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle, onReplaceSubtitle, onReplaceVideo, onDeleteMaterial, documentHandlers) {
+    documentHandlers = documentHandlers || {};
     container.querySelectorAll('[data-register-cos-video]').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
@@ -3084,6 +3350,65 @@
         if (entry && typeof onDeleteMaterial === 'function') {
           onDeleteMaterial({
             targetType: 'custom-video',
+            resourceId: String(entry.object.id)
+          }, entry.object.title || entry.object.id);
+        }
+      });
+    });
+    container.querySelectorAll('[data-register-cos-document]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof documentHandlers.register === 'function') {
+          documentHandlers.register(
+            button.getAttribute('data-register-cos-document'),
+            button.getAttribute('data-document-section')
+          );
+        }
+      });
+    });
+    container.querySelectorAll('[data-add-document-file]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-add-document-file'));
+        if (entry && typeof documentHandlers.add === 'function') documentHandlers.add(entry.object);
+      });
+    });
+    container.querySelectorAll('[data-replace-document]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const assetEntry = objectMap.get(button.getAttribute('data-replace-document'));
+        const nodeEntry = objectMap.get(button.getAttribute('data-replace-document-node'));
+        if (assetEntry && nodeEntry && typeof documentHandlers.replace === 'function') {
+          documentHandlers.replace(nodeEntry.object, assetEntry.object);
+        }
+      });
+    });
+    container.querySelectorAll('[data-delete-document]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const assetEntry = objectMap.get(button.getAttribute('data-delete-document'));
+        const nodeEntry = objectMap.get(button.getAttribute('data-delete-document-node'));
+        if (assetEntry && nodeEntry && typeof documentHandlers.remove === 'function') {
+          documentHandlers.remove({
+            targetType: 'document',
+            resourceId: String(nodeEntry.object.id),
+            assetId: String(assetEntry.object.id)
+          }, assetEntry.object.label || assetEntry.object.id);
+        }
+      });
+    });
+    container.querySelectorAll('[data-delete-custom-document]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const entry = objectMap.get(button.getAttribute('data-delete-custom-document'));
+        if (entry && typeof documentHandlers.remove === 'function') {
+          documentHandlers.remove({
+            targetType: 'custom-document',
             resourceId: String(entry.object.id)
           }, entry.object.title || entry.object.id);
         }
@@ -3258,7 +3583,7 @@
         '<button class="settings-tab" data-settings-tab="analytics">3. 用户行为看板</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
-        '<div class="material-tree-note">可重命名学生端显示名称，并使用 ↑ ↓ 调整同级材料或关联文件顺序。点击底部保存后同步云端；上传与新增将在下一步启用。</div>' +
+        '<div class="material-tree-note">可登记 COS 文件、为已有材料增加语言版本，以及重命名、替换、删除和调整顺序。新增或替换后请到“开放与关闭”发布。</div>' +
         '<div id="admin-material-tree"><div class="login-status-line">正在从腾讯云读取完整材料目录...</div></div>' +
       '</section>' +
       '<section class="settings-tab-panel" data-settings-panel="access">' +
@@ -3267,8 +3592,9 @@
         '<details class="settings-section"><summary class="settings-section-title">现有平台权限（过渡兼容）</summary>' + accessHtml + '</details>' +
       '</section>' +
       '<section class="settings-tab-panel" data-settings-panel="analytics">' +
-        '<div class="settings-section"><div class="settings-section-title">用户行为看板</div>' +
-        '<div class="material-empty">本模块将在材料管理稳定后接入登录、章节访问、材料打开和视频观看数据。</div></div>' +
+        '<div class="analytics-toolbar"><select id="analytics-days"><option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option><option value="90">最近 90 天</option></select>' +
+        '<button type="button" class="btn-ghost" id="analytics-refresh">刷新看板</button></div>' +
+        '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
       '</section>';
 
     const footer = document.createElement('div');
@@ -3292,6 +3618,26 @@
       win.classList.remove('fullscreen');
       win.style.zIndex = ++currentZ;
     });
+    const analyticsContainer = body.querySelector('#analytics-dashboard');
+    const analyticsDays = body.querySelector('#analytics-days');
+    const analyticsRefresh = body.querySelector('#analytics-refresh');
+    let analyticsLoaded = false;
+    const refreshAnalytics = async () => {
+      if (!analyticsContainer || !analyticsRefresh) return;
+      analyticsRefresh.disabled = true;
+      analyticsContainer.innerHTML = '<div class="login-status-line">正在读取用户行为数据...</div>';
+      try {
+        const payload = await loadAnalyticsDashboard(Number(analyticsDays && analyticsDays.value || 30));
+        renderAnalyticsDashboard(analyticsContainer, payload);
+        analyticsLoaded = true;
+      } catch (err) {
+        analyticsContainer.innerHTML = '<div class="login-status-line error">行为看板读取失败：' + escapeHtml(err.message) + '</div>';
+      } finally {
+        analyticsRefresh.disabled = false;
+      }
+    };
+    if (analyticsRefresh) analyticsRefresh.addEventListener('click', refreshAnalytics);
+    if (analyticsDays) analyticsDays.addEventListener('change', refreshAnalytics);
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
@@ -3301,6 +3647,7 @@
         });
         footer.style.display = (tabName === 'files' || tabName === 'access') ? '' : 'none';
         saveBtn.textContent = tabName === 'files' ? '保存名称与排序' : '保存开放设置';
+        if (tabName === 'analytics' && !analyticsLoaded) refreshAnalytics();
       });
     });
     const treeContainer = body.querySelector('#admin-material-tree');
@@ -3378,6 +3725,47 @@
               renderCatalogViews();
             }
           });
+        }, {
+          register: (chapterId, sectionId) => {
+            const chapters = Array.isArray(adminMaterialsCatalog.chapters) ? adminMaterialsCatalog.chapters : [];
+            const chapter = chapters.find(item => String(item.id) === String(chapterId));
+            const section = chapter && chapter.sections.find(item => item.id === sectionId);
+            if (!chapter || !section) return alert('未找到指定的普通材料区域。');
+            openDocumentRegistrationDialog({ chapter, section }, adminMaterialsCatalog, payload => {
+              if (payload && payload.catalog) {
+                adminMaterialsCatalog = payload.catalog;
+                renderCatalogViews();
+              }
+            });
+          },
+          add: resource => {
+            const context = findCatalogResourceContext(adminMaterialsCatalog, resource);
+            if (!context) return alert('未找到该材料的目录位置。');
+            openDocumentRegistrationDialog(context, adminMaterialsCatalog, payload => {
+              if (payload && payload.catalog) {
+                adminMaterialsCatalog = payload.catalog;
+                renderCatalogViews();
+              }
+            });
+          },
+          replace: (resource, asset) => {
+            const context = findCatalogResourceContext(adminMaterialsCatalog, resource);
+            if (!context) return alert('未找到该文件的目录位置。');
+            openDocumentRegistrationDialog({ ...context, asset }, adminMaterialsCatalog, payload => {
+              if (payload && payload.catalog) {
+                adminMaterialsCatalog = payload.catalog;
+                renderCatalogViews();
+              }
+            });
+          },
+          remove: (data, displayName) => {
+            confirmAndRemoveDocumentMaterial(adminMaterialsCatalog, data, displayName, payload => {
+              if (payload && payload.catalog) {
+                adminMaterialsCatalog = payload.catalog;
+                renderCatalogViews();
+              }
+            });
+          }
         });
       }
       if (accessTreeContainer && accessTreeContainer.isConnected) {
@@ -3893,6 +4281,7 @@
       saveCurrentAuth({ role: result.role, name: result.id || studentName, loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
+      trackPlatformEvent('login', { title: result.role === 'teacher' ? '管理员登录' : '学生登录' });
       try {
         await refreshMaterialsCatalogForRole(result.role);
       } catch (catalogError) {
@@ -3963,6 +4352,7 @@
       } else if (role === 'about-page') {
         openAboutCoursePage();
       } else if (chStr === '1' || chStr === '2' || chStr === '3' || chStr === '4' || chStr === '5' || chStr === '6') {
+        trackPlatformEvent('chapter-open', { chapter: chStr, title: getModuleLabel('chapter-' + chStr) });
         currentChapter = parseInt(chStr, 10);
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
@@ -3972,6 +4362,7 @@
         updatePptView();
         applyChapterPermissions();
       } else if (role === 'final-task') {
+        trackPlatformEvent('chapter-open', { chapter: 'final', title: getModuleLabel('final-task') });
         currentChapter = 'final';
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
@@ -4122,6 +4513,12 @@
           alert('该资料暂未向学生开放。');
           return;
         }
+        trackPlatformEvent('material-open', {
+          chapter: String(currentChapter),
+          resourceType: type,
+          resourceId: id,
+          title
+        });
         openFloatingWindow(type, id, title);
       });
     });
@@ -4837,6 +5234,24 @@
     let isDown = false;
     let offsetX = 0;
     let offsetY = 0;
+    const keepReachable = (left, top) => {
+      const rect = win.getBoundingClientRect();
+      const headerHeight = Math.max(32, dragHandle.getBoundingClientRect().height || 0);
+      const minLeft = Math.min(0, window.innerWidth - rect.width);
+      const maxLeft = Math.max(0, window.innerWidth - Math.min(120, rect.width));
+      const maxTop = Math.max(0, window.innerHeight - headerHeight);
+      return {
+        left: Math.min(maxLeft, Math.max(minLeft, left)),
+        top: Math.min(maxTop, Math.max(0, top))
+      };
+    };
+    const repairPosition = () => {
+      if (win.classList.contains('fullscreen')) return;
+      const rect = win.getBoundingClientRect();
+      const next = keepReachable(rect.left, rect.top);
+      win.style.left = next.left + 'px';
+      win.style.top = next.top + 'px';
+    };
     dragHandle.addEventListener('mousedown', (e) => {
       if (e.target.tagName.toLowerCase() === 'button' ||
           e.target.tagName.toLowerCase() === 'select') return;
@@ -4850,16 +5265,17 @@
     });
     function onMouseMove(e) {
       if (!isDown) return;
-      const x = e.clientX - offsetX;
-      const y = e.clientY - offsetY;
-      win.style.left = x + 'px';
-      win.style.top = y + 'px';
+      const next = keepReachable(e.clientX - offsetX, e.clientY - offsetY);
+      win.style.left = next.left + 'px';
+      win.style.top = next.top + 'px';
     }
     function onMouseUp() {
       isDown = false;
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     }
+    window.addEventListener('resize', repairPosition);
+    repairPosition();
   }
 
   // 初始化
