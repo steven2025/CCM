@@ -453,10 +453,12 @@
     }
 
     .panel {
-      background: rgba(15, 20, 35, 0.88);
+      background:
+        linear-gradient(180deg, rgba(30,41,59,0.82), rgba(15,20,35,0.92)),
+        rgba(15, 20, 35, 0.88);
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+      border: 1px solid rgba(148,163,184,0.14);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.04);
       padding: 10px 14px;
       display: flex;
       flex-direction: column;
@@ -500,9 +502,9 @@
       cursor: pointer;
     }
     .btn-ghost {
-      background: rgba(46,52,64,0.9);
+      background: linear-gradient(180deg, rgba(51,65,85,0.95), rgba(30,41,59,0.95));
       border-radius: 999px;
-      border: 1px solid rgba(136,192,255,0.5);
+      border: 1px solid rgba(147,197,253,0.46);
       padding: 4px 10px;
       font-size: 0.78rem;
       color: #e5e9f0;
@@ -510,10 +512,12 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease, border-color 0.16s ease;
     }
     .btn-ghost:hover {
-      background: rgba(129,161,193,0.18);
+      background: linear-gradient(180deg, rgba(59,130,246,0.24), rgba(30,41,59,0.96));
+      border-color: rgba(191,219,254,0.72);
       box-shadow: 0 6px 16px rgba(0,0,0,0.45);
       transform: translateY(-1px);
     }
@@ -522,9 +526,11 @@
       flex: 1;
       margin-top: 4px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(147,197,253,0.14);
       overflow: hidden;
-      background: radial-gradient(circle at top, rgba(76,86,106,0.6), rgba(15,16,25,0.95));
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.16), transparent 42%),
+        linear-gradient(180deg, rgba(15,23,42,0.96), rgba(2,6,23,0.96));
       display: flex;
       flex-direction: column;
       min-height: 420px;
@@ -534,16 +540,22 @@
       .pdf-viewer { height: 60vh; }
     }
     .pdf-placeholder-header {
-      padding: 6px 10px;
+      padding: 8px 10px;
       font-size: 0.9rem;
-      background: linear-gradient(90deg, rgba(76,86,106,0.4), rgba(59,66,82,0.2));
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(90deg, rgba(30,41,59,0.96), rgba(15,23,42,0.8));
+      border-bottom: 1px solid rgba(147,197,253,0.12);
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .pdf-header-right-text {
+    .pdf-viewer-controls {
       margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .pdf-header-right-text {
       font-size: 0.8rem;
       opacity: 0.8;
     }
@@ -553,6 +565,32 @@
       overflow: auto;
       font-size: 0.85rem;
       line-height: 1.5;
+    }
+    .pdf-viewer.presentation-fullscreen {
+      position: fixed;
+      inset: 8px;
+      width: auto;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+      margin: 0;
+      z-index: 2200;
+      border-radius: 10px;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.85);
+    }
+    .pdf-viewer.presentation-minimized {
+      min-height: 0;
+      height: auto;
+      flex: 0 0 auto;
+    }
+    .pdf-viewer.presentation-minimized .pdf-placeholder-body,
+    .pdf-viewer.presentation-minimized .pdfjs-toolbar,
+    .pdf-viewer.presentation-minimized .pdfjs-canvas-wrap,
+    .pdf-viewer.presentation-minimized #pdf-iframe {
+      display: none !important;
+    }
+    .pdf-viewer.presentation-minimized .pdf-placeholder-header {
+      border-bottom: 0;
     }
 
     /* 使用 iframe 标签显示 PDF - 更可靠 */
@@ -651,10 +689,12 @@
       min-height: 500px;
       max-width: 90vw;
       max-height: 85vh;
-      background: rgba(15,18,30,0.96);
+      background:
+        linear-gradient(180deg, rgba(15,23,42,0.98), rgba(15,18,30,0.96)),
+        rgba(15,18,30,0.96);
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+      border: 1px solid rgba(148,163,184,0.16);
+      box-shadow: 0 22px 54px rgba(0,0,0,0.68), inset 0 1px 0 rgba(255,255,255,0.04);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -663,7 +703,8 @@
     }
     .floating-header {
       padding: 8px 10px;
-      background: linear-gradient(90deg, rgba(59,66,82,0.9), rgba(76,86,106,0.7));
+      background: linear-gradient(90deg, rgba(30,41,59,0.96), rgba(51,65,85,0.78));
+      border-bottom: 1px solid rgba(147,197,253,0.12);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -701,8 +742,8 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.5);
-      background: rgba(15,18,30,0.9);
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.92);
       color: #eceff4;
       display: inline-flex;
       align-items: center;
@@ -712,7 +753,8 @@
       transition: background 0.16s ease, transform 0.12s ease, box-shadow 0.16s ease;
     }
     .btn-icon:hover {
-      background: rgba(229,233,244,0.12);
+      background: rgba(59,130,246,0.24);
+      border-color: rgba(191,219,254,0.78);
       box-shadow: 0 3px 10px rgba(0,0,0,0.6);
       transform: translateY(-1px);
     }
@@ -735,6 +777,15 @@
       max-width: none;
       max-height: none;
       border-radius: 10px;
+    }
+    .floating-window.minimized {
+      min-height: 0;
+      height: auto !important;
+      resize: none;
+    }
+    .floating-window.minimized .floating-body,
+    .floating-window.minimized .floating-footer {
+      display: none;
     }
 
 
@@ -1239,7 +1290,12 @@
           <div class="pdf-viewer">
             <div class="pdf-placeholder-header">
               <span id="ppt-placeholder-title">Chapter 1 PPT (Chinese + English)</span>
-              <span class="pdf-header-right-text" id="ppt-viewer-mode-label">PDF viewer · scrollable</span>
+              <div class="pdf-viewer-controls">
+                <span class="pdf-header-right-text" id="ppt-viewer-mode-label">PDF viewer · scrollable</span>
+                <button class="btn-icon" id="ppt-viewer-fullscreen-btn" title="全屏 / Full screen">⛶</button>
+                <button class="btn-icon" id="ppt-viewer-restore-btn" title="恢复 / Restore">↙</button>
+                <button class="btn-icon" id="ppt-viewer-minimize-btn" title="缩回 / Collapse">—</button>
+              </div>
             </div>
 
             <div class="pdf-placeholder-body" id="ppt-placeholder-body">
@@ -1363,6 +1419,10 @@
   const pptPlaceholderLang2 = document.getElementById('ppt-placeholder-lang2');
   const pptDownloadBtn = document.getElementById('ppt-download-btn');
   const pptPlaceholderBody = document.getElementById('ppt-placeholder-body');
+  const pptViewer = document.querySelector('.pdf-viewer');
+  const pptViewerFullscreenBtn = document.getElementById('ppt-viewer-fullscreen-btn');
+  const pptViewerRestoreBtn = document.getElementById('ppt-viewer-restore-btn');
+  const pptViewerMinimizeBtn = document.getElementById('ppt-viewer-minimize-btn');
   const pdfIframe = document.getElementById('pdf-iframe');
   const pptViewerModeLabel = document.getElementById('ppt-viewer-mode-label');
   const pdfjsToolbar = document.getElementById('pdfjs-toolbar');
@@ -1381,6 +1441,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
+  const PLATFORM_VERSION = 'frontend-2026-07-14-v14';
   const AUTH_STORAGE_KEY = 'ccm_auth_user';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3992,6 +4053,35 @@
     await renderPdfPage(1);
   }
 
+  function refreshCurrentPdfPageSoon() {
+    if (!pdfDoc || !pdfCurrentPage) return;
+    window.setTimeout(() => {
+      if (pdfDoc && pdfCurrentPage) {
+        renderPdfPage(pdfCurrentPage).catch(() => {});
+      }
+    }, 120);
+  }
+
+  function setPptViewerState(state) {
+    if (!pptViewer) return;
+    pptViewer.classList.remove('presentation-fullscreen', 'presentation-minimized');
+    if (state === 'fullscreen') {
+      pptViewer.classList.add('presentation-fullscreen');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      if (state === 'minimized') {
+        pptViewer.classList.add('presentation-minimized');
+      }
+    }
+    if (pptViewerMinimizeBtn) {
+      const minimized = state === 'minimized';
+      pptViewerMinimizeBtn.textContent = minimized ? '▢' : '—';
+      pptViewerMinimizeBtn.title = minimized ? '展开 / Expand' : '缩回 / Collapse';
+    }
+    refreshCurrentPdfPageSoon();
+  }
+
   function openAiConfigWindow() {
     openLoginDialog();
     return;
@@ -4226,6 +4316,23 @@
   }
 
   pptLangSelect.addEventListener('change', () => { updatePptView(); });
+  if (pptViewerFullscreenBtn) {
+    pptViewerFullscreenBtn.addEventListener('click', () => setPptViewerState('fullscreen'));
+  }
+  if (pptViewerRestoreBtn) {
+    pptViewerRestoreBtn.addEventListener('click', () => setPptViewerState('normal'));
+  }
+  if (pptViewerMinimizeBtn) {
+    pptViewerMinimizeBtn.addEventListener('click', () => {
+      const isMinimized = pptViewer && pptViewer.classList.contains('presentation-minimized');
+      setPptViewerState(isMinimized ? 'normal' : 'minimized');
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pptViewer && pptViewer.classList.contains('presentation-fullscreen')) {
+      setPptViewerState('normal');
+    }
+  });
 
   pptDownloadBtn.addEventListener('click', () => {
     if (!isResourceAllowed('slides', getModuleKeyFromChapter(currentChapter))) {
@@ -4876,6 +4983,11 @@
     btnFull.title = 'Full screen';
     btnFull.textContent = '⛶';
 
+    const btnMinimize = document.createElement('button');
+    btnMinimize.className = 'btn-icon';
+    btnMinimize.title = '缩回 / Collapse';
+    btnMinimize.textContent = '—';
+
     const btnClose = document.createElement('button');
     btnClose.className = 'btn-icon';
     btnClose.title = 'Close';
@@ -4883,6 +4995,7 @@
 
     controls.appendChild(langSelect);
     controls.appendChild(btnFull);
+    controls.appendChild(btnMinimize);
     controls.appendChild(btnClose);
     header.appendChild(title);
     header.appendChild(controls);
@@ -5223,7 +5336,15 @@
 
     btnClose.addEventListener('click', () => win.remove());
     btnFull.addEventListener('click', () => {
+      win.classList.remove('minimized');
       win.classList.toggle('fullscreen');
+      win.style.zIndex = ++currentZ;
+    });
+    btnMinimize.addEventListener('click', () => {
+      win.classList.remove('fullscreen');
+      win.classList.toggle('minimized');
+      btnMinimize.textContent = win.classList.contains('minimized') ? '▢' : '—';
+      btnMinimize.title = win.classList.contains('minimized') ? '展开 / Expand' : '缩回 / Collapse';
       win.style.zIndex = ++currentZ;
     });
 
