@@ -1,0 +1,23 @@
+.settings-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.student-manager { color: #e2e8f0; font-size: .8rem; }
+.student-manager .sm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
+.student-manager button, .student-manager .sm-download { border:1px solid #47617a; border-radius:8px; background:#183349; color:#dff9ff; padding:7px 10px; cursor:pointer; font:inherit; }
+.student-manager button:disabled { opacity:.5; cursor:not-allowed; }
+.student-manager input { background:#101d30; border:1px solid #47617a; color:#f1f5f9; border-radius:7px; padding:8px; min-width:0; font:inherit; }
+.student-manager .sm-search { flex:1; min-width:160px; }
+.student-manager .sm-table { overflow:auto; max-height:430px; }
+.student-manager table { width:100%; border-collapse:collapse; }
+.student-manager th,.student-manager td { padding:9px 7px; border-bottom:1px solid #304056; text-align:left; white-space:nowrap; }
+.student-manager th { position:sticky; top:0; background:#14243a; }
+.student-manager td:last-child { white-space:normal; min-width:220px; }
+.student-manager td button { margin:2px; padding:5px 7px; }
+.student-manager code { letter-spacing:1px; color:#99f6e4; }
+.student-manager .sm-status { margin:10px 0; padding:9px; border-radius:8px; background:#122c3d; white-space:pre-wrap; }
+.student-manager .sm-status.error { color:#fecaca; background:#48232d; }
+.student-manager .sm-note { color:#a9bbce; line-height:1.6; margin:8px 0; }
+.student-manager .sm-editor,.student-manager .sm-preview { padding:12px; border:1px solid #456479; border-radius:10px; margin:12px 0; }
+.student-manager .sm-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.student-manager label { display:flex; flex-direction:column; gap:5px; }
+.student-manager textarea { width:100%; min-height:200px; background:#101d30; color:#f1f5f9; padding:10px; }
+.student-manager [hidden] { display:none !important; }
+@media(max-width:720px) { .settings-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); } .student-manager .sm-fields { grid-template-columns:1fr; } }
