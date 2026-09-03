@@ -19,15 +19,15 @@
 
 ### 当前前端
 
-- 版本：`frontend-2026-09-03-v29`（班级管理，本地已实现；本次未替用户发布到线上）
+- 版本：`frontend-2026-09-03-v30`（多语言JSON字幕，本地已实现；本次未替用户发布到线上）
 - 当前源文件：`index.html`
-- 部署包：`CCM-FRONTEND-2026-09-03-v29.zip`
+- 部署包：`CCM-FRONTEND-2026-09-03-v30.zip`
 - GitHub发布文件夹：`GITHUB发布页/`；只上传该文件夹内的内容到仓库根目录，不要上传文件夹本身这一层。
 - 内联脚本检查工具：`tools/check-inline-scripts.js`
 
 ### 当前云函数
 
-- 部署包：`CCMTEACHER-deploy-v22-classes.zip`（本地新包，线上部署仍需用户操作）
+- 部署包：`CCMTEACHER-deploy-v23-json-subtitles.zip`（本地新包，线上部署仍需用户操作）
 - SCF 执行方法：`index.main_handler`
 - 运行环境：Node.js 20
 - 部署包根目录必须直接包含 `index.js`、`package.json` 和依赖，不能再多包一层 `src/`。
@@ -38,7 +38,7 @@
 
 ### 重要文件差异
 
-- 根目录 `index.html`：当前开发与部署源，版本 v29。
+- 根目录 `index.html`：当前开发与部署源，版本 v30。
 - `github/index.html`：2026-06-29 的旧副本，未包含后续登录、材料管理、测验、看板和智能体原型更新，不能用于覆盖当前线上首页。
 
 ## 3. 系统架构
@@ -375,7 +375,18 @@ STABLE_RELEASE.md
 
 ## 12. 建议的下一阶段
 
-### 2026-09-03 班级管理更新（v29 / v22，当前最新）
+### 多语言JSON字幕（v30 / v23，当前最新）
+
+- 视频登记新增可选字幕JSON链接和“添加到首位”。第一章登记对话框提供“0. 盈塑工业（YingSu）”名称、视频及JSON链接的预填按钮；需管理员部署后验证登记并开放，未直接写生产目录。
+- 所有视频有JSON字幕链接管理入口：登记、更换、移除JSON字幕引用。COS文件不删除，材料目录仍保留备份与revision校验。
+- 每语种保存为type=subtitle的独立目录项，subtitleFormat=json、jsonLanguage记录来源键，url指向同一个JSON；前端subtitleFormats映射区分SRT/JSON，仍可逐语种改名、排序、开放/隐藏。
+- JSON替换覆盖同语种字幕、保留它们原有label/status，移除旧JSON已不存在语种，保留其他语种SRT。新语种默认published；新视频仍hidden。单独上传SRT会把该语种subtitleFormat改为srt。
+- 新解析器源：cloud-functions/CCMTEACHER/subtitle-json.js，浏览器镜像assets/subtitle-json.js（保持字节一致）。服务器通过COS SDK验证同桶永久JSON链接，拒绝system目录、签名链接等；最大5MB/30语种/30000条，时间顺序与无重叠验证。
+- 学生播放器每窗口缓存一次JSON读取，语言切换有请求序号保护避免串字幕，JSON文字用textContent显示，默认使用JSON声明语言（已隐藏时选可用语种）。支持zh→ZH、ko→KR、ms→MY等代码映射。
+- 盈塑实际JSON已验证：6语种×161条，359.2秒，默认中文；视频URL与字幕URL均在 `JSON_SUBTITLES_DEPLOYMENT.md`。前端与云函数均需更新，无新npm依赖。
+- 本地测试tools/test-subtitle-json.cjs以及学生/班级/PWA回归通过。线上登记和音画同步验收仍需用户部署后操作。
+
+### 2026-09-03 班级管理更新（v29 / v22，已确认可用）
 
 - 学生管理采用班级目录：全部学生、未分班、各班（含归档班）。新增/重命名/归档/恢复班级；每班显示人数。
 - 一人一班。班级使用随机UUID固定编号，名称可以修改。学号继续全平台唯一，允许同名学生，不允许跨班重复建相同学号。

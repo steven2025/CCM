@@ -14,6 +14,7 @@
   <script src="./assets/pwa.js" defer></script>
   <link rel="stylesheet" href="./assets/student-manager.css?v=29">
   <script src="./assets/student-manager.js?v=29" defer></script>
+  <script src="./assets/subtitle-json.js?v=30"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -1880,7 +1881,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-09-03-v29';
+  const PLATFORM_VERSION = 'frontend-2026-09-03-v30';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3992,6 +3993,11 @@
   async function registerCosVideoLink(catalog, data) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
+    if (data.subtitleJsonUrl) {
+      const check = await fetch(TEACHER_SETTINGS_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'register-video-subtitle-json', id: auth.id || '', inviteCode, url: data.subtitleJsonUrl, validateOnly: true }) });
+      const checked = await check.json().catch(() => null);
+      if (!check.ok || !checked?.validated) throw new Error((checked?.message || 'JSON字幕验证失败') + '；请确认已部署云函数v23。');
+    }
     const resp = await fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -4016,14 +4022,16 @@
     const overlay = document.createElement('div');
     overlay.className = 'material-register-overlay';
     const nodes = sortCatalogItems(videoSection && videoSection.nodes);
-    const insertOptions = ['<option value="">添加到末尾</option>'].concat(nodes.map(node =>
+    const insertOptions = ['<option value="">添加到末尾</option><option value="__first__">添加到首位</option>'].concat(nodes.map(node =>
       '<option value="' + escapeHtml(node.id) + '">在“' + escapeHtml(node.title) + '”后插入</option>'
     )).join('');
     overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true">' +
       '<h3>登记已有 COS 视频</h3>' +
+      (String(chapter.id) === '1' ? '<button type="button" class="btn-ghost" data-yingsu-preset>填入“0. 盈塑工业（YingSu）”链接</button>' : '') +
       '<div class="material-tree-note">章节：' + escapeHtml(chapter.title) + '。请先在 COS 控制台完成视频上传，再粘贴该对象的永久访问链接。新视频登记后默认隐藏。</div>' +
       '<div class="material-register-field"><label>学生端显示名称</label><input type="text" data-video-field="title" maxlength="160" placeholder="例如：跨文化沟通案例"></div>' +
       '<div class="material-register-field"><label>COS 视频永久链接</label><input type="url" data-video-field="url" placeholder="https://ccm2025-...myqcloud.com/.../video.mp4"></div>' +
+      '<div class="material-register-field"><label>多语言字幕 JSON 链接（可选） / Subtitle JSON URL</label><input type="url" data-video-field="subtitleJsonUrl" placeholder="https://…/subtitles.json"></div>' +
       '<div class="material-register-field"><label>插入位置</label><select data-video-field="insertAfterId">' + insertOptions + '</select></div>' +
       '<div class="material-register-field"><label>字幕默认位置</label><select data-video-field="subtitlePosition"><option value="top">顶部</option><option value="bottom">底部</option></select></div>' +
       '<div class="login-status-line" data-video-status></div>' +
@@ -4035,6 +4043,13 @@
     const urlInput = overlay.querySelector('[data-video-field="url"]');
     const insertSelect = overlay.querySelector('[data-video-field="insertAfterId"]');
     const subtitleSelect = overlay.querySelector('[data-video-field="subtitlePosition"]');
+    const jsonInput = overlay.querySelector('[data-video-field="subtitleJsonUrl"]');
+    overlay.querySelector('[data-yingsu-preset]')?.addEventListener('click', () => {
+      titleInput.value = '0. 盈塑工业（YingSu）';
+      urlInput.value = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/yingsu.mp4';
+      jsonInput.value = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/yingsu_subtitles.json';
+      insertSelect.value = '__first__';
+    });
     const status = overlay.querySelector('[data-video-status]');
     const confirmBtn = overlay.querySelector('[data-video-confirm]');
     const close = () => overlay.remove();
@@ -4058,6 +4073,8 @@
           title,
           url,
           insertAfterId: insertSelect.value,
+          insertAtStart: insertSelect.value === '__first__',
+          subtitleJsonUrl: jsonInput.value.trim(),
           subtitlePosition: subtitleSelect.value
         });
         close();
@@ -4094,6 +4111,44 @@
       throw err;
     }
     return payload;
+  }
+
+  function openSubtitleJsonDialog(videoNode, catalog, onComplete) {
+    const overlay = document.createElement('div');
+    overlay.className = 'material-register-overlay';
+    const existing = (videoNode.assets || []).find(asset => asset.subtitleFormat === 'json');
+    overlay.innerHTML = '<div class="material-register-dialog" role="dialog" aria-modal="true"><h3>多语言 JSON 字幕 / Multilingual JSON subtitles</h3>' +
+      '<p class="material-tree-note">视频：' + escapeHtml(videoNode.title) + '。JSON中同语种字幕将被更新，旧JSON中已移除的语种会从目录移除；其他语种SRT保留。新语种默认开放，原有语种保留开放/隐藏状态。<br>Update matching languages; preserve unrelated SRT tracks.</p>' +
+      '<div class="material-register-field"><label>COS JSON 永久链接（最大5MB）</label><input type="url" data-json-url value="' + escapeHtml(existing?.url || '') + '" placeholder="https://…/subtitles.json"></div>' +
+      '<p class="material-tree-note">同一链接的文件内容更新后，也请点击验证保存以同步语种目录。移除只删登记，不删除COS文件。</p>' +
+      '<div class="login-status-line" data-json-status></div><div class="material-register-actions"><button type="button" class="btn-ghost" data-json-close>取消</button>' +
+      (existing ? '<button type="button" class="btn-ghost" data-json-remove>移除本视频全部JSON字幕</button>' : '') +
+      '<button type="button" class="btn-ghost" data-json-save>验证并保存 / Validate & save</button></div></div>';
+    document.body.appendChild(overlay);
+    const close = () => overlay.remove();
+    overlay.querySelector('[data-json-close]').addEventListener('click', close);
+    const submit = async remove => {
+      if (remove && !confirm('只移除JSON字幕登记，保留其他SRT和COS原文件。继续？')) return;
+      const url = overlay.querySelector('[data-json-url]').value.trim();
+      if (!remove && !url) return;
+      const status = overlay.querySelector('[data-json-status]');
+      overlay.querySelectorAll('button,input').forEach(item => item.disabled = true);
+      status.textContent = '正在验证语种、时间轴并保存 / Validating and saving…';
+      try {
+        const auth = getCurrentAuth();
+        const response = await fetch(TEACHER_SETTINGS_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+          action: 'register-video-subtitle-json', id: auth.id, inviteCode: localStorage.getItem('ccm_invite_code') || '',
+          expectedRevision: Number(catalog.revision || 0), resourceId: videoNode.id, url, remove
+        }) });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok || !payload.catalog) throw new Error(payload.message || '保存失败；请确认已部署云函数v23');
+        close(); onComplete(payload);
+        alert(remove ? '已移除JSON字幕登记，COS原文件未删除。' : '字幕已更新：' + (payload.languages || []).map(item => item.label + ' (' + item.count + '条)').join('、'));
+      } catch (error) { status.textContent = error.message; status.className = 'login-status-line error'; }
+      finally { overlay.querySelectorAll('button,input').forEach(item => item.disabled = false); }
+    };
+    overlay.querySelector('[data-json-save]').addEventListener('click', () => submit(false));
+    overlay.querySelector('[data-json-remove]')?.addEventListener('click', () => submit(true));
   }
 
   function openSrtUploadDialog(videoNode, catalog, onComplete, initialLanguage) {
@@ -4598,10 +4653,12 @@
             const legacyId = String(node.legacyId || node.id || '').replace(/^video-/, '');
             const subtitles = {};
             const subtitleLabels = {};
+            const subtitleFormats = {};
             assets.filter(asset => asset.type === 'subtitle' && asset.url).forEach(asset => {
               const language = asset.language || asset.label;
               subtitles[language] = asset.url;
               subtitleLabels[language] = asset.label || language;
+              if (asset.subtitleFormat === 'json') subtitleFormats[language] = { format: 'json', key: asset.jsonLanguage };
             });
             const testAsset = assets.find(asset => asset.type === 'test-link' && asset.url);
             if (testAsset) videoTestLinks[legacyId] = testAsset.url;
@@ -4612,6 +4669,8 @@
               videoUrl: videoAsset.url,
               subtitles,
               subtitleLabels,
+              subtitleFormats,
+              defaultSubtitleLanguage: node.defaultSubtitleLanguage,
               subtitlePosition: node.subtitlePosition || 'top',
               subMode: node.subtitleMode || 'multiLang'
             });
@@ -4685,6 +4744,7 @@
       const customDocumentControls = isDocumentSection && String(node.legacyId || '').startsWith('custom-doc-')
         ? '<button type="button" class="material-mini-btn" data-delete-custom-document="' + escapeHtml(nodePath) + '">删除材料</button>'
         : '';
+      const jsonSubtitleButton = parentPath.includes('/section:videos') ? '<button type="button" class="material-mini-btn" data-video-subtitle-json="' + escapeHtml(nodePath) + '">JSON字幕链接</button>' : '';
       const customVideoControls = parentPath.includes('/section:videos') && String(node.legacyId || '').startsWith('custom-')
         ? '<button type="button" class="material-mini-btn" data-replace-custom-video="' + escapeHtml(nodePath) + '">更换视频</button>' +
           '<button type="button" class="material-mini-btn" data-delete-custom-video="' + escapeHtml(nodePath) + '">删除视频</button>'
@@ -4694,7 +4754,7 @@
         objectMap.set(assetPath, { object: asset, field: 'label' });
         siblingMap.set(assetPath, assets);
         const subtitleActions = asset.type === 'subtitle'
-          ? '<button type="button" class="material-mini-btn" data-replace-srt-node="' + escapeHtml(nodePath) + '" data-replace-srt-language="' + escapeHtml(asset.language || '') + '">替换</button>' +
+          ? '<button type="button" class="material-mini-btn" data-replace-srt-node="' + escapeHtml(nodePath) + '" data-replace-srt-language="' + escapeHtml(asset.language || '') + '">替换为SRT</button>' +
             '<button type="button" class="material-mini-btn" data-delete-subtitle="' + escapeHtml(assetPath) + '" data-delete-subtitle-node="' + escapeHtml(nodePath) + '">删除</button>'
           : '';
         const documentActions = asset.type === 'document'
@@ -4704,13 +4764,13 @@
         return (
         '<div class="material-asset"><span class="material-asset-icon">' + getMaterialAssetIcon(asset.type) + '</span>' +
         '<span>' + escapeHtml(asset.label || asset.language || '文件') + '</span>' +
-        '<span class="material-tree-badge">' + escapeHtml(asset.type || 'file') + '</span>' +
+        '<span class="material-tree-badge">' + escapeHtml(asset.subtitleFormat === 'json' ? 'JSON · ' + asset.language : (asset.type || 'file')) + '</span>' +
         renderMaterialEditControls(assetPath, assetIndex, assets.length) + subtitleActions + documentActions + '</div>'
         );
       }).join('');
       if (!assetHtml) assetHtml = '<div class="material-empty">该材料暂无关联文件</div>';
       return '<details data-tree-key="' + escapeHtml(nodePath) + '"><summary><span class="material-node-title">📌 ' + escapeHtml(node.title) + '</span>' +
-        '<span class="material-tree-badge">' + assets.length + ' 个文件</span>' + controls + uploadSubtitleButton + customVideoControls + addDocumentButton + customDocumentControls + '</summary>' + assetHtml + '</details>';
+        '<span class="material-tree-badge">' + assets.length + ' 个文件/语种</span>' + controls + uploadSubtitleButton + jsonSubtitleButton + customVideoControls + addDocumentButton + customDocumentControls + '</summary>' + assetHtml + '</details>';
     }).join('');
   }
 
@@ -4761,6 +4821,11 @@
 
   function bindMaterialFileTree(container, objectMap, siblingMap, rerender, onRegisterVideo, onUploadSubtitle, onReplaceSubtitle, onReplaceVideo, onDeleteMaterial, documentHandlers) {
     documentHandlers = documentHandlers || {};
+    container.querySelectorAll('[data-video-subtitle-json]').forEach(button => button.addEventListener('click', event => {
+      event.preventDefault(); event.stopPropagation();
+      const entry = objectMap.get(button.getAttribute('data-video-subtitle-json'));
+      if (entry && documentHandlers.subtitleJson) documentHandlers.subtitleJson(entry.object);
+    }));
     container.querySelectorAll('[data-register-cos-video]').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();
@@ -5483,6 +5548,9 @@
             }
           });
         }, {
+          subtitleJson: resource => openSubtitleJsonDialog(resource, adminMaterialsCatalog, payload => {
+            adminMaterialsCatalog = payload.catalog; renderCatalogViews();
+          }),
           register: (chapterId, sectionId) => {
             const chapters = Array.isArray(adminMaterialsCatalog.chapters) ? adminMaterialsCatalog.chapters : [];
             const chapter = chapters.find(item => String(item.id) === String(chapterId));
@@ -6785,13 +6853,19 @@
           body.insertBefore(quizStatus, quizCard);
         }
 
+        let subtitleRequestSerial = 0;
+        let activeSubtitleXhr = null;
+        const subtitleJsonCache = new Map();
         function loadSubtitlesFor(langCode) {
+          const serial = ++subtitleRequestSerial;
+          if (activeSubtitleXhr) { activeSubtitleXhr.abort(); activeSubtitleXhr = null; }
+          currentCues = []; lastActiveIndex = -1;
           const url = meta.subtitles[langCode];
           const label = langSelect.options[langSelect.selectedIndex]?.textContent || langCode;
           if (!url || url === '#') {
             currentCues = [];
             lastActiveIndex = -1;
-            subtitleOverlay.innerHTML = `<span style="font-size:0.8em;opacity:0.85;">No subtitles for ${label}</span>`;
+            subtitleOverlay.textContent = `No subtitles for ${label}`;
             subtitleStatus.textContent = `无字幕可用: ${label}`;
             subtitleStatus.className = 'subtitle-status subtitle-error';
             return;
@@ -6799,12 +6873,45 @@
           subtitleOverlay.innerHTML = '<span style="font-size:0.8em;opacity:0.85;">Loading subtitles...</span>';
           subtitleStatus.textContent = `正在加载字幕: ${label}`;
           subtitleStatus.className = 'subtitle-status subtitle-loading';
+          const source = meta.subtitleFormats && meta.subtitleFormats[langCode];
+          if (source && source.format === 'json') {
+            if (!subtitleJsonCache.has(url)) {
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 15000);
+              const request = fetch(url, { cache: 'no-store', credentials: 'omit', signal: controller.signal })
+                .then(async response => {
+                  if (!response.ok) throw new Error('HTTP ' + response.status);
+                  const text = await response.text();
+                  if (new TextEncoder().encode(text).length > 5 * 1024 * 1024) throw new Error('字幕JSON超过5MB');
+                  return window.CCMSubtitleJson.parse(text);
+                }).catch(error => { subtitleJsonCache.delete(url); throw error; }).finally(() => clearTimeout(timeout));
+              subtitleJsonCache.set(url, request);
+            }
+            subtitleJsonCache.get(url).then(bundle => {
+              if (serial !== subtitleRequestSerial || !subtitleStatus.isConnected) return;
+              const language = bundle.languages.find(item => item.code === window.CCMSubtitleJson.languageCode(langCode));
+              if (!language) throw new Error('JSON缺少该语种，请管理员重新验证链接 / Language missing');
+              currentCues = language.cues.map(cue => ({ ...cue, plainText: true }));
+              subtitleOverlay.textContent = '';
+              subtitleStatus.textContent = `字幕加载成功: ${label} (${currentCues.length} 条字幕 · JSON)`;
+              subtitleStatus.className = 'subtitle-status subtitle-success';
+              updateSubtitle();
+            }).catch(error => {
+              if (serial !== subtitleRequestSerial || !subtitleStatus.isConnected) return;
+              subtitleOverlay.textContent = '';
+              subtitleStatus.textContent = '字幕JSON加载失败 / Failed: ' + error.message;
+              subtitleStatus.className = 'subtitle-status subtitle-error';
+            });
+            return;
+          }
           
           const xhr = new XMLHttpRequest();
+          activeSubtitleXhr = xhr;
           xhr.open('GET', url, true);
           xhr.withCredentials = false;
           
           xhr.onload = function() {
+            if (serial !== subtitleRequestSerial || !subtitleStatus.isConnected) return;
             if (xhr.status === 200) {
               const txt = xhr.responseText;
               if (!txt || txt.trim() === '') {
@@ -6831,6 +6938,7 @@
           };
           
           xhr.onerror = function() {
+            if (serial !== subtitleRequestSerial || !subtitleStatus.isConnected) return;
             subtitleStatus.textContent = `网络错误，无法加载字幕: ${label}`;
             subtitleStatus.className = 'subtitle-status subtitle-error';
             console.error('字幕网络错误:', url);
@@ -6847,6 +6955,7 @@
           
           xhr.timeout = 10000;
           xhr.ontimeout = function() {
+            if (serial !== subtitleRequestSerial || !subtitleStatus.isConnected) return;
             subtitleStatus.textContent = `字幕加载超时: ${label}`;
             subtitleStatus.className = 'subtitle-status subtitle-error';
           };
@@ -6906,7 +7015,8 @@
 
           if (cue) {
             lastActiveIndex = idx;
-            subtitleOverlay.innerHTML = cue.text;
+            if (cue.plainText) subtitleOverlay.textContent = cue.text;
+            else subtitleOverlay.innerHTML = cue.text;
           } else {
             lastActiveIndex = -1;
             subtitleOverlay.textContent = '';
@@ -7135,6 +7245,7 @@
           loadSubtitlesFor(currentLang);
         });
 
+        if (meta.defaultSubtitleLanguage && Array.from(langSelect.options).some(option => option.value === meta.defaultSubtitleLanguage)) langSelect.value = meta.defaultSubtitleLanguage;
         if (!langSelect.value && langSelect.options.length > 0) {
           langSelect.value = langSelect.options[0].value;
         }
