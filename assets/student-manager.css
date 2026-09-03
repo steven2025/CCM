@@ -3,7 +3,17 @@
 .student-manager .sm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
 .student-manager button, .student-manager .sm-download { border:1px solid #47617a; border-radius:8px; background:#183349; color:#dff9ff; padding:7px 10px; cursor:pointer; font:inherit; }
 .student-manager button:disabled { opacity:.5; cursor:not-allowed; }
-.student-manager input { background:#101d30; border:1px solid #47617a; color:#f1f5f9; border-radius:7px; padding:8px; min-width:0; font:inherit; }
+.student-manager input,.student-manager select { background:#101d30; border:1px solid #47617a; color:#f1f5f9; border-radius:7px; padding:8px; min-width:0; font:inherit; }
+.student-manager .sm-class-layout { display:grid; grid-template-columns:190px minmax(0,1fr); gap:16px; align-items:start; }
+.student-manager .sm-classes { display:flex; flex-direction:column; gap:7px; max-height:560px; overflow:auto; }
+.student-manager .sm-class-content { min-width:0; }
+.student-manager .sm-class-button { text-align:left; white-space:normal; overflow-wrap:anywhere; padding:11px; background:#142338; }
+.student-manager .sm-class-button span,.student-manager .sm-class-button small { display:block; }
+.student-manager .sm-class-button small { color:#a9bbce; margin-top:5px; }
+.student-manager .sm-class-button.active { border-color:#38bdf8; background:#16465b; box-shadow:inset 3px 0 #38bdf8; }
+.student-manager input[type="checkbox"] { width:17px; height:17px; padding:0; accent-color:#38bdf8; }
+.student-manager [data-class-heading] h3 { margin:0 0 8px; overflow-wrap:anywhere; }
+.student-manager [data-transfer-target] { max-width:260px; }
 .student-manager .sm-search { flex:1; min-width:160px; }
 .student-manager .sm-table { overflow:auto; max-height:430px; }
 .student-manager table { width:100%; border-collapse:collapse; }
@@ -20,4 +30,4 @@
 .student-manager label { display:flex; flex-direction:column; gap:5px; }
 .student-manager textarea { width:100%; min-height:200px; background:#101d30; color:#f1f5f9; padding:10px; }
 .student-manager [hidden] { display:none !important; }
-@media(max-width:720px) { .settings-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); } .student-manager .sm-fields { grid-template-columns:1fr; } }
+@media(max-width:720px) { .settings-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); } .student-manager .sm-fields,.student-manager .sm-class-layout { grid-template-columns:1fr; } .student-manager .sm-classes { max-height:210px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } }
