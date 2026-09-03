@@ -12,8 +12,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
   <link rel="stylesheet" href="./assets/pwa.css">
   <script src="./assets/pwa.js" defer></script>
-  <link rel="stylesheet" href="./assets/student-manager.css">
-  <script src="./assets/student-manager.js" defer></script>
+  <link rel="stylesheet" href="./assets/student-manager.css?v=29">
+  <script src="./assets/student-manager.js?v=29" defer></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -1880,7 +1880,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-09-03-v28';
+  const PLATFORM_VERSION = 'frontend-2026-09-03-v29';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3481,7 +3481,7 @@
     return Array.isArray(payload.attempts) ? payload.attempts : [];
   }
 
-  async function loadAnalyticsDashboard(days) {
+  async function loadAnalyticsDashboard(days, classId = '*') {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
     const resp = await fetch(TEACHER_SETTINGS_API_URL, {
@@ -3491,7 +3491,8 @@
         action: 'get-analytics',
         id: auth.id || '',
         inviteCode,
-        days
+        days,
+        classId
       })
     });
     const payload = await resp.json().catch(() => null);
@@ -3593,13 +3594,13 @@
           return '<td>' + (answer ? escapeHtml(String(answer.earned)) : '—') + '</td>';
         }).join('');
         const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) : 0;
-        return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + escapeHtml(student.name || '') + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
+        return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + escapeHtml(student.name || '') + '</td><td>' + escapeHtml(student.className || '未分班 / Unassigned') + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
           '</td><td>' + student.score + ' / ' + student.totalPoints + '</td><td>' + percent + '%</td>' + cells +
           '<td>' + escapeHtml(student.lastAnsweredAt ? new Date(student.lastAnsweredAt).toLocaleString() : '—') + '</td></tr>';
-      }).join('') || '<tr><td colspan="' + (6 + item.questions.length) + '">暂无学生答题数据</td></tr>';
+      }).join('') || '<tr><td colspan="' + (7 + item.questions.length) + '">暂无学生答题数据</td></tr>';
       return '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(item.report.title || item.report.quizId) +
         '（' + item.participants.length + ' 人） <button type="button" class="btn-ghost" data-quiz-download="' + item.reportIndex + '">下载 CSV</button></div>' +
-        '<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名 / Name</th><th>完成度</th><th>总分</th><th>得分率</th>' +
+        '<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名 / Name</th><th>班级 / Class</th><th>完成度</th><th>总分</th><th>得分率</th>' +
         questionHeaders + '<th>最后作答</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
     }).join('') || '<div class="analytics-empty">暂无测试数据</div>';
 
@@ -3699,11 +3700,11 @@
     const questions = Array.isArray(report.questions) ? report.questions : [];
     const participants = Array.isArray(report.participants) ? report.participants : [];
     const csvCell = value => { let text = String(value == null ? '' : value); if (/^[\s]*[=+@-]/.test(text)) text = "'" + text; return '"' + text.replace(/"/g, '""') + '"'; };
-    const header = ['测试', '学号', '姓名 / Name', '完成题数', '总题数', '得分', '总分', '正确率']
+    const header = ['测试', '学号', '姓名 / Name', '班级 / Class', '完成题数', '总题数', '得分', '总分', '正确率']
       .concat(questions.map(question => question.label || question.id), ['最后作答时间']);
     const rows = participants.map(student => {
       const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) + '%' : '0%';
-      return [report.title || report.quizId, student.id, student.name || '', student.answered, student.totalQuestions, student.score, student.totalPoints, percent]
+      return [report.title || report.quizId, student.id, student.name || '', student.className || '未分班 / Unassigned', student.answered, student.totalQuestions, student.score, student.totalPoints, percent]
         .concat(questions.map(question => {
           const answer = student.answers && student.answers[question.id];
           return answer ? answer.earned : '';
@@ -5324,7 +5325,9 @@
       '</section>' +
       '<section class="settings-tab-panel" data-settings-panel="analytics">' +
         '<div class="analytics-toolbar"><select id="analytics-days"><option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option><option value="90">最近 90 天</option></select>' +
+        '<select id="analytics-class" aria-label="看板班级 / Dashboard class"><option value="*">全部班级 / All classes</option></select>' +
         '<button type="button" class="btn-ghost" id="analytics-refresh">刷新看板</button></div>' +
+        '<p class="material-tree-note">按学生当前所属班级统计；转班后，历史记录随学生归入新班。成绩下载遵循当前班级筛选。 / Reports follow current class membership.</p>' +
         '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
       '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>';
 
@@ -5351,24 +5354,33 @@
     });
     const analyticsContainer = body.querySelector('#analytics-dashboard');
     const analyticsDays = body.querySelector('#analytics-days');
+    const analyticsClass = body.querySelector('#analytics-class');
     const analyticsRefresh = body.querySelector('#analytics-refresh');
     let analyticsLoaded = false;
     const refreshAnalytics = async () => {
       if (!analyticsContainer || !analyticsRefresh) return;
       analyticsRefresh.disabled = true;
+      analyticsDays.disabled = true;
+      analyticsClass.disabled = true;
       analyticsContainer.innerHTML = '<div class="login-status-line">正在读取用户行为数据...</div>';
       try {
-        const payload = await loadAnalyticsDashboard(Number(analyticsDays && analyticsDays.value || 30));
+        const payload = await loadAnalyticsDashboard(Number(analyticsDays && analyticsDays.value || 30), analyticsClass.value);
+        if (!Array.isArray(payload.classes)) throw new Error('班级看板需要云函数 v22，请先部署 / Deploy cloud function v22 first');
+        analyticsClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + payload.classes.map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + (item.archived ? ' · 已归档 / Archived' : '') + '</option>').join('');
+        analyticsClass.value = payload.classId;
         renderAnalyticsDashboard(analyticsContainer, payload);
         analyticsLoaded = true;
       } catch (err) {
         analyticsContainer.innerHTML = '<div class="login-status-line error">行为看板读取失败：' + escapeHtml(err.message) + '</div>';
       } finally {
         analyticsRefresh.disabled = false;
+        analyticsDays.disabled = false;
+        analyticsClass.disabled = false;
       }
     };
     if (analyticsRefresh) analyticsRefresh.addEventListener('click', refreshAnalytics);
     if (analyticsDays) analyticsDays.addEventListener('change', refreshAnalytics);
+    if (analyticsClass) analyticsClass.addEventListener('change', refreshAnalytics);
     let studentManager = null;
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -5389,6 +5401,7 @@
             });
             const payload = await response.json();
             if (!response.ok || !payload.ok) throw new Error(payload.message || '操作失败 / Request failed');
+            if (action !== 'students-list') analyticsLoaded = false;
             return payload;
           });
         }
