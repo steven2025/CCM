@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <title>跨文化管理课程多语言学习支持系统-学生端 · Cross-cultural Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#02132f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CCM 跨文化">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/pwa/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
+  <link rel="stylesheet" href="./assets/pwa.css">
+  <script src="./assets/pwa.js" defer></script>
+  <link rel="stylesheet" href="./assets/student-manager.css">
+  <script src="./assets/student-manager.js" defer></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -90,6 +100,33 @@
       border-color: rgba(254,202,202,0.75);
       background: rgba(153,27,27,0.44);
     }
+    .scenario-agent-launcher {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: 38px;
+      height: 36px;
+      padding: 4px 7px;
+      overflow: hidden;
+      white-space: nowrap;
+      border-radius: 999px;
+      border: 1px solid rgba(45,212,191,0.38);
+      color: #ecfeff;
+      background: linear-gradient(135deg, rgba(8,47,73,0.92), rgba(15,118,110,0.72));
+      box-shadow: 0 6px 18px rgba(6,78,59,0.24), inset 0 1px 0 rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: width 0.2s ease, transform 0.16s ease, border-color 0.16s ease;
+    }
+    .scenario-agent-launcher.active { display: inline-flex; }
+    .scenario-agent-launcher:hover,
+    .scenario-agent-launcher:focus-visible {
+      width: 188px;
+      transform: translateY(-1px);
+      border-color: rgba(103,232,249,0.72);
+      outline: none;
+    }
+    .scenario-agent-launcher svg { width: 24px; height: 24px; flex: 0 0 24px; }
+    .scenario-agent-launcher span { font-size: 0.76rem; font-weight: 700; }
 
     main.main-layout {
       flex: 1;
@@ -289,7 +326,7 @@
     }
     .settings-tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 6px;
       position: sticky;
       top: 0;
@@ -906,6 +943,161 @@
     .floating-window.minimized .floating-footer {
       display: none;
     }
+    .scenario-agent-window {
+      width: min(920px, 94vw);
+      height: min(700px, 82vh);
+      min-width: min(620px, 92vw);
+      min-height: 430px;
+      max-width: 96vw;
+      max-height: 92vh;
+      border-color: rgba(45,212,191,0.28);
+    }
+    .scenario-agent-window .floating-header {
+      background: linear-gradient(90deg, rgba(8,47,73,0.98), rgba(15,118,110,0.7), rgba(30,41,59,0.92));
+    }
+    .scenario-agent-body { padding: 0; overflow: auto; scrollbar-color: rgba(45,212,191,0.55) rgba(15,23,42,0.5); }
+    .scenario-agent-shell { min-width: 0; padding: 12px; }
+    .scenario-prototype-banner {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 11px;
+      margin-bottom: 10px;
+      border-radius: 11px;
+      border: 1px solid rgba(56,189,248,0.2);
+      background: linear-gradient(135deg, rgba(14,116,144,0.16), rgba(15,23,42,0.5));
+      color: #cbd5e1;
+    }
+    .scenario-prototype-banner strong { color: #cffafe; }
+    .scenario-prototype-badge {
+      flex: 0 0 auto;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.35);
+      color: #fde68a;
+      font-size: 0.68rem;
+    }
+    .scenario-primary-nav,
+    .scenario-secondary-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 7px; scrollbar-width: thin; }
+    .scenario-primary-nav { position: sticky; top: 0; z-index: 5; padding-top: 2px; background: rgba(15,23,42,0.96); }
+    .scenario-primary-btn,
+    .scenario-secondary-btn {
+      flex: 0 0 auto;
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.18);
+      color: #cbd5e1;
+      background: rgba(30,41,59,0.7);
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+    .scenario-primary-btn { padding: 9px 13px; font-weight: 700; }
+    .scenario-secondary-btn { padding: 7px 11px; font-size: 0.74rem; }
+    .scenario-primary-btn:hover,
+    .scenario-secondary-btn:hover { color: #fff; border-color: rgba(94,234,212,0.5); }
+    .scenario-primary-btn.active,
+    .scenario-secondary-btn.active {
+      color: #fff;
+      border-color: rgba(94,234,212,0.58);
+      background: linear-gradient(135deg, rgba(8,145,178,0.82), rgba(13,148,136,0.78));
+      box-shadow: 0 5px 14px rgba(13,148,136,0.18);
+    }
+    .scenario-primary-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+    .scenario-workspace {
+      min-height: 440px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.14);
+      background: radial-gradient(circle at 90% 0, rgba(45,212,191,0.09), transparent 34%), rgba(15,23,42,0.5);
+    }
+    .scenario-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .scenario-title-row h3 { color: #f8fafc; font-size: 1rem; }
+    .scenario-title-row p { margin-top: 3px; color: #94a3b8; font-size: 0.74rem; }
+    .scenario-language-controls { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .scenario-language-controls select {
+      padding: 5px 7px;
+      border-radius: 8px;
+      background: #172033;
+      border: 1px solid rgba(103,232,249,0.22);
+      color: #e2e8f0;
+      font-size: 0.7rem;
+    }
+    .scenario-progress { display: grid; grid-template-columns: repeat(6, minmax(90px, 1fr)); gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+    .scenario-progress-step {
+      min-width: 90px;
+      padding: 7px 6px;
+      border-radius: 9px;
+      text-align: center;
+      color: #94a3b8;
+      background: rgba(30,41,59,0.58);
+      border: 1px solid rgba(148,163,184,0.12);
+      font-size: 0.67rem;
+    }
+    .scenario-progress-step.active { color: #ccfbf1; border-color: rgba(45,212,191,0.4); background: rgba(13,148,136,0.17); }
+    .scenario-content-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 12px; }
+    .scenario-people-panel,
+    .scenario-meeting-panel {
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.13);
+      background: rgba(15,23,42,0.58);
+      padding: 10px;
+    }
+    .scenario-panel-label { margin-bottom: 8px; color: #bfdbfe; font-size: 0.72rem; font-weight: 700; }
+    .scenario-person { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid rgba(148,163,184,0.09); }
+    .scenario-avatar {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.18);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.28);
+    }
+    .scenario-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .scenario-person strong { display: block; color: #e2e8f0; font-size: 0.72rem; }
+    .scenario-person small { color: #94a3b8; font-size: 0.64rem; line-height: 1.25; }
+    .scenario-avatar-actions { display: grid; gap: 5px; margin-top: 10px; }
+    .scenario-avatar-actions button { width: 100%; }
+    .scenario-meeting-log { display: grid; gap: 8px; max-height: 235px; overflow-y: auto; padding-right: 4px; }
+    .scenario-message { padding: 8px 10px; border-radius: 10px; background: rgba(30,41,59,0.68); border-left: 3px solid #38bdf8; }
+    .scenario-message.local { border-left-color: #2dd4bf; }
+    .scenario-message.student { border-left-color: #a78bfa; background: rgba(76,29,149,0.16); }
+    .scenario-message strong { display: block; color: #dbeafe; font-size: 0.7rem; margin-bottom: 2px; }
+    .scenario-message p { color: #cbd5e1; font-size: 0.72rem; line-height: 1.45; }
+    .scenario-compose { display: grid; grid-template-columns: 1fr auto; gap: 7px; margin-top: 9px; }
+    .scenario-compose textarea {
+      min-height: 62px;
+      resize: vertical;
+      padding: 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.18);
+      color: #e2e8f0;
+      background: rgba(15,23,42,0.76);
+    }
+    .scenario-placeholder {
+      min-height: 330px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      color: #94a3b8;
+      border: 1px dashed rgba(148,163,184,0.2);
+      border-radius: 12px;
+    }
+    @media (max-width: 720px) {
+      .scenario-agent-launcher:hover,
+      .scenario-agent-launcher:focus-visible { width: 38px; }
+      .scenario-agent-window { min-width: 310px; width: 94vw; }
+      .scenario-title-row { flex-direction: column; }
+      .scenario-language-controls { justify-content: flex-start; }
+      .scenario-content-grid { grid-template-columns: 1fr; }
+      .scenario-people-panel { max-height: 190px; overflow-y: auto; }
+    }
 
 
     .about-apps-grid {
@@ -1419,8 +1611,26 @@
     程序开发/授课教师：重庆工商大学 鄢清华 副教授 · Program Developing / Instructor: Prof. Yan Qinghua, Chongqing Technology and Business University
   </h2>
   <div class="header-clock" id="headerClock" aria-live="polite">Loading time...</div>
+  <div class="pwa-install-row"><button id="pwaInstallButton" type="button" hidden><img src="./assets/icons/pwa/icon-192.png" alt="" width="24" height="24"><span>安装应用 / Install app</span></button></div>
   <div class="header-auth" id="headerAuth" aria-live="polite">
     <span class="header-user-info" id="headerUserInfo"></span>
+    <button class="scenario-agent-launcher" id="scenarioAgentLauncher" type="button"
+            title="跨文化情景智能体 / Intercultural Scenario Agent"
+            aria-label="打开跨文化情景智能体">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <defs>
+          <linearGradient id="scenarioAgentIconGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#67e8f9"/>
+            <stop offset="1" stop-color="#2dd4bf"/>
+          </linearGradient>
+        </defs>
+        <circle cx="22" cy="22" r="14" fill="none" stroke="url(#scenarioAgentIconGradient)" stroke-width="2.5"/>
+        <path d="M8 22h28M22 8c5 5 7 10 7 14s-2 9-7 14c-5-5-7-10-7-14s2-9 7-14Z" fill="none" stroke="url(#scenarioAgentIconGradient)" stroke-width="2"/>
+        <path d="M29 29h12v9h-5l-4 4v-4h-3Z" fill="#0f172a" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="33" cy="33.5" r="1" fill="#fbbf24"/><circle cx="36.5" cy="33.5" r="1" fill="#fbbf24"/><circle cx="40" cy="33.5" r="1" fill="#fbbf24"/>
+      </svg>
+      <span>跨文化情景智能体</span>
+    </button>
     <button class="header-logout-btn" id="headerLogoutBtn" type="button">退出登录 / Log out</button>
   </div>
 </header>
@@ -1607,8 +1817,8 @@
       <input id="inviteCode" type="text" autocomplete="off" placeholder="请输入邀请码 / Enter invitation code">
     </div>
     <div class="login-field">
-      <label for="studentName">姓名 · Name</label>
-      <input id="studentName" type="text" autocomplete="name" placeholder="请输入姓名 / Enter your name">
+      <label for="studentName">学生学号 / 管理员账号 · Student ID / Admin ID</label>
+      <input id="studentName" type="text" autocomplete="username" placeholder="学生填学号，管理员填原账号 / Student ID or admin account">
     </div>
     <div class="login-actions">
       <span class="login-status-line" id="loginStatusLine"></span>
@@ -1632,6 +1842,7 @@
   const headerClock = document.getElementById('headerClock');
   const headerAuth = document.getElementById('headerAuth');
   const headerUserInfo = document.getElementById('headerUserInfo');
+  const scenarioAgentLauncher = document.getElementById('scenarioAgentLauncher');
   const headerLogoutBtn = document.getElementById('headerLogoutBtn');
   const loginOverlay = document.getElementById('loginOverlay');
   const inviteCodeInput = document.getElementById('inviteCode');
@@ -1669,8 +1880,8 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-07-14-v25';
-  const AUTH_STORAGE_KEY = 'ccm_auth_user';
+  const PLATFORM_VERSION = 'frontend-2026-09-03-v28';
+  const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
   const chapterTitleMain = document.getElementById('chapter-title-main');
@@ -3213,13 +3424,13 @@
   function trackPlatformEvent(eventType, details) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
-    if (!auth.name || !inviteCode) return;
+    if (!auth.id || !inviteCode) return;
     fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'track-event',
-        id: auth.name,
+        id: auth.id,
         inviteCode,
         eventType,
         ...(details || {})
@@ -3235,7 +3446,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'submit-quiz-answer',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         quizId,
         checkpointId,
@@ -3252,13 +3463,13 @@
   async function loadCloudQuizProgress(quizId) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
-    if (!auth.name || !inviteCode) return [];
+    if (!auth.id || !inviteCode) return [];
     const resp = await fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'get-quiz-progress',
-        id: auth.name,
+        id: auth.id,
         inviteCode,
         quizId
       })
@@ -3278,7 +3489,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'get-analytics',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         days
       })
@@ -3371,7 +3582,7 @@
         '<div class="analytics-panel"><div class="analytics-panel-title">各测试完成率</div><div class="analytics-ring-grid">' + rings + '</div></div>' +
         '<div class="analytics-panel"><div class="analytics-panel-title">成绩分布（测试人次）</div>' + renderBars(distributionBars) + '</div>' +
         '<div class="analytics-panel"><div class="analytics-panel-title">指标口径</div><div class="analytics-source-note">平均累计得分率：学生当前累计得分 ÷ 测试满分；未完成测试仍计入。<br>已答题正确率：所有已提交题目中回答正确的比例。<br>完成率：已回答该测试全部题目的参与人数比例。</div></div>' +
-        '</div><div class="analytics-source-note">数据源：腾讯云 COS system/quiz-results/。统计学生首次提交答案，排除教师试答；测试成绩为全部历史记录。</div>';
+        '</div><div class="analytics-source-note">数据源：腾讯云 COS system/quiz-results-students-v1/。按学号统计学生首次提交答案，排除教师试答；不混入旧测试账号记录。</div>';
     };
 
     const renderResults = () => reportStats.map(item => {
@@ -3382,13 +3593,13 @@
           return '<td>' + (answer ? escapeHtml(String(answer.earned)) : '—') + '</td>';
         }).join('');
         const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) : 0;
-        return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
+        return '<tr><td>' + escapeHtml(student.id) + '</td><td>' + escapeHtml(student.name || '') + '</td><td>' + student.answered + ' / ' + student.totalQuestions +
           '</td><td>' + student.score + ' / ' + student.totalPoints + '</td><td>' + percent + '%</td>' + cells +
           '<td>' + escapeHtml(student.lastAnsweredAt ? new Date(student.lastAnsweredAt).toLocaleString() : '—') + '</td></tr>';
-      }).join('') || '<tr><td colspan="' + (5 + item.questions.length) + '">暂无学生答题数据</td></tr>';
+      }).join('') || '<tr><td colspan="' + (6 + item.questions.length) + '">暂无学生答题数据</td></tr>';
       return '<div class="settings-section"><div class="settings-section-title">' + escapeHtml(item.report.title || item.report.quizId) +
         '（' + item.participants.length + ' 人） <button type="button" class="btn-ghost" data-quiz-download="' + item.reportIndex + '">下载 CSV</button></div>' +
-        '<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学生 ID</th><th>完成度</th><th>总分</th><th>得分率</th>' +
+        '<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名 / Name</th><th>完成度</th><th>总分</th><th>得分率</th>' +
         questionHeaders + '<th>最后作答</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
     }).join('') || '<div class="analytics-empty">暂无测试数据</div>';
 
@@ -3487,12 +3698,12 @@
   function downloadQuizReportCsv(report) {
     const questions = Array.isArray(report.questions) ? report.questions : [];
     const participants = Array.isArray(report.participants) ? report.participants : [];
-    const csvCell = value => '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
-    const header = ['测试', '学生ID', '完成题数', '总题数', '得分', '总分', '正确率']
+    const csvCell = value => { let text = String(value == null ? '' : value); if (/^[\s]*[=+@-]/.test(text)) text = "'" + text; return '"' + text.replace(/"/g, '""') + '"'; };
+    const header = ['测试', '学号', '姓名 / Name', '完成题数', '总题数', '得分', '总分', '正确率']
       .concat(questions.map(question => question.label || question.id), ['最后作答时间']);
     const rows = participants.map(student => {
       const percent = student.totalPoints ? Math.round(student.score / student.totalPoints * 100) + '%' : '0%';
-      return [report.title || report.quizId, student.id, student.answered, student.totalQuestions, student.score, student.totalPoints, percent]
+      return [report.title || report.quizId, student.id, student.name || '', student.answered, student.totalQuestions, student.score, student.totalPoints, percent]
         .concat(questions.map(question => {
           const answer = student.answers && student.answers[question.id];
           return answer ? answer.earned : '';
@@ -3591,7 +3802,7 @@
   async function saveCloudAccessSettings(settings) {
     if (!TEACHER_SETTINGS_API_URL) return null;
     const auth = getCurrentAuth();
-    const teacherName = auth.name || localStorage.getItem('ccm_student_name') || '';
+    const teacherName = auth.id || '';
     const teacherCode = localStorage.getItem('ccm_invite_code') || '';
     const resp = await fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
@@ -3702,9 +3913,10 @@
     const auth = getCurrentAuth();
     const loggedIn = auth && (auth.role === 'student' || auth.role === 'teacher');
     if (headerAuth) headerAuth.classList.toggle('active', !!loggedIn);
+    if (scenarioAgentLauncher) scenarioAgentLauncher.classList.toggle('active', !!loggedIn);
     if (headerUserInfo) {
       headerUserInfo.textContent = loggedIn
-        ? ('👤 ' + (auth.name || '') + ' · ' + (auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
+        ? ('👤 ' + (auth.name || '') + (auth.role === 'student' ? ' · ' + auth.id : '') + ' · ' + (auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
         : '';
     }
     mainMenu.querySelectorAll('.card-btn').forEach(btn => {
@@ -3742,7 +3954,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'get-materials-admin',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode
       })
     });
@@ -3761,7 +3973,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'save-materials-catalog',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         catalog
@@ -3784,7 +3996,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'register-video-link',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         ...data
@@ -3868,7 +4080,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'upload-video-subtitle',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         ...data
@@ -3987,7 +4199,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'replace-registered-video',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         resourceId,
@@ -4059,7 +4271,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'remove-video-material',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         ...data
@@ -4098,7 +4310,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'register-document-link',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         ...data
@@ -4215,7 +4427,7 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'remove-document-material',
-        id: auth.name || '',
+        id: auth.id || '',
         inviteCode,
         expectedRevision: Number(catalog && catalog.revision || 0),
         ...data
@@ -4792,6 +5004,266 @@
     });
   }
 
+  function openScenarioAgentPrototype() {
+    const existing = document.querySelector('.floating-window[data-tool="scenario-agent"]');
+    if (existing) {
+      existing.classList.remove('minimized');
+      existing.style.zIndex = ++currentZ;
+      return;
+    }
+    if (!isLoggedIn()) {
+      openLoginDialog();
+      return;
+    }
+
+    const auth = getCurrentAuth();
+    const avatarStorageKey = 'ccm_scenario_avatar_v2_' + encodeURIComponent(auth.id || 'student');
+    let studentAvatar = '';
+    try { studentAvatar = localStorage.getItem(avatarStorageKey) || ''; } catch (e) {}
+
+    const themes = {
+      'team-types': {
+        children: {
+          token: {
+            label: '象征性成员团队', title: '象征性成员团队 · Token-member Team',
+            subtitle: '识别少数文化成员的参与风险，并设计更公平的讨论机制。',
+            people: [
+              ['M', 'Maya', '区域项目经理 / Regional PM', 'linear-gradient(135deg,#0ea5e9,#2563eb)'],
+              ['A', 'Arun', '本地市场顾问 / Local adviser', 'linear-gradient(135deg,#f59e0b,#ef4444)'],
+              ['L', 'Li Wei', '产品负责人 / Product lead', 'linear-gradient(135deg,#10b981,#0f766e)']
+            ],
+            messages: [
+              ['Maya · Facilitator', '团队需要在 20 分钟内确定东南亚市场广告的核心诉求。', ''],
+              ['Arun · Local adviser', 'Before choosing a slogan, we should test whether the family scene feels authentic locally.', 'local']
+            ]
+          },
+          bicultural: {
+            label: '双文化团队', title: '双文化团队 · Bicultural Team',
+            subtitle: '处理两种文化逻辑之间的分歧、联盟与共同决策。',
+            people: [
+              ['C', 'Chen Yu', '中国总部代表 / HQ representative', 'linear-gradient(135deg,#14b8a6,#0f766e)'],
+              ['N', 'Nadia', '东南亚市场负责人 / Market lead', 'linear-gradient(135deg,#8b5cf6,#db2777)'],
+              ['F', 'Farid', '会议协调人 / Facilitator', 'linear-gradient(135deg,#f97316,#ca8a04)']
+            ],
+            messages: [
+              ['Farid · Facilitator', '请双方先分别说明最不能妥协的一项要求，再寻找共同标准。', ''],
+              ['Nadia · Market lead', 'Speed matters, but local consumer testing should be part of the launch decision.', 'local']
+            ]
+          },
+          multicultural: {
+            label: '多文化团队', title: '多文化团队 · Multicultural Team',
+            subtitle: '在多种沟通风格、权力期待与专业背景之间建立协作规则。',
+            people: [
+              ['S', 'Suriya', '泰国创意总监 / Creative director', 'linear-gradient(135deg,#eab308,#f97316)'],
+              ['D', 'Dewi', '印尼招聘经理 / HR manager', 'linear-gradient(135deg,#ec4899,#7c3aed)'],
+              ['Z', 'Zhang Min', '中国项目经理 / Project manager', 'linear-gradient(135deg,#06b6d4,#2563eb)']
+            ],
+            messages: [
+              ['Zhang Min · Project manager', '今天要确定职责分工、反馈方式和发生分歧时的升级路径。', ''],
+              ['Dewi · HR manager', 'Could each member explain what “quick feedback” means in their own work context?', 'local']
+            ]
+          }
+        }
+      },
+      integration: {
+        children: {
+          'geely-volvo': {
+            label: '吉利 × Volvo', title: '吉利并购 Volvo · Integration Decision Lab',
+            subtitle: '观看前半段背景后，作为联合管理团队提出融合方案，再与真实进程对照。',
+            people: [
+              ['G', 'Guo', '吉利整合负责人 / Integration lead', 'linear-gradient(135deg,#ef4444,#f59e0b)'],
+              ['E', 'Erik', 'Volvo 工程代表 / Engineering', 'linear-gradient(135deg,#3b82f6,#1d4ed8)'],
+              ['A', 'Anna', '独立协调人 / Facilitator', 'linear-gradient(135deg,#14b8a6,#0f766e)']
+            ],
+            messages: [
+              ['Anna · Facilitator', '请决定哪些能力需要保持独立，哪些流程适合共享，并说明依据。', ''],
+              ['Erik · Engineering', 'Brand identity and engineering autonomy are central concerns for our team.', 'local']
+            ]
+          },
+          'fuyao-us': {
+            label: '福耀美国工厂', title: '福耀玻璃美国工厂 · Integration Decision Lab',
+            subtitle: '围绕生产效率、劳动关系与管理沟通，形成可执行的跨文化方案。',
+            people: [
+              ['W', 'Wang', '工厂运营经理 / Operations', 'linear-gradient(135deg,#f97316,#dc2626)'],
+              ['J', 'James', '美方班组代表 / Team representative', 'linear-gradient(135deg,#2563eb,#7c3aed)'],
+              ['R', 'Rosa', '人力资源伙伴 / HR partner', 'linear-gradient(135deg,#ec4899,#be185d)']
+            ],
+            messages: [
+              ['Rosa · HR partner', '请先区分制度冲突、文化误读和利益分歧，再提出处理顺序。', ''],
+              ['James · Team representative', 'Workers need a clear channel to raise safety and scheduling concerns.', 'local']
+            ]
+          },
+          'lenovo-ibm': {
+            label: '联想 × IBM', title: '联想并购 IBM PC · Integration Decision Lab',
+            subtitle: '在全球组织中讨论领导、人才保留、品牌与工作方式的融合安排。',
+            people: [
+              ['Y', 'Yang', '全球业务负责人 / Global lead', 'linear-gradient(135deg,#ef4444,#991b1b)'],
+              ['S', 'Susan', '原 IBM 团队代表 / Legacy team', 'linear-gradient(135deg,#6366f1,#4338ca)'],
+              ['K', 'Kenji', '亚太客户负责人 / APAC client lead', 'linear-gradient(135deg,#06b6d4,#047857)']
+            ],
+            messages: [
+              ['Yang · Global lead', '我们的决定既要稳定关键人才，也要让新组织形成共同的行动方式。', ''],
+              ['Susan · Legacy team', 'Employees want to know what will change immediately and what will remain stable.', 'local']
+            ]
+          }
+        }
+      }
+    };
+
+    let activeTheme = 'team-types';
+    let activeCase = 'token';
+    const win = document.createElement('div');
+    win.className = 'floating-window scenario-agent-window';
+    win.setAttribute('data-tool', 'scenario-agent');
+    win.style.zIndex = ++currentZ;
+
+    const header = document.createElement('div');
+    header.className = 'floating-header';
+    header.innerHTML = '<div class="floating-title">🌐 跨文化情景智能体 · Intercultural Scenario Agent</div>' +
+      '<div class="floating-controls"><button class="btn-icon" data-agent-action="minimize" title="缩回 / Collapse">—</button>' +
+      '<button class="btn-icon" data-agent-action="fullscreen" title="全屏 / Full screen">□</button>' +
+      '<button class="btn-icon" data-agent-action="restore" title="恢复 / Restore">↙</button>' +
+      '<button class="btn-icon" data-agent-action="close" title="关闭 / Close">×</button></div>';
+
+    const body = document.createElement('div');
+    body.className = 'floating-body scenario-agent-body';
+    body.innerHTML = '<div class="scenario-agent-shell">' +
+      '<div class="scenario-prototype-banner"><div><strong>跨文化角色对话实验室</strong><br>基于课程案例进行有限目标、有限角色的情景决策。</div><span class="scenario-prototype-badge">FRONTEND PROTOTYPE</span></div>' +
+      '<nav class="scenario-primary-nav" aria-label="智能体主题导航"></nav>' +
+      '<nav class="scenario-secondary-nav" aria-label="案例导航"></nav>' +
+      '<section class="scenario-workspace"></section></div>';
+    const footer = document.createElement('div');
+    footer.className = 'floating-footer';
+    footer.textContent = '原型说明：当前角色回应与案例材料均为界面演示；后续通过 COS 接入背景、前后半段视频与任务配置。';
+    win.appendChild(header);
+    win.appendChild(body);
+    win.appendChild(footer);
+    document.body.appendChild(win);
+
+    const primaryNav = body.querySelector('.scenario-primary-nav');
+    const secondaryNav = body.querySelector('.scenario-secondary-nav');
+    const workspace = body.querySelector('.scenario-workspace');
+
+    function renderAvatar() {
+      return studentAvatar ? '<img src="' + studentAvatar + '" alt="学生头像">' : escapeHtml((auth.name || 'S').trim().slice(0, 1).toUpperCase() || 'S');
+    }
+
+    function renderScenario() {
+      primaryNav.innerHTML = [
+        ['team-types', 'A · 跨文化团队类型', false], ['integration', 'B · 跨文化融合', false],
+        ['topic-c', 'C · 待建设', true], ['topic-d', 'D · 待建设', true], ['topic-e', 'E · 待建设', true]
+      ].map(item => '<button class="scenario-primary-btn' + (activeTheme === item[0] ? ' active' : '') + '" data-theme="' + item[0] + '"' + (item[2] ? ' disabled title="等待后续课程内容"' : '') + '>' + item[1] + '</button>').join('');
+      const theme = themes[activeTheme];
+      const caseKeys = Object.keys(theme.children);
+      if (!theme.children[activeCase]) activeCase = caseKeys[0];
+      secondaryNav.innerHTML = caseKeys.map(key => '<button class="scenario-secondary-btn' + (activeCase === key ? ' active' : '') + '" data-case="' + key + '">' + escapeHtml(theme.children[key].label) + '</button>').join('');
+      const item = theme.children[activeCase];
+      const peopleHtml = item.people.map(person => '<div class="scenario-person"><div class="scenario-avatar" style="background:' + person[3] + '">' + person[0] + '</div><div><strong>' + escapeHtml(person[1]) + '</strong><small>' + escapeHtml(person[2]) + '</small></div></div>').join('');
+      const messagesHtml = item.messages.map(message => '<div class="scenario-message ' + message[2] + '"><strong>' + escapeHtml(message[0]) + '</strong><p>' + escapeHtml(message[1]) + '</p></div>').join('');
+      workspace.innerHTML = '<div class="scenario-title-row"><div><h3>' + escapeHtml(item.title) + '</h3><p>' + escapeHtml(item.subtitle) + '</p></div>' +
+        '<div class="scenario-language-controls"><select title="界面语言"><option>界面：中文</option><option>Interface: English</option></select>' +
+        '<select title="会议语言"><option>讨论：中英双语</option><option>Meeting: English</option><option>讨论：中文</option></select>' +
+        '<select title="反馈语言"><option>反馈：中英双语</option><option>Feedback: English</option></select></div></div>' +
+        '<div class="scenario-progress">' + ['① 背景材料', '② 前半段视频', '③ 角色会议', '④ 提交决策', '⑤ 后半段视频', '⑥ 反思报告'].map((label, index) => '<div class="scenario-progress-step' + (index === 0 ? ' active' : '') + '">' + label + '</div>').join('') + '</div>' +
+        '<div class="scenario-content-grid"><aside class="scenario-people-panel"><div class="scenario-panel-label">会议成员 · Participants</div>' + peopleHtml +
+        '<div class="scenario-person"><div class="scenario-avatar" data-student-avatar style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">' + renderAvatar() + '</div><div><strong>' + escapeHtml(auth.name || 'Student') + '（你 / You）</strong><small>系统分配角色 · 与语言选择无关</small></div></div>' +
+        '<div class="scenario-avatar-actions"><input type="file" data-avatar-file accept="image/png,image/jpeg,image/webp" hidden><button type="button" class="btn-ghost" data-avatar-upload>导入我的头像</button><button type="button" class="btn-ghost" data-avatar-remove>恢复默认头像</button></div></aside>' +
+        '<section class="scenario-meeting-panel"><div class="scenario-panel-label">情景会议 · Scenario Meeting</div><div class="scenario-meeting-log">' +
+        '<div class="scenario-message"><strong>材料接入点 · COS placeholder</strong><p>案例背景、视频前半段、角色卡和决策约束将在这里按配置加载。当前可先体验窗口与导航结构。</p><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px"><button type="button" class="btn-ghost" data-prototype-material>查看背景（待接 COS）</button><button type="button" class="btn-ghost" data-prototype-material>播放前半段（待接 COS）</button></div></div>' + messagesHtml + '</div>' +
+        '<div class="scenario-compose"><textarea data-scenario-draft placeholder="以你的角色提出判断、问题或方案…… / Respond in your assigned role..."></textarea><button type="button" class="btn-ghost" data-scenario-send>保存发言草稿</button></div></section></div>';
+
+      workspace.querySelector('[data-avatar-upload]').addEventListener('click', () => workspace.querySelector('[data-avatar-file]').click());
+      workspace.querySelector('[data-avatar-remove]').addEventListener('click', () => {
+        studentAvatar = '';
+        try { localStorage.removeItem(avatarStorageKey); } catch (e) {}
+        renderScenario();
+      });
+      workspace.querySelector('[data-avatar-file]').addEventListener('change', handleAvatarFile);
+      workspace.querySelectorAll('[data-prototype-material]').forEach(btn => btn.addEventListener('click', () => alert('这是材料接入位置。提供 COS 背景材料和视频地址后即可继续配置。')));
+      workspace.querySelector('[data-scenario-send]').addEventListener('click', () => {
+        const draft = workspace.querySelector('[data-scenario-draft]');
+        const value = draft.value.trim();
+        if (!value) { alert('请先输入一段角色发言。'); return; }
+        const log = workspace.querySelector('.scenario-meeting-log');
+        const message = document.createElement('div');
+        message.className = 'scenario-message student';
+        message.innerHTML = '<strong>' + escapeHtml(auth.name || 'Student') + ' · Draft</strong><p>' + escapeHtml(value) + '</p>';
+        log.appendChild(message);
+        const notice = document.createElement('div');
+        notice.className = 'scenario-message';
+        notice.innerHTML = '<strong>原型提示 · Prototype</strong><p>发言已保留在当前窗口。本版本尚未调用智能体，也不会上传到云端。</p>';
+        log.appendChild(notice);
+        draft.value = '';
+        log.scrollTop = log.scrollHeight;
+      });
+    }
+
+    function handleAvatarFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!/^image\/(png|jpeg|webp)$/i.test(file.type) || file.size > 5 * 1024 * 1024) {
+        alert('请选择 PNG、JPG 或 WebP 图片，大小不超过 5MB。');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const size = 256;
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const crop = Math.min(image.naturalWidth, image.naturalHeight);
+          ctx.drawImage(image, (image.naturalWidth - crop) / 2, (image.naturalHeight - crop) / 2, crop, crop, 0, 0, size, size);
+          studentAvatar = canvas.toDataURL('image/webp', 0.82);
+          try { localStorage.setItem(avatarStorageKey, studentAvatar); } catch (e) { alert('头像可以在当前窗口预览，但浏览器未允许本地保存。'); }
+          renderScenario();
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    primaryNav.addEventListener('click', event => {
+      const btn = event.target.closest('[data-theme]');
+      if (!btn || btn.disabled) return;
+      activeTheme = btn.getAttribute('data-theme');
+      activeCase = Object.keys(themes[activeTheme].children)[0];
+      renderScenario();
+    });
+    secondaryNav.addEventListener('click', event => {
+      const btn = event.target.closest('[data-case]');
+      if (!btn) return;
+      activeCase = btn.getAttribute('data-case');
+      renderScenario();
+    });
+
+    const minBtn = header.querySelector('[data-agent-action="minimize"]');
+    header.querySelector('[data-agent-action="close"]').addEventListener('click', () => win.remove());
+    header.querySelector('[data-agent-action="fullscreen"]').addEventListener('click', () => {
+      win.classList.remove('minimized'); win.classList.add('fullscreen'); win.style.zIndex = ++currentZ;
+    });
+    header.querySelector('[data-agent-action="restore"]').addEventListener('click', () => {
+      win.classList.remove('fullscreen', 'minimized');
+      win.style.width = ''; win.style.height = '';
+      win.style.left = Math.max(8, (window.innerWidth - Math.min(920, window.innerWidth * 0.94)) / 2) + 'px';
+      win.style.top = Math.max(48, (window.innerHeight - Math.min(700, window.innerHeight * 0.82)) / 2) + 'px';
+      minBtn.textContent = '—'; win.style.zIndex = ++currentZ;
+    });
+    minBtn.addEventListener('click', () => {
+      win.classList.remove('fullscreen'); win.classList.toggle('minimized');
+      minBtn.textContent = win.classList.contains('minimized') ? '▣' : '—';
+      minBtn.title = win.classList.contains('minimized') ? '展开 / Expand' : '缩回 / Collapse';
+      win.style.zIndex = ++currentZ;
+    });
+    win.addEventListener('mousedown', () => { win.style.zIndex = ++currentZ; });
+    win.style.left = Math.max(8, (window.innerWidth - Math.min(920, window.innerWidth * 0.94)) / 2) + 'px';
+    win.style.top = Math.max(48, (window.innerHeight - Math.min(700, window.innerHeight * 0.82)) / 2) + 'px';
+    makeDraggable(win, header);
+    renderScenario();
+  }
+
   function openSystemSettingsWindow() {
     const existing = document.querySelector('.floating-window[data-tool="system-settings"]');
     if (existing) {
@@ -4839,6 +5311,7 @@
         '<button class="settings-tab active" data-settings-tab="files">① 文件与排序</button>' +
         '<button class="settings-tab" data-settings-tab="access">② 开放与关闭</button>' +
         '<button class="settings-tab" data-settings-tab="analytics">③ 用户行为看板</button>' +
+        '<button class="settings-tab" data-settings-tab="students">④ 学生管理 / Students</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
         '<div class="material-tree-note">可登记 COS 文件、为已有材料增加语言版本，以及重命名、替换、删除和调整顺序。新增或替换后请到“开放与关闭”发布。</div>' +
@@ -4853,7 +5326,7 @@
         '<div class="analytics-toolbar"><select id="analytics-days"><option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option><option value="90">最近 90 天</option></select>' +
         '<button type="button" class="btn-ghost" id="analytics-refresh">刷新看板</button></div>' +
         '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
-      '</section>';
+      '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>';
 
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
@@ -4896,6 +5369,7 @@
     };
     if (analyticsRefresh) analyticsRefresh.addEventListener('click', refreshAnalytics);
     if (analyticsDays) analyticsDays.addEventListener('change', refreshAnalytics);
+    let studentManager = null;
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
@@ -4906,6 +5380,18 @@
         footer.style.display = (tabName === 'files' || tabName === 'access') ? '' : 'none';
         saveBtn.textContent = tabName === 'files' ? '保存名称与排序' : '保存开放设置';
         if (tabName === 'analytics' && !analyticsLoaded) refreshAnalytics();
+        if (tabName === 'students' && !studentManager) {
+          studentManager = window.CCMStudents.mount(body.querySelector('#student-manager'), async (action, data = {}) => {
+            const auth = getCurrentAuth();
+            const response = await fetch(TEACHER_SETTINGS_API_URL, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
+              body: JSON.stringify({ ...data, action, id: auth.id || '', inviteCode: localStorage.getItem('ccm_invite_code') || '' })
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) throw new Error(payload.message || '操作失败 / Request failed');
+            return payload;
+          });
+        }
       });
     });
     const treeContainer = body.querySelector('#admin-material-tree');
@@ -5558,7 +6044,7 @@
   function openLoginDialog() {
     if (!loginOverlay) return;
     const auth = getCurrentAuth();
-    if (studentNameInput && auth.name) studentNameInput.value = auth.name;
+    if (studentNameInput && auth.id) studentNameInput.value = auth.id;
     setLoginStatus(auth.role ? ('当前登录身份：' + auth.name + '（' + (auth.role === 'teacher' ? '教师' : '学生') + '）') : '', auth.role ? 'success' : '');
     loginOverlay.classList.add('active');
     loginOverlay.setAttribute('aria-hidden', 'false');
@@ -5582,7 +6068,7 @@
     setLoginStatus('正在验证登录信息...', '');
     try {
       const result = await validateCloudLogin(studentName, inviteCode);
-      saveCurrentAuth({ role: result.role, name: result.id || studentName, loginAt: Date.now() });
+      saveCurrentAuth({ role: result.role, id: result.id || studentName, name: result.name || result.id || studentName, loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
       trackPlatformEvent('login', { title: result.role === 'teacher' ? '管理员登录' : '学生登录' });
@@ -5634,6 +6120,7 @@
 
   if (loginCancelBtn) loginCancelBtn.addEventListener('click', closeLoginDialog);
   if (loginSubmitBtn) loginSubmitBtn.addEventListener('click', submitLoginDialog);
+  if (scenarioAgentLauncher) scenarioAgentLauncher.addEventListener('click', openScenarioAgentPrototype);
   if (headerLogoutBtn) headerLogoutBtn.addEventListener('click', logoutCurrentUser);
   if (loginOverlay) {
     loginOverlay.addEventListener('click', (e) => {
