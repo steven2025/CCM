@@ -3950,12 +3950,7 @@
         entries.push({ key: 'exercise:' + item.id, label: item.title });
       });
     }
-    if (chapter && chapter !== 'final') {
-      videoCases.filter(video => video.chapter === chapter).forEach(video => {
-        entries.push({ key: 'video:' + video.id, label: video.title });
-        if (chapter === 2) entries.push({ key: 'video-test:' + video.id, label: video.title + ' - Test' });
-      });
-    }
+    // 视频开放状态由上方材料目录树统一管理；旧权限字段在保存时自动同步，避免两套开关互相冲突。
     if (isPdfJsModeChapter(chapter)) {
       entries.push({ key: moduleKey + ':ai-glossary', label: 'AI词汇窗 / AI Glossary' });
     }
@@ -5084,6 +5079,26 @@
     });
   }
 
+  function syncLegacyVideoAccessFromCatalog(settings, catalog) {
+    const resources = settings.resources ||= {};
+    (catalog && Array.isArray(catalog.chapters) ? catalog.chapters : []).forEach(chapter => {
+      const chapterOpen = chapter.status !== 'hidden';
+      (Array.isArray(chapter.sections) ? chapter.sections : []).filter(section => section.id === 'videos').forEach(section => {
+        const sectionOpen = chapterOpen && section.status !== 'hidden';
+        (Array.isArray(section.nodes) ? section.nodes : []).forEach(node => {
+          if (!node || node.kind === 'group') return;
+          const id = String(node.legacyId || node.id || '').replace(/^video-/, '');
+          if (!id) return;
+          const assets = Array.isArray(node.assets) ? node.assets : [];
+          const video = assets.find(asset => asset && asset.type === 'video');
+          resources['video:' + id] = !!(sectionOpen && node.status !== 'hidden' && video && video.status === 'published' && video.url);
+          const test = assets.find(asset => asset && asset.type === 'test-link');
+          if (test) resources['video-test:' + id] = !!(sectionOpen && node.status !== 'hidden' && test.status === 'published' && test.url);
+        });
+      });
+    });
+  }
+
   function openScenarioAgentPrototype() {
     const existing = document.querySelector('.floating-window[data-tool="scenario-agent"]');
     if (existing) {
@@ -5688,6 +5703,7 @@
       body.querySelectorAll('input[data-setting-type="resource"]').forEach(input => {
         next.resources[input.getAttribute('data-key')] = input.checked;
       });
+      syncLegacyVideoAccessFromCatalog(next, adminMaterialsCatalog);
       saveAccessSettings(next);
       updateAuthUi();
       applyChapterPermissions();
