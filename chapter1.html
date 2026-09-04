@@ -1,0 +1,2261 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第一章 · 跨文化管理 HTML 课件</title><style>
+/* ============ RESET & BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563eb;--primary-light:#3b82f6;--accent:#06b6d4;
+  --bg:#f0f4f8;--card:#ffffff;--text:#1e293b;--text-light:#64748b;
+  --border:#e2e8f0;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(37,99,235,.10);
+  --shadow-lg:0 8px 30px rgba(37,99,235,.15);
+  --radius:12px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);
+  background-image:
+    radial-gradient(circle at 15% 20%,rgba(37,99,235,.04) 0%,transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(6,182,212,.04) 0%,transparent 40%);
+}
+
+/* ============ TOP BAR (hidden buttons) ============ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:2.2rem;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.2rem;
+  background:rgba(255,255,255,.75);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  transition:height .3s ease,box-shadow .3s ease;
+}
+.topbar:hover{height:3rem;box-shadow:var(--shadow-md)}
+.topbar-title{
+  font-size:.75rem;font-weight:600;color:var(--text-light);
+  letter-spacing:.5px;white-space:nowrap;
+  transition:font-size .3s ease;
+}
+.topbar:hover .topbar-title{font-size:.85rem;color:var(--primary)}
+.topbar-buttons{display:flex;gap:.5rem;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.topbar:hover .topbar-buttons{opacity:1;pointer-events:auto}
+.media-btn{
+  display:flex;align-items:center;gap:.3rem;
+  padding:.3rem .7rem;border:none;border-radius:6px;
+  font-size:.72rem;font-weight:600;cursor:pointer;
+  background:#f1f5f9;color:#94a3b8;transition:all .2s;
+}
+.media-btn.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.media-btn.active:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.4)}
+.media-btn .count{background:rgba(255,255,255,.25);padding:.05rem .35rem;border-radius:8px;font-size:.65rem}
+.media-btn:not(.active) .count{background:#e2e8f0;color:#94a3b8}
+
+/* ============ STAGE ============ */
+.stage{
+  position:fixed;top:2.2rem;left:0;right:0;bottom:3rem;
+  overflow:hidden;
+}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:1.8rem 2.5rem;
+  opacity:0;visibility:hidden;transform:translateX(30px);
+  transition:opacity .4s ease,transform .4s ease,visibility .4s;
+  overflow-y:auto;
+}
+.slide.active{opacity:1;visibility:visible;transform:translateX(0)}
+.slide-inner{width:100%;max-width:1180px;margin:auto}
+
+/* ============ PAGE NUMBER (top-left badge) ============ */
+.page-num{
+  position:absolute;top:.9rem;left:1.2rem;z-index:5;
+  display:flex;align-items:center;gap:.5rem;
+  user-select:none;pointer-events:none;
+}
+.page-num .num-badge{
+  width:2.5rem;height:2.5rem;border-radius:12px;
+  background:linear-gradient(135deg,#2563eb,#06b6d4);
+  color:#fff;font-weight:800;font-size:1.15rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(37,99,235,.35), inset 0 1px 2px rgba(255,255,255,.35);
+  font-variant-numeric:tabular-nums;
+  position:relative;
+}
+.page-num .num-badge::after{
+  content:'';position:absolute;top:3px;left:3px;right:3px;height:40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.4),transparent);
+  border-radius:8px 8px 0 0;
+}
+.page-num .page-label{
+  display:flex;flex-direction:column;line-height:1;
+  font-size:.55rem;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;
+}
+.page-num .page-label b{font-size:1rem;color:var(--primary);letter-spacing:0;font-variant-numeric:tabular-nums}
+
+/* ============ ANIM ELEMENTS ============ */
+.anim{opacity:0;transform:translateY(15px);transition:opacity .5s ease,transform .5s ease}
+.anim.visible{opacity:1;transform:translateY(0)}
+
+/* ============ TYPOGRAPHY ============ */
+.slide-title{
+  font-size:2rem;font-weight:700;color:var(--primary);
+  margin-bottom:1.2rem;text-align:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.slide-subtitle{font-size:1.15rem;color:var(--text-light);text-align:center;margin-bottom:1.5rem}
+
+/* ============ COVER ============ */
+.cover{text-align:center}
+.cover h1{
+  font-size:3.4rem;font-weight:800;letter-spacing:1px;
+  background:linear-gradient(135deg,#1e40af 0%,#2563eb 40%,#06b6d4 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:.8rem;
+}
+.cover .divider{
+  width:90px;height:4px;margin:1.2rem auto;
+  background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:2px;
+}
+.cover .author{font-size:1.15rem;color:var(--text-light);line-height:1.9}
+.cover .author strong{color:var(--text)}
+.cover-deco{position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.5}
+
+/* ============ CARDS ============ */
+.card{
+  background:var(--card);border:1.5px solid #a5b8d1;
+  border-radius:var(--radius);padding:1.4rem 1.8rem;
+  box-shadow:var(--shadow-sm);transition:box-shadow .3s,transform .3s;
+}
+.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.card-grid{display:grid;gap:1.2rem}
+.card-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card-grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.card h3{
+  font-size:1.15rem;color:#1d4ed8;margin-bottom:.7rem;
+  padding-bottom:.5rem;border-bottom:2px solid var(--border);
+  display:flex;align-items:center;gap:.4rem;
+}
+.card h3 .num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1.7rem;height:1.7rem;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-size:.85rem;font-weight:700;
+}
+.card ul{list-style:none;padding:0}
+.card li{
+  padding:.4rem 0 .4rem 1.3rem;position:relative;
+  font-size:1.02rem;line-height:1.65;color:var(--text);
+}
+.card li::before{
+  content:'';position:absolute;left:0;top:.75rem;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--accent);
+}
+.card li .en{color:var(--text-light);font-size:.9rem}
+
+/* ============ TABLE ============ */
+.data-table{
+  width:100%;border-collapse:separate;border-spacing:0;
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-md);font-size:.98rem;
+}
+.data-table th{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;padding:1rem 1.2rem;text-align:left;font-weight:600;
+}
+.data-table td{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);background:#fff}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:nth-child(even) td{background:#f8fafc}
+.data-table tr:hover td{background:#eff6ff}
+.data-table .group-label{font-weight:600;color:var(--primary)}
+
+/* ============ LIST ============ */
+.obj-list{list-style:none;counter-reset:obj}
+.obj-list li{
+  counter-increment:obj;
+  padding:.85rem 1.2rem .85rem 3.2rem;position:relative;
+  background:#fff;border:1.5px solid #a5b8d1;border-radius:8px;
+  margin-bottom:.6rem;font-size:1.05rem;line-height:1.6;
+  transition:all .2s;
+}
+.obj-list li:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm);transform:translateX(4px)}
+.obj-list li::before{
+  content:counter(obj);
+  position:absolute;left:.8rem;top:50%;transform:translateY(-50%);
+  width:1.8rem;height:1.8rem;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-size:.85rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.obj-list li .zh{color:var(--text-light);font-size:.92rem}
+
+/* Course Objectives: 中文单独一行，字体放大 */
+.course-obj li{display:block;padding:.9rem 1.4rem .9rem 3.4rem}
+.course-obj li .zh{
+  display:block;
+  font-size:1.15rem;
+  font-weight:500;
+  color:var(--text-light);
+  margin-top:.35rem;
+  padding-left:.15rem;
+  border-left:2px solid var(--primary-light);
+  line-height:1.6;
+}
+
+/* ============ GRADING ============ */
+.grade-total{
+  text-align:center;font-size:1.6rem;font-weight:700;color:var(--primary);margin-bottom:1.2rem;
+}
+.grade-bars{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.2rem}
+.grade-bar{display:flex;align-items:center;gap:.8rem}
+.grade-bar .label{width:230px;font-size:.98rem;font-weight:600;text-align:right}
+.grade-bar .track{flex:1;height:28px;background:#e2e8f0;border-radius:14px;overflow:hidden;position:relative}
+.grade-bar .fill{
+  height:100%;border-radius:14px;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:.7rem;color:#fff;font-size:.85rem;font-weight:700;
+  transition:width 1s ease;
+}
+.grade-bar:nth-child(1) .fill{background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.grade-bar:nth-child(2) .fill{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+.grade-bar:nth-child(3) .fill{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.grade-detail{
+  background:#f8fafc;border:1px dashed var(--border);border-radius:8px;
+  padding:.9rem 1.4rem;font-size:.95rem;color:var(--text-light);line-height:1.9;
+}
+.grade-detail strong{color:var(--text)}
+
+/* ============ BOOKS ============ */
+.book-list{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.book-item{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.2rem 1.5rem;position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.book-item:hover{border-color:var(--primary-light);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.book-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+.book-item .tag{
+  display:inline-block;padding:.2rem .6rem;border-radius:4px;
+  font-size:.78rem;font-weight:600;margin-bottom:.5rem;
+}
+.book-item .tag.textbook{background:#bfdbfe;border:1.5px solid #93c5fd;color:#1e40af}
+.book-item .tag.reference{background:#fde68a;border:1.5px solid #fcd34d;color:#92400e}
+.book-item .title{font-size:1.08rem;font-weight:600;color:var(--text);margin-bottom:.4rem;line-height:1.45}
+.book-item .meta{font-size:.9rem;color:var(--text-light);line-height:1.6}
+
+/* ============ TOC ============ */
+.toc-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.toc-objectives{
+  background:#f0f6ff;
+  border:1px solid #bfdbfe;border-radius:var(--radius);padding:1.4rem 1.8rem;
+}
+.toc-objectives h3{color:var(--primary);margin-bottom:.6rem;font-size:1.15rem}
+.toc-objectives p{font-size:1.02rem;line-height:1.7;color:var(--text)}
+.toc-list{list-style:none;counter-reset:toc}
+.toc-list li{
+  counter-increment:toc;
+  padding:.95rem 1.2rem .95rem 3.5rem;position:relative;
+  background:#fff;border:1.5px solid #a5b8d1;border-radius:8px;
+  margin-bottom:.6rem;font-size:1.05rem;cursor:default;
+  transition:all .2s;
+}
+.toc-list li:hover{border-color:var(--primary);background:#eff6ff;transform:translateX(4px)}
+.toc-list li::before{
+  content:counter(toc);
+  position:absolute;left:.8rem;top:50%;transform:translateY(-50%);
+  width:2rem;height:2rem;border-radius:8px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-size:.95rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.toc-list li .zh{color:var(--text-light);font-size:.9rem}
+
+/* ============ SVG CONTAINER ============ */
+.svg-wrap{width:100%;display:flex;justify-content:center;margin:.5rem 0}
+.svg-wrap svg{max-width:100%;height:auto;filter:drop-shadow(0 4px 12px rgba(37,99,235,.12))}
+
+/* ============ FRAMEWORK PAGE ============ */
+.framework-placeholder{
+  text-align:center;padding:3rem 1rem;
+}
+.framework-placeholder .icon{
+  font-size:3rem;margin-bottom:1rem;opacity:.3;
+}
+.framework-placeholder p{color:var(--text-light);font-size:.9rem}
+
+/* ============ DEFINITION BOX ============ */
+.def-box{
+  background:#f0f6ff;
+  border:2px solid var(--primary);border-left:6px solid var(--primary);border-radius:10px;
+  padding:1.2rem 1.8rem;margin-bottom:1.2rem;font-size:1.1rem;line-height:1.8;
+}
+.def-box .en{font-weight:600;color:#0f172a}
+.def-box .zh{color:#334155;font-size:.98rem;display:block;margin-top:.4rem}
+
+/* ============ NAVBAR ============ */
+.navbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  height:3rem;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+}
+.nav-btn{
+  padding:.45rem 1.2rem;border:none;border-radius:8px;
+  font-size:.85rem;font-weight:600;cursor:pointer;
+  background:#f1f5f9;color:var(--text);transition:all .2s;
+}
+.nav-btn:hover:not(:disabled){background:#e2e8f0}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
+.nav-btn.primary{
+  background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;
+  box-shadow:0 2px 8px rgba(37,99,235,.3);
+}
+.nav-btn.primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.4)}
+.page-info{font-size:.85rem;font-weight:600;color:var(--text-light)}
+.page-info .current{color:var(--primary);font-size:1rem}
+.step-indicator{
+  display:flex;gap:4px;align-items:center;
+}
+.step-dot{
+  width:8px;height:8px;border-radius:50%;background:#e2e8f0;transition:all .3s;
+}
+.step-dot.active{background:var(--primary);transform:scale(1.3)}
+.step-dot.done{background:var(--accent)}
+
+/* ============ MEDIA DRAWER ============ */
+.media-drawer{
+  position:fixed;top:2.2rem;right:-420px;width:400px;max-width:90vw;
+  bottom:3rem;z-index:90;
+  background:#fff;border-left:1px solid var(--border);
+  box-shadow:-4px 0 20px rgba(0,0,0,.1);
+  transition:right .35s ease;display:flex;flex-direction:column;
+}
+.media-drawer.open{right:0}
+.drawer-header{
+  padding:.8rem 1rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.drawer-header h3{font-size:.95rem;color:var(--primary)}
+.drawer-close{
+  border:none;background:none;font-size:1.2rem;cursor:pointer;color:var(--text-light);
+  width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+}
+.drawer-close:hover{background:#f1f5f9;color:var(--text)}
+.drawer-body{flex:1;overflow-y:auto;padding:1rem}
+.drawer-body .empty{text-align:center;color:var(--text-light);padding:2rem 1rem;font-size:.85rem}
+.media-item{
+  background:#f8fafc;border:1px solid var(--border);border-radius:8px;
+  padding:.8rem;margin-bottom:.6rem;
+}
+.media-item .name{font-size:.85rem;font-weight:600;margin-bottom:.3rem}
+.media-item .placeholder{
+  width:100%;height:120px;background:linear-gradient(135deg,#e2e8f0,#f1f5f9);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  color:var(--text-light);font-size:.8rem;
+}
+.media-item video{width:100%;border-radius:6px}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:768px){
+  .cover h1{font-size:1.8rem}
+  .card-grid.cols-3,.card-grid.cols-2{grid-template-columns:1fr}
+  .book-list{grid-template-columns:1fr}
+  .toc-wrap{grid-template-columns:1fr}
+  .slide{padding:1rem}
+  .slide-title{font-size:1.2rem}
+  .grade-bar .label{width:120px;font-size:.75rem}
+}
+
+/* ============ TILT & GLOW (cursor interaction) ============ */
+.tilt-card{
+  position:relative;
+  transition:transform .12s ease-out, box-shadow .3s ease, border-color .3s;
+  transform-style:preserve-3d;
+  cursor:zoom-in;
+  overflow:hidden;
+}
+.tilt-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(37,99,235,.15), transparent 55%);
+  opacity:0;transition:opacity .3s;pointer-events:none;z-index:1;
+}
+.tilt-card::after{
+  content:'';
+  position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg, transparent 40%, rgba(6,182,212,.15) 50%, transparent 60%);
+  background-size:200% 200%;background-position:var(--mx,50%) var(--my,50%);
+  opacity:0;transition:opacity .3s;pointer-events:none;z-index:1;mix-blend-mode:screen;
+}
+.tilt-card:hover{border-color:var(--primary-light);box-shadow:0 8px 25px rgba(37,99,235,.18);}
+.tilt-card:hover::before,.tilt-card:hover::after{opacity:1;}
+.tilt-card > *{position:relative;z-index:2;}
+
+/* ============ ZOOM MODAL (大幅度放大) ============ */
+#zoomModal{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,15,35,.92);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;
+  padding:1rem;
+}
+#zoomModal.open{opacity:1;visibility:visible;}
+#zoomContent{
+  width:96vw;max-width:96vw;max-height:94vh;overflow:auto;
+  background:#fff;border-radius:20px;padding:1.2rem 1.5rem;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  transform:scale(.88);transition:transform .3s ease;
+}
+#zoomModal.open #zoomContent{transform:scale(1);}
+#zoomContent .tilt-card,#zoomContent .zoomable{cursor:default;transform:none!important;}
+#zoomContent .tilt-card::before,#zoomContent .tilt-card::after{display:none;}
+/* 隐藏所有框的伪元素边框/装饰 */
+#zoomContent .card::before,
+#zoomContent .card::after,
+#zoomContent .book-item::before,
+#zoomContent .book-item::after,
+#zoomContent .def-box::before,
+#zoomContent .def-box::after,
+#zoomContent .obj-list li::before,
+#zoomContent .toc-list li::before{display:none!important;}
+/* ===== 去掉框的样式，只放大纯内容 ===== */
+#zoomContent .card,
+#zoomContent .book-item,
+#zoomContent .def-box{
+  background:transparent!important;
+  border:none!important;
+  border-left:none!important;
+  border-image:none!important;
+  box-shadow:none!important;
+  padding:0!important;
+  margin:0!important;
+  border-radius:0!important;
+  font-size:1.5em;
+  line-height:2;
+  color:var(--text-dark);
+}
+#zoomContent .card-title{
+  font-size:1.5em!important;
+  color:var(--primary);
+  margin-bottom:1.2rem!important;
+  padding-bottom:.6rem;
+  border-bottom:2px solid var(--primary-light);
+}
+#zoomContent .card-body{padding:0!important;}
+#zoomContent .card-body li{font-size:1em!important;line-height:2;}
+#zoomContent .book-tag{
+  display:inline-block;
+  font-size:.7em;
+  padding:.3rem 1rem;
+  margin-bottom:1rem;
+  border-radius:8px;
+  background:var(--primary-light);
+  color:#fff;
+}
+#zoomContent .book-title{font-size:1.4em!important;color:var(--text-dark);margin-bottom:.8rem;line-height:1.5;}
+#zoomContent .book-author,#zoomContent .book-publisher{font-size:1em;color:var(--text-muted);margin-bottom:.5rem;}
+#zoomContent .def-box p{margin-bottom:1.2rem;font-size:1em;}
+#zoomContent .def-box .en{font-size:1.1em;}
+#zoomContent .def-box .zh{font-size:.95em;color:var(--text-muted);}
+/* 列表项：去掉框样式 */
+#zoomContent .obj-list,
+#zoomContent .toc-list{
+  max-width:100%!important;width:100%;margin:0;padding:0;list-style:none;
+}
+#zoomContent .obj-list li,
+#zoomContent .toc-list li{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  padding:1rem 0!important;
+  margin:0!important;
+  font-size:1.5em;
+  line-height:1.8;
+  border-bottom:1px solid rgba(0,0,0,.06)!important;
+  border-radius:0!important;
+}
+#zoomContent .obj-list li::before,
+#zoomContent .toc-list li::before{display:none;}
+#zoomContent .toc-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:2rem;height:2rem;border-radius:50%;
+  background:var(--primary);color:#fff;font-size:.8em;margin-right:.8rem;
+}
+/* 表格：保留结构，放大字体 */
+#zoomContent .data-table{width:100%!important;max-width:100%!important;font-size:1.2em;}
+#zoomContent .data-table th,#zoomContent .data-table td{padding:1.1rem 1.3rem;}
+/* SVG：占满全宽 */
+#zoomContent .svg-wrap{width:100%!important;max-width:100%!important;margin:0 auto;background:transparent!important;}
+#zoomContent .svg-wrap svg{width:100%!important;height:auto!important;max-height:80vh;}
+/* 评分条：去掉框 */
+#zoomContent .grade-bars,
+#zoomContent .grade-total,
+#zoomContent .grade-detail{
+  background:transparent!important;border:none!important;box-shadow:none!important;
+  padding:0!important;margin:0 0 1rem!important;font-size:1.2em;
+}
+#zoomClose{
+  position:absolute;top:1.2rem;right:1.2rem;
+  width:50px;height:50px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  color:#fff;font-size:1.5rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .2s;z-index:1001;
+}
+#zoomClose:hover{background:rgba(255,255,255,.3);transform:rotate(90deg) scale(1.1);}
+#zoomHint{
+  position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.55);font-size:.85rem;letter-spacing:.5px;
+}
+
+:root{--reader-top:64px;--reader-bottom:64px}
+html{font-size:clamp(17px,1.35vw,20px)}
+:root{--text-light:#475569;--text-dark:#1e293b;--text-muted:#475569}
+.slide-title{font-size:clamp(1.65rem,2.6vw,2.3rem)!important;line-height:1.25;font-weight:800}
+.slide-subtitle{font-size:1.2rem!important;line-height:1.5;color:#475569}
+.card li,.obj-list li,.toc-list li,.toc-objectives p,.def-box,.data-table{font-size:1.15rem;line-height:1.75}
+.card h3,.card-title,.toc-objectives h3,.book-item .title{font-size:1.28rem;font-weight:700}
+.card li .en,.obj-list li .zh,.toc-list li .zh,.def-box .zh,.book-item .meta,.grade-detail{font-size:1.08rem;line-height:1.7;color:#334155}
+.card{padding:1.25rem 1.4rem}.data-table th,.data-table td{padding:.85rem 1rem;overflow-wrap:anywhere}
+.svg-wrap svg{width:100%;max-width:1180px}.slide-inner{min-width:0}
+.anim:not(.visible){pointer-events:none;visibility:hidden}.anim.visible{visibility:visible}
+.media-drawer{right:-480px}
+.topbar,.topbar:hover{height:var(--reader-top);padding:8px 18px;gap:16px;box-shadow:0 2px 12px #18335b0a}
+.topbar-title,.topbar:hover .topbar-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.reader-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;align-items:center}
+button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+.reader-actions button,.drawer-body button,.drawer-header button{border:1px solid #d5e0ed;border-radius:8px;background:white;color:#244569;padding:8px 10px;font-size:12px}
+.reader-actions button[aria-pressed=true]{background:#e4efff;border-color:#2563eb;color:#164fb5}
+#pictureCount{background:#e4efff;padding:2px 6px;border-radius:5px;margin-left:3px}
+.stage{top:var(--reader-top);bottom:var(--reader-bottom)}
+.slide{padding:28px 32px 36px;justify-content:flex-start}.slide-inner{margin:auto;flex-shrink:0}
+.slide[hidden]{display:none}.navbar{height:var(--reader-bottom);gap:12px;padding:8px 20px}
+.page-picker{display:flex;align-items:center;gap:8px;font-size:12px;min-width:0}.page-picker select{max-width:380px;width:30vw;padding:8px;border:1px solid #cbd8e8;border-radius:8px;color:#1e3a5f;background:white}
+#stepStatus{color:#64748b;font-size:12px}.nav-btn{font-size:13px}
+.media-drawer{top:var(--reader-top);bottom:var(--reader-bottom);height:auto;width:min(460px,100vw);max-width:100vw;z-index:200;box-shadow:-10px 0 35px #14346322}
+.media-drawer .drawer-body{height:calc(100% - 62px);overflow:auto}.drawer-header{height:62px}
+.editor-note{padding:10px;background:#fff7e6;color:#7c5600;font-size:12px;line-height:1.65;border-radius:8px;margin-bottom:10px}
+.reader-image-card{padding:12px;border:1px solid #dce5ef;border-radius:12px;margin:12px 0;background:white}
+.reader-image-card img{width:100%;max-height:300px;object-fit:contain;background:#f5f8fc;cursor:zoom-in;border-radius:8px}
+.reader-image-card h4{font-size:14px;line-height:1.6;margin:8px 0;overflow-wrap:anywhere}
+.reader-image-card input{width:100%;padding:8px;border:1px solid #cbd8e8;border-radius:6px;margin:8px 0}
+.reader-image-actions{display:flex;gap:6px;flex-wrap:wrap}.reader-image-actions button{font-size:12px;padding:6px 9px}
+.reader-empty{padding:24px 12px;color:#728096;background:#f7f9fc;border:1px dashed #c8d4e3;border-radius:10px;text-align:center;font-size:13px;line-height:1.7}
+#imageStatus{font-size:12px;line-height:1.6;margin:10px 0;color:#1d658a}#imageStatus.error{color:#b91c1c}
+#readerZoom{position:fixed;inset:0;width:94vw;height:92vh;max-width:1400px;max-height:95vh;margin:auto;border:0;border-radius:18px;background:#f8fafc;color:#1e293b;padding:55px 30px 30px;overflow:auto}
+#readerZoom::backdrop{background:#071426dd}#readerZoom #zoomClose{position:fixed;top:5vh;right:5vw;width:40px;height:40px;background:#172e4e;color:white;border:0;border-radius:50%;font-size:24px}
+#readerZoom #zoomContent{font-size:1.25rem;color:#1e293b;max-width:1150px;margin:auto;min-height:0;display:block}
+#readerZoom #zoomContent img{display:block;max-width:100%;max-height:72vh;object-fit:contain;margin:auto}
+#readerZoom #zoomContent svg{width:100%;height:auto;max-height:72vh}#readerZoom>p{text-align:center;font-size:12px;margin-top:24px;color:#64748b}
+.reader-zoomable{cursor:zoom-in}.reader-zoomable:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #06b6d4;outline-offset:3px}
+[hidden]{display:none!important}
+@media(max-width:900px){:root{--reader-top:108px}.topbar{align-items:flex-start;flex-direction:column;gap:6px}.reader-actions{width:100%;gap:4px}.reader-actions button{font-size:11px;padding:6px 8px}.topbar-title{width:100%}.slide{padding:24px 16px}.navbar{padding:8px;gap:6px}.page-picker select{width:30vw}#stepStatus{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(max-width:600px){.slide [style*="grid-template-columns"]{grid-template-columns:1fr!important}.slide-title{overflow-wrap:anywhere}.nav-btn{padding:8px;font-size:12px}.page-picker{font-size:10px}.reader-actions{row-gap:5px}.data-table{min-width:650px}.slide-inner{overflow-x:auto}.grade-bar .label{font-size:1rem;width:130px;flex-shrink:0}}
+.reading-title-row{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.5rem;padding:0 1rem}
+.reading-title-row .slide-subtitle{margin-bottom:0}
+.reading-open{flex:0 0 auto;border:0;border-radius:999px;padding:.62rem 1rem;background:linear-gradient(135deg,#1d4ed8,#0891b2);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.25);transition:transform .2s,box-shadow .2s}
+.reading-open:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(37,99,235,.32)}
+.reading-win{position:fixed;z-index:380;left:50%;top:50%;width:min(760px,88vw);height:min(610px,80vh);min-width:320px;min-height:280px;transform:translate(-50%,-50%);display:none;flex-direction:column;background:#fff;border:1px solid #93c5fd;border-radius:16px;box-shadow:0 24px 70px rgba(15,23,42,.3);overflow:hidden;resize:both}
+.reading-win.open{display:flex}
+.reading-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 1rem;background:linear-gradient(135deg,#1d4ed8,#0891b2);color:#fff;cursor:move;user-select:none}
+.reading-head strong{font-size:1rem}.reading-close{width:2rem;height:2rem;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:1.25rem;cursor:pointer}
+.reading-body{padding:1.15rem 1.35rem 1.5rem;overflow:auto;line-height:1.75;color:#334155}
+.reading-body h3{color:#1e3a8a;font-size:1.12rem;margin-bottom:.25rem}.reading-meta{font-size:.88rem;color:#64748b;margin-bottom:1rem}
+.reading-summary{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:8px;padding:.85rem 1rem;margin:.8rem 0 1rem}
+.reading-body h4{color:#0f766e;margin:1rem 0 .35rem;font-size:1rem}.reading-body ol,.reading-body ul{padding-left:1.35rem}.reading-body li{margin:.35rem 0}
+.reading-link{display:inline-flex;align-items:center;gap:.35rem;margin-top:1rem;padding:.7rem 1.05rem;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:700}.reading-source{font-size:.78rem;color:#64748b;margin-top:.65rem}
+@media(max-width:700px){.reading-title-row{flex-direction:column;gap:.65rem}.reading-win{width:94vw;height:82vh;min-width:0}.reading-body{padding:1rem}.reading-open{font-size:.82rem}}
+.onion-practice{display:grid;grid-template-columns:minmax(390px,1.05fr) minmax(330px,.95fr);gap:1.25rem;align-items:start}
+.onion-left,.onion-right{background:rgba(255,255,255,.82);border:1.5px solid #b9cbe2;border-radius:18px;padding:1rem;box-shadow:0 6px 22px rgba(30,64,175,.08)}
+.onion-canvas{position:relative;width:min(100%,430px);aspect-ratio:1;margin:0 auto .75rem;isolation:isolate}
+.onion-ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;display:flex;justify-content:center;cursor:default;transition:filter .2s,box-shadow .2s,transform .2s}
+.onion-ring.selected-target,.onion-ring.dragover{filter:saturate(1.18);box-shadow:0 0 0 5px rgba(14,165,233,.22);transform:translate(-50%,-50%) scale(1.015)}
+.onion-outer{width:94%;height:94%;z-index:1;background:linear-gradient(145deg,#e0f2fe,#bfdbfe);border:3px solid #3b82f6;padding-top:4.5%}
+.onion-middle{width:66%;height:66%;z-index:2;background:linear-gradient(145deg,#ccfbf1,#99f6e4);border:3px solid #0d9488;padding-top:5%}
+.onion-core{width:35%;height:35%;z-index:3;background:linear-gradient(145deg,#1e40af,#2563eb);border:3px solid #1e3a8a;align-items:center;color:#fff}
+.onion-label{pointer-events:none;text-align:center;font-weight:800;line-height:1.15;color:#1e3a8a;font-size:.9rem}.onion-middle>.onion-label{color:#115e59}.onion-core>.onion-label{color:#fff}
+.onion-label small{display:block;margin-top:.18rem;font-size:.68rem;font-weight:650;opacity:.82;letter-spacing:.03em}
+.onion-markers{position:absolute;inset:0;z-index:5;pointer-events:none}.onion-marker{position:absolute;width:2rem;height:2rem;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.82rem;font-weight:850;border:2px solid #fff;box-shadow:0 3px 9px rgba(15,23,42,.25);pointer-events:auto;cursor:pointer;animation:onionPop .25s ease}
+.onion-marker[data-layer="outer"]{background:#2563eb}.onion-marker[data-layer="middle"]{background:#0f766e}.onion-marker[data-layer="core"]{background:#f59e0b;color:#422006}
+@keyframes onionPop{from{transform:scale(.45);opacity:0}to{transform:scale(1);opacity:1}}
+.onion-help{text-align:center;color:#64748b;font-size:.8rem;line-height:1.5}.onion-help b{color:#1d4ed8}
+.onion-bank-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;color:#1e3a8a}.onion-bank-title span{font-size:.78rem;color:#64748b;font-weight:500}
+.onion-bank{display:grid;gap:.52rem;max-height:365px;overflow:auto;padding:.15rem .25rem .15rem .1rem}
+.onion-term{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 126px;align-items:center;gap:.65rem;border:1.5px solid #b7c8dc;border-radius:11px;background:#fff;padding:.52rem .58rem;color:#1e293b;box-shadow:0 2px 7px rgba(15,23,42,.06);transition:border-color .2s,box-shadow .2s}
+.onion-term:focus-within{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+.onion-term-copy{min-width:0;font-size:.86rem;font-weight:650}.onion-term-copy b{display:inline-grid;place-items:center;width:1.45rem;height:1.45rem;border-radius:50%;background:#e0e7ff;color:#3730a3;margin-right:.4rem;font-size:.75rem}.onion-term .term-en{display:block;margin:.16rem 0 0 1.9rem;color:#64748b;font-size:.7rem;font-weight:500;white-space:normal}
+.onion-select{width:100%;border:1.5px solid #94a3b8;border-radius:9px;background:#f8fafc;color:#334155;padding:.48rem .4rem;font-size:.74rem;font-weight:700;cursor:pointer}.onion-select[data-layer="outer"]{border-color:#3b82f6;color:#1d4ed8;background:#eff6ff}.onion-select[data-layer="middle"]{border-color:#14b8a6;color:#0f766e;background:#f0fdfa}.onion-select[data-layer="core"]{border-color:#f59e0b;color:#92400e;background:#fffbeb}
+.onion-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-top:.72rem}.onion-result{min-height:62px;border-radius:11px;padding:.48rem;border:1px solid #cbd5e1;background:#f8fafc}.onion-result h4{font-size:.72rem;margin-bottom:.3rem}.onion-result[data-layer="outer"] h4{color:#1d4ed8}.onion-result[data-layer="middle"] h4{color:#0f766e}.onion-result[data-layer="core"] h4{color:#b45309}
+.onion-chip{display:block;border-radius:7px;padding:.26rem .35rem;margin:.2rem 0;background:#fff;border:1px solid #dbe4ef;font-size:.67rem;line-height:1.25;cursor:pointer}.onion-chip.wrong{border-color:#fb923c;background:#fff7ed}.onion-chip.correct{border-color:#4ade80;background:#f0fdf4}
+.onion-actions{display:flex;justify-content:center;gap:.65rem;margin-top:.7rem}.onion-actions button{border:0;border-radius:10px;padding:.62rem 1rem;font-weight:750;cursor:pointer}.onion-submit{background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff}.onion-reset{background:#e2e8f0;color:#334155}.onion-status{text-align:center;min-height:1.45rem;margin-top:.45rem;color:#475569;font-size:.82rem;font-weight:650}
+.onion-feedback{z-index:390}.onion-answer-table{display:grid;gap:.8rem;margin-top:.75rem}.onion-answer-row{border-radius:12px;padding:.8rem 1rem;border-left:5px solid}.onion-answer-row.outer{background:#eff6ff;border-color:#3b82f6}.onion-answer-row.middle{background:#f0fdfa;border-color:#0d9488}.onion-answer-row.core{background:#fffbeb;border-color:#f59e0b}.onion-answer-row strong{display:block;margin-bottom:.35rem}.onion-caution{margin-top:1rem;padding:.75rem .9rem;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;color:#475569}
+@media(max-width:900px){.onion-practice{grid-template-columns:1fr}.onion-canvas{max-width:370px}.onion-bank{max-height:280px}.onion-results{grid-template-columns:1fr}}
+@media(max-width:520px){.onion-term{grid-template-columns:1fr}.onion-term .term-en{margin-left:1.9rem}}
+.shock-explorer{background:rgba(255,255,255,.88);border:1.5px solid #b9cbe2;border-radius:18px;padding:1rem 1.15rem;box-shadow:0 7px 24px rgba(30,64,175,.09)}
+.shock-map{position:relative;width:100%;max-width:950px;aspect-ratio:3.2/1;margin:auto}.shock-map svg{position:absolute;inset:0;width:100%;height:100%}
+.shock-node{position:absolute;transform:translate(-50%,-50%);min-width:122px;border:2px solid currentColor;border-radius:13px;padding:.48rem .6rem;background:#fff;color:#334155;font-weight:800;line-height:1.18;cursor:pointer;box-shadow:0 4px 12px rgba(15,23,42,.14);transition:transform .2s,box-shadow .2s,background .2s}
+.shock-node:hover,.shock-node.active{transform:translate(-50%,-50%) scale(1.06);box-shadow:0 8px 20px rgba(15,23,42,.2)}.shock-node small{display:block;margin-top:.2rem;font-size:.72rem;font-weight:650}.shock-node .shock-check{position:absolute;right:-7px;top:-8px;width:21px;height:21px;border-radius:50%;display:none;place-items:center;background:#16a34a;color:#fff;font-size:.7rem;border:2px solid #fff}.shock-node.visited .shock-check{display:grid}
+.shock-node[data-stage="honeymoon"]{left:11%;top:23%;color:#b45309}.shock-node[data-stage="frustration"]{left:39%;top:72%;color:#dc2626}.shock-node[data-stage="adjustment"]{left:68%;top:56%;color:#0f766e}.shock-node[data-stage="adaptation"]{left:89%;top:24%;color:#1d4ed8}
+.shock-instruction{text-align:center;color:#64748b;font-size:.87rem;margin-top:.35rem}.shock-instruction strong{color:#1d4ed8}.shock-progress{display:inline-block;margin-left:.5rem;padding:.15rem .55rem;border-radius:999px;background:#e0e7ff;color:#3730a3;font-weight:750}
+.shock-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-bottom:1rem}.shock-tab{border:1.5px solid #cbd5e1;border-radius:9px;padding:.5rem .3rem;background:#f8fafc;color:#475569;font-size:.75rem;font-weight:750;cursor:pointer}.shock-tab.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.shock-tab.visited::after{content:' ✓';color:#16a34a}.shock-tab.active.visited::after{color:#bbf7d0}
+.shock-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem}.shock-detail-card{border:1px solid #dbe4ef;border-radius:11px;padding:.7rem .8rem;background:#f8fafc}.shock-detail-card strong{display:block;color:#1e3a8a;margin-bottom:.25rem;font-size:.83rem}.shock-detail-card p{font-size:.86rem;line-height:1.6}
+.shock-footer{display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-top:1rem}.shock-footer button,.shock-overview-btn{border:0;border-radius:9px;padding:.58rem .85rem;font-weight:750;cursor:pointer}.shock-footer button{background:#e2e8f0;color:#334155}.shock-overview-btn{background:linear-gradient(135deg,#2563eb,#0d9488)!important;color:#fff!important}
+.shock-overview{width:100%;border-collapse:collapse;font-size:.78rem}.shock-overview th,.shock-overview td{border:1px solid #cbd5e1;padding:.5rem;vertical-align:top}.shock-overview th{background:#e0e7ff;color:#312e81}.shock-scenario{margin-top:1rem;padding:.85rem;background:#fffbeb;border:1px solid #fcd34d;border-radius:11px}.shock-scenario h4{color:#92400e;margin-bottom:.5rem}.shock-choice{display:block;width:100%;margin:.35rem 0;padding:.52rem .65rem;text-align:left;border:1px solid #d6d3d1;border-radius:8px;background:#fff;cursor:pointer}.shock-choice.correct{border-color:#22c55e;background:#f0fdf4}.shock-choice.wrong{border-color:#fb923c;background:#fff7ed}
+@media(max-width:700px){.shock-map{aspect-ratio:1.45/1}.shock-node{min-width:96px;font-size:.7rem;padding:.38rem}.shock-detail-grid{grid-template-columns:1fr}.shock-tabs{grid-template-columns:repeat(2,1fr)}}
+.assignment-launch{border:0;border-radius:13px;padding:.78rem 1.2rem;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;box-shadow:0 6px 17px rgba(79,70,229,.28)}
+.assignment-form{display:grid;gap:.75rem}.assignment-identity{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}.assignment-field{display:grid;gap:.28rem}.assignment-field label{font-size:.75rem;font-weight:750;color:#475569}.assignment-field input{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:.58rem .65rem;background:#f8fafc;color:#1e293b}
+.assignment-file-box{border:2px dashed #93c5fd;border-radius:12px;padding:1rem;background:#eff6ff}.assignment-file-box input{width:100%}.assignment-progress{height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}.assignment-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width .2s}.assignment-status{min-height:1.5rem;color:#475569;font-size:.83rem}.assignment-status.error{color:#b91c1c}.assignment-status.success{color:#15803d}.assignment-submit{justify-self:end;border:0;border-radius:10px;padding:.68rem 1rem;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}.assignment-submit:disabled{opacity:.55;cursor:not-allowed}.assignment-latest{padding:.7rem .8rem;border-radius:10px;background:#f0fdf4;border:1px solid #86efac;font-size:.8rem;line-height:1.55;color:#166534}
+@media(max-width:650px){.assignment-identity{grid-template-columns:1fr}}
+</style></head><body data-reader-version="1">
+<header class="topbar"><div class="topbar-title" id="topbarTitle">第一章 · Cross-cultural Management</div><div class="reader-actions"><button id="picturesBtn">本页图片 <span id="pictureCount">0</span></button><button id="modeBtn" aria-pressed="false">课堂模式</button><button id="revealBtn">本页全部展开</button><button id="fullscreenBtn">全屏</button><button id="editBtn" aria-pressed="false">本机编辑</button><button id="exportBtn" hidden>导出含图片的 HTML</button></div></header>
+<main class="stage" id="stage">
+
+<!-- ===== SLIDE 1: COVER ===== -->
+<section class="slide active" data-slide="1" data-title="Cross-Cultural Management">
+  <div class="slide-inner cover">
+    <svg class="cover-deco" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="deco1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2563eb" stop-opacity=".08"/>
+          <stop offset="100%" stop-color="#06b6d4" stop-opacity=".02"/>
+        </linearGradient>
+      </defs>
+      <circle cx="120" cy="100" r="80" fill="url(#deco1)"/>
+      <circle cx="700" cy="400" r="120" fill="url(#deco1)"/>
+      <rect x="600" y="60" width="120" height="120" rx="20" fill="none" stroke="#2563eb" stroke-opacity=".08" stroke-width="2" transform="rotate(15 660 120)"/>
+      <line x1="0" y1="250" x2="800" y2="250" stroke="#2563eb" stroke-opacity=".04" stroke-width="1"/>
+      <line x1="400" y1="0" x2="400" y2="500" stroke="#2563eb" stroke-opacity=".04" stroke-width="1"/>
+    </svg>
+    <h1 class="anim visible" data-order="0">Cross-Cultural<br>Management<span style="display:block;margin-top:.45rem;font-size:.55em;letter-spacing:.18em;color:#0f766e;-webkit-text-fill-color:#0f766e">跨文化管理</span></h1>
+    <div class="divider anim visible" data-order="0"></div>
+    <div class="author anim" data-order="1">
+      <p><strong>Yan Qinghua</strong> · Associate Professor</p>
+      <p>Email: yanqinghua@ctbu.edu.cn</p>
+      <p style="margin-top:.5rem;color:var(--text-light);font-size:.85rem">Chongqing Technology and Business University</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="2" data-title="Opening Case: Yingsu Industry">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim visible" data-order="0">Opening Case 开篇案例</h2>
+    <div class="reading-title-row anim visible" data-order="0">
+      <p class="slide-subtitle">盈塑工业 · 马来西亚工厂的跨文化管理</p>
+      <button class="reading-open" id="openCultureReading" type="button">📖 延伸阅读 / Further Reading</button>
+    </div>
+    <div class="def-box anim visible" data-order="1" style="font-size:1.05rem;line-height:1.9">
+      <p class="en"><strong>Watch the video:</strong> Cross-Cultural Management at Yingsu Industry's Malaysia Plant (5-minute commentary video)</p>
+      <p class="zh"><strong>观看视频：</strong>《盈塑工业跨文化视频案例》——盈塑工业在马来西亚工厂的跨文化管理（5 分钟口播视频）</p>
+    </div>
+    <div class="anim visible" data-order="2" style="margin-top:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.9rem 1rem;text-align:center;font-size:1rem;color:#1e3a8a;font-weight:600">
+      🎬 视频案例入口：请使用主程序视频案例入口播放（Video available via the main app's video case entrance）
+    </div>
+    <div class="card anim visible" data-order="3" style="margin-top:1.2rem">
+      <h3><span class="num">Q</span>观后思考 · Think &amp; Discuss</h3>
+      <ul>
+        <li>Why is cultural difference important for cross-cultural business management?<span class="zh">文化差异对于跨国经营管理为什么重要？</span></li>
+        <li>What is culture?<span class="zh">什么是文化？</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="3" data-title="Chapter 1: Determinants of Culture">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Chapter One · Determinants of Culture</h2>
+    <p class="slide-subtitle anim visible" data-order="0">第一章 · 文化的决定因素</p>
+    <div class="toc-wrap">
+      <div class="toc-objectives anim" data-order="1">
+        <h3>🎯 Objectives 学习目标</h3>
+        <p>To understand the concept, levels, and influence of culture.</p>
+        <p style="margin-top:.5rem;color:var(--text-light);font-size:.82rem">理解文化的概念、层次及其影响。</p>
+      </div>
+      <ol class="toc-list">
+        <li class="anim" data-order="2">Opening Case &amp; Why Culture Matters<span class="zh">开篇案例与"文化为什么重要"</span></li>
+        <li class="anim" data-order="3">What is Culture?<span class="zh">什么是文化？</span></li>
+        <li class="anim" data-order="4">Culture Shock<span class="zh">文化休克（拓展）</span></li>
+        <li class="anim" data-order="5">Levels of Culture &amp; Conclusion<span class="zh">商业文化层次与总结</span></li>
+      </ol>
+
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="4" data-title="Workplace Culture Differences">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Cultural Differences at Workplace</h2>
+    <p class="slide-subtitle anim visible" data-order="0">At Workplace · 职场中的文化差异</p>
+    <div class="anim visible" data-order="1" style="margin-bottom:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：中欧职场对比（请使用主程序视频案例入口播放）</div>
+    <div class="svg-wrap anim" data-order="2">
+      <svg viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="euGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#dbeafe"/><stop offset="100%" stop-color="#bfdbfe"/>
+          </linearGradient>
+          <linearGradient id="cnGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fef3c7"/><stop offset="100%" stop-color="#fde68a"/>
+          </linearGradient>
+          <linearGradient id="vsGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+          <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#2563eb" flood-opacity=".15"/>
+          </filter>
+        </defs>
+
+        <!-- Scenario 1 -->
+                <rect x="200" y="10" width="480" height="46" rx="12" fill="url(#vsGrad)"/>
+        <text x="440" y="29" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Scenario 1 · Asking for help from boss?</text>
+        <text x="440" y="48" text-anchor="middle" font-size="12" fill="#dbeafe">场景一：向老板求助？</text>
+
+        <!-- Europe card -->
+        <rect x="80" y="62" width="300" height="110" rx="12" fill="url(#euGrad)" filter="url(#cardShadow)"/>
+        <text x="230" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#1e40af">Europe 欧洲</text>
+        <circle cx="230" cy="125" r="22" fill="#10b981"/>
+        <text x="230" y="133" text-anchor="middle" font-size="24" font-weight="800" fill="#fff">√</text>
+        <text x="230" y="160" text-anchor="middle" font-size="11" fill="#1e40af">Common and acceptable</text>
+
+        <!-- VS -->
+        <circle cx="440" cy="117" r="20" fill="url(#vsGrad)"/>
+        <text x="440" y="123" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">VS</text>
+
+        <!-- China card -->
+        <rect x="500" y="62" width="300" height="110" rx="12" fill="url(#cnGrad)" filter="url(#cardShadow)"/>
+        <text x="650" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#92400e">China 中国</text>
+        <circle cx="650" cy="125" r="22" fill="#ef4444"/>
+        <text x="650" y="133" text-anchor="middle" font-size="24" font-weight="800" fill="#fff">×</text>
+        <text x="650" y="160" text-anchor="middle" font-size="11" fill="#92400e">May show incompetence</text>
+
+        <!-- Why button 1 -->
+        <rect x="390" y="182" width="100" height="28" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="440" y="201" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">Why? →</text>
+
+        <!-- Scenario 2 -->
+                <rect x="200" y="222" width="480" height="46" rx="12" fill="url(#vsGrad)"/>
+        <text x="440" y="241" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Scenario 2 · Response to after-work message?</text>
+        <text x="440" y="260" text-anchor="middle" font-size="12" fill="#dbeafe">场景二：回复下班后的工作消息？</text>
+
+        <!-- Europe card 2 -->
+        <rect x="80" y="274" width="300" height="110" rx="12" fill="url(#euGrad)" filter="url(#cardShadow)"/>
+        <text x="230" y="302" text-anchor="middle" font-size="16" font-weight="700" fill="#1e40af">Europe 欧洲</text>
+        <rect x="160" y="315" width="140" height="28" rx="14" fill="#1e40af"/>
+        <text x="230" y="334" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">unless urgent</text>
+        <text x="230" y="368" text-anchor="middle" font-size="11" fill="#1e40af">Work-life boundary respected</text>
+
+        <!-- VS 2 -->
+        <circle cx="440" cy="329" r="20" fill="url(#vsGrad)"/>
+        <text x="440" y="335" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">VS</text>
+
+        <!-- China card 2 -->
+        <rect x="500" y="274" width="300" height="110" rx="12" fill="url(#cnGrad)" filter="url(#cardShadow)"/>
+        <text x="650" y="302" text-anchor="middle" font-size="16" font-weight="700" fill="#92400e">China 中国</text>
+        <rect x="590" y="315" width="120" height="28" rx="14" fill="#92400e"/>
+        <text x="650" y="334" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">always</text>
+        <text x="650" y="368" text-anchor="middle" font-size="11" fill="#92400e">Dedication and responsiveness</text>
+
+        <!-- Why button 2 -->
+        <rect x="390" y="394" width="100" height="28" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="440" y="413" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb">Why? →</text>
+
+        <!-- Bottom note -->
+        <text x="440" y="445" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">Differences rooted in individualism vs. collectivism, power distance, and work-life norms</text>
+      </svg>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="5" data-title="Cultural Interpreter">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Cultural Interpreter</h2>
+    <p class="slide-subtitle anim visible" data-order="0">文化翻译官 · 角色画像</p>
+    <div class="card-grid cols-3">
+      <div class="card anim" data-order="1">
+        <h3><span class="num">1</span>Core Traits 特质</h3>
+        <ul>
+          <li>Cultural Empathy <span class="en">共情力</span></li>
+          <li>Open-Mindedness <span class="en">开放心态</span></li>
+          <li>Neutrality <span class="en">中立</span></li>
+          <li>Patience <span class="en">耐心细致</span></li>
+          <li>Adaptability <span class="en">适应力</span></li>
+        </ul>
+      </div>
+      <div class="card anim" data-order="2">
+        <h3><span class="num">2</span>Key Abilities 核心能力</h3>
+        <ul>
+          <li>Bilingual/Multilingual Proficiency <span class="en">双语/多语能力</span></li>
+          <li>Cross-Cultural Communication <span class="en">跨文化沟通</span></li>
+          <li>Semantic Accuracy <span class="en">语义精准转化力</span></li>
+          <li>Non-Verbal Cue Interpretation <span class="en">非语言信号解读</span></li>
+          <li>Conflict Mediation <span class="en">文化冲突调解</span></li>
+        </ul>
+      </div>
+      <div class="card anim" data-order="3">
+        <h3><span class="num">3</span>Experience 经验</h3>
+        <ul>
+          <li>Cross-Cultural Living/Working <span class="en">跨文化生活/工作</span></li>
+          <li>Cultural Project Involvement <span class="en">文化项目参与</span></li>
+          <li>Translation/Interpretation Practice <span class="en">笔译/口译实践</span></li>
+          <li>Cultural Research Experience <span class="en">文化研究经验</span></li>
+          <li>Multinational Team Collaboration <span class="en">跨国团队协作</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+<div class="anim visible" data-order="9" style="margin-top:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：文化翻译官（请使用主程序视频案例入口播放）</div>
+</section>
+<section class="slide" data-slide="6" data-title="Framework of Cross-Cultural Management">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Framework of Cross-Cultural Management</h2>
+    <p class="slide-subtitle anim visible" data-order="0">跨文化管理框架</p>
+    <div class="svg-wrap anim" data-order="1">
+      <svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="fwTop" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#3b82f6"/>
+          </linearGradient>
+          <linearGradient id="fwMid" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+          <linearGradient id="fwBot" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a78bfa"/>
+          </linearGradient>
+          <filter id="fwShadow"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#2563eb" flood-opacity=".15"/></filter>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+          </marker>
+        </defs>
+
+        <!-- Top level: Global Management -->
+        <rect x="250" y="20" width="300" height="55" rx="12" fill="url(#fwTop)" filter="url(#fwShadow)"/>
+        <text x="400" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Global Management 全球管理</text>
+        <text x="400" y="63" text-anchor="middle" font-size="11" fill="#dbeafe">Cross-Cultural Management 跨文化管理</text>
+
+        <!-- Arrows down -->
+        <line x1="400" y1="75" x2="400" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Mid level: 3 pillars -->
+        <rect x="60" y="105" width="200" height="70" rx="10" fill="url(#fwMid)" filter="url(#fwShadow)"/>
+        <text x="160" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Cultural Factors</text>
+        <text x="160" y="152" text-anchor="middle" font-size="11" fill="#cffafe">文化因素</text>
+
+        <rect x="300" y="105" width="200" height="70" rx="10" fill="url(#fwMid)" filter="url(#fwShadow)"/>
+        <text x="400" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Institutional Factors</text>
+        <text x="400" y="152" text-anchor="middle" font-size="11" fill="#cffafe">制度因素</text>
+
+        <rect x="540" y="105" width="200" height="70" rx="10" fill="url(#fwMid)" filter="url(#fwShadow)"/>
+        <text x="640" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Non-Cultural Factors</text>
+        <text x="640" y="152" text-anchor="middle" font-size="11" fill="#cffafe">非文化因素</text>
+
+        <!-- Arrows -->
+        <line x1="160" y1="175" x2="160" y2="205" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="400" y1="175" x2="400" y2="205" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="640" y1="175" x2="640" y2="205" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- Bottom level: details -->
+        <rect x="30" y="210" width="260" height="90" rx="10" fill="#f0f6ff" stroke="#93b8e8" stroke-width="1.5"/>
+        <text x="160" y="235" text-anchor="middle" font-size="12" font-weight="600" fill="#1d4ed8">Values & Norms 价值观与规范</text>
+        <text x="160" y="255" text-anchor="middle" font-size="10" fill="#475569">Individualism / Collectivism</text>
+        <text x="160" y="272" text-anchor="middle" font-size="10" fill="#475569">Power Distance · Uncertainty Avoidance</text>
+        <text x="160" y="289" text-anchor="middle" font-size="10" fill="#475569">Communication Styles · Time Orientation</text>
+
+        <rect x="290" y="210" width="220" height="90" rx="10" fill="#ecfafc" stroke="#5fd0e0" stroke-width="1.5"/>
+        <text x="400" y="235" text-anchor="middle" font-size="12" font-weight="600" fill="#0e7490">Organizational Systems</text>
+        <text x="400" y="255" text-anchor="middle" font-size="10" fill="#475569">Corporate Culture 企业文化</text>
+        <text x="400" y="272" text-anchor="middle" font-size="10" fill="#475569">Leadership · Decision-Making</text>
+        <text x="400" y="289" text-anchor="middle" font-size="10" fill="#475569">HR Practices · Negotiation</text>
+
+        <rect x="540" y="210" width="230" height="90" rx="10" fill="#f4f1fc" stroke="#b6a6e8" stroke-width="1.5"/>
+        <text x="655" y="235" text-anchor="middle" font-size="12" font-weight="600" fill="#7c3aed">Context & Strategy</text>
+        <text x="655" y="255" text-anchor="middle" font-size="10" fill="#475569">Industry · Market Structure</text>
+        <text x="655" y="272" text-anchor="middle" font-size="10" fill="#475569">Technology · Resources</text>
+        <text x="655" y="289" text-anchor="middle" font-size="10" fill="#475569">Legal · Political Environment</text>
+
+        <!-- Outcome -->
+        <line x1="400" y1="300" x2="400" y2="330" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+        <rect x="200" y="335" width="400" height="55" rx="12" fill="url(#fwBot)" filter="url(#fwShadow)"/>
+        <text x="400" y="360" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Cross-Cultural Competence 跨文化能力</text>
+        <text x="400" y="380" text-anchor="middle" font-size="11" fill="#ede9fe">Effective Global Business · 有效的全球业务</text>
+
+        <text x="400" y="415" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">Framework adapted from Browaeys & Price (2015)</text>
+      </svg>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="7" data-title="Course Introduction & Assessment">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim visible" data-order="0">Course Introduction &amp; Assessment</h2>
+    <p class="slide-subtitle anim visible" data-order="0">课程介绍与考核规则</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:1 1 360px;min-width:0;box-sizing:border-box">
+        <h3 style="color:var(--primary);font-size:1.1rem;margin:.2rem 0 .6rem">Course Objectives 课程目标</h3>
+        <ol class="obj-list course-obj">
+          <li class="anim visible" data-order="1">Appreciate the importance and scope of cross-cultural management<span class="zh">认识跨文化管理概念的重要性及其范围</span></li>
+          <li class="anim visible" data-order="2">Elaborate different theories and approaches of cross-cultural management<span class="zh">阐述跨文化管理的不同理论与方法</span></li>
+          <li class="anim visible" data-order="3">Understand cultural and non-cultural factors in global management<span class="zh">理解文化与非文化因素在全球管理中的作用</span></li>
+          <li class="anim visible" data-order="4">Identify and measure cross-cultural competencies for effective global business<span class="zh">识别和衡量跨文化能力，以促进有效的全球业务</span></li>
+          <li class="anim visible" data-order="5">Develop global managers for organizations<span class="zh">为组织培养全球管理者</span></li>
+        </ol>
+      </div>
+      <div style="flex:1 1 360px;min-width:0;box-sizing:border-box">
+        <h3 style="color:var(--primary);font-size:1.1rem;margin:.2rem 0 .6rem">Grading 评分标准</h3>
+        <div class="grade-total anim visible" data-order="6" style="margin-bottom:.6rem">Total Score = <span style="font-size:1.4rem">100</span></div>
+        <div class="grade-bars anim visible" data-order="7">
+          <div class="grade-bar">
+            <span class="label">Attendance + Q&amp;A<br><span style="font-weight:400;font-size:.75rem;color:var(--text-light)">考勤 + 课堂问答</span></span>
+            <div class="track"><div class="fill" style="width:20%">20%</div></div>
+          </div>
+          <div class="grade-bar">
+            <span class="label">Coursework + Assignment + Quiz<br><span style="font-weight:400;font-size:.75rem;color:var(--text-light)">作业 + 小测验</span></span>
+            <div class="track"><div class="fill" style="width:40%">40%</div></div>
+          </div>
+          <div class="grade-bar">
+            <span class="label">Final Assignment<br><span style="font-weight:400;font-size:.75rem;color:var(--text-light)">期末大作业</span></span>
+            <div class="track"><div class="fill" style="width:40%">40%</div></div>
+          </div>
+        </div>
+        <div class="grade-detail anim visible" data-order="8" style="margin-top:.6rem">
+          <strong>Attendance 考勤：</strong>
+          Late/Early leave <strong style="color:var(--danger)">-2</strong>/time ·
+          Absence <strong style="color:var(--danger)">-5</strong>/time ·
+          Q&amp;A <strong style="color:var(--success)">+1~2</strong>/time
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="8" data-title="Textbooks & References">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Textbooks & References</h2>
+    <p class="slide-subtitle anim visible" data-order="0">教材与参考书目</p>
+    <div class="book-list">
+      <div class="book-item anim" data-order="1">
+        <span class="tag textbook">Textbook 教材</span>
+        <div class="title">Understanding Cross-Cultural Management (3rd Edition)</div>
+        <div class="meta">Ed. by Browaeys, M.J. & Price, R.<br>Pearson Education Limited, 2015</div>
+      </div>
+      <div class="book-item anim" data-order="1">
+        <span class="tag textbook">Textbook 教材</span>
+        <div class="title">Leading Cross Cultures (Chinese Version) 跨文化管理（第四版）</div>
+        <div class="meta">陈小萍 著<br>清华大学出版社, 2022 · ISBN 9787302616085</div>
+      </div>
+      <div class="book-item anim" data-order="2">
+        <span class="tag reference">Reference 参考</span>
+        <div class="title">The Culture Map: Breaking Through the Invisible Boundaries of Global Business</div>
+        <div class="meta">Erin Meyer<br>PublicAffairs, 2014 · ISBN 978-1-61039-259-4</div>
+      </div>
+      <div class="book-item anim" data-order="2">
+        <span class="tag reference">Reference 参考</span>
+        <div class="title">The Clash of Civilizations and the Remaking of World Order</div>
+        <div class="meta">Samuel P. Huntington<br>Free Press, 2002 · ISBN 9780743231497</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="9" data-title="Video Case 1: BRAG">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">Video Case (1): BRAG — Bragging Across Cultures</h2>
+    <p class="slide-subtitle anim visible" data-order="0">Bragging Behaviors Across Cultures · 不同文化中的"炫耀"行为</p>
+    <div class="anim visible" data-order="1" style="margin-bottom:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：BRAG — 三种文化炫耀的区别讲解（请使用主程序视频案例入口播放）</div>
+    <div class="anim" data-order="2" style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:28%">Group 群体</th>
+            <th style="width:35%">Focus of Bragging<br>炫耀焦点</th>
+            <th>Underlying Cultural Values<br>深层文化价值观</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="group-label">Western (White) Cultures<br><span style="font-weight:400;color:var(--text-light)">西方（白人）文化</span></td>
+            <td>Experiences, Taste, Legacy<br><span style="color:var(--text-light)">体验、品味、传承</span></td>
+            <td>Individualism, Self-Actualization, Class & Taste<br><span style="color:var(--text-light)">个人主义、自我实现、阶级与品味</span></td>
+          </tr>
+          <tr>
+            <td class="group-label">Black Cultures<br><span style="font-weight:400;color:var(--text-light)">黑人文化</span></td>
+            <td>Material Wealth, Immediate Possession<br><span style="color:var(--text-light)">物质财富、即时拥有</span></td>
+            <td>Declaring Success, Overcoming Adversity, Status within Community<br><span style="color:var(--text-light)">宣告成功、克服逆境、社区内部地位</span></td>
+          </tr>
+          <tr>
+            <td class="group-label">Asian (East Asian) Cultures<br><span style="font-weight:400;color:var(--text-light)">亚洲（东亚）文化</span></td>
+            <td>Savviness, Value, Smart Acquisition<br><span style="color:var(--text-light)">精明、价值、聪明地获取</span></td>
+            <td>Collectivism, Frugality as a Virtue, Wisdom, and Humility<br><span style="color:var(--text-light)">集体主义、节俭美德、智慧与谦逊</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="10" data-title="Mosuo Marriage">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Mosuo Marriage</h2>
+    <p class="slide-subtitle anim" data-order="0">摩梭婚姻</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.1rem;line-height:2">
+      <p class="en"><strong>Question:</strong> In your view, what is a family?</p>
+      <p class="zh"><strong>思考问题：</strong>在你看来，什么是家庭？</p>
+    </div>
+    <div class="anim" data-order="2" style="margin-top:1.5rem">
+      <h3 style="color:var(--primary);font-size:1.2rem;margin-bottom:.8rem">Mosuo's Matrilineal Family 摩梭母系家庭</h3>
+      <p style="color:var(--text-dark);line-height:1.9;font-size:1rem">摩梭人是中国现存唯一的母系氏族社会，实行"走婚"制度——男女不结婚，男方夜间到女方家走访，白天回到自己母亲家。子女由女方家庭抚养，世系按母系计算。</p>
+    </div>
+    <div class="anim" data-order="3" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:.95rem">
+      🎬 视频 + 🖼 3张图片：摩梭文化（图片见本页图片区，视频请使用主程序的视频案例入口）
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="11" data-title="Assignment 1 · Topic Video">
+  <div class="slide-inner" style="max-width:960px">
+    <h2 class="slide-title anim visible" data-order="0">Assignment 1 · 第一次作业</h2>
+    <p class="slide-subtitle anim visible" data-order="0">文化主题口播视频 · Culture-themed Commentary Video</p>
+    <div class="def-box anim visible" data-order="1" style="font-size:1rem;line-height:1.9">
+      <p class="en"><strong>Task:</strong> Select ONE topic, research with Doubao and other tools, write a commentary script, clone your own voice, and produce a 4–5 minute spoken video.</p>
+      <p class="zh"><strong>任务：</strong>从下方 5 个选题中任选一个，用豆包等工具搜集资料制作口播稿，协助完成你自己的声纹克隆，再生成 4–5 分钟口播视频。</p>
+    </div>
+    <div class="card anim visible" data-order="2">
+      <h3><span class="num">①</span>选题规则 Rules</h3>
+      <ul>
+        <li>全班共享 5 个选题，每人限选一题，同一题不超过 4 人（按班级统计）<span class="zh">One topic per student · max 4 per topic (per class)</span></li>
+        <li>选题后如需改选：在目标题仍有名额的前提下可改选<span class="zh">Re-select allowed while seats remain</span></li>
+        <li>口播稿须注明资料出处（自媒体 / 新闻 / 博文 / 研究文献）<span class="zh">Cite your sources in the script</span></li>
+      </ul>
+    </div>
+    <div class="anim visible" data-order="3" style="text-align:center;margin-top:1.2rem">
+      <button id="openAssignmentBtn" type="button" style="background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;border:none;border-radius:14px;padding:.9rem 1.6rem;font-size:1.05rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.3)">📋 查看 5 个选题并登记 / View Topics &amp; Register</button>
+    </div>
+    <div class="anim visible" data-order="4" id="assignmentAuthStatus" style="margin-top:.8rem;text-align:center;font-size:.95rem;color:var(--text-light)"></div>
+  </div>
+</section>
+
+<style id="assignmentCss">
+  .ass-win{position:fixed;z-index:9999;top:60px;right:16px;width:min(560px,94vw);max-height:86vh;display:flex;flex-direction:column;background:#fff;border:1.5px solid #2563eb;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.25);font-family:inherit;overflow:hidden}
+  .ass-win.mini{height:48px;overflow:hidden}
+  .ass-win .ass-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;cursor:move;user-select:none}
+  .ass-win .ass-head .ass-title{flex:1;font-weight:700;font-size:14px}
+  .ass-win .ass-head button{background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:8px;width:26px;height:26px;font-size:13px;line-height:1;cursor:pointer}
+  .ass-win .ass-body{padding:12px;overflow:auto;flex:1}
+  .ass-win .ass-auth{font-size:12px;color:#1e3a8a;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;margin-bottom:10px}
+  .ass-win .ass-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .ass-win .ass-nav button{background:#eff6ff;border:1.5px solid #2563eb;color:#2563eb;border-radius:10px;padding:6px 12px;font-weight:600;cursor:pointer}
+  .ass-win .ass-nav .ass-page{flex:1;text-align:center;font-weight:700;color:#1e3a8a;font-size:13px}
+  .ass-win .ass-topic{background:#f8fafc;border:1.5px solid #a5b8d1;border-radius:12px;padding:10px 12px;margin-bottom:10px}
+  .ass-win .ass-topic h4{margin:0 0 6px;color:#1d4ed8;font-size:14px}
+  .ass-win .ass-topic .ass-steps{font-size:12.5px;color:#334155;line-height:1.8}
+  .ass-win .ass-topic .ass-steps b{color:#1e3a8a}
+  .ass-win .ass-count{margin-top:8px;font-size:12.5px;color:#475569}
+  .ass-win .ass-count .filled{color:#16a34a;font-weight:700}
+  .ass-win .ass-count .full{color:#dc2626;font-weight:700}
+  .ass-win .ass-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .ass-win .ass-act button{flex:1 1 200px;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer;border:none}
+  .ass-win .ass-act .do{background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff}
+  .ass-win .ass-act .do:disabled{background:#94a3b8;cursor:not-allowed}
+  .ass-win .ass-act .mine{background:#fff;border:1.5px solid #2563eb;color:#2563eb}
+  .ass-win .ass-foot{font-size:11.5px;color:#94a3b8;padding:6px 12px;border-top:1px solid #e2e8f0;text-align:center}
+  .ass-win .ass-msg{font-size:12.5px;border-radius:8px;padding:6px 10px;margin-top:8px}
+  .ass-win .ass-msg.ok{background:#dcfce7;color:#14532d}
+  .ass-win .ass-msg.err{background:#fee2e2;color:#7f1d1d}
+</style>
+
+<script>
+/* ============================================================
+ * 作业 1 · 选题登记弹窗
+ * ------------------------------------------------------------
+ * 接口契约（供 CODEX 在平台主程序中按此实现）：
+ *
+ * ① 身份桥（postMessage）：
+ *    - 本页加载后向父页面发送  {type:'CCM_AUTH_REQUEST'}
+ *    - 父页面收到后应回复      {type:'CCM_AUTH', auth:{role,id,name,inviteCode}}
+ *      （inviteCode 可选，用于云函数鉴权；若平台用 id 即可鉴权可省略）
+ *    - 若父页面未在 3 秒内回复，视为未登录（学生必须登录主程序才能进入课程）
+ *
+ * ② 云函数（腾讯云 SCF，POST JSON）：
+ *    body = { action, id, inviteCode, topicId }
+ *    - topic-choice-list → { ok:true, topics:[{topicId, count}] }  各题已选人数
+ *    - topic-choice-mine → { ok:true, topicId|null }               当前学生选题
+ *    - topic-choice-set  → { ok:true, topicId }                    登记/改选（服务端校验：一人一题、同题≤4）
+ *    存储建议：COS 私有前缀 system/topic-choices-v1/revisions/，按班级统计，选题池全校共享
+ *
+ * ③ 降级：云函数未联调时（fetch 失败），弹窗自动进入"浏览模式"，
+ *    可查看题目与名额占用示例，登记按钮禁用并提示等待联调。
+ * ============================================================ */
+(function () {
+  'use strict';
+  try {
+    /* ---- 配置（CODEX 联调时按实际替换） ---- */
+    var CFG = {
+      SCF_URL: 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com',
+      LIST: 'topic-choice-list',
+      MINE: 'topic-choice-mine',
+      SET: 'topic-choice-set',
+      MAX_PER_TOPIC: 4,
+      AUTH_TIMEOUT: 3000,
+      INVITE_KEY: 'ccm_invite_code'
+    };
+
+    /* ---- 5 个选题（摩梭文化主题 · 题目已发布） ---- */
+    var TOPICS = [
+      { id: 1, title: 'Topic 1 · 摩梭与汉族社会的性别与家庭角色对比（Gender and Family Roles in Mosuo vs Han Chinese Society）', hint: '' },
+      { id: 2, title: 'Topic 2 · 摩梭大家庭结构及走婚习俗的形成与影响因素（Determinants of Mosuo Culture Formation）', hint: '' },
+      { id: 3, title: 'Topic 3 · 外部世界对摩梭文化的刻板印象（External Perceptions and Stereotypes of Mosuo Culture）', hint: '' },
+      { id: 4, title: "Topic 4 · 旅游业对摩梭文化的影响（Tourism's Impact on Mosuo Culture）", hint: '' },
+      { id: 5, title: 'Topic 5 · 泸沽湖旅游的核心吸引力是什么？当这种核心吸引力消失了，泸沽湖旅游的可持续性还存在吗？（What Constitutes the Core Attraction of Lugu Lake Tourism? And If This Core Attraction Disappears, Can Lugu Lake Tourism Survive Sustainably?）', hint: '' }
+    ];
+    var STEP_LABELS = [
+      '口播稿：用豆包等搜索相关自媒体、新闻、博文、研究文献，制作口播稿（注明资料出处）',
+      '声纹克隆：协助完成你自己的声纹克隆',
+      '视频生成：生成 4–5 分钟口播视频'
+    ];
+
+    var state = { auth: null, authResolved: false, current: 0, myTopic: null, counts: {}, mode: 'browse' };
+    var win = null;
+    var btn = document.getElementById('openAssignmentBtn');
+    var statusEl = document.getElementById('assignmentAuthStatus');
+    if (!btn) return;
+
+    function $id(id) { return document.getElementById(id); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+    function renderAuthStatus() {
+      if (!statusEl) return;
+      var a = state.auth;
+      if (a && a.id) { statusEl.textContent = '当前身份：' + (a.name || a.id) + '（' + (a.role === 'teacher' ? '教师' : '学生') + '）· 已登录主程序'; statusEl.style.color = '#16a34a'; }
+      else { statusEl.textContent = '⚠ 未检测到登录信息：请先登录主程序再进入课程，登录后选题登记可用。'; statusEl.style.color = '#b45309'; }
+    }
+
+    /* ---- 身份桥：postMessage 与父页面通信 ---- */
+    function requestAuth() {
+      try { if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'CCM_AUTH_REQUEST' }, '*'); }
+      catch (e) { /* 忽略 */ }
+      setTimeout(function () { state.authResolved = true; renderAuthStatus(); updateActionUI(); }, CFG.AUTH_TIMEOUT);
+    }
+    window.addEventListener('message', function (ev) {
+      var d = ev.data;
+      if (!d || d.type !== 'CCM_AUTH') return;
+      state.auth = d.auth || null;
+      state.authResolved = true;
+      renderAuthStatus();
+      if (win) { renderAuthLine(); updateActionUI(); }
+    });
+
+    /* ---- 云函数调用（契约见文件头注释） ---- */
+    function callCloud(action, extra) {
+      var body = { action: action };
+      if (state.auth && state.auth.id) body.id = state.auth.id;
+      if (state.auth && state.auth.inviteCode) body.inviteCode = state.auth.inviteCode;
+      else { try { var ic = window.localStorage.getItem(CFG.INVITE_KEY); if (ic) body.inviteCode = ic; } catch (e) {} }
+      if (extra) Object.assign(body, extra);
+      var ctrl = ('AbortController' in window) ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+      var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+      if (ctrl) opts.signal = ctrl.signal;
+      return fetch(CFG.SCF_URL, opts)
+        .then(function (r) { if (timer) clearTimeout(timer); return r.json(); })
+        .catch(function (err) { if (timer) clearTimeout(timer); throw err; });
+    }
+
+    function refreshData() {
+      if (!state.auth || !state.auth.id) { updateActionUI(); return; }
+      Promise.all([
+        callCloud(CFG.LIST).then(function (r) { if (r && r.topics) { r.topics.forEach(function (t) { state.counts[t.topicId] = t.count; }); } }),
+        callCloud(CFG.MINE).then(function (r) { if (r) state.myTopic = r.topicId != null ? r.topicId : null; })
+      ]).catch(function () {
+        state.mode = 'browse';
+        if (win) showMsg('选题登记接口尚未连接（等待 CODEX 联调），当前为浏览模式。', 'err');
+      }).then(function () { if (win) renderTopic(); });
+    }
+
+    /* ---- 弹窗 UI ---- */
+    function buildWin() {
+      win = document.createElement('div');
+      win.className = 'ass-win';
+      win.innerHTML =
+        '<div class="ass-head"><span class="ass-title">📋 作业1 · 选题登记</span>' +
+        '<button type="button" id="assMini" title="最小化">–</button>' +
+        '<button type="button" id="assClose" title="关闭">×</button></div>' +
+        '<div class="ass-body">' +
+        '  <div class="ass-auth" id="assAuthLine">…</div>' +
+        '  <div class="ass-nav">' +
+        '    <button type="button" id="assPrev">◀ 上一题</button>' +
+        '    <div class="ass-page" id="assPage">1 / 5</div>' +
+        '    <button type="button" id="assNext">下一题 ▶</button>' +
+        '  </div>' +
+        '  <div id="assTopic"></div>' +
+        '  <div class="ass-msg" id="assMsg" style="display:none"></div>' +
+        '</div>' +
+        '<div class="ass-foot">选题以班级为单位统计 · 每题最多 ' + CFG.MAX_PER_TOPIC + ' 人 · 刷新后以云端为准</div>';
+      document.body.appendChild(win);
+      win.addEventListener('mousedown', startDrag);
+      $id('assClose').addEventListener('click', closeWin);
+      $id('assMini').addEventListener('click', function () { win.classList.toggle('mini'); });
+      $id('assPrev').addEventListener('click', function () { state.current = (state.current - 1 + TOPICS.length) % TOPICS.length; renderTopic(); });
+      $id('assNext').addEventListener('click', function () { state.current = (state.current + 1) % TOPICS.length; renderTopic(); });
+      renderAuthLine();
+      renderTopic();
+      refreshData();
+    }
+    function closeWin() { if (win) { win.remove(); win = null; } }
+    function renderAuthLine() {
+      var el = $id('assAuthLine'); if (!el) return;
+      var a = state.auth;
+      el.textContent = a && a.id ? '👤 ' + (a.name || a.id) + ' · ' + (a.role === 'teacher' ? '教师' : '学生') + '（已登录主程序）' : '⚠ 未检测到登录信息，选题登记不可用，请先登录主程序';
+      el.style.color = a && a.id ? '#1e3a8a' : '#b45309';
+    }
+    function renderTopic() {
+      var t = TOPICS[state.current]; if (!t) return;
+      $id('assPage').textContent = (state.current + 1) + ' / ' + TOPICS.length;
+      var c = state.counts[t.id] || 0;
+      var isFull = c >= CFG.MAX_PER_TOPIC;
+      var isMine = state.myTopic === t.id;
+      var countHtml = isFull ? '<span class="full">' + c + ' / ' + CFG.MAX_PER_TOPIC + ' 人（已满）</span>'
+        : '<span class="filled">' + c + ' / ' + CFG.MAX_PER_TOPIC + ' 人已选</span>';
+      var steps = STEP_LABELS.map(function (s, i) { return '<b>' + ['①', '②', '③'][i] + '</b> ' + esc(s); }).join('<br>');
+      $id('assTopic').innerHTML =
+        '<div class="ass-topic"><h4>' + esc(t.title) + '</h4>' +
+        '<div class="ass-steps">口播视频要求：<br>' + steps + '</div>' +
+        '<div class="ass-count">已选人数：' + countHtml + (isMine ? ' · <b style="color:#1d4ed8">✓ 这是你的选题</b>' : '') + '</div>' +
+        '<div class="ass-act">' +
+        '<button type="button" class="do" id="assChoose" ' + ((!state.auth || !state.auth.id || isFull) ? 'disabled' : '') + '>' + (isMine ? '✓ 已选择此题' : (isFull ? '已满，不可选' : '选择此题')) + '</button>' +
+        '<button type="button" class="mine" id="assMy" ' + ((!state.auth || !state.auth.id) ? 'disabled' : '') + '>我的选题</button>' +
+        '</div></div>';
+      var cho = $id('assChoose');
+      if (cho) cho.addEventListener('click', function () { chooseTopic(t.id); });
+      var my = $id('assMy');
+      if (my) my.addEventListener('click', function () {
+        if (state.myTopic != null) {
+          var idx = TOPICS.findIndex(function (x) { return x.id === state.myTopic; });
+          if (idx >= 0) { state.current = idx; renderTopic(); }
+        } else { showMsg('你还没有选题。', 'err'); }
+      });
+    }
+    function chooseTopic(topicId) {
+      if (!state.auth || !state.auth.id) { showMsg('请先登录主程序再登记选题。', 'err'); return; }
+      var btn = $id('assChoose'); if (btn) btn.disabled = true;
+      callCloud(CFG.SET, { topicId: topicId }).then(function (r) {
+        if (r && r.ok) {
+          state.myTopic = r.topicId != null ? r.topicId : topicId;
+          if (r.topics) r.topics.forEach(function (t) { state.counts[t.topicId] = t.count; });
+          showMsg('✓ 登记成功：已选择 ' + TOPICS[state.current].title, 'ok');
+          renderTopic();
+        } else { showMsg('登记失败：' + ((r && r.error) || '平台接口尚未就绪（等待 CODEX 联调）'), 'err'); if (btn) btn.disabled = false; }
+      }).catch(function () {
+        showMsg('登记接口尚未连接（等待 CODEX 联调）。', 'err'); if (btn) btn.disabled = false;
+      });
+    }
+    function showMsg(text, kind) {
+      var el = $id('assMsg'); if (!el) return;
+      el.style.display = 'block'; el.textContent = text;
+      el.className = 'ass-msg ' + (kind === 'ok' ? 'ok' : 'err');
+    }
+    function updateActionUI() { if (win) renderTopic(); }
+
+    /* ---- 拖拽 ---- */
+    function startDrag(e) {
+      var head = e.target.closest('.ass-head'); if (!head || !win) return;
+      var sx = e.clientX, sy = e.clientY;
+      var ox = win.offsetLeft, oy = win.offsetTop;
+      function mv(ev) { win.style.left = (ox + ev.clientX - sx) + 'px'; win.style.top = (oy + ev.clientY - sy) + 'px'; win.style.right = 'auto'; }
+      function up() { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); }
+      document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+      e.preventDefault();
+    }
+
+    btn.addEventListener('click', function () {
+      if (win) { closeWin(); return; }
+      buildWin();
+    });
+    renderAuthStatus();
+    requestAuth();
+  } catch (err) {
+    /* 作业弹窗脚本异常时静默降级，不影响课件其他功能 */
+    if (typeof console !== 'undefined') console.error('assignment window init error', err);
+  }
+})();
+</script>
+
+<section class="slide" data-slide="12" data-title="1. The Concept of Culture">
+  <div class="slide-inner">
+    <h2 class="slide-title anim visible" data-order="0">1. The Concept of Culture</h2>
+    <div class="def-box anim" data-order="1">
+      "Culture" derives from the Latin word <em>"Cultura"</em>, meaning "Cultivation" and "Tillage" — implying that just like land in need of tillage, human culture needs cultivating.
+      <span class="zh">"文化"一词源于拉丁语"Cultura"，意为"培育"与"耕作"——暗示正如土地需要耕耘，人类文化亦需要精心培育。</span>
+    </div>
+    <div class="svg-wrap anim" data-order="2">
+      <svg viewBox="0 0 880 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="culGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#dbeafe"/><stop offset="100%" stop-color="#93c5fd"/>
+          </linearGradient>
+          <linearGradient id="natGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#dcfce7"/><stop offset="100%" stop-color="#86efac"/>
+          </linearGradient>
+          <linearGradient id="vsBadge" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#06b6d4"/>
+          </linearGradient>
+          <filter id="s10shadow"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#2563eb" flood-opacity=".12"/></filter>
+        </defs>
+
+        <!-- Title -->
+                <rect x="210" y="6" width="460" height="34" rx="12" fill="url(#vsBadge)"/>
+        <text x="440" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Culture vs. Nature · 文化与自然相对立</text>
+
+        <!-- Row 1: Human-made vs Innate -->
+        <text x="440" y="52" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Dimension 1 · "Human-made" vs. "Innate"</text>
+
+        <rect x="60" y="62" width="330" height="115" rx="12" fill="url(#culGrad)" filter="url(#s10shadow)"/>
+        <text x="225" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">"Human-made" 人造</text>
+        <line x1="100" y1="96" x2="350" y2="96" stroke="#1e40af" stroke-opacity=".2" stroke-width="1"/>
+        <text x="225" y="116" text-anchor="middle" font-size="11" fill="#1e3a8a">▸ Hands & body to interact with environment</text>
+        <text x="225" y="133" text-anchor="middle" font-size="10" fill="#3b82f6">运用双手和身体与环境互动</text>
+        <text x="225" y="155" text-anchor="middle" font-size="11" fill="#1e3a8a">▸ Invention of tools (smartphone, hammer, car)</text>
+        <text x="225" y="172" text-anchor="middle" font-size="10" fill="#3b82f6">发明特定工具（智能手机、锤子、汽车）</text>
+
+        <circle cx="440" cy="120" r="18" fill="url(#vsBadge)"/>
+        <text x="440" y="126" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">VS</text>
+
+        <rect x="490" y="62" width="330" height="115" rx="12" fill="url(#natGrad)" filter="url(#s10shadow)"/>
+        <text x="655" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#166534">"Innate" 天生</text>
+        <line x1="530" y1="96" x2="780" y2="96" stroke="#166534" stroke-opacity=".2" stroke-width="1"/>
+        <text x="655" y="116" text-anchor="middle" font-size="11" fill="#14532d">▸ Biological drive to form groups for survival</text>
+        <text x="655" y="133" text-anchor="middle" font-size="10" fill="#22c55e">为生存组成群体、建立联结的生物驱动</text>
+        <text x="655" y="155" text-anchor="middle" font-size="11" fill="#14532d">▸ Creation of nations, corporations, legal systems</text>
+        <text x="655" y="172" text-anchor="middle" font-size="10" fill="#22c55e">创建国家、公司和法律制度</text>
+
+        <!-- Row 2: Learned vs Instinctive -->
+        <text x="440" y="205" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">Dimension 2 · "Learned" vs. "Instinctive"</text>
+
+        <rect x="60" y="215" width="330" height="105" rx="12" fill="url(#culGrad)" filter="url(#s10shadow)"/>
+        <text x="225" y="241" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af">"Learned" 习得</text>
+        <line x1="100" y1="249" x2="350" y2="249" stroke="#1e40af" stroke-opacity=".2" stroke-width="1"/>
+        <text x="225" y="270" text-anchor="middle" font-size="11" fill="#1e3a8a">▸ Emotion/desire are natural; how we love/marry is cultural</text>
+        <text x="225" y="287" text-anchor="middle" font-size="10" fill="#3b82f6">情感欲望是天生的；如何相爱结婚是文化约定的</text>
+        <text x="225" y="308" text-anchor="middle" font-size="11" fill="#1e3a8a">▸ Hunger is natural; how we eat is cultural</text>
+
+        <circle cx="440" cy="268" r="18" fill="url(#vsBadge)"/>
+        <text x="440" y="274" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">VS</text>
+
+        <rect x="490" y="215" width="330" height="105" rx="12" fill="url(#natGrad)" filter="url(#s10shadow)"/>
+        <text x="655" y="241" text-anchor="middle" font-size="15" font-weight="700" fill="#166534">"Instinctive" 本能</text>
+        <line x1="530" y1="249" x2="780" y2="249" stroke="#166534" stroke-opacity=".2" stroke-width="1"/>
+        <text x="655" y="270" text-anchor="middle" font-size="11" fill="#14532d">▸ Natural emotions and desires</text>
+        <text x="655" y="287" text-anchor="middle" font-size="10" fill="#22c55e">天生的情感与欲望</text>
+        <text x="655" y="308" text-anchor="middle" font-size="11" fill="#14532d">▸ Biological hunger and survival instincts</text>
+      </svg>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="13" data-title="Culture as Rational Adaptation">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Culture as Rational Adaptation</h2>
+    <p class="slide-subtitle anim" data-order="0">文化作为理性适应</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.08rem;line-height:2">
+      <p class="en">Culture is the set of the most appropriate solutions developed by people under the rigid constraints of environment, technology, and resources to address specific problems in a specific time and place.</p>
+      <p class="zh">文化是在环境、技术和资源的刚性约束下，人们为解决特定时空下的具体问题而找到的"当时当地最恰当的方法"的集合。</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="14" data-title="What Culture Is / Is Not">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">What Culture Is / Is Not</h2>
+    <p class="slide-subtitle anim" data-order="0">文化是什么 / 不是什么</p>
+    <div class="def-box anim" data-order="1" style="font-size:1rem;line-height:1.95">
+      <p class="en">Culture is a code of <strong>attitudes, norms and values</strong> — the way of thinking of a relatively large group of people. It determines how we see ourselves and how we see the world.</p>
+      <p class="zh">文化是态度、规范和价值观的集合——是一个相对较大群体的思维方式。它决定我们如何看待自己、如何看待世界。</p>
+    </div>
+    <ul class="obj-list anim" data-order="2">
+      <li><strong>Culture is NOT right or wrong</strong> — each has its own internal standards of right and wrong; no cultural group is "better" in any absolute sense. <span class="zh">文化无对错之分——每个群体都有自己的内在标准，没有哪个文化群体在绝对意义上"更优"。</span></li>
+      <li><strong>Culture is shared</strong> — a shared way of thinking in a society, reflected in individual behaviour. <span class="zh">文化是共享的——特定社会中个体共享的思维方式，体现在个体行为中。</span></li>
+      <li><strong>"The way we do this thing here."</strong> <span class="zh">"这是我们这里做这件事的方式。"</span></li>
+    </ul>
+  </div>
+</section>
+<section class="slide" data-slide="15" data-title="Model of Culture - Onion Model">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Model of Culture — Onion Model</h2>
+    <p class="slide-subtitle anim" data-order="0">文化洋葱模型</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start">
+      <div class="svg-wrap anim" data-order="1">
+        <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <ellipse cx="200" cy="190" rx="170" ry="160" fill="#dbeafe" stroke="#93c5fd" stroke-width="2"/>
+          <ellipse cx="200" cy="190" rx="115" ry="108" fill="#bfdbfe" stroke="#60a5fa" stroke-width="2"/>
+          <ellipse cx="200" cy="190" rx="60" ry="56" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+                    <rect x="140" y="44" width="120" height="28" rx="8" fill="#2563eb"/>
+          <text x="200" y="63" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Skin 表层</text>
+                    <rect x="150" y="114" width="100" height="26" rx="8" fill="#0e7490"/>
+          <text x="200" y="131" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Middle 中层</text>
+          <text x="200" y="195" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Core 核心</text>
+        </svg>
+      </div>
+      <div>
+        <div class="def-box anim" data-order="2" style="font-size:.9rem;line-height:1.7;margin-bottom:.8rem">
+          <p><strong style="color:#1e40af">Skin 表层：</strong>Observable &amp; Tangible — Artefacts (architecture, dress), behaviour (language, eating), attitudes (rituals). <span class="zh">可观察与有形层次：人工制品、行为、态度。</span></p>
+        </div>
+        <div class="def-box anim" data-order="3" style="font-size:.9rem;line-height:1.7;margin-bottom:.8rem">
+          <p><strong style="color:#1e3a8a">Middle 中层：</strong>Norms (rules) and Values — Norms explain surface behaviour, define right/wrong; Values define good/bad. <span class="zh">规范与价值观：规范解释表层行为、界定对错；价值观界定好坏。</span></p>
+        </div>
+        <div class="def-box anim" data-order="4" style="font-size:.9rem;line-height:1.7">
+          <p><strong style="color:#1e3a8a">Core 核心：</strong>Basic assumptions — invisible, inferred via interpreting the first two levels; answers "Why?". <span class="zh">基本假设：不可见，需通过解读前两层推导；回答"为什么"。</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="16" data-title="Three Layers of Culture">
+  <div class="slide-inner" style="max-width:1120px">
+    <h2 class="slide-title anim" data-order="0" style="margin-bottom:.35rem">Decode Mosuo Culture with the Onion Model</h2>
+    <p class="slide-subtitle anim" data-order="0" style="margin-bottom:.8rem">用文化洋葱模型解构摩梭大家庭与走婚</p>
+    <div class="onion-practice anim" data-order="1" id="mosuoOnionPractice">
+      <div class="onion-left">
+        <div class="onion-canvas" id="onionCanvas" aria-label="文化洋葱模型分类区">
+          <div class="onion-ring onion-outer" data-layer="outer" aria-label="表层 Observable practices"><div class="onion-label">表层<small>OBSERVABLE PRACTICES</small></div></div>
+          <div class="onion-ring onion-middle" data-layer="middle" aria-label="中层 Norms and values"><div class="onion-label">中层<small>NORMS &amp; VALUES</small></div></div>
+          <div class="onion-ring onion-core" data-layer="core" aria-label="核心层 Basic assumptions"><div class="onion-label">核心<small>BASIC ASSUMPTIONS</small></div></div>
+          <div class="onion-markers" id="onionMarkers" aria-hidden="true"></div>
+        </div>
+        <p class="onion-help">在每条文化线索右侧<b>选择层级</b>；可以随时改选，或退回“未选择”。圆圈中的编号同步显示你的判断。</p>
+        <div class="onion-results" id="onionResults"></div>
+      </div>
+      <div class="onion-right">
+        <div class="onion-bank-title"><strong>文化线索 · Cultural Clues</strong><span id="onionRemaining">0 / 7 已选择</span></div>
+        <div class="onion-bank" id="onionBank"></div>
+        <div class="onion-actions"><button class="onion-reset" id="onionReset" type="button">重新开始</button><button class="onion-submit" id="onionSubmit" type="button">提交分析</button></div>
+        <p class="onion-status" id="onionStatus" role="status" aria-live="polite">先观察行为，再追问规范与深层假设。</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="17" data-title="The Concept of Culture - Timeline">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">The Concept of Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">文化概念的演变 — 以"压岁钱"为例</p>
+    <div class="svg-wrap anim" data-order="1" style="margin:1rem 0">
+      <svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <defs>
+          <linearGradient id="tlGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#2563eb"/>
+            <stop offset="50%" stop-color="#06b6d4"/>
+            <stop offset="100%" stop-color="#22c55e"/>
+          </linearGradient>
+        </defs>
+        <line x1="60" y1="140" x2="840" y2="140" stroke="url(#tlGrad)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="170" cy="140" r="14" fill="#2563eb"/>
+        <circle cx="450" cy="140" r="14" fill="#06b6d4"/>
+        <circle cx="730" cy="140" r="14" fill="#22c55e"/>
+                  <rect x="60" y="70" width="220" height="52" rx="12" fill="#2563eb"/>
+          <text x="170" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">17th – 20th Century</text>
+        <text x="170" y="110" text-anchor="middle" font-size="12" fill="#dbeafe">Ancient &amp; Traditional 古代与传统</text>
+        <rect x="110" y="165" width="120" height="55" rx="10" fill="#dbeafe" stroke="#60a5fa"/>
+        <text x="170" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Physical Red Envelope</text>
+        <text x="170" y="208" text-anchor="middle" font-size="11" fill="#3b82f6">实物红包</text>
+                  <rect x="340" y="70" width="220" height="52" rx="12" fill="#06b6d4"/>
+          <text x="450" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">1950s – 2010s</text>
+        <text x="450" y="110" text-anchor="middle" font-size="12" fill="#cffafe">Modern Transition 近代现代过渡</text>
+        <rect x="390" y="165" width="120" height="55" rx="10" fill="#cffafe" stroke="#22d3ee"/>
+        <text x="450" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#0e7490">Paper Red Envelope</text>
+        <text x="450" y="208" text-anchor="middle" font-size="11" fill="#06b6d4">纸币红包</text>
+                  <rect x="620" y="70" width="220" height="52" rx="12" fill="#22c55e"/>
+          <text x="730" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">2014 – Present</text>
+        <text x="730" y="110" text-anchor="middle" font-size="12" fill="#dcfce7">Digital Era 数字时代</text>
+        <rect x="670" y="165" width="120" height="55" rx="10" fill="#dcfce7" stroke="#4ade80"/>
+        <text x="730" y="190" text-anchor="middle" font-size="12" font-weight="600" fill="#15803d">Virtual Red Envelope</text>
+        <text x="730" y="208" text-anchor="middle" font-size="11" fill="#22c55e">电子红包</text>
+        <text x="450" y="255" text-anchor="middle" font-size="12" fill="#475569" font-style="italic">Core Concept: "压岁钱" — Money that suppresses the evil spirit "Sui" 压住邪兽'岁'的钱</text>
+      </svg>
+    </div>
+    <div class="def-box anim" data-order="2" style="font-size:.95rem;line-height:1.85">
+      <p class="en">Culture is the configuration of learned behavior and result of behavior whose component elements are shared and transmitted among the members of a particular society. <strong>Culture is relative.</strong></p>
+      <p class="zh">文化是习得行为及其结果的构型，其组成要素在特定社会成员中共享并传承。文化是相对的。</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="18" data-title="Group Research Assignment">
+  <div class="slide-inner" style="max-width:800px;text-align:center">
+    <h2 class="slide-title anim" data-order="0">Group Research Assignment</h2>
+    <p class="slide-subtitle anim" data-order="0">小组汇报 — 摩梭文化 Mosuo Culture</p>
+    <button class="assignment-launch anim" data-order="1" data-assignment-id="mosuo-commentary-video" type="button">🎥 提交口播视频 / Submit Video Assignment</button>
+  </div>
+</section>
+<section class="slide" data-slide="20" data-title="Culture Shock">
+  <div class="slide-inner" style="max-width:800px;text-align:center">
+    <h2 class="slide-title anim" data-order="0" style="font-size:2.2rem">2. Culture Shock</h2>
+    <p class="slide-subtitle anim" data-order="0" style="font-size:1.3rem">文化休克（文化休克）</p>
+    <div class="anim" data-order="1" style="margin-top:2rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap">
+      <div style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:16px;padding:2rem 2.5rem;min-width:200px">
+        <div style="font-size:2rem;margin-bottom:.5rem">🎬</div>
+        <div style="font-weight:600;color:#1e40af">Video 1</div>
+        <div style="font-size:.9rem;color:#2563eb">1.5 American in Korea</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#a5f3fc,#67e8f9);border:1.5px solid #22d3ee;border-radius:16px;padding:2rem 2.5rem;min-width:200px">
+        <div style="font-size:2rem;margin-bottom:.5rem">🎬</div>
+        <div style="font-weight:600;color:#0e7490">Video 2</div>
+        <div style="font-size:.9rem;color:#0891b2">1.6 Culture shock in the US</div>
+      </div>
+    </div>
+    <p class="anim" data-order="2" style="margin-top:1.5rem;color:var(--text-light)">请使用主程序右侧的视频案例入口观看</p>
+  </div>
+</section>
+<section class="slide" data-slide="21" data-title="Case: American Teacher in Japan">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Case: American Teacher and Her Japanese Students</h2>
+    <p class="slide-subtitle anim" data-order="0">案例：美国教师与她的日本学生</p>
+    <div class="def-box anim" data-order="1" style="font-size:.92rem;line-height:1.82;max-height:58vh;overflow-y:auto;padding-right:1.15rem">
+      <p class="zh"><strong>中文：</strong>简是一位在美国任教的美国教师，她刚开始给一群日本学生教授英语。她希望以较正式的方式进一步了解这些学生，于是邀请他们到自己家中参加聚会。学生们在晚上8点整一起到达。他们似乎很享受这场聚会：大家跳舞、唱歌，并吃掉了大部分食物。大约晚上10点，一名学生对老师说：“我想我该离开了。非常感谢您举办这次聚会。”随后，其他学生也都站起身准备离开，最后所有人同时离开了。简感到很受伤。</p>
+      <div style="height:1px;background:#cbd5e1;margin:1rem 0"></div>
+      <p class="en"><strong>English:</strong> Jane, an American teacher in the US, had just started teaching English to a group of Japanese students. She wanted to get to know the students more formally, so she invited them to her house for a party. The students all arrived together at exactly 8:00 p.m. They seemed to enjoy the party: they danced, sang, and ate most of the food. At about 10:00 p.m., one of the students said to the teacher, “I think it’s time for me to leave. Thank you very much for the party.” Then all the other students got up to go, and all left at the same time. Jane felt hurt.</p>
+      <p style="margin-top:1rem;color:var(--primary);font-weight:650">💡 思考 / Think: Why did the students leave together, and why did Jane feel hurt? 学生为什么一起离开？简为什么感到受伤？</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="22" data-title="Culture Shock - Definition & Causes">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Culture Shock — Definition &amp; Causes</h2>
+    <p class="slide-subtitle anim" data-order="0">文化休克的定义与原因</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.02rem;line-height:1.95">
+      <p class="en">Culture Shock means the <strong>traumatic experience</strong> and the strong feelings of discomfort, fear, or anxiety, which people may have when they enter another culture.</p>
+      <p class="zh">文化休克指人们进入另一种文化时可能经历的创伤性体验，以及强烈的不适、恐惧或焦虑感。</p>
+    </div>
+    <h3 class="anim" data-order="2" style="color:var(--primary);margin:1.2rem 0 .6rem;font-size:1.15rem">Culture Shock Causes 文化休克的原因</h3>
+    <ul class="obj-list anim" data-order="3">
+      <li><strong>Language &amp; communication barriers</strong> — verbal gaps and non-verbal differences (body language). <span class="zh">语言与沟通障碍——口头差异和非语言差异（肢体语言）。</span></li>
+      <li><strong>Differences in values &amp; beliefs</strong> — individualism/collectivism, right/wrong, time orientation. <span class="zh">价值观与信仰差异——个人主义/集体主义、对错观、时间取向。</span></li>
+      <li><strong>Daily life differences</strong> — food, weather, transportation, social customs. <span class="zh">日常生活差异——饮食、气候、交通、社会习俗。</span></li>
+      <li><strong>Social isolation &amp; loneliness</strong> — losing familiar support networks. <span class="zh">社会孤立与孤独——失去熟悉的支持网络。</span></li>
+    </ul>
+  </div>
+</section>
+<section class="slide" data-slide="23" data-title="Stages of Adaptation">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Stages of Adaptation to a New Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">新文化适应阶段（U型曲线）</p>
+    <div class="shock-explorer anim" data-order="1">
+      <div class="shock-map">
+        <svg viewBox="0 0 960 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="shockCurve" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset=".36" stop-color="#ef4444"/><stop offset=".7" stop-color="#14b8a6"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+          <line x1="50" y1="253" x2="915" y2="253" stroke="#cbd5e1" stroke-width="2"/><path d="M90 72 C220 55 280 230 390 230 C520 230 590 168 680 155 C780 140 830 85 895 70" fill="none" stroke="url(#shockCurve)" stroke-width="7" stroke-linecap="round"/>
+          <text x="480" y="282" text-anchor="middle" font-size="14" fill="#64748b" font-weight="650">Time in the new culture · 进入新文化的时间</text>
+        </svg>
+        <button class="shock-node" data-stage="honeymoon" type="button">1 · Honeymoon<small>蜜月期</small><span class="shock-check">✓</span></button>
+        <button class="shock-node" data-stage="frustration" type="button">2 · Frustration<small>挫折期</small><span class="shock-check">✓</span></button>
+        <button class="shock-node" data-stage="adjustment" type="button">3 · Adjustment<small>调整期</small><span class="shock-check">✓</span></button>
+        <button class="shock-node" data-stage="adaptation" type="button">4 · Adaptation<small>适应期</small><span class="shock-check">✓</span></button>
+      </div>
+      <p class="shock-instruction"><strong>点击任一阶段探索</strong>情绪、反应、案例和应对方式。<span class="shock-progress" id="shockProgress">已查看 0 / 4</span></p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="25" data-title="Group Task - International Students Survey">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Group Task — Cultural Adaptation Survey</h2>
+    <p class="slide-subtitle anim" data-order="0">小组任务 — CTBU来华留学生文化适应调查与分析</p>
+    <div class="def-box anim" data-order="1" style="font-size:1rem;line-height:1.95">
+      <p class="en"><strong>Objective:</strong> To investigate the cultural shock challenges and cross-cultural adaptation process of international students at CTBU (Chongqing Technology and Business University).</p>
+      <p class="zh"><strong>目标：</strong>调查重庆工商大学来华留学生面临的文化休克挑战及跨文化适应过程。</p>
+      <p style="margin-top:.8rem"><strong>Tasks:</strong> Design questionnaire → Collect data → Analyze findings → Present results</p>
+      <p class="zh" style="color:var(--text-light)"><strong>任务：</strong>设计问卷 → 收集数据 → 分析发现 → 汇报成果</p>
+    </div>
+    <div class="anim" data-order="2" style="margin-top:1rem;text-align:right"><button class="assignment-launch" data-assignment-id="cultural-adaptation-survey" type="button">📄 提交调查报告 / Submit Survey Report</button></div>
+  </div>
+</section>
+<section class="slide" data-slide="26" data-title="Levels of Culture in Business">
+  <div class="slide-inner" style="max-width:900px">
+    <h2 class="slide-title anim" data-order="0">3. Levels of Culture in a Business Context</h2>
+    <p class="slide-subtitle anim" data-order="0">商业背景下的文化层次（P16）</p>
+    <div class="anim" data-order="1" style="margin-top:1.5rem;display:grid;grid-template-columns:repeat(2,1fr);gap:1.2rem">
+      <div style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:14px;padding:1.5rem;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#1e40af">National Culture</div>
+        <div style="color:#2563eb;font-size:.95rem;margin-top:.3rem">国家文化</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#a5f3fc,#67e8f9);border:1.5px solid #22d3ee;border-radius:14px;padding:1.5rem;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#0e7490">Organisational Culture</div>
+        <div style="color:#0891b2;font-size:.95rem;margin-top:.3rem">组织文化</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#bbf7d0,#86efac);border:1.5px solid #4ade80;border-radius:14px;padding:1.5rem;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#15803d">Corporate Culture</div>
+        <div style="color:#16a34a;font-size:.95rem;margin-top:.3rem">企业文化</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fbcfe8,#f9a8d4);border:1.5px solid #f472b6;border-radius:14px;padding:1.5rem;text-align:center">
+        <div style="font-size:1.3rem;font-weight:700;color:#9d174d">Professional Culture</div>
+        <div style="color:#db2777;font-size:.95rem;margin-top:.3rem">职业文化</div>
+      </div>
+    </div>
+    <p class="anim" data-order="2" style="margin-top:1.2rem;text-align:center;color:var(--text-light);font-size:.95rem">Cultures can develop at different levels — 文化可以在不同层次上形成</p>
+  </div>
+</section>
+<section class="slide" data-slide="27" data-title="National Culture">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">National Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">国家文化</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.02rem;line-height:1.95">
+      <p class="en"><strong>Elements that contribute to the creation of a national culture:</strong></p>
+      <ul style="margin:.5rem 0 0 1.2rem">
+        <li><strong>Physical environment</strong> — 自然环境</li>
+        <li><strong>History of the nation</strong> — 国家历史</li>
+      </ul>
+    </div>
+    <div class="anim" data-order="2" style="margin-top:1.2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+      <div style="background:linear-gradient(135deg,#fde68a,#fcd34d);border:1.5px solid #fbbf24;border-radius:12px;padding:1rem 1.5rem;text-align:center">
+        <div style="font-size:1.5rem">🎬</div>
+        <div style="font-weight:600;color:#92400e;font-size:.9rem">JAPAN1</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="28" data-title="Indian Culture & Caste System">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Core of Indian Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">印度文化核心与种姓制度</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1rem">
+      <div class="anim" data-order="1" style="background:linear-gradient(135deg,#fde68a,#fcd34d);border:1.5px solid #fbbf24;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#92400e;margin-bottom:.5rem">Religion-centered Worldview</h4>
+        <p style="font-size:.88rem;color:#78350f;line-height:1.6">Hierarchy &amp; Dharma · Karma因果 · Reincarnation轮回 · Moksha解脱 · Caste System种姓制度 · Plural Religions多元宗教</p>
+      </div>
+      <div class="anim" data-order="2" style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#1e40af;margin-bottom:.5rem">Hinduism Values</h4>
+        <p style="font-size:.88rem;color:#1e3a8a;line-height:1.6">Respect for Elders &amp; Authority · Family &amp; Collectivism · Balance of Spiritual &amp; Material · Joint Family System · Village Community</p>
+      </div>
+    </div>
+    <h3 class="anim" data-order="3" style="color:var(--primary);margin:.5rem 0 .6rem;font-size:1.1rem">Caste System 种姓制度</h3>
+    <table class="data-table anim" data-order="4">
+      <thead><tr><th>Varna 种姓</th><th>Role 角色</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Brahmins</strong> 婆罗门</td><td>Priests and scholars 祭司与学者</td></tr>
+        <tr><td><strong>Kshatriyas</strong> 刹帝利</td><td>Warriors and rulers 武士与统治者</td></tr>
+        <tr><td><strong>Vaishyas</strong> 吠舍</td><td>Merchants and landowners 商人与地主</td></tr>
+        <tr><td><strong>Shudras</strong> 首陀罗</td><td>Laborers and service providers 劳动者与服务提供者</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="slide" data-slide="29" data-title="Core of Modern Chinese Culture">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Core of Modern Chinese Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">现代中国文化核心层</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem">
+      <div class="anim" data-order="1" style="background:linear-gradient(135deg,#fecaca,#fca5a5);border:1.5px solid #f87171;border-radius:12px;padding:1rem">
+        <h4 style="color:#b91c1c;font-size:.95rem;margin-bottom:.3rem">国家认同与爱国主义</h4>
+        <p style="font-size:.82rem;color:#7f1d1d;line-height:1.5">历史民族主义 · 革命传统 · 社会主义核心价值观</p>
+      </div>
+      <div class="anim" data-order="2" style="background:linear-gradient(135deg,#fde68a,#fcd34d);border:1.5px solid #fbbf24;border-radius:12px;padding:1rem">
+        <h4 style="color:#92400e;font-size:.95rem;margin-bottom:.3rem">集体主义与社会和谐</h4>
+        <p style="font-size:.82rem;color:#78350f;line-height:1.5">儒家"和为贵" · 社会主义集体主义 · 国家稳定与统一</p>
+      </div>
+      <div class="anim" data-order="3" style="background:linear-gradient(135deg,#bbf7d0,#86efac);border:1.5px solid #4ade80;border-radius:12px;padding:1rem">
+        <h4 style="color:#15803d;font-size:.95rem;margin-bottom:.3rem">家庭本位与孝道</h4>
+        <p style="font-size:.82rem;color:#14532d;line-height:1.5">儒家孝文化 · 宗族制度 · 家庭伦理</p>
+      </div>
+      <div class="anim" data-order="4" style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:12px;padding:1rem">
+        <h4 style="color:#1e40af;font-size:.95rem;margin-bottom:.3rem">道德与关系（人情/面子）</h4>
+        <p style="font-size:.82rem;color:#1e3a8a;line-height:1.5">儒家礼仪文化 · 人际网络 Guanxi · 面子观念</p>
+      </div>
+      <div class="anim" data-order="5" style="background:linear-gradient(135deg,#a5f3fc,#67e8f9);border:1.5px solid #22d3ee;border-radius:14px;padding:1rem;grid-column:span 2">
+        <h4 style="color:#0e7490;font-size:.95rem;margin-bottom:.3rem">实用主义与奋斗精神</h4>
+        <p style="font-size:.82rem;color:#155e75;line-height:1.5">勤劳致富传统 · 科举与教育观 · 现代化与市场经济</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="30" data-title="Organizational Culture">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Organizational Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">组织文化</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.02rem;line-height:1.95">
+      <p class="en"><strong>Organization VS Group</strong></p>
+      <p class="zh"><strong>组织 VS 群体</strong></p>
+      <p style="margin-top:.8rem">In organisations, culture affects the way:</p>
+      <ul style="margin:.3rem 0 0 1.2rem">
+        <li>Strategy is determined — 战略制定方式</li>
+        <li>Goals are established — 目标确立方式</li>
+        <li>How the organisation operates — 组织运营方式</li>
+      </ul>
+      <p style="margin-top:.8rem">The personnel of the organisation are influenced by their cultural background, and in turn shape the organisational culture.</p>
+      <p class="zh">组织成员受其文化背景影响，同时也塑造组织文化。</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="31" data-title="Corporate Culture">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Corporate Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">企业文化</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.02rem;line-height:1.95">
+      <p class="en">Corporate culture is a combination of:</p>
+      <ul style="margin:.5rem 0 0 1.2rem">
+        <li><strong>Organisational culture</strong> — 组织文化</li>
+        <li><strong>National / regional culture</strong> — 国家/地区文化</li>
+      </ul>
+      <p style="margin-top:.8rem"><strong>Two differing views</strong> about the influence of corporate culture on a (multi-)national company:</p>
+      <ul style="margin:.3rem 0 0 1.2rem">
+        <li>Success depends on adapting to national cultures — 成功取决于适应各国文化</li>
+        <li>A strong corporate culture can transcend national differences — 强大的企业文化可以超越国家差异</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="32" data-title="Corporate Culture - IBM vs Google">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Corporate Culture — IBM vs Google</h2>
+    <p class="slide-subtitle anim" data-order="0">企业文化案例：IBM vs Google</p>
+    <div class="card-grid cols-2 anim" data-order="1">
+      <div class="card">
+        <div class="card-title">IBM — Clearly Defined</div>
+        <div class="card-body">
+          <p>IBM has long adhered to a clearly defined corporate culture centered on three core values:</p>
+          <p style="color:var(--primary);font-weight:600;margin:.5rem 0">"Respect for the Individual"</p>
+          <p style="color:var(--primary);font-weight:600;margin:.3rem 0">"Excellence"</p>
+          <p style="color:var(--primary);font-weight:600;margin:.3rem 0">"Innovation"</p>
+          <p style="font-size:.88rem;color:var(--text-light);margin-top:.5rem">This consistent cultural framework guides employee behaviour and decision-making globally.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Google — Highly Flexible</div>
+        <div class="card-body">
+          <p>Google adopts a highly flexible corporate culture:</p>
+          <p style="margin:.5rem 0"><strong>"20% Time"</strong> — employees use 20% of working time to develop personal projects</p>
+          <p style="font-size:.88rem;color:var(--text-light)">Adjusts strategies and culture to local markets, encouraging creativity and autonomy.</p>
+          <p style="margin-top:.5rem;color:var(--accent);font-weight:600">灵活适应 · 鼓励创新 · 员工自主</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="33" data-title="Corporate Culture System (EN)">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Corporate Culture System</h2>
+    <p class="slide-subtitle anim" data-order="0">公司文化体系（英文版）</p>
+    <div class="svg-wrap anim" data-order="1">
+      <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <rect x="300" y="10" width="300" height="60" rx="10" fill="#2563eb"/>
+        <text x="450" y="35" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Mental Layer 精神层</text>
+        <text x="450" y="55" text-anchor="middle" font-size="11" fill="#dbeafe">Mission · Vision · Core Values</text>
+        <rect x="300" y="90" width="300" height="60" rx="10" fill="#06b6d4"/>
+        <text x="450" y="115" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Institutional Dimension 制度层</text>
+        <text x="450" y="135" text-anchor="middle" font-size="11" fill="#cffafe">Leadership · Structure · Management System</text>
+        <rect x="300" y="170" width="300" height="60" rx="10" fill="#22c55e"/>
+        <text x="450" y="195" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Behavioral Layer 行为层</text>
+        <text x="450" y="215" text-anchor="middle" font-size="11" fill="#dcfce7">Leadership · Managerial · Employee Conduct</text>
+        <rect x="300" y="250" width="300" height="60" rx="10" fill="#f59e0b"/>
+        <text x="450" y="275" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Material Layer 物质层</text>
+        <text x="450" y="295" text-anchor="middle" font-size="11" fill="#fef3c7">Physical Facilities · Logo · Products</text>
+        <line x1="450" y1="70" x2="450" y2="90" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <line x1="450" y1="150" x2="450" y2="170" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <line x1="450" y1="230" x2="450" y2="250" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <text x="100" y="220" font-size="12" fill="#475569" font-style="italic">Core → Surface</text>
+        <path d="M 140,210 Q 200,210 280,210" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+        <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="34" data-title="公司文化体系（中文）">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">公司文化体系</h2>
+    <p class="slide-subtitle anim" data-order="0">Corporate Culture System（中文版）</p>
+    <div class="svg-wrap anim" data-order="1">
+      <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <rect x="300" y="10" width="300" height="60" rx="10" fill="#2563eb"/>
+        <text x="450" y="35" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">精神层</text>
+        <text x="450" y="55" text-anchor="middle" font-size="11" fill="#dbeafe">使命 · 愿景 · 核心价值观</text>
+        <rect x="300" y="90" width="300" height="60" rx="10" fill="#06b6d4"/>
+        <text x="450" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">制度层</text>
+        <text x="450" y="135" text-anchor="middle" font-size="11" fill="#cffafe">领导体制 · 组织结构 · 管理制度</text>
+        <rect x="300" y="170" width="300" height="60" rx="10" fill="#22c55e"/>
+        <text x="450" y="195" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">行为层</text>
+        <text x="450" y="215" text-anchor="middle" font-size="11" fill="#dcfce7">领导行为 · 管理者行为 · 员工行为</text>
+        <rect x="300" y="250" width="300" height="60" rx="10" fill="#f59e0b"/>
+        <text x="450" y="275" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">物质层</text>
+        <text x="450" y="295" text-anchor="middle" font-size="11" fill="#fef3c7">物质设施 · 标识寓意 · 企业产品</text>
+        <line x1="450" y1="70" x2="450" y2="90" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <line x1="450" y1="150" x2="450" y2="170" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <line x1="450" y1="230" x2="450" y2="250" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+        <text x="120" y="220" font-size="13" fill="#475569" font-style="italic">核心 → 表层</text>
+      </svg>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="35" data-title="海底捞文化（中文）">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">海底捞文化简介</h2>
+    <p class="slide-subtitle anim" data-order="0">HAIDILAO Hotpot Culture</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem">
+      <div class="anim" data-order="1" style="background:#fde68a;border:1.5px solid #fcd34d;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>内部晋升</strong><br>踏实苦干才能成为管理者</div>
+      <div class="anim" data-order="2" style="background:#bfdbfe;border:1.5px solid #93c5fd;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>集中+导师培训</strong><br>新员工集中培训+导师辅导</div>
+      <div class="anim" data-order="3" style="background:#bbf7d0;border:1.5px solid #86efac;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>高激励政策</strong><br>高于市场10%薪酬+员工持股</div>
+      <div class="anim" data-order="4" style="background:#fbcfe8;border:1.5px solid #f9a8d4;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>招聘推荐制</strong><br>员工推荐价值观相符的人</div>
+      <div class="anim" data-order="5" style="background:#a5f3fc;border:1.5px solid #67e8f9;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>轮岗制</strong><br>避免单调劳动，允许调岗</div>
+      <div class="anim" data-order="6" style="background:#fde68a;border:1.5px solid #fcd34d;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>灵活考核</strong><br>正面激励为主，粗线条月度考核</div>
+      <div class="anim" data-order="7" style="background:#bfdbfe;border:1.5px solid #93c5fd;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>授权基层员工</strong><br>打折、换菜甚至免单权</div>
+      <div class="anim" data-order="8" style="background:#bbf7d0;border:1.5px solid #86efac;border-radius:10px;padding:.8rem;text-align:center;font-size:.82rem"><strong>完善福利保障</strong><br>免费公寓、食堂、保险</div>
+    </div>
+    <div class="def-box anim" data-order="9" style="font-size:.92rem;line-height:1.8">
+      <p><strong>核心理念：</strong>让员工尊重顾客，首先要尊重员工。海底捞通过对企业文化及企业制度的细心打造，为员工建立起一个富于"尊重"、"公平"和"责任"的工作环境，得以让员工以极佳的心态为顾客提供服务。</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="36" data-title="Haidilao Hotpot Culture (EN)">
+  <div class="slide-inner" style="max-width:1100px">
+    <h2 class="slide-title anim" data-order="0">Haidilao Hotpot Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">海底捞文化（英文版）</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem">
+      <div class="anim" data-order="1" style="background:#fde68a;border:1.5px solid #fcd34d;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Internal Promotion</strong><br>Hard work → Manager</div>
+      <div class="anim" data-order="2" style="background:#bfdbfe;border:1.5px solid #93c5fd;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Mentor Training</strong><br>Centralized + mentor guidance</div>
+      <div class="anim" data-order="3" style="background:#bbf7d0;border:1.5px solid #86efac;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>High Incentives</strong><br>10% above market + stock</div>
+      <div class="anim" data-order="4" style="background:#fbcfe8;border:1.5px solid #f9a8d4;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Referral Hiring</strong><br>Value-aligned candidates</div>
+      <div class="anim" data-order="5" style="background:#a5f3fc;border:1.5px solid #67e8f9;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Job Rotation</strong><br>Avoid monotony</div>
+      <div class="anim" data-order="6" style="background:#fde68a;border:1.5px solid #fcd34d;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Flexible Assessment</strong><br>Positive motivation first</div>
+      <div class="anim" data-order="7" style="background:#bfdbfe;border:1.5px solid #93c5fd;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Empower Staff</strong><br>Discount / free meal rights</div>
+      <div class="anim" data-order="8" style="background:#bbf7d0;border:1.5px solid #86efac;border-radius:10px;padding:.7rem;text-align:center;font-size:.78rem"><strong>Welfare Benefits</strong><br>Free housing, meals, insurance</div>
+    </div>
+    <div class="def-box anim" data-order="9" style="font-size:.92rem;line-height:1.8">
+      <p><strong>Core philosophy:</strong> To cultivate customer-centric values, employees must first be respected. Haidilao created a workplace rich in "respect", "fairness" and "responsibility", enabling employees to serve customers with excellence.</p>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="37" data-title="Xiaomi Culture">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Xiaomi Corporate Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">小米企业文化</p>
+    <div class="anim" data-order="1" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem">
+      <div style="background:linear-gradient(135deg,#fecaca,#fca5a5);border:1.5px solid #f87171;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#b91c1c;margin-bottom:.5rem">使命层 Purpose</h4>
+        <p style="font-size:.9rem;color:#7f1d1d;line-height:1.6">对产品 · 对客户 · 对员工</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#1e40af;margin-bottom:.5rem">制度层 System</h4>
+        <p style="font-size:.9rem;color:#1e3a8a;line-height:1.6">对产品 · 对客户 · 对员工</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#bbf7d0,#86efac);border:1.5px solid #4ade80;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#15803d;margin-bottom:.5rem">行为层 Behaviours</h4>
+        <p style="font-size:.9rem;color:#14532d;line-height:1.6">对产品 · 对客户 · 对员工</p>
+      </div>
+      <div style="background:linear-gradient(135deg,#fde68a,#fcd34d);border:1.5px solid #fbbf24;border-radius:14px;padding:1.2rem">
+        <h4 style="color:#92400e;margin-bottom:.5rem">物质层 Surface</h4>
+        <p style="font-size:.9rem;color:#78350f;line-height:1.6">标识 Logo · 仪式等 Ceremony</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="38" data-title="Professional Culture">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Professional Culture</h2>
+    <p class="slide-subtitle anim" data-order="0">职业文化（P20）</p>
+    <p class="anim" data-order="1" style="font-size:1.05rem;color:var(--text-dark);margin-bottom:1rem">Three professional cultures in management (Schein, 1996):</p>
+    <div class="card-grid cols-3 anim" data-order="2">
+      <div class="card">
+        <div class="card-title">Operators<br><span style="font-size:.75em;font-weight:400">运营者</span></div>
+        <div class="card-body"><p>Involved in production (goods/services)<br>参与生产（产品/服务）</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Engineers<br><span style="font-size:.75em;font-weight:400">工程师</span></div>
+        <div class="card-body"><p>Design and monitor the technology<br>设计与监控技术</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Executives<br><span style="font-size:.75em;font-weight:400">高管</span></div>
+        <div class="card-body"><p>Senior managers — 高级管理者<br>Focus on strategy &amp; growth</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="39" data-title="Culture and Management">
+  <div class="slide-inner" style="max-width:1000px">
+    <h2 class="slide-title anim" data-order="0">Culture and Management</h2>
+    <p class="slide-subtitle anim" data-order="0">文化与管理</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.02rem;line-height:2">
+      <p class="en"><strong>Cross-cultural management:</strong></p>
+      <ul style="margin:.5rem 0 0 1.2rem">
+        <li>Explains the behaviour of people in organisations around the world — 解释全球组织中人的行为</li>
+        <li>Describes and compares organisational behaviour across countries and cultures — 描述和比较跨国家与文化的组织行为</li>
+        <li>Seeks to understand and improve management practices in multicultural contexts — 寻求理解和改进多元文化背景下的管理实践</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<section class="slide" data-slide="40" data-title="Conclusion">
+  <div class="slide-inner" style="max-width:900px;text-align:center">
+    <h2 class="slide-title anim" data-order="0" style="font-size:2rem">Conclusion</h2>
+    <p class="slide-subtitle anim" data-order="0" style="font-size:1.2rem">本章总结</p>
+    <div class="def-box anim" data-order="1" style="font-size:1.1rem;line-height:2.2;text-align:left;display:inline-block;max-width:800px">
+      <p class="en">How difficult it is to give a definition of the word 'culture'.</p>
+      <p class="zh">"文化"一词的定义何其困难。</p>
+      <p style="margin-top:1rem" class="en">The individuals in a group form a culture that can be <strong>national, organisational or professional</strong>.</p>
+      <p class="zh">群体中的个体形成文化，这种文化可以是<strong>国家的、组织的或职业的</strong>。</p>
+    </div>
+    <p class="anim" data-order="2" style="margin-top:2rem;color:var(--primary);font-size:1.3rem;font-weight:700">— End of Chapter 1 —</p>
+  </div>
+</section>
+
+</main>
+<footer class="navbar"><button class="nav-btn" id="prevBtn">← 上一页</button><label class="page-picker">页码 / Page <select id="pageSelect" aria-label="跳转页面"></select></label><span id="stepStatus" role="status" aria-live="polite"></span><button class="nav-btn primary" id="nextBtn">下一步 →</button></footer>
+<aside class="media-drawer" id="mediaDrawer" aria-label="本页图片" aria-hidden="true"><div class="drawer-header"><h3 id="drawerTitle">本页图片</h3><button id="drawerClose" aria-label="关闭图片区">×</button></div><div class="drawer-body"><div id="imageEditor" hidden><p class="editor-note">本机草稿：图片不会上传COS，也不会同步学生。完成后请导出HTML；关闭前未导出的修改可能丢失。</p><button id="addImagesBtn">＋ 导入本页图片</button><input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden><p class="editor-note">PNG/JPG/WebP/GIF，单张≤8MB；EMF请先转换。替换和排序都只影响本页。</p></div><p id="imageStatus" role="status" aria-live="polite"></p><div id="imageList"></div></div></aside>
+<dialog id="readerZoom" aria-label="放大查看"><button id="zoomClose" aria-label="关闭放大">×</button><div id="zoomContent"></div><p>按 Esc 或点击空白处关闭</p></dialog>
+<aside class="reading-win" id="cultureReading" role="dialog" aria-modal="true" aria-labelledby="cultureReadingTitle" aria-hidden="true">
+  <div class="reading-head" id="cultureReadingHead"><strong id="cultureReadingTitle">📖 延伸阅读 / Further Reading</strong><button class="reading-close" id="closeCultureReading" type="button" aria-label="关闭">×</button></div>
+  <div class="reading-body">
+    <h3>The Culture Compass: Using Early Insights to Guide Integration Planning</h3>
+    <p class="reading-meta">Jocelyn Chao, Rebecca Kaetzler, Kameron Kordestani &amp; Emily O’Loughlin · McKinsey &amp; Company · 29 February 2024</p>
+    <div class="reading-summary">
+      <p><strong>参考文献：</strong>Jocelyn Chao、Rebecca Kaetzler、Kameron Kordestani 等：《文化指南针：利用早期洞察指导整合规划》[R]，麦肯锡咨询公司，2024-02-29。</p>
+      <p style="margin-top:.65rem"><strong>调研依据：</strong>麦肯锡于2023年1月调研近1,100位全球并购负责人，其中<strong>44%</strong>的受访者将“文化不匹配”以及“收购方与目标企业之间的组织摩擦”列为整合失败的首要原因。</p>
+    </div>
+    <h4>五大文化指南针属性 · Five Culture-Compass Attributes</h4>
+    <ul>
+      <li><strong>Talent · 人才</strong></li>
+      <li><strong>Role clarity · 角色清晰</strong></li>
+      <li><strong>Performance management · 绩效管理</strong></li>
+      <li><strong>Customer focus · 客户焦点</strong></li>
+      <li><strong>Decision-making · 决策</strong></li>
+    </ul>
+    <p style="margin-top:.55rem">这些指标来源于麦肯锡组织健康指数（Organizational Health Index，OHI），并与企业股东总回报（Total Shareholder Return，TSR）呈正相关。</p>
+    <h4>核心启示 · Key Takeaways</h4>
+    <ol>
+      <li><strong>文化评估不要等到交易官宣之后：</strong>尽调阶段即可启动文化风险研判，并让早期洞察进入整合规划。</li>
+      <li><strong>区分两类差异：</strong>既要考虑国家文化差异，也要分析企业内部管理实践和工作方式的差异。</li>
+      <li><strong>不以文化完全同化为目标：</strong>重点是识别可能妨碍价值实现或人才保留的摩擦风险，同时保留双方文化优势。</li>
+      <li><strong>把诊断转化为行动：</strong>围绕人才、角色、绩效、客户和决策形成明确的领导责任、沟通机制与实施方案。</li>
+      <li><strong>从实践中理解框架：</strong>原文结合3个真实并购整合案例，展示文化洞察如何改变具体的整合决策。</li>
+    </ol>
+    <h4>联系盈塑案例思考 · Apply to the Yingsu Case</h4>
+    <ul>
+      <li>中国总部与马来西亚工厂可能在哪些管理习惯上产生差异？</li>
+      <li>这些差异会怎样影响沟通、授权、员工关系与生产协作？</li>
+      <li>如果你是项目负责人，会在工厂建设和运营的哪个阶段开始文化诊断？</li>
+    </ul>
+    <a class="reading-link" href="https://www.mckinsey.com/capabilities/m-and-a/our-insights/the-culture-compass-using-early-insights-to-guide-integration-planning" target="_blank" rel="noopener noreferrer">阅读麦肯锡英文原文 ↗</a>
+    <p class="reading-source">本文仅提供教学摘要；英文原文版权归 McKinsey &amp; Company 所有。</p>
+  </div>
+</aside>
+<aside class="reading-win onion-feedback" id="onionFeedback" role="dialog" aria-modal="true" aria-labelledby="onionFeedbackTitle" aria-hidden="true">
+  <div class="reading-head" id="onionFeedbackHead"><strong id="onionFeedbackTitle">🧅 摩梭文化三层解析 / Interpretation</strong><button class="reading-close" id="closeOnionFeedback" type="button" aria-label="关闭">×</button></div>
+  <div class="reading-body">
+    <p>文化分析需要从<strong>可观察现象</strong>逐步追问其背后的<strong>规范与价值</strong>，再推断更深层的<strong>基本假设</strong>。</p>
+    <div class="onion-answer-table">
+      <div class="onion-answer-row outer"><strong>表层 · Observable practices</strong>母系大家庭共同居住；男方夜间到女方家走访，白天返回母家；舅舅参与姐妹子女的照料与教育。<br><small>这是能够直接观察或描述的家庭结构、交往方式与日常行为。</small></div>
+      <div class="onion-answer-row middle"><strong>中层 · Norms &amp; values</strong>家族成员按母系确认亲属关系；对母系家庭责任的重视高于夫妻共同居住。<br><small>这些规则说明群体如何界定亲属身份，以及家庭责任如何排序。</small></div>
+      <div class="onion-answer-row core"><strong>核心 · Basic assumptions</strong>家庭的延续与安全建立在稳定的母系家庭之上；亲密关系不必以夫妻共同居住和共同财产为基础。<br><small>这些通常不会被直接说出，却回答了相关制度与行为“为什么合理”。</small></div>
+    </div>
+    <div class="onion-caution"><strong>特别注意：</strong>“走婚”不是一个只能放入单层的标签。夜访晨归是表层行为；围绕家庭责任形成的规则属于中层；对亲密关系、居住和家庭安全的理解则进入核心层。这是用于学习的分析框架，不代表所有摩梭个体完全相同。</div>
+  </div>
+</aside>
+<aside class="reading-win onion-feedback" id="shockWindow" role="dialog" aria-modal="true" aria-labelledby="shockWindowTitle" aria-hidden="true">
+  <div class="reading-head" id="shockWindowHead"><strong id="shockWindowTitle">🌏 Culture Shock Journey · 文化适应之旅</strong><button class="reading-close" id="closeShockWindow" type="button" aria-label="关闭">×</button></div>
+  <div class="reading-body">
+    <div class="shock-tabs" id="shockTabs"></div>
+    <div id="shockDetail"></div>
+    <div class="shock-footer"><button id="shockPrev" type="button">← 上一阶段</button><button class="shock-overview-btn" id="shockOverview" type="button">查看完整对照</button><button id="shockNext" type="button">下一阶段 →</button></div>
+  </div>
+</aside>
+<aside class="reading-win onion-feedback" id="assignmentSubmitWindow" role="dialog" aria-modal="true" aria-labelledby="assignmentSubmitTitle" aria-hidden="true">
+  <div class="reading-head" id="assignmentSubmitHead"><strong id="assignmentSubmitTitle">📤 作业提交 / Submit Assignment</strong><button class="reading-close" id="closeAssignmentSubmit" type="button" aria-label="关闭">×</button></div>
+  <div class="reading-body">
+    <form class="assignment-form" id="assignmentSubmitForm">
+      <p id="assignmentDescription"></p>
+      <div class="assignment-identity"><div class="assignment-field"><label>姓名 / Name</label><input id="assignmentStudentName" readonly></div><div class="assignment-field"><label>学号 / Student ID</label><input id="assignmentStudentId" readonly></div><div class="assignment-field"><label>班级 / Class</label><input id="assignmentClassName" readonly></div></div>
+      <div class="assignment-latest" id="assignmentLatest" hidden></div>
+      <div class="assignment-file-box"><div class="assignment-field"><label for="assignmentFile">选择文件 / Select file</label><input id="assignmentFile" type="file" required></div><p id="assignmentRule" style="margin-top:.5rem;font-size:.76rem;color:#64748b"></p></div>
+      <div class="assignment-progress" aria-hidden="true"><span id="assignmentProgressBar"></span></div><p class="assignment-status" id="assignmentSubmitStatus" role="status" aria-live="polite"></p>
+      <button class="assignment-submit" id="assignmentSubmitButton" type="submit">确认提交 / Confirm</button>
+    </form>
+  </div>
+</aside>
+<script id="reader-images" type="application/json">{"version":1,"chapterId":"chapter-1","pages":{"1":[{"id":"p1-image-1","name":"封面装饰图","sourceFile":"image1.png","src":""}],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[{"id":"p8-image-1","name":"教材封面1","sourceFile":"image7.png","src":""},{"id":"p8-image-2","name":"教材封面2","sourceFile":"image8.png","src":""},{"id":"p8-image-3","name":"参考书1","sourceFile":"image10.png","src":""},{"id":"p8-image-4","name":"参考书2","sourceFile":"image9.png","src":""}],"9":[],"10":[{"id":"p17-image-1","name":"摩梭1","sourceFile":"image24.png","src":""},{"id":"p17-image-2","name":"摩梭2","sourceFile":"image25.png","src":""},{"id":"p17-image-3","name":"摩梭3","sourceFile":"image26.png","src":""}],"11":[],"12":[{"id":"p10-image-1","name":"文化概念示意图","sourceFile":"image11.png","src":""}],"13":[],"14":[{"id":"p14-image-1","name":"文化示意1","sourceFile":"image16.png","src":""},{"id":"p14-image-2","name":"文化示意2","sourceFile":"image17.png","src":""}],"15":[{"id":"p19-image-1","name":"洋葱模型图","sourceFile":"image31.jpeg","src":""}],"16":[{"id":"p20-image-1","name":"文化三层图","sourceFile":"image32.jpeg","src":""}],"17":[],"18":[],"20":[],"21":[],"22":[],"23":[],"24":[],"25":[],"26":[],"27":[],"28":[],"29":[],"30":[],"31":[],"32":[{"id":"p33-image-1","name":"IBM","sourceFile":"image40.png","src":""},{"id":"p33-image-2","name":"Google","sourceFile":"image39.png","src":""}],"33":[],"34":[],"35":[],"36":[],"37":[],"38":[],"39":[{"id":"p40-image-1","name":"文化与管理","sourceFile":"image2.png","src":""}],"40":[]}}</script><script>(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const slides = [...document.querySelectorAll('.stage .slide')];
+  const config = JSON.parse($('reader-images').textContent);
+  const localDraft = location.protocol === 'file:';
+  $('editBtn').hidden = !localDraft;
+  let page = 0, study = false, editing = false, dirty = false, busy = false, replaceId = null;
+  const progress = slides.map(() => 0);
+  const orders = slides.map(slide => [...new Set([...slide.querySelectorAll('.anim')].map(el => Number(el.dataset.order) || 0))].sort((a,b) => a-b));
+  const items = () => config.pages[slides[page].dataset.slide] ||= [];
+  const status = (message, error = false) => { $('imageStatus').textContent = message; $('imageStatus').classList.toggle('error', error); };
+  const button = (name, action, disabled = false) => { const b = document.createElement('button'); b.textContent = name; b.disabled = disabled; b.onclick = action; return b; };
+  slides.forEach((slide, index) => {
+    const option = document.createElement('option'); option.value = index; option.textContent = `${index + 1} / ${slides.length} · ${slide.dataset.title}`; $('pageSelect').append(option);
+    // Increase small inline HTML copy without altering coordinate-based SVG labels.
+    slide.querySelectorAll('[style]').forEach(el => {
+      if (el instanceof HTMLElement && el.style.fontSize && /rem$/.test(el.style.fontSize) && parseFloat(el.style.fontSize) < 1.15) el.style.fontSize = '1.15rem';
+    });
+    slide.querySelectorAll('.svg-wrap,.card,.def-box,.data-table').forEach(el => {
+      if (el.parentElement.closest('.svg-wrap,.card,.def-box,.data-table')) return;
+      el.classList.add('reader-zoomable'); el.tabIndex = 0; el.setAttribute('aria-label', '放大查看 / Enlarge');
+      el.addEventListener('click', () => zoom(el));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.stopPropagation(); zoom(el); } });
+    });
+  });
+  function zoom(element) {
+    const clone = element.cloneNode(true);
+    const idMap = new Map([...clone.querySelectorAll('[id]')].map(el => [el.id, 'zoom-' + el.id]));
+    [clone, ...clone.querySelectorAll('*')].forEach(el => {
+      if (el.id) el.id = idMap.get(el.id) || 'zoom-' + el.id;
+      [...el.attributes].forEach(attr => { let value = attr.value; idMap.forEach((next, old) => { value = value.replaceAll('url(#' + old + ')', 'url(#' + next + ')'); if ((attr.name === 'href' || attr.name === 'xlink:href') && value === '#' + old) value = '#' + next; }); if (value !== attr.value) el.setAttribute(attr.name, value); });
+      el.removeAttribute('tabindex'); el.classList.remove('reader-zoomable'); if (el.classList.contains('anim')) el.classList.add('visible');
+    });
+    $('zoomContent').replaceChildren(clone); $('readerZoom').showModal();
+  }
+  function render() {
+    slides.forEach((slide, index) => { slide.hidden = index !== page; slide.classList.toggle('active', index === page); });
+    const maximum = orders[page].length - 1;
+    slides[page].querySelectorAll('.anim').forEach(el => el.classList.toggle('visible', study || (Number(el.dataset.order) || 0) <= orders[page][progress[page]]));
+    $('pageSelect').value = page; $('topbarTitle').textContent = `第一章 · ${slides[page].dataset.title}`;
+    $('stepStatus').textContent = study ? '自主阅读 · 全部展开' : `课堂分步 ${progress[page]} / ${maximum}`;
+    $('prevBtn').disabled = page === 0;
+    $('nextBtn').disabled = page === slides.length - 1 && (study || progress[page] >= maximum);
+    $('nextBtn').textContent = !study && progress[page] < maximum ? '下一步 →' : '下一页 →';
+    $('modeBtn').textContent = study ? '自主阅读' : '课堂模式'; $('modeBtn').setAttribute('aria-pressed', String(study));
+    renderImages();
+  }
+  function go(index) { if (busy) return; page = Math.max(0, Math.min(slides.length - 1, index)); render(); slides[page].scrollTop = 0; }
+  function next() { if (busy) return; if (!study && progress[page] < orders[page].length - 1) { progress[page]++; render(); const target = slides[page].querySelector(`[data-order="${orders[page][progress[page]]}"]`); target?.scrollIntoView({block:'nearest',behavior:'instant'}); } else go(page + 1); }
+  function drawer(open) { $('mediaDrawer').classList.toggle('open', open); $('mediaDrawer').setAttribute('aria-hidden', String(!open)); $('mediaDrawer').inert = !open; }
+  function renderImages() {
+    $('pictureCount').textContent = items().filter(i => i.src).length;
+    $('drawerTitle').textContent = `第 ${page + 1} 页 · 本页图片`;
+    $('imageEditor').hidden = !editing; $('exportBtn').hidden = !editing;
+    if (localDraft) { $('editBtn').setAttribute('aria-pressed', String(editing)); $('editBtn').textContent = editing ? '结束本机编辑' : '本机编辑'; }
+    const list = $('imageList'); list.replaceChildren();
+    const shown = items().filter(i => editing || i.src);
+    if (!shown.length) { const empty = document.createElement('p'); empty.className = 'reader-empty'; empty.textContent = '本页图片尚未添加 / No images added yet'; list.append(empty); }
+    shown.forEach(item => {
+      const card = document.createElement('div'); card.className = 'reader-image-card';
+      if (/^(?:data:image\/(?:png|jpeg|webp|gif);base64,|https:\/\/)/.test(item.src || '')) {
+        const img = document.createElement('img'); img.src = item.src; img.alt = item.name; img.tabIndex = 0; img.onclick = () => zoom(img); img.onkeydown = e => { if (e.key === 'Enter') zoom(img); }; card.append(img);
+      }
+      const title = document.createElement('h4'); title.textContent = item.name + (!item.src ? '（待导入图片）' : ''); card.append(title);
+      if (editing) {
+        const input = document.createElement('input'); input.value = item.name; input.maxLength = 160; input.setAttribute('aria-label', '图片名称'); input.disabled = busy;
+        input.onchange = () => { item.name = input.value.trim() || item.name; dirty = true; renderImages(); }; card.append(input);
+        const actions = document.createElement('div'); actions.className = 'reader-image-actions'; const index = items().indexOf(item);
+        actions.append(button('替换图片', () => pick(item.id), busy), button('上移', () => move(index, -1), busy || index === 0), button('下移', () => move(index, 1), busy || index === items().length - 1), button('移除', () => { if (confirm(`移除“${item.name}”？仅修改本机草稿。`)) { items().splice(index,1); dirty = true; renderImages(); } }, busy)); card.append(actions);
+      }
+      list.append(card);
+    });
+  }
+  function move(index, direction) { const list = items(); [list[index],list[index + direction]] = [list[index + direction],list[index]]; dirty = true; renderImages(); }
+  function pick(id = null) { if (busy) return; replaceId = id; $('imageFile').multiple = !id; $('imageFile').value = ''; $('imageFile').click(); }
+  function readImage(file) {
+    return new Promise((resolve, reject) => {
+      if (!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type) || file.size > 8 * 1024 * 1024) return reject(new Error('请选用不超过8MB的 PNG/JPG/WebP/GIF 图片。'));
+      const reader = new FileReader(); reader.onerror = () => reject(new Error('读取图片失败。'));
+      reader.onload = () => { const img = new Image(); img.onerror = () => reject(new Error('图片无法解码，请检查文件。')); img.onload = () => img.naturalWidth * img.naturalHeight > 24000000 ? reject(new Error('图片像素过大，请缩小到2400万像素以内。')) : resolve({ id: 'img-' + crypto.randomUUID(), name: file.name.replace(/\.[^.]+$/, ''), src: reader.result }); img.src = reader.result; }; reader.readAsDataURL(file);
+    });
+  }
+  $('imageFile').onchange = async () => {
+    const files = [...$('imageFile').files]; if (!files.length) return;
+    const target = items(), id = replaceId; busy = true; renderImages(); status('正在读取图片…');
+    try {
+      if (!id && target.length + files.length > 24) throw new Error('每页最多保留24个图片条目。');
+      if (files.reduce((n,f) => n + f.size, 0) > 24 * 1024 * 1024) throw new Error('本次导入请控制在24MB以内。');
+      const images = await Promise.all(files.map(readImage));
+      const old = JSON.stringify(config).length;
+      if (old + JSON.stringify(images).length > 40 * 1024 * 1024) throw new Error('本课件图片总量较大，请先压缩图片（嵌入总量上限40MB）。');
+      if (id) { const original = target.find(i => i.id === id); if (!original) throw new Error('图片条目已不存在。'); original.src = images[0].src; } else target.push(...images);
+      dirty = true; status('已加入本机草稿，请导出 HTML 保存；尚未同步学生。');
+    } catch (error) { status(error.message, true); } finally { busy = false; renderImages(); }
+  };
+  $('picturesBtn').onclick = () => drawer(!$('mediaDrawer').classList.contains('open'));
+  $('drawerClose').onclick = () => { drawer(false); $('picturesBtn').focus(); };
+  $('editBtn').onclick = () => { if (busy || !localDraft) return; editing = !editing; renderImages(); if (editing) drawer(true); };
+  $('addImagesBtn').onclick = () => pick();
+  $('prevBtn').onclick = () => go(page - 1); $('nextBtn').onclick = next;
+  $('pageSelect').onchange = e => go(Number(e.target.value));
+  $('modeBtn').onclick = () => { study = !study; render(); };
+  $('revealBtn').onclick = () => { progress[page] = orders[page].length - 1; render(); };
+  $('fullscreenBtn').onclick = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch { alert('当前环境不支持全屏，请使用浏览器全屏功能。'); } };
+  document.addEventListener('fullscreenchange', () => { $('fullscreenBtn').textContent = document.fullscreenElement ? '退出全屏' : '全屏'; });
+  $('zoomClose').onclick = () => $('readerZoom').close();
+  $('readerZoom').onclick = e => { if (e.target === $('readerZoom')) $('readerZoom').close(); };
+  const onionTerms = [
+    {id:1, zh:'母系大家庭共同居住', en:'Living in a matrilineal extended household', layer:'outer'},
+    {id:2, zh:'男方夜间到女方家走访，白天返回母家', en:'Men visit their partners at night and return to their maternal homes during the day', layer:'outer'},
+    {id:3, zh:'舅舅参与姐妹子女的照料与教育', en:'Maternal uncles help care for and educate their sisters’ children', layer:'outer'},
+    {id:4, zh:'家族成员按母系确认亲属关系', en:'Kinship is traced through the maternal line', layer:'middle'},
+    {id:5, zh:'对母系家庭责任的重视高于夫妻共同居住', en:'Responsibility to the maternal household takes priority over spousal co-residence', layer:'middle'},
+    {id:6, zh:'家庭的延续与安全建立在稳定的母系家庭之上', en:'Family continuity and security rest on a stable maternal household', layer:'core'},
+    {id:7, zh:'亲密关系不必以夫妻共同居住和共同财产为基础', en:'An intimate partnership need not depend on spousal co-residence or shared property', layer:'core'}
+  ];
+  const onionLayerNames = {outer:'表层 · Practices',middle:'中层 · Norms & Values',core:'核心 · Assumptions'};
+  const onionPositions = {
+    outer:[[8,46],[31,10],[76,70]], middle:[[47,21],[70,48]], core:[[42,43],[53,54]]
+  };
+  const shuffleOnion = () => onionTerms.map(t => t.id).sort(() => Math.random() - .5);
+  let onionOrder = shuffleOnion(), onionPlaced = {}, onionSelected = null, onionAttempts = 0, onionChecked = false;
+  const onionBank = $('onionBank'), onionResults = $('onionResults'), onionMarkers = $('onionMarkers');
+  const onionLabel = id => onionOrder.indexOf(id) + 1;
+  function onionAssign(id, layer) { if (layer) onionPlaced[id] = layer; else delete onionPlaced[id]; onionSelected = null; onionChecked = false; renderOnion(); }
+  function renderOnion() {
+    onionBank.replaceChildren(); onionMarkers.replaceChildren(); onionResults.replaceChildren();
+    onionOrder.map(id => onionTerms.find(t => t.id === id)).forEach(t => {
+      const card = document.createElement('div'); card.className = 'onion-term';
+      const copy = document.createElement('div'); copy.className = 'onion-term-copy'; copy.innerHTML = `<b>${onionLabel(t.id)}</b>${t.zh}<span class="term-en">${t.en}</span>`; card.append(copy);
+      const select = document.createElement('select'); select.className = 'onion-select'; select.dataset.layer = onionPlaced[t.id] || ''; select.setAttribute('aria-label', `${t.zh}的文化层级`);
+      [['','— 未选择 —'],['outer','表层 · Practices'],['middle','中层 · Norms'],['core','核心 · Assumptions']].forEach(([value,label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; select.append(option); });
+      select.value = onionPlaced[t.id] || ''; select.onchange = () => onionAssign(t.id, select.value); card.append(select);
+      onionBank.append(card);
+    });
+    ['outer','middle','core'].forEach(layer => {
+      const terms = onionTerms.filter(t => onionPlaced[t.id] === layer);
+      const box = document.createElement('div'); box.className = 'onion-result'; box.dataset.layer = layer; box.innerHTML = `<h4>${onionLayerNames[layer]}</h4>`;
+      terms.forEach((t,index) => {
+        const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'onion-chip';
+        if (onionChecked) chip.classList.add(t.layer === layer ? 'correct' : 'wrong');
+        chip.textContent = `${onionLabel(t.id)}. ${t.zh} / ${t.en}`; chip.title = '点击撤回'; chip.onclick = () => { delete onionPlaced[t.id]; onionChecked = false; renderOnion(); }; box.append(chip);
+        const pos = onionPositions[layer][index] || [45 + index * 7,45];
+        const marker = document.createElement('button'); marker.type = 'button'; marker.className = 'onion-marker'; marker.dataset.layer = layer; marker.textContent = t.id; marker.title = `${t.zh} / ${t.en}（点击撤回）`;
+        marker.textContent = onionLabel(t.id); marker.style.left = pos[0] + '%'; marker.style.top = pos[1] + '%'; marker.onclick = e => { e.stopPropagation(); delete onionPlaced[t.id]; onionChecked = false; renderOnion(); }; onionMarkers.append(marker);
+      });
+      onionResults.append(box);
+    });
+    const completed = Object.keys(onionPlaced).length;
+    $('onionRemaining').textContent = completed === onionTerms.length ? '分类完成' : `${completed} / ${onionTerms.length} 已选择`;
+  }
+  $('onionReset').onclick = () => { onionOrder = shuffleOnion(); onionPlaced = {}; onionSelected = null; onionAttempts = 0; onionChecked = false; $('onionStatus').textContent = '术语已重新排序。先观察行为，再追问规范与深层假设。'; renderOnion(); };
+  const onionFeedback = $('onionFeedback');
+  const closeOnionFeedback = () => { onionFeedback.classList.remove('open'); onionFeedback.setAttribute('aria-hidden','true'); $('onionSubmit').focus(); };
+  $('closeOnionFeedback').onclick = closeOnionFeedback;
+  $('onionSubmit').onclick = () => {
+    if (Object.keys(onionPlaced).length < onionTerms.length) { $('onionStatus').textContent = '请先将7项文化线索全部放入洋葱模型。'; return; }
+    onionAttempts++; onionChecked = true;
+    const score = onionTerms.filter(t => onionPlaced[t.id] === t.layer).length; renderOnion();
+    if (score === onionTerms.length) { $('onionStatus').textContent = '✓ 全部正确！正在打开三层解析。'; onionFeedback.classList.add('open'); onionFeedback.setAttribute('aria-hidden','false'); $('closeOnionFeedback').focus(); }
+    else if (onionAttempts < 2) $('onionStatus').textContent = `已正确 ${score}/7。橙色项目需要重新思考，你还有一次机会。`;
+    else {
+      onionTerms.forEach(t => onionPlaced[t.id] = t.layer); renderOnion(); $('onionStatus').textContent = `第二次完成：${score}/7。已呈现参考分类。`;
+      onionFeedback.classList.add('open'); onionFeedback.setAttribute('aria-hidden','false'); $('closeOnionFeedback').focus();
+    }
+  };
+  function makeReadingDraggable(win, head) {
+    head.onpointerdown = e => {
+      if (e.target.closest('button')) return;
+      const rect = win.getBoundingClientRect(), startX = e.clientX, startY = e.clientY;
+      win.style.left = rect.left + 'px'; win.style.top = rect.top + 'px'; win.style.transform = 'none'; head.setPointerCapture(e.pointerId);
+      const move = ev => { const maxX = Math.max(0, innerWidth - win.offsetWidth), maxY = Math.max(0, innerHeight - 48); win.style.left = Math.max(0,Math.min(maxX,rect.left + ev.clientX - startX)) + 'px'; win.style.top = Math.max(0,Math.min(maxY,rect.top + ev.clientY - startY)) + 'px'; };
+      const stop = () => { head.removeEventListener('pointermove',move); head.removeEventListener('pointerup',stop); head.removeEventListener('pointercancel',stop); };
+      head.addEventListener('pointermove',move); head.addEventListener('pointerup',stop); head.addEventListener('pointercancel',stop);
+    };
+  }
+  const shockStages = [
+    {id:'honeymoon', name:'Honeymoon · 蜜月期', feelings:'兴奋、好奇、乐观 / Excited, curious, optimistic', response:'关注新鲜感，容易理想化文化差异 / Focuses on novelty and may idealize differences', example:'主动尝试当地食物、语言和活动 / Eagerly tries local food, language, and activities', action:'保持开放，同时记录真实观察 / Stay open-minded and record concrete observations'},
+    {id:'frustration', name:'Frustration · 挫折期', feelings:'烦躁、孤独、疲惫或思乡 / Irritated, lonely, tired, or homesick', response:'频繁比较“这里”和“家乡”，可能把差异理解为不合理 / Repeatedly compares “here” with home and may judge differences as unreasonable', example:'听不懂隐含规则，认为当地人故意不配合 / Misreads implicit rules and assumes locals are being uncooperative', action:'区分事实、个人解释与文化差异，主动寻求支持 / Separate facts from interpretations and seek support'},
+    {id:'adjustment', name:'Adjustment · 调整期', feelings:'压力下降，信心逐渐恢复 / Less stressed and increasingly confident', response:'开始理解当地规则，形成新的生活与沟通策略 / Begins to understand local rules and develops new routines', example:'能预判沟通误解，并调整表达方式 / Anticipates misunderstandings and adapts communication', action:'练习当地语言与行为规范，建立稳定支持网络 / Practise local norms and build a stable support network'},
+    {id:'adaptation', name:'Adaptation · 适应期', feelings:'自在、胜任，并能接受差异 / Comfortable, competent, and accepting of differences', response:'能够在不同文化逻辑之间灵活转换 / Can move flexibly between different cultural logics', example:'根据对象和情境调整管理或合作方式 / Adjusts management and collaboration to people and context', action:'保持反思，避免把个人经验变成文化刻板印象 / Remain reflective and avoid turning experience into stereotypes'}
+  ];
+  let shockCurrent = 0, shockVisited = new Set(), shockOverviewMode = false;
+  const shockWindow = $('shockWindow');
+  function updateShockPage() {
+    document.querySelectorAll('.shock-node').forEach(node => { node.classList.toggle('visited', shockVisited.has(node.dataset.stage)); node.classList.toggle('active', node.dataset.stage === shockStages[shockCurrent].id && shockWindow.classList.contains('open')); });
+    $('shockProgress').textContent = `已查看 ${shockVisited.size} / ${shockStages.length}`;
+  }
+  function renderShock() {
+    const tabs = $('shockTabs'); tabs.replaceChildren();
+    shockStages.forEach((stage,index) => { const tab = document.createElement('button'); tab.type='button'; tab.className='shock-tab' + (index === shockCurrent && !shockOverviewMode ? ' active' : '') + (shockVisited.has(stage.id) ? ' visited' : ''); tab.textContent=stage.name; tab.onclick=()=>openShock(index); tabs.append(tab); });
+    if (shockOverviewMode) {
+      $('shockDetail').innerHTML = `<h3 style="margin-bottom:.7rem;color:#1e3a8a">四阶段完整对照 · Full Comparison</h3><table class="shock-overview"><thead><tr><th>阶段</th><th>典型情绪</th><th>典型反应</th><th>应对方向</th></tr></thead><tbody>${shockStages.map(s=>`<tr><td><strong>${s.name}</strong></td><td>${s.feelings}</td><td>${s.response}</td><td>${s.action}</td></tr>`).join('')}</tbody></table><div class="shock-scenario"><h4>情境判断 · Quick Check</h4><p>一名留学生刚到重庆时非常兴奋，两个月后开始持续抱怨饮食、语言和办事方式。她现在最可能处于哪个阶段？</p><button class="shock-choice" data-answer="0">蜜月期 Honeymoon</button><button class="shock-choice" data-answer="1">挫折期 Frustration</button><button class="shock-choice" data-answer="0">适应期 Adaptation</button><p id="shockChoiceResult" style="margin-top:.45rem;font-weight:650"></p></div>`;
+      $('shockDetail').querySelectorAll('.shock-choice').forEach(choice => choice.onclick=()=>{ $('shockDetail').querySelectorAll('.shock-choice').forEach(b=>b.classList.remove('correct','wrong')); const ok=choice.dataset.answer==='1'; choice.classList.add(ok?'correct':'wrong'); $('shockChoiceResult').textContent=ok?'✓ 正确。持续抱怨、比较和不适是挫折期的典型表现。':'再想一想：最初的新鲜感已经消退，目前出现了持续的不适和负面比较。'; });
+    } else {
+      const s=shockStages[shockCurrent]; $('shockDetail').innerHTML=`<h3 style="margin-bottom:.7rem;color:#1e3a8a">${shockCurrent+1}. ${s.name}</h3><div class="shock-detail-grid"><div class="shock-detail-card"><strong>Feelings · 情绪</strong><p>${s.feelings}</p></div><div class="shock-detail-card"><strong>Typical response · 典型反应</strong><p>${s.response}</p></div><div class="shock-detail-card"><strong>Example · 例子</strong><p>${s.example}</p></div><div class="shock-detail-card"><strong>Helpful action · 应对建议</strong><p>${s.action}</p></div></div>`;
+    }
+    $('shockPrev').disabled=shockOverviewMode || shockCurrent===0; $('shockNext').disabled=shockOverviewMode || shockCurrent===shockStages.length-1;
+    $('shockOverview').disabled=shockVisited.size<shockStages.length; $('shockOverview').textContent=shockOverviewMode?'返回阶段探索':'查看完整对照'; updateShockPage();
+  }
+  function openShock(index) { shockCurrent=index; shockOverviewMode=false; shockVisited.add(shockStages[index].id); shockWindow.classList.add('open'); shockWindow.setAttribute('aria-hidden','false'); renderShock(); $('closeShockWindow').focus(); }
+  const closeShockWindow=()=>{ shockWindow.classList.remove('open'); shockWindow.setAttribute('aria-hidden','true'); updateShockPage(); document.querySelector(`.shock-node[data-stage="${shockStages[shockCurrent].id}"]`)?.focus(); };
+  document.querySelectorAll('.shock-node').forEach((node,index)=>node.onclick=()=>openShock(index));
+  $('closeShockWindow').onclick=closeShockWindow; $('shockPrev').onclick=()=>openShock(Math.max(0,shockCurrent-1)); $('shockNext').onclick=()=>openShock(Math.min(shockStages.length-1,shockCurrent+1));
+  $('shockOverview').onclick=()=>{ if(shockVisited.size<shockStages.length)return; shockOverviewMode=!shockOverviewMode; renderShock(); };
+  makeReadingDraggable(shockWindow,$('shockWindowHead')); updateShockPage();
+  makeReadingDraggable(onionFeedback, $('onionFeedbackHead'));
+  renderOnion();
+  let chapterAuth = null, activeAssignment = null, assignmentBusy = false;
+  const assignmentDefinitions = {
+    'mosuo-commentary-video': { title:'摩梭文化口播视频 / Mosuo Culture Commentary Video', accept:'.mp4,video/mp4', type:'video/mp4', max:500, description:'提交4–5分钟MP4口播视频。允许多次提交，教师端以最后一次为准。' },
+    'cultural-adaptation-survey': { title:'来华留学生文化适应调查与分析 / Cultural Adaptation Survey and Analysis', accept:'.pdf,application/pdf', type:'application/pdf', max:50, description:'提交小组调查分析报告，建议统一使用PDF。允许多次提交，教师端以最后一次为准。' }
+  };
+  const assignmentWindow = $('assignmentSubmitWindow'), assignmentStatus = $('assignmentSubmitStatus');
+  window.CCMHostAuth = null;
+  window.addEventListener('message', event => { if (event.data?.type === 'CCM_AUTH') { chapterAuth = event.data.auth || null; window.CCMHostAuth = chapterAuth; window.dispatchEvent(new CustomEvent('ccm-auth-ready', { detail: chapterAuth })); } });
+  try { if (window.parent !== window) window.parent.postMessage({type:'CCM_AUTH_REQUEST'}, '*'); } catch {}
+  const assignmentApi = async (action, data={}) => {
+    if (!chapterAuth?.apiUrl || !chapterAuth.id || !chapterAuth.inviteCode) throw new Error('未取得主程序登录信息，请从主程序进入本课件。');
+    const response = await fetch(chapterAuth.apiUrl, { method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store', body:JSON.stringify({...data,action,id:chapterAuth.id,inviteCode:chapterAuth.inviteCode}) });
+    const payload = await response.json().catch(()=>null); if (!response.ok || !payload?.ok) throw new Error(payload?.message || ('HTTP '+response.status)); return payload;
+  };
+  const setAssignmentStatus = (text, kind='') => { assignmentStatus.textContent=text; assignmentStatus.className='assignment-status '+kind; };
+  const closeAssignment = () => { if (assignmentBusy) return; assignmentWindow.classList.remove('open'); assignmentWindow.setAttribute('aria-hidden','true'); };
+  $('closeAssignmentSubmit').onclick = closeAssignment; makeReadingDraggable(assignmentWindow,$('assignmentSubmitHead'));
+  async function openAssignment(id) {
+    if (!chapterAuth?.id) return alert('请从主程序登录后进入本课件，再提交作业。');
+    if (chapterAuth.role !== 'student') return alert('作业提交入口仅供学生使用；教师可在系统设置的“作业收集”中查看。');
+    activeAssignment=id; const item=assignmentDefinitions[id]; if (!item) return;
+    $('assignmentSubmitTitle').textContent='📤 '+item.title; $('assignmentDescription').textContent=item.description;
+    $('assignmentStudentName').value=chapterAuth.name || ''; $('assignmentStudentId').value=chapterAuth.id; $('assignmentClassName').value=chapterAuth.className || (chapterAuth.classId ? '已绑定班级' : '未分班');
+    $('assignmentFile').accept=item.accept; $('assignmentFile').value=''; $('assignmentRule').textContent=`允许格式：${item.type==='video/mp4'?'MP4':'PDF'} · 最大 ${item.max}MB · 无截止日期`;
+    $('assignmentProgressBar').style.width='0%'; $('assignmentLatest').hidden=true; setAssignmentStatus('正在读取最后一次提交记录…');
+    assignmentWindow.classList.add('open'); assignmentWindow.setAttribute('aria-hidden','false');
+    try { const result=await assignmentApi('assignment-my-submission',{assignmentId:id}); if(result.submission){const s=result.submission; $('assignmentLatest').hidden=false; $('assignmentLatest').textContent=`当前有效版本：第${s.version}次提交 · ${s.fileName} · ${new Date(s.submittedAt).toLocaleString()}`; setAssignmentStatus('重新提交后，新文件将成为教师端默认版本。');} else setAssignmentStatus('尚未提交。'); } catch(error){setAssignmentStatus(error.message,'error');}
+  }
+  document.querySelectorAll('[data-assignment-id]').forEach(button=>button.onclick=()=>openAssignment(button.dataset.assignmentId));
+  $('assignmentSubmitForm').onsubmit = async event => {
+    event.preventDefault(); if(assignmentBusy) return; const item=assignmentDefinitions[activeAssignment], file=$('assignmentFile').files[0]; if(!item || !file) return setAssignmentStatus('请选择要提交的文件。','error');
+    if(file.size>item.max*1024*1024) return setAssignmentStatus(`文件不能超过${item.max}MB。`,'error');
+    assignmentBusy=true; $('assignmentSubmitButton').disabled=true; $('closeAssignmentSubmit').disabled=true; setAssignmentStatus('正在申请安全上传权限…');
+    try {
+      const init=await assignmentApi('assignment-upload-init',{assignmentId:activeAssignment,fileName:file.name,size:file.size,contentType:file.type || item.type});
+      await new Promise((resolve,reject)=>{const xhr=new XMLHttpRequest(); xhr.open('PUT',init.uploadUrl); Object.entries(init.requiredHeaders||{}).forEach(([key,value])=>xhr.setRequestHeader(key,value)); xhr.upload.onprogress=e=>{if(e.lengthComputable){const percent=Math.round(e.loaded/e.total*100); $('assignmentProgressBar').style.width=percent+'%'; setAssignmentStatus(`正在上传… ${percent}%`);}}; xhr.onload=()=>xhr.status>=200&&xhr.status<300?resolve():reject(new Error('COS上传失败：HTTP '+xhr.status)); xhr.onerror=()=>reject(new Error('网络中断或COS跨域设置未允许上传。')); xhr.send(file);});
+      const done=await assignmentApi('assignment-upload-complete',{submissionId:init.submissionId}); const s=done.submission; $('assignmentLatest').hidden=false; $('assignmentLatest').textContent=`当前有效版本：第${s.version}次提交 · ${s.fileName} · ${new Date(s.submittedAt).toLocaleString()}`; setAssignmentStatus('✓ 作业提交成功。教师端已可查看。','success'); $('assignmentFile').value='';
+    } catch(error){setAssignmentStatus(error.message,'error');}
+    finally{assignmentBusy=false;$('assignmentSubmitButton').disabled=false;$('closeAssignmentSubmit').disabled=false;}
+  };
+  const reading = $('cultureReading'), readingHead = $('cultureReadingHead');
+  const closeReading = () => { reading.classList.remove('open'); reading.setAttribute('aria-hidden', 'true'); $('openCultureReading').focus(); };
+  $('openCultureReading').onclick = () => { reading.classList.add('open'); reading.setAttribute('aria-hidden', 'false'); $('closeCultureReading').focus(); };
+  $('closeCultureReading').onclick = closeReading;
+  readingHead.onpointerdown = e => {
+    if (e.target.closest('button')) return;
+    const rect = reading.getBoundingClientRect(), startX = e.clientX, startY = e.clientY;
+    reading.style.left = rect.left + 'px'; reading.style.top = rect.top + 'px'; reading.style.transform = 'none';
+    readingHead.setPointerCapture(e.pointerId);
+    const move = ev => {
+      const maxX = Math.max(0, innerWidth - reading.offsetWidth), maxY = Math.max(0, innerHeight - 48);
+      reading.style.left = Math.max(0, Math.min(maxX, rect.left + ev.clientX - startX)) + 'px';
+      reading.style.top = Math.max(0, Math.min(maxY, rect.top + ev.clientY - startY)) + 'px';
+    };
+    const stop = () => { readingHead.removeEventListener('pointermove', move); readingHead.removeEventListener('pointerup', stop); readingHead.removeEventListener('pointercancel', stop); };
+    readingHead.addEventListener('pointermove', move); readingHead.addEventListener('pointerup', stop); readingHead.addEventListener('pointercancel', stop);
+  };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && assignmentWindow.classList.contains('open') && !assignmentBusy) { e.preventDefault(); closeAssignment(); return; }
+    if (e.key === 'Escape' && shockWindow.classList.contains('open')) { e.preventDefault(); closeShockWindow(); return; }
+    if (e.key === 'Escape' && onionFeedback.classList.contains('open')) { e.preventDefault(); closeOnionFeedback(); return; }
+    if (e.key === 'Escape' && reading.classList.contains('open')) { e.preventDefault(); closeReading(); return; }
+    if ($('readerZoom').open || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select,button,[contenteditable]')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(page - 1); }
+    if (e.key === 'Escape') drawer(false);
+  });
+  $('exportBtn').onclick = () => {
+    if (busy) return;
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#reader-images').textContent = JSON.stringify(config).replace(/</g, '\\u003c');
+    clone.querySelector('#pageSelect').replaceChildren(); clone.querySelector('#imageList').replaceChildren(); clone.querySelector('#zoomContent').replaceChildren(); clone.querySelector('#readerZoom').removeAttribute('open');
+    clone.querySelector('#mediaDrawer').classList.remove('open');
+    const url = URL.createObjectURL(new Blob(['<!doctype html>\n' + clone.outerHTML], {type: 'text/html;charset=utf-8'}));
+    const a = document.createElement('a'); a.href = url; a.download = 'chapter1-reader-with-images.html'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+    status('已发起下载，请确认文件已保存。导出的 HTML 可独立打开，包含当前图片。');
+  };
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  window.CCMReaderImages = {
+    chapterId: 'chapter-1',
+    getPageId: () => slides[page].dataset.slide,
+    getPageNumber: () => page + 1,
+    getCloudPages: () => Object.fromEntries(Object.entries(config.pages).map(([key,list]) => [key, list.filter(item => item.objectKey).map(item => ({...item, src: undefined}))])),
+    applyCloudCatalog: catalog => {
+      const cloudPages = catalog?.pages || {};
+      const keys = new Set([...Object.keys(config.pages), ...Object.keys(cloudPages)]);
+      keys.forEach(key => { config.pages[key] = [...(config.pages[key] || []).filter(item => !item.objectKey), ...(cloudPages[key] || [])]; });
+      renderImages();
+    },
+    openPictures: () => { drawer(true); renderImages(); }
+  };
+  window.dispatchEvent(new CustomEvent('ccm-reader-images-ready'));
+  status(''); drawer(false); render();
+})();
+</script><script src="../assets/chapter1-language-data.js?v=1"></script><script src="../assets/chapter1-i18n.js?v=1"></script><script src="../assets/chapter-cloud-images.js?v=32"></script></body></html>
