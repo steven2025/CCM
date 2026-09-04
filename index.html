@@ -327,7 +327,7 @@
     }
     .settings-tabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 6px;
       position: sticky;
       top: 0;
@@ -442,6 +442,9 @@
     .analytics-view-toolbar select { padding: 7px 9px; border-radius: 8px; background: #1e293b; color: #f8fafc; border: 1px solid rgba(147,197,253,0.35); }
     .analytics-source-note { margin-top: 10px; color: #94a3b8; font-size: 0.68rem; line-height: 1.55; }
     .analytics-empty { padding: 24px; text-align: center; color: #94a3b8; }
+    .assignment-state { display:inline-block;padding:3px 8px;border-radius:999px;font-weight:700;font-size:.68rem; }
+    .assignment-state.submitted { color:#bbf7d0;background:rgba(22,163,74,.2);border:1px solid rgba(74,222,128,.3); }
+    .assignment-state.missing { color:#fed7aa;background:rgba(234,88,12,.16);border:1px solid rgba(251,146,60,.28); }
     .material-tree-note {
       padding: 9px 11px;
       border-radius: 10px;
@@ -1704,7 +1707,7 @@
         <div class="panel">
           <div class="panel-header">
             <div class="panel-header-left">
-              <div class="panel-title">课件 PPT · Lecture Slides</div>
+              <div class="panel-title" id="lecture-viewer-title">课件 PPT · Lecture Slides</div>
               <div class="panel-subtitle" id="ppt-lang-label">当前版本：Chinese + English</div>
             </div>
             <div class="panel-header-right">
@@ -1854,6 +1857,7 @@
 
   const pptLangSelect = document.getElementById('ppt-lang-select');
   const pptLangLabel = document.getElementById('ppt-lang-label');
+  const lectureViewerTitle = document.getElementById('lecture-viewer-title');
   const pptPlaceholderTitle = document.getElementById('ppt-placeholder-title');
   const pptPlaceholderLang = document.getElementById('ppt-placeholder-lang');
   const pptPlaceholderLang2 = document.getElementById('ppt-placeholder-lang2');
@@ -1900,6 +1904,7 @@
   let availableCatalogModules = new Set();
   let catalogAssetLabels = { slides: {}, exercises: {} };
   const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
+  const interactiveChapterUrls = { 1: './chapters/chapter1.html?v=20260904-1', 2: './chapters/chapter2.html?v=20260904-1' };
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
     deepseek: { baseUrl: 'https://api.deepseek.com/v1', model: 'deepseek-chat' },
@@ -3397,6 +3402,15 @@
   function saveCurrentAuth(auth) {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(auth || {}));
   }
+
+  window.addEventListener('message', event => {
+    if (!event.data || event.data.type !== 'CCM_AUTH_REQUEST') return;
+    const isHostedFrame = Array.from(document.querySelectorAll('iframe')).some(frame => frame.contentWindow === event.source);
+    if (!isHostedFrame) return;
+    const auth = getCurrentAuth();
+    const payload = auth && auth.id ? { ...auth, inviteCode: localStorage.getItem('ccm_invite_code') || '', apiUrl: TEACHER_SETTINGS_API_URL } : null;
+    event.source.postMessage({ type: 'CCM_AUTH', auth: payload }, event.origin && event.origin !== 'null' ? event.origin : '*');
+  });
 
   function isTeacher() {
     return getCurrentAuth().role === 'teacher';
@@ -5378,6 +5392,7 @@
         '<button class="settings-tab" data-settings-tab="access">② 开放与关闭</button>' +
         '<button class="settings-tab" data-settings-tab="analytics">③ 用户行为看板</button>' +
         '<button class="settings-tab" data-settings-tab="students">④ 学生管理 / Students</button>' +
+        '<button class="settings-tab" data-settings-tab="assignments">⑤ 作业收集 / Assignments</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
         '<div class="material-tree-note">可登记 COS 文件、为已有材料增加语言版本，以及重命名、替换、删除和调整顺序。新增或替换后请到“开放与关闭”发布。</div>' +
@@ -5394,7 +5409,8 @@
         '<button type="button" class="btn-ghost" id="analytics-refresh">刷新看板</button></div>' +
         '<p class="material-tree-note">按学生当前所属班级统计；转班后，历史记录随学生归入新班。成绩下载遵循当前班级筛选。 / Reports follow current class membership.</p>' +
         '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
-      '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>';
+      '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>' +
+      '<section class="settings-tab-panel" data-settings-panel="assignments"><div class="analytics-toolbar"><select id="assignment-class"><option value="*">全部班级 / All classes</option></select><button type="button" class="btn-ghost" id="assignment-refresh">刷新作业</button></div><p class="material-tree-note">第一版默认收集第一章两项作业，不设置截止日期；学生可多次提交，教师端默认显示最后一次。</p><div id="assignment-dashboard"><div class="material-empty">进入本页后读取提交情况。</div></div></section>';
 
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
@@ -5447,6 +5463,55 @@
     if (analyticsDays) analyticsDays.addEventListener('change', refreshAnalytics);
     if (analyticsClass) analyticsClass.addEventListener('change', refreshAnalytics);
     let studentManager = null;
+    const assignmentContainer = body.querySelector('#assignment-dashboard');
+    const assignmentClass = body.querySelector('#assignment-class');
+    const assignmentRefresh = body.querySelector('#assignment-refresh');
+    let assignmentsLoaded = false;
+    const assignmentCall = async (action, data = {}) => {
+      const current = getCurrentAuth();
+      const response = await fetch(TEACHER_SETTINGS_API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store', body:JSON.stringify({ ...data, action, id:current.id || '', inviteCode:localStorage.getItem('ccm_invite_code') || '' }) });
+      const payload = await response.json().catch(() => null); if (!response.ok || !payload?.ok) throw new Error(payload?.message || ('HTTP ' + response.status)); return payload;
+    };
+    const topicTitles = {
+      1:'摩梭与汉族社会的性别与家庭角色对比', 2:'摩梭大家庭结构及走婚习俗的形成与影响因素', 3:'外部世界对摩梭文化的刻板印象',
+      4:'旅游业对摩梭文化的影响', 5:'泸沽湖旅游的核心吸引力与可持续性'
+    };
+    const openTopicAdmin = async () => {
+      assignmentContainer.innerHTML = '<div class="login-status-line">正在读取摩梭文化选题登记...</div>';
+      try {
+        const payload = await assignmentCall('topic-choice-admin-list',{classId:assignmentClass.value || '*'}), classNames=new Map((payload.classes||[]).map(item=>[item.classId,item.name]));
+        const cards=(payload.topics||[]).map(item=>'<button type="button" class="analytics-card" data-topic-filter="'+item.topicId+'" style="text-align:left;cursor:pointer"><strong>'+item.count+' / 4</strong><span>Topic '+item.topicId+' · '+escapeHtml(topicTitles[item.topicId]||'')+'</span></button>').join('');
+        const renderRows = topicId => {
+          const selected=(payload.rows||[]).filter(row=>topicId==='unselected'?!row.topicId:Number(row.topicId)===Number(topicId));
+          const bodyRows=selected.map(row=>'<tr><td>'+escapeHtml(row.studentId)+'</td><td>'+escapeHtml(row.name)+'</td><td>'+escapeHtml(classNames.get(row.classId)||'未分班')+'</td><td>'+(row.topicId?'Topic '+row.topicId+' · '+escapeHtml(topicTitles[row.topicId]||''):'未选题')+'</td><td>'+(row.updatedAt?escapeHtml(new Date(row.updatedAt).toLocaleString()):'—')+'</td></tr>').join('');
+          assignmentContainer.querySelector('[data-topic-table]').innerHTML=bodyRows||'<tr><td colspan="5">暂无学生</td></tr>';
+          assignmentContainer.querySelector('[data-topic-caption]').textContent=topicId==='unselected'?'尚未选题学生':'Topic '+topicId+' · '+(topicTitles[topicId]||'');
+        };
+        const unselected=(payload.rows||[]).filter(row=>!row.topicId).length;
+        assignmentContainer.innerHTML='<div class="analytics-subnav"><button type="button" data-topic-back>← 返回作业提交</button><button type="button" class="active">摩梭文化口播视频 · 选题登记</button><button type="button" data-topic-unselected>未选题 '+unselected+' 人</button><button type="button" data-topic-export>导出 CSV</button></div><div class="analytics-cards">'+cards+'</div><div class="analytics-panel"><div class="analytics-panel-title" data-topic-caption>点击上方题目查看学生</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>选题</th><th>最后更新时间</th></tr></thead><tbody data-topic-table><tr><td colspan="5">请选择一个题目</td></tr></tbody></table></div></div>';
+        assignmentContainer.querySelector('[data-topic-back]').onclick=refreshAssignments; assignmentContainer.querySelector('[data-topic-unselected]').onclick=()=>renderRows('unselected'); assignmentContainer.querySelectorAll('[data-topic-filter]').forEach(button=>button.onclick=()=>renderRows(button.dataset.topicFilter));
+        assignmentContainer.querySelector('[data-topic-export]').onclick=()=>{const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';const rows=[['学号','姓名','班级','选题编号','选题名称','最后更新时间'],...(payload.rows||[]).map(row=>[row.studentId,row.name,classNames.get(row.classId)||'未分班',row.topicId||'',row.topicId?topicTitles[row.topicId]:'未选题',row.updatedAt||''])];const csv='\uFEFF'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='第一章-摩梭文化选题登记.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);};
+      } catch(error){assignmentContainer.innerHTML='<div class="login-status-line error">选题登记读取失败：'+escapeHtml(error.message)+'</div>';}
+    };
+    const refreshAssignments = async () => {
+      if (!assignmentContainer) return; assignmentRefresh.disabled = true; assignmentClass.disabled = true; assignmentContainer.innerHTML = '<div class="login-status-line">正在读取作业提交情况...</div>';
+      try {
+        const payload = await assignmentCall('assignments-admin-list', { classId: assignmentClass.value || '*' });
+        const classNames = new Map((payload.classes || []).map(item => [item.classId,item.name]));
+        assignmentClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + (payload.classes || []).map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + '</option>').join(''); assignmentClass.value = payload.classId;
+        const groups = (payload.assignments || []).map(item => {
+          const rows = (payload.rows || []).filter(row => row.assignmentId === item.assignmentId), submitted = rows.filter(row => row.submission);
+          const table = rows.map(row => '<tr><td>' + escapeHtml(row.studentId) + '</td><td>' + escapeHtml(row.name) + '</td><td>' + escapeHtml(classNames.get(row.classId) || '未分班') + '</td><td><span class="assignment-state ' + (row.submission ? 'submitted">已提交' : 'missing">未提交') + '</span></td><td>' + (row.submission ? escapeHtml(row.submission.fileName) : '—') + '</td><td>' + (row.submission ? Number(row.submission.version || 1) : '—') + '</td><td>' + (row.submission ? escapeHtml(new Date(row.submission.submittedAt).toLocaleString()) : '—') + '</td><td>' + (row.submission ? '<button type="button" class="btn-ghost" data-assignment-download="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">下载</button>' : '—') + '</td></tr>').join('');
+          const topicButton=item.assignmentId==='mosuo-commentary-video'?'<button type="button" class="btn-ghost" data-topic-admin style="margin-bottom:9px">查看选题登记 / Topic Registration</button>':'';
+          return '<div class="analytics-panel" style="margin-bottom:12px"><div class="analytics-panel-title">第一章 · ' + escapeHtml(item.titleZh) + ' / ' + escapeHtml(item.titleEn) + '　<span style="color:#86efac">已交 ' + submitted.length + '</span> / 应交 ' + rows.length + '　· 无截止日期</div>'+topicButton+'<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>状态</th><th>最后文件</th><th>提交次数</th><th>最后提交</th><th>操作</th></tr></thead><tbody>' + table + '</tbody></table></div></div>';
+        }).join(''); assignmentContainer.innerHTML = groups || '<div class="analytics-empty">暂无作业数据。</div>';
+        assignmentContainer.querySelector('[data-topic-admin]')?.addEventListener('click',openTopicAdmin);
+        assignmentContainer.querySelectorAll('[data-assignment-download]').forEach(button => button.onclick = async () => { button.disabled=true; try { const result=await assignmentCall('assignment-download-url',{assignmentId:button.dataset.assignmentDownload,studentId:button.dataset.studentId}); const a=document.createElement('a'); a.href=result.url; a.download=result.fileName || ''; a.target='_blank'; a.rel='noopener'; a.click(); } catch(error){ alert('下载失败：'+error.message); } finally { button.disabled=false; } });
+        assignmentsLoaded = true;
+      } catch(error) { assignmentContainer.innerHTML = '<div class="login-status-line error">作业读取失败：' + escapeHtml(error.message) + '</div>'; }
+      finally { assignmentRefresh.disabled=false; assignmentClass.disabled=false; }
+    };
+    assignmentRefresh?.addEventListener('click', refreshAssignments); assignmentClass?.addEventListener('change', refreshAssignments);
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
@@ -5457,6 +5522,7 @@
         footer.style.display = (tabName === 'files' || tabName === 'access') ? '' : 'none';
         saveBtn.textContent = tabName === 'files' ? '保存名称与排序' : '保存开放设置';
         if (tabName === 'analytics' && !analyticsLoaded) refreshAnalytics();
+        if (tabName === 'assignments' && !assignmentsLoaded) refreshAssignments();
         if (tabName === 'students' && !studentManager) {
           studentManager = window.CCMStudents.mount(body.querySelector('#student-manager'), async (action, data = {}) => {
             const auth = getCurrentAuth();
@@ -6006,6 +6072,28 @@
 
   /* 更新课件视图：第3/4/5/6章及期末任务使用 pdf.js 单页翻页模式，其余保持原有 iframe 模式 */
   async function updatePptView() {
+    const interactiveUrl = interactiveChapterUrls[currentChapter];
+    if (interactiveUrl) {
+      lectureViewerTitle.textContent = '互动课件 · Interactive Lesson';
+      pptLangLabel.textContent = '当前版本：中文 + English · HTML';
+      pptLangSelect.style.display = 'none';
+      pptDownloadBtn.style.display = 'none';
+      pptViewerModeLabel.textContent = 'Interactive HTML · scrollable';
+      btnAiGlossary.style.display = 'none'; pdfGlossaryBtn.style.display = 'none';
+      pdfjsToolbar.classList.remove('active'); pdfjsCanvasWrap.classList.remove('active');
+      if (!isResourceAllowed('slides', getModuleKeyFromChapter(currentChapter))) {
+        pdfIframe.style.display = 'none'; pptPlaceholderBody.style.display = 'block';
+        pptPlaceholderBody.innerHTML = '<p>本章互动课件暂未开放。<br>Interactive lesson is currently unavailable.</p>';
+        return;
+      }
+      pptPlaceholderBody.style.display = 'none'; pdfIframe.style.display = 'block';
+      pdfIframe.style.width = '100%'; pdfIframe.style.height = '100%'; pdfIframe.style.border = 'none';
+      if (!pdfIframe.src.endsWith(interactiveUrl.replace('./',''))) pdfIframe.src = interactiveUrl;
+      return;
+    }
+    lectureViewerTitle.textContent = '课件 PPT · Lecture Slides';
+    pptLangSelect.style.display = '';
+    pptDownloadBtn.style.display = '';
     const value = (pptLangSelect.value || '').trim();
     const fullName = getLangFullName(value);
     const linksForChapter = pptLinksByChapter[currentChapter] || pptLinksByChapter[1];
@@ -6149,7 +6237,7 @@
     setLoginStatus('正在验证登录信息...', '');
     try {
       const result = await validateCloudLogin(studentName, inviteCode);
-      saveCurrentAuth({ role: result.role, id: result.id || studentName, name: result.name || result.id || studentName, loginAt: Date.now() });
+      saveCurrentAuth({ role: result.role, id: result.id || studentName, name: result.name || result.id || studentName, classId: result.classId || '', className: result.className || '', loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
       trackPlatformEvent('login', { title: result.role === 'teacher' ? '管理员登录' : '学生登录' });

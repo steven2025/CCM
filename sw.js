@@ -1,8 +1,8 @@
-/* v27: online-only courses; cache ONLY the neutral offline explanation page. */
+/* v31: interactive chapter HTML; cache ONLY the neutral offline explanation page. */
 'use strict';
 const BASE = new URL('./', self.location.href);
 const CACHE_PREFIX = 'ccm-pwa-' + encodeURIComponent(BASE.pathname) + '-';
-const CACHE_NAME = CACHE_PREFIX + 'v27';
+const CACHE_NAME = CACHE_PREFIX + 'v31';
 const OFFLINE_URL = new URL('offline.html', BASE).href;
 
 self.addEventListener('install', event => {
