@@ -5072,6 +5072,12 @@
         : [];
       const input = item.querySelector(':scope > label > input[data-material-toggle]');
       if (input && childInputs.length) {
+        const currentObject = objectMap.get(input.getAttribute('data-material-toggle'));
+        if (currentObject && currentObject.status === 'hidden') {
+          input.checked = false;
+          input.indeterminate = false;
+          return;
+        }
         const checkedCount = childInputs.filter(child => child.checked || child.indeterminate).length;
         input.checked = checkedCount === childInputs.length && childInputs.every(child => child.checked);
         input.indeterminate = checkedCount > 0 && !input.checked;
