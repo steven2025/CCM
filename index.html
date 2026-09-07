@@ -3765,7 +3765,7 @@
       'chapter-4': '第四章 / Chapter 4',
       'chapter-5': '第五章 / Chapter 5',
       'chapter-6': '第六章 / Chapter 6',
-      'final-task': '期末任务 / Final Task',
+      'final-task': '期末任务项目库 / Final Task Project Library',
       'about-course': 'AI工具与APPs / AI Tools & APPs'
     };
     return labels[moduleKey] || moduleKey;
@@ -3781,6 +3781,8 @@
       resources[key + ':slides'] = true;
       resources[key + ':ai-glossary'] = true;
     });
+    // 期末任务现在由跨文化 AI 应用项目库承载，保留独立开关以便管理员控制开放状态。
+    resources['final-task:opc-library'] = true;
     Object.keys(exerciseResources).forEach(chapter => {
       collectExerciseLeaves(exerciseResources[chapter]).forEach(item => {
         resources['exercise:' + item.id] = true;
@@ -3881,7 +3883,10 @@
       if (!materialsCatalogReady) return false;
       if (!availableCatalogModules.has(moduleKey)) return false;
     }
-    return getAccessSettings().modules[moduleKey] !== false;
+    const settings = getAccessSettings();
+    if (settings.modules[moduleKey] === false) return false;
+    if (moduleKey === 'final-task' && settings.resources['final-task:opc-library'] === false) return false;
+    return true;
   }
 
   function isResourceAllowed(type, id) {
@@ -3952,6 +3957,9 @@
   }
 
   function getResourceEntriesForModule(moduleKey) {
+    if (moduleKey === 'final-task') {
+      return [{ key: 'final-task:opc-library', label: '跨文化 AI 应用项目库 / Cross-cultural AI App Project Library' }];
+    }
     const entries = [{ key: moduleKey + ':slides', label: '课件 PPT / Lecture Slides' }];
     const chapter = moduleKey === 'final-task' ? 'final' : Number((moduleKey || '').replace('chapter-', ''));
     if (chapter && exerciseResources[chapter]) {

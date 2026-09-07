@@ -66,6 +66,15 @@
     $('teacherClass').onchange=e=>run(async()=>{listing=await request('opc-list',{classId:e.target.value});teacherRecord=null;teacherStudent='';accountView();render();teacherView();});panel.querySelectorAll('[data-student]').forEach(b=>b.onclick=()=>run(async()=>{const result=await request('opc-record',{studentId:b.dataset.student});teacherStudent=b.dataset.student;teacherRecord=result.record;teacherView();}));if(teacherRecord){bindRecords(teacherRecord,teacherStudent);bindCustomReview();}
   }
   const style=document.createElement('style');style.textContent='#cloudAccount{font-size:13px}#cloudAccount summary{cursor:pointer}#cloudAccount .toolbar{margin-top:8px}.topicNames{font-size:13px;margin:6px 0;color:var(--brand)}.topicNames summary{cursor:pointer}.topicNames p{overflow-wrap:anywhere}.attachment{display:block;font-size:14px;padding:4px}.attachment input{min-width:0;margin-right:8px}#cloudPanel h3{margin:5px 0 12px}#cloudPanel fieldset{border:1px solid var(--line);border-radius:8px}.cloudChoice{margin-bottom:8px}.main-menu-btn{margin-left:auto}.mainnav button,.navrow button,.stage{font-weight:650}';document.head.appendChild(style);
+  const mainNavLabels={
+    'nav-library':'项目库 / Project Library',
+    'nav-overview':'项目概览 / Project Overview',
+    'nav-stages':'阶段向导 / Stage Guide',
+    'nav-resources':'平台与搜索 API / Platforms & Search APIs',
+    'nav-publishing':'GitHub 发布 / GitHub Publishing',
+    'nav-submission':'课程提交 / Course Submission'
+  };
+  Object.entries(mainNavLabels).forEach(([id,label])=>{const el=$(id);if(el)el.textContent=label;});
   accountView();render();
   const returnButton=document.createElement('button');returnButton.type='button';returnButton.className='back main-menu-btn';returnButton.textContent='返回主菜单 / Back to Main Menu';returnButton.addEventListener('click',returnToMainMenu);document.querySelector('header').appendChild(returnButton);
   // Same-origin standalone opening can reuse the course's existing login; never trust a role from storage.
