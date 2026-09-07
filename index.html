@@ -6392,6 +6392,16 @@
     chapterView.appendChild(host);
   }
 
+  window.addEventListener('message', event => {
+    if (event.data?.type !== 'CCM_OPC_RETURN_MAIN_MENU') return;
+    const frame = chapterView.querySelector('.opc-final-host iframe');
+    if (frame && event.source !== frame.contentWindow) return;
+    chapterView.style.display = 'none';
+    chapterView.classList.remove('final-opc-mode');
+    chapterView.querySelector('.opc-final-host')?.remove();
+    mainMenu.style.display = 'grid';
+  });
+
   function getVideoCasesForChapter(chapter) {
     return videoCases.filter(vc => vc.chapter === chapter);
   }
