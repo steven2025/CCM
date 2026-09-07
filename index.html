@@ -223,6 +223,13 @@
         radial-gradient(circle at 18% 8%, rgba(168,85,247,0.16), transparent 34%),
         linear-gradient(180deg, rgba(30,41,59,0.94), rgba(15,23,42,0.94));
     }
+    /* The legacy final-task reader remains in the source for rollback, but the live entry uses the project library. */
+    #chapter-view.final-opc-mode .chapter-layout { display:block; }
+    #chapter-view.final-opc-mode .chapter-layout > .panel,
+    #chapter-view.final-opc-mode .chapter-layout > .side-panel,
+    #chapter-view.final-opc-mode > .panel-thin { display:none !important; }
+    #chapter-view.final-opc-mode .opc-final-host { display:block; min-height:calc(100vh - 120px); border:0; background:#f7fafb; }
+    #chapter-view.final-opc-mode .opc-final-host iframe { display:block; width:100%; height:calc(100vh - 120px); min-height:680px; border:0; background:#f7fafb; }
 
     .login-overlay {
       position: fixed;
@@ -3083,6 +3090,7 @@
 
 
   const aboutCourseApps = [
+    { id: 'opc-project-library', title: '跨文化 AI 应用项目库', subtitle: '选题名单 · 阶段开发 · 作品提交', icon: '🧩', color: '#176b87', url: 'ccm-opc-project-library.html' },
     { id: "ai-api-config", title: "系统登录", subtitle: "请输入邀请码", icon: "🤖", color: "linear-gradient(135deg, #0ea5e9, #2563eb)", mode: "api-config" },
     { id: "business-spss", title: "商务统计/Business-Spss", subtitle: "Business statistics tools", icon: "📊", color: "linear-gradient(135deg, #2563eb, #1d4ed8)", url: "https://steven2025.github.io/business-spss/" },
     { id: "hofstede-index", title: "文化指数", subtitle: "Culture dimensions reference", icon: "🌐", color: "linear-gradient(135deg, #7c3aed, #5b21b6)", url: "https://steven2025.github.io/Culture-dimention/" },
@@ -3663,8 +3671,9 @@
       const resourceRows = (payload.topResources || []).map(item => '<tr><td>' + escapeHtml(item.title || item.resourceId) + '</td><td>' +
         escapeHtml(item.resourceType || '') + '</td><td>' + item.count + '</td></tr>').join('') || '<tr><td colspan="3">暂无数据</td></tr>';
       const recentRows = (payload.recentEvents || []).map(item => '<tr><td>' + escapeHtml(new Date(item.createdAt).toLocaleString()) + '</td><td>' +
-        escapeHtml(item.id) + '</td><td>' + escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
-      ).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+        escapeHtml(item.className || '未分班 / Unassigned') + '</td><td>' + escapeHtml(item.studentId || item.id || '—') + '</td><td>' +
+        escapeHtml(item.name || '—') + '</td><td>' + escapeHtml(item.eventType) + '</td><td>' + escapeHtml(item.title || item.chapter || '') + '</td></tr>'
+      ).join('') || '<tr><td colspan="6">暂无数据</td></tr>';
       const dayEntries = Object.entries(payload.byDay || {}).sort((a, b) => a[0].localeCompare(b[0]));
       const maxDay = Math.max(1, ...dayEntries.map(item => Number(item[1]) || 0));
       const dayBars = dayEntries.map(([day, count]) => ({ label: day.slice(5), percent: count / maxDay * 100, value: String(count), color: '#38bdf8' }));
@@ -3672,7 +3681,7 @@
         '<div class="analytics-panel"><div class="analytics-panel-title">每日行为量（最近 ' + Number(payload.days || 30) + ' 天）</div>' + renderBars(dayBars) + '</div>' +
         '<div class="analytics-panel"><div class="analytics-panel-title">章节访问排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>章节</th><th>次数</th></tr></thead><tbody>' + chapterRows + '</tbody></table></div></div>' +
         '<div class="analytics-panel"><div class="analytics-panel-title">材料打开排名</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>材料</th><th>类型</th><th>次数</th></tr></thead><tbody>' + resourceRows + '</tbody></table></div></div>' +
-        '<div class="analytics-panel"><div class="analytics-panel-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>用户</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div></div>' +
+        '<div class="analytics-panel"><div class="analytics-panel-title">最近行为</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>班级</th><th>学号</th><th>姓名</th><th>行为</th><th>对象</th></tr></thead><tbody>' + recentRows + '</tbody></table></div></div></div>' +
         '<div class="analytics-source-note">行为数据按上方最近 7/30/90 天筛选；测试成绩为全部历史首次答案，不受该筛选影响。</div>';
     };
 
@@ -6298,6 +6307,8 @@
     localStorage.removeItem('ccm_student_name');
     closeAllFloatingWindows();
     chapterView.style.display = 'none';
+    chapterView.classList.remove('final-opc-mode');
+    chapterView.querySelector('.opc-final-host')?.remove();
     mainMenu.style.display = 'grid';
     currentChapter = 1;
     resetResourceListHint();
@@ -6349,10 +6360,7 @@
         mainMenu.style.display = 'none';
         chapterView.style.display = 'block';
         closeAllFloatingWindows();
-        updateChapterHeader();
-        resetResourceListHint();
-        updatePptView();
-        applyChapterPermissions();
+        openOpcFinalTask();
       } else if (role === 'about-course') {
         openAboutCourseApps();
       } else {
@@ -6363,9 +6371,26 @@
 
   btnResetView.addEventListener('click', () => {
     chapterView.style.display = 'none';
+    chapterView.classList.remove('final-opc-mode');
+    chapterView.querySelector('.opc-final-host')?.remove();
     mainMenu.style.display = 'grid';
     closeAllFloatingWindows();
   });
+
+  function openOpcFinalTask() {
+    chapterView.classList.add('final-opc-mode');
+    chapterView.querySelector('.opc-final-host')?.remove();
+    const host = document.createElement('div');
+    host.className = 'opc-final-host';
+    host.setAttribute('aria-label', '跨文化 AI 应用项目库');
+    const frame = document.createElement('iframe');
+    frame.title = '跨文化 AI 应用项目库';
+    frame.src = './ccm-opc-project-library.html';
+    frame.loading = 'eager';
+    frame.allow = 'clipboard-write';
+    host.appendChild(frame);
+    chapterView.appendChild(host);
+  }
 
   function getVideoCasesForChapter(chapter) {
     return videoCases.filter(vc => vc.chapter === chapter);
