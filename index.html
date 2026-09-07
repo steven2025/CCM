@@ -230,6 +230,11 @@
     #chapter-view.final-opc-mode > .panel-thin { display:none !important; }
     #chapter-view.final-opc-mode .opc-final-host { display:block; min-height:calc(100vh - 120px); border:0; background:#f7fafb; }
     #chapter-view.final-opc-mode .opc-final-host iframe { display:block; width:100%; height:calc(100vh - 120px); min-height:680px; border:0; background:#f7fafb; }
+    #chapter-view.final-opc-mode .opc-final-toolbar { display:flex; justify-content:flex-end; align-items:center; gap:8px; padding:6px 10px; background:#0f172a; }
+    #chapter-view.final-opc-mode .opc-final-toolbar button { border:1px solid rgba(255,255,255,.35); border-radius:7px; padding:6px 11px; color:#fff; background:#2563eb; cursor:pointer; font-weight:650; }
+    #chapter-view.final-opc-mode .opc-final-toolbar button:hover { background:#3b82f6; }
+    #chapter-view.final-opc-mode .opc-final-host.opc-fullscreen { position:fixed; inset:0; z-index:10000; min-height:100vh; background:#f7fafb; }
+    #chapter-view.final-opc-mode .opc-final-host.opc-fullscreen iframe { height:calc(100vh - 44px); min-height:0; }
 
     .login-overlay {
       position: fixed;
@@ -6391,6 +6396,19 @@
     const host = document.createElement('div');
     host.className = 'opc-final-host';
     host.setAttribute('aria-label', '跨文化 AI 应用项目库');
+    const toolbar = document.createElement('div');
+    toolbar.className = 'opc-final-toolbar';
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.type = 'button';
+    fullscreenButton.textContent = '全屏 / Full screen';
+    fullscreenButton.setAttribute('aria-label', '全屏 / Full screen');
+    fullscreenButton.addEventListener('click', () => {
+      const full = host.classList.toggle('opc-fullscreen');
+      fullscreenButton.textContent = full ? '缩回 / Restore' : '全屏 / Full screen';
+      fullscreenButton.setAttribute('aria-label', full ? '缩回 / Restore' : '全屏 / Full screen');
+    });
+    toolbar.appendChild(fullscreenButton);
+    host.appendChild(toolbar);
     const frame = document.createElement('iframe');
     frame.title = '跨文化 AI 应用项目库';
     frame.src = './ccm-opc-project-library.html';
