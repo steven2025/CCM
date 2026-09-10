@@ -454,6 +454,21 @@
     .analytics-view-toolbar select { padding: 7px 9px; border-radius: 8px; background: #1e293b; color: #f8fafc; border: 1px solid rgba(147,197,253,0.35); }
     .analytics-source-note { margin-top: 10px; color: #94a3b8; font-size: 0.68rem; line-height: 1.55; }
     .analytics-empty { padding: 24px; text-align: center; color: #94a3b8; }
+    .gallery-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+    .gallery-card { display:flex; flex-direction:column; gap:6px; min-height:92px; padding:16px; text-align:left; border:1px solid rgba(96,165,250,.35); border-radius:12px; background:linear-gradient(145deg,#172554,#1e3a8a); color:#fff; cursor:pointer; box-shadow:0 5px 0 #172554,0 10px 20px rgba(15,23,42,.25); }
+    .gallery-card:hover { transform:translateY(-2px); filter:brightness(1.1); }
+    .gallery-card span { color:#bfdbfe; font-size:.8rem; }
+    .gallery-breadcrumb { margin-bottom:14px; }
+    .gallery-list { display:grid; gap:14px; }
+    .gallery-item { padding:14px; border:1px solid rgba(148,163,184,.22); border-radius:12px; background:rgba(15,23,42,.35); }
+    .gallery-item h3 { margin:0 0 6px; color:#dbeafe; }
+    .gallery-item p { color:#94a3b8; font-size:.8rem; }
+    .gallery-item video { display:block; width:100%; max-height:440px; border-radius:8px; background:#000; }
+    .gallery-interactions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; color:#cbd5e1; font-size:.85rem; }
+    .gallery-interactions .active { color:#fbbf24; border-color:#fbbf24; }
+    .gallery-comments { flex-basis:100%; padding-top:8px; }
+    .gallery-comments input { width:min(100%,420px); padding:7px 9px; border-radius:7px; border:1px solid rgba(148,163,184,.35); background:#0f172a; color:#fff; }
+    .gallery-comments p { margin:5px 0; }
     .assignment-state { display:inline-block;padding:3px 8px;border-radius:999px;font-weight:700;font-size:.68rem; }
     .assignment-state.submitted { color:#bbf7d0;background:rgba(22,163,74,.2);border:1px solid rgba(74,222,128,.3); }
     .assignment-state.missing { color:#fed7aa;background:rgba(234,88,12,.16);border:1px solid rgba(251,146,60,.28); }
@@ -3943,8 +3958,35 @@
     }
   }
 
+  function openCourseGallery() {
+    const auth=getCurrentAuth();
+    if(!auth||!['student','teacher'].includes(auth.role)){openLoginDialog();return;}
+    const win=document.createElement('div');win.className='floating-window settings-window';win.style.zIndex=++currentZ;win.style.width='900px';win.style.maxWidth='95vw';
+    const header=document.createElement('div');header.className='floating-header';header.innerHTML='<div class="floating-title">课程作业展示 · Course Work Gallery</div><div class="floating-controls"><button class="btn-icon" data-gallery-close title="关闭 / Close">×</button></div>';
+    const body=document.createElement('div');body.className='floating-body';body.innerHTML='<div class="login-status-line">正在读取已审核作业...</div>';win.append(header,body);document.body.appendChild(win);makeDraggable(win,header);header.querySelector('[data-gallery-close]').onclick=()=>win.remove();
+    const api=async data=>{const r=await fetch(TEACHER_SETTINGS_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...data,id:auth.id||'',inviteCode:localStorage.getItem('ccm_invite_code')||''})});const j=await r.json().catch(()=>null);if(!r.ok||!j?.ok)throw Error(j?.message||('HTTP '+r.status));return j;};
+    api({action:'assignment-gallery'}).then(payload=>{
+      const defs=payload.assignments||[],rows=payload.rows||[],classes=payload.classes||[],className=id=>classes.find(c=>c.classId===id)?.name||'未分班';
+      const chapterName=id=>String(id).replace('chapter-','Chapter ');
+      const card=(title,sub,action)=>{const b=document.createElement('button');b.type='button';b.className='gallery-card';b.innerHTML='<strong>'+escapeHtml(title)+'</strong><span>'+escapeHtml(sub)+'</span>';b.onclick=action;return b;};
+      const classIds=auth.role==='teacher' ? classes.filter(c=>!c.archived).map(c=>c.classId) : [...new Set(rows.map(r=>r.classId))];
+      function renderClasses(){body.innerHTML='<div class="gallery-breadcrumb">课程作业展示 / Course Work Gallery</div><div class="gallery-grid"></div>';const g=body.querySelector('.gallery-grid');classIds.forEach(id=>g.appendChild(card(className(id),'已审核作业 / Reviewed work',()=>renderChapters(id))));if(!classIds.length)g.innerHTML='<div class="analytics-empty">暂无已开放作业。</div>';}
+      function renderChapters(cid){const chapters=[...new Set(rows.filter(r=>r.classId===cid).map(r=>r.chapterId))];body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回班级 / Back</button></div><div class="gallery-grid"></div>';body.querySelector('[data-back]').onclick=renderClasses;const g=body.querySelector('.gallery-grid');chapters.forEach(ch=>g.appendChild(card(chapterName(ch),'已审核作业 / Reviewed work',()=>renderAssignments(cid,ch))));}
+      function renderAssignments(cid,ch){const items=defs.filter(d=>rows.some(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===d.assignmentId));body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回章节 / Back</button></div><div class="gallery-grid"></div>';body.querySelector('[data-back]').onclick=()=>renderChapters(cid);const g=body.querySelector('.gallery-grid');items.forEach(d=>{const n=rows.filter(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===d.assignmentId).length;g.appendChild(card(d.titleZh+' · '+d.titleEn,n+' 份已审核作业 / approved submissions',()=>renderSubmissions(cid,ch,d.assignmentId)));});}
+      function renderSubmissions(cid,ch,aid){const items=rows.filter(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===aid);body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回作业 / Back</button></div><div class="gallery-list"></div>';body.querySelector('[data-back]').onclick=()=>renderAssignments(cid,ch);const g=body.querySelector('.gallery-list');items.forEach(item=>{const article=document.createElement('article');article.className='gallery-item';article.innerHTML='<h3>'+escapeHtml(item.name)+'</h3><p>'+escapeHtml(item.fileName)+' · '+new Date(item.submittedAt).toLocaleString()+'</p>';if(item.contentType==='video/mp4'){const v=document.createElement('video');v.controls=true;v.preload='metadata';v.src=item.fileUrl;article.appendChild(v);}else{const a=document.createElement('a');a.className='btn-ghost';a.target='_blank';a.rel='noopener';a.href=item.fileUrl;a.textContent='预览或下载 / Preview or download';article.appendChild(a);}const bar=document.createElement('div');bar.className='gallery-interactions';bar.innerHTML='<button type="button" class="btn-ghost" data-like>👍 <span>'+(item.likeCount||0)+'</span></button><span data-view>👁️ '+(item.viewCount||0)+'</span><button type="button" class="btn-ghost" data-comment-toggle>💬 <span>'+(item.commentCount||0)+'</span></button><div class="gallery-comments" hidden><div data-comments></div><input maxlength="500" placeholder="写评论 / Add a comment"><button type="button" class="btn-ghost" data-comment-send>发送 / Post</button></div>';article.appendChild(bar);g.appendChild(article);const update=data=>{bar.querySelector('[data-like] span').textContent=data.likeCount;bar.querySelector('[data-like]').classList.toggle('active',!!data.likedByMe);bar.querySelector('[data-comment-toggle] span').textContent=data.commentCount;bar.querySelector('[data-view]').textContent='👁️ '+data.viewCount;bar.querySelector('[data-comments]').innerHTML=(data.comments||[]).map(c=>'<p><b>'+escapeHtml(c.name)+'</b>：'+escapeHtml(c.text)+'</p>').join('');};update(item);api({action:'assignment-gallery-interaction',type:'view',assignmentId:aid,studentId:item.studentId}).then(update).catch(()=>{});bar.querySelector('[data-like]').onclick=()=>api({action:'assignment-gallery-interaction',type:'like',assignmentId:aid,studentId:item.studentId}).then(update);bar.querySelector('[data-comment-toggle]').onclick=()=>{bar.querySelector('.gallery-comments').hidden=!bar.querySelector('.gallery-comments').hidden;};bar.querySelector('[data-comment-send]').onclick=()=>{const input=bar.querySelector('input');if(!input.value.trim())return;api({action:'assignment-gallery-interaction',type:'comment',assignmentId:aid,studentId:item.studentId,text:input.value}).then(data=>{input.value='';update(data);bar.querySelector('.gallery-comments').hidden=false;});};});}
+      renderClasses();
+    }).catch(e=>{body.innerHTML='<div class="login-status-line error">作业展示读取失败：'+escapeHtml(e.message)+'</div>';});
+  }
+
+  function ensureCourseGalleryButton() {
+    let btn = mainMenu.querySelector('[data-role="course-gallery"]');
+    if (!btn) { btn=document.createElement('div'); btn.className='card-btn'; btn.setAttribute('data-role','course-gallery'); btn.innerHTML='<div class="card-btn-title">课程作业展示</div><div class="card-btn-sub">Course Work Gallery</div>'; btn.onclick=()=>openCourseGallery(); }
+    const settings=mainMenu.querySelector('[data-role="system-settings"]'); if(settings && settings.nextSibling!==btn) mainMenu.insertBefore(btn,settings.nextSibling); else if(!settings && !btn.parentNode) mainMenu.appendChild(btn);
+  }
+
   function updateAuthUi() {
     ensureTeacherSettingsButton();
+    ensureCourseGalleryButton();
     const auth = getCurrentAuth();
     const loggedIn = auth && (auth.role === 'student' || auth.role === 'teacher');
     if (headerAuth) headerAuth.classList.toggle('active', !!loggedIn);
@@ -5544,12 +5586,13 @@
         assignmentClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + (payload.classes || []).map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + '</option>').join(''); assignmentClass.value = payload.classId;
         const groups = (payload.assignments || []).map(item => {
           const rows = (payload.rows || []).filter(row => row.assignmentId === item.assignmentId), submitted = rows.filter(row => row.submission);
-          const table = rows.map(row => '<tr><td>' + escapeHtml(row.studentId) + '</td><td>' + escapeHtml(row.name) + '</td><td>' + escapeHtml(classNames.get(row.classId) || '未分班') + '</td><td><span class="assignment-state ' + (row.submission ? 'submitted">已提交' : 'missing">未提交') + '</span></td><td>' + (row.submission ? escapeHtml(row.submission.fileName) : '—') + '</td><td>' + (row.submission ? Number(row.submission.version || 1) : '—') + '</td><td>' + (row.submission ? escapeHtml(new Date(row.submission.submittedAt).toLocaleString()) : '—') + '</td><td>' + (row.submission ? '<button type="button" class="btn-ghost" data-assignment-download="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">下载</button>' : '—') + '</td></tr>').join('');
+          const table = rows.map(row => '<tr><td>' + escapeHtml(row.studentId) + '</td><td>' + escapeHtml(row.name) + '</td><td>' + escapeHtml(classNames.get(row.classId) || '未分班') + '</td><td><span class="assignment-state ' + (row.submission ? 'submitted">' + (row.submission.status === 'approved' ? '已开放' : row.submission.status === 'needs-revision' ? '需修改' : '待审核') : 'missing">未提交') + '</span></td><td>' + (row.submission ? escapeHtml(row.submission.fileName) : '—') + '</td><td>' + (row.submission ? Number(row.submission.version || 1) : '—') + '</td><td>' + (row.submission ? escapeHtml(new Date(row.submission.submittedAt).toLocaleString()) : '—') + '</td><td>' + (row.submission ? '<button type="button" class="btn-ghost" data-assignment-review="approved" data-assignment-id="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">开放</button> <button type="button" class="btn-ghost" data-assignment-review="needs-revision" data-assignment-id="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">退回</button> <button type="button" class="btn-ghost" data-assignment-download="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">下载</button>' : '—') + '</td></tr>').join('');
           const topicButton=item.assignmentId==='mosuo-commentary-video'?'<button type="button" class="btn-ghost" data-topic-admin style="margin-bottom:9px">查看选题登记 / Topic Registration</button>':'';
           return '<div class="analytics-panel" style="margin-bottom:12px"><div class="analytics-panel-title">第一章 · ' + escapeHtml(item.titleZh) + ' / ' + escapeHtml(item.titleEn) + '　<span style="color:#86efac">已交 ' + submitted.length + '</span> / 应交 ' + rows.length + '　· 无截止日期</div>'+topicButton+'<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>状态</th><th>最后文件</th><th>提交次数</th><th>最后提交</th><th>操作</th></tr></thead><tbody>' + table + '</tbody></table></div></div>';
         }).join(''); assignmentContainer.innerHTML = groups || '<div class="analytics-empty">暂无作业数据。</div>';
         assignmentContainer.querySelector('[data-topic-admin]')?.addEventListener('click',openTopicAdmin);
         assignmentContainer.querySelectorAll('[data-assignment-download]').forEach(button => button.onclick = async () => { button.disabled=true; try { const result=await assignmentCall('assignment-download-url',{assignmentId:button.dataset.assignmentDownload,studentId:button.dataset.studentId}); const a=document.createElement('a'); a.href=result.url; a.download=result.fileName || ''; a.target='_blank'; a.rel='noopener'; a.click(); } catch(error){ alert('下载失败：'+error.message); } finally { button.disabled=false; } });
+        assignmentContainer.querySelectorAll('[data-assignment-review]').forEach(button => button.onclick = async () => { button.disabled=true; try { await assignmentCall('assignment-review',{assignmentId:button.dataset.assignmentId,studentId:button.dataset.studentId,status:button.dataset.assignmentReview}); await refreshAssignments(); } catch(error){ alert('审核失败：'+error.message); button.disabled=false; } });
         assignmentsLoaded = true;
       } catch(error) { assignmentContainer.innerHTML = '<div class="login-status-line error">作业读取失败：' + escapeHtml(error.message) + '</div>'; }
       finally { assignmentRefresh.disabled=false; assignmentClass.disabled=false; }
@@ -7644,3 +7687,4 @@
 
 </body>
 </html>
+
