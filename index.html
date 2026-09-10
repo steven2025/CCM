@@ -3965,9 +3965,10 @@
     const header=document.createElement('div');header.className='floating-header';header.innerHTML='<div class="floating-title">课程作业展示 · Course Work Gallery</div><div class="floating-controls"><button class="btn-icon" data-gallery-close title="关闭 / Close">×</button></div>';
     const body=document.createElement('div');body.className='floating-body';body.innerHTML='<div class="login-status-line">正在读取已审核作业...</div>';win.append(header,body);document.body.appendChild(win);makeDraggable(win,header);header.querySelector('[data-gallery-close]').onclick=()=>win.remove();
     const api=async data=>{const r=await fetch(TEACHER_SETTINGS_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...data,id:auth.id||'',inviteCode:localStorage.getItem('ccm_invite_code')||''})});const j=await r.json().catch(()=>null);if(!r.ok||!j?.ok)throw Error(j?.message||('HTTP '+r.status));return j;};
-    api({action:'assignment-gallery'}).then(payload=>{
+    Promise.all([api({action:'assignment-gallery'}),api({action:'opc-gallery'})]).then(([payload,opc])=>{
+      const opcRows=(opc.rows||[]).map(r=>({...r,chapterId:'final-task',assignmentId:r.assignmentId})); payload.rows=(payload.rows||[]).concat(opcRows); payload.assignments=(payload.assignments||[]).concat((opc.assignments||[]).map(a=>({...a,chapterId:'final-task'}))); 
       const defs=payload.assignments||[],rows=payload.rows||[],classes=payload.classes||[],className=id=>classes.find(c=>c.classId===id)?.name||'未分班';
-      const chapterName=id=>String(id).replace('chapter-','Chapter ');
+      const chapterName=id=>id==='final-task'?'期末任务项目库 / Final Task Project Library':String(id).replace('chapter-','Chapter ');
       const card=(title,sub,action)=>{const b=document.createElement('button');b.type='button';b.className='gallery-card';b.innerHTML='<strong>'+escapeHtml(title)+'</strong><span>'+escapeHtml(sub)+'</span>';b.onclick=action;return b;};
       const classIds=auth.role==='teacher' ? classes.filter(c=>!c.archived).map(c=>c.classId) : [...new Set(rows.map(r=>r.classId))];
       function renderClasses(){body.innerHTML='<div class="gallery-breadcrumb">课程作业展示 / Course Work Gallery</div><div class="gallery-grid"></div>';const g=body.querySelector('.gallery-grid');classIds.forEach(id=>g.appendChild(card(className(id),'已审核作业 / Reviewed work',()=>renderChapters(id))));if(!classIds.length)g.innerHTML='<div class="analytics-empty">暂无已开放作业。</div>';}
@@ -7704,6 +7705,8 @@
 
 </body>
 </html>
+
+
 
 
 
