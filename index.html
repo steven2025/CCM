@@ -5570,6 +5570,7 @@
     const assignmentClass = body.querySelector('#assignment-class');
     const assignmentRefresh = body.querySelector('#assignment-refresh');
     let assignmentsLoaded = false;
+    let latestAssignmentsPayload = { assignments: [], classes: [] };
     const assignmentCall = async (action, data = {}) => {
       const current = getCurrentAuth();
       const response = await fetch(TEACHER_SETTINGS_API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store', body:JSON.stringify({ ...data, action, id:current.id || '', inviteCode:localStorage.getItem('ccm_invite_code') || '' }) });
@@ -5600,6 +5601,7 @@
       if (!assignmentContainer) return; assignmentRefresh.disabled = true; assignmentClass.disabled = true; assignmentContainer.innerHTML = '<div class="login-status-line">正在读取作业提交情况...</div>';
       try {
         const payload = await assignmentCall('assignments-admin-list', { classId: assignmentClass.value || '*' });
+        latestAssignmentsPayload = payload;
         const classNames = new Map((payload.classes || []).map(item => [item.classId,item.name]));
         assignmentClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + (payload.classes || []).map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + '</option>').join(''); assignmentClass.value = payload.classId;
         const groups = (payload.assignments || []).map(item => {
@@ -5616,7 +5618,7 @@
       finally { assignmentRefresh.disabled=false; assignmentClass.disabled=false; }
     };
     assignmentRefresh?.addEventListener('click', refreshAssignments); assignmentClass?.addEventListener('change', refreshAssignments);
-    body.querySelector('#showcase-add')?.addEventListener('click', async () => { const title=prompt('示范作品标题 / Title','火塘 / Huotang'); if(!title)return; const videoUrl=prompt('COS 视频 HTTPS 地址 / COS video URL',''); if(!videoUrl)return; try { await assignmentCall('teacher-showcase-save',{title,videoUrl,classId:assignmentClass.value==='*'?'':assignmentClass.value,chapterId:'chapter-1',assignmentId:'mosuo-commentary-video',studentName:'教师示范作品',pinned:true,status:'approved'}); alert('教师示范作品已公开。'); await refreshAssignments(); } catch(error){ alert('保存失败：'+error.message); } });
+    body.querySelector('#showcase-add')?.addEventListener('click', async () => { const title=prompt('示范作品标题 / Title','火塘 / Huotang'); if(!title)return; const videoUrl=prompt('COS 视频 HTTPS 地址 / COS video URL',''); if(!videoUrl)return; const defs=latestAssignmentsPayload.assignments||[]; if(!defs.length){alert('请先刷新作业列表 / Refresh assignments first');return;} const choice=prompt('请选择作业编号 / Choose assignment number:\n'+defs.map((d,i)=>(i+1)+'. '+d.titleZh+' · '+d.titleEn).join('\n'),'1'); const selected=defs[Number(choice)-1]; if(!selected){alert('作业编号无效 / Invalid assignment');return;} const classes=latestAssignmentsPayload.classes||[]; const classChoice=prompt('请选择班级编号（可留空表示全部班级）/ Choose class number:\n'+classes.map((c,i)=>(i+1)+'. '+c.name).join('\n'),''); const selectedClass=classes[Number(classChoice)-1]; try { await assignmentCall('teacher-showcase-save',{title,videoUrl,classId:selectedClass?.classId||'',chapterId:selected.chapterId,assignmentId:selected.assignmentId,studentName:'教师示范作品',pinned:true,status:'approved'}); alert('教师示范作品已公开并归入：'+selected.titleZh); await refreshAssignments(); } catch(error){ alert('保存失败：'+error.message); } });
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
