@@ -3965,8 +3965,8 @@
     const header=document.createElement('div');header.className='floating-header';header.innerHTML='<div class="floating-title">课程作业展示 · Course Work Gallery</div><div class="floating-controls"><button class="btn-icon" data-gallery-close title="关闭 / Close">×</button></div>';
     const body=document.createElement('div');body.className='floating-body';body.innerHTML='<div class="login-status-line">正在读取已审核作业...</div>';win.append(header,body);document.body.appendChild(win);makeDraggable(win,header);header.querySelector('[data-gallery-close]').onclick=()=>win.remove();
     const api=async data=>{const r=await fetch(TEACHER_SETTINGS_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({...data,id:auth.id||'',inviteCode:localStorage.getItem('ccm_invite_code')||''})});const j=await r.json().catch(()=>null);if(!r.ok||!j?.ok)throw Error(j?.message||('HTTP '+r.status));return j;};
-    Promise.all([api({action:'assignment-gallery'}),api({action:'opc-gallery'})]).then(([payload,opc])=>{
-      const opcRows=(opc.rows||[]).map(r=>({...r,chapterId:'final-task',assignmentId:r.assignmentId})); payload.rows=(payload.rows||[]).concat(opcRows); payload.assignments=(payload.assignments||[]).concat((opc.assignments||[]).map(a=>({...a,chapterId:'final-task'}))); 
+    Promise.all([api({action:'assignment-gallery'}),api({action:'opc-gallery'}),api({action:'teacher-showcase-list'})]).then(([payload,opc,showcase])=>{
+      const opcRows=(opc.rows||[]).map(r=>({...r,chapterId:'final-task',assignmentId:r.assignmentId})); const showcaseRows=(showcase.rows||[]).map(r=>({...r,studentId:'showcase-'+r.id,contentType:'video/mp4',fileName:r.title,fileUrl:r.videoUrl,assignmentId:r.assignmentId||'mosuo-commentary-video',chapterId:r.chapterId||'chapter-1',name:r.studentName||'教师示范作品'})); payload.rows=(payload.rows||[]).concat(opcRows,showcaseRows); payload.assignments=(payload.assignments||[]).concat((opc.assignments||[]).map(a=>({...a,chapterId:'final-task'}))); 
       const defs=payload.assignments||[],rows=payload.rows||[],classes=payload.classes||[],className=id=>classes.find(c=>c.classId===id)?.name||'未分班';
       const chapterName=id=>id==='final-task'?'期末任务项目库 / Final Task Project Library':String(id).replace('chapter-','Chapter ');
       const card=(title,sub,action)=>{const b=document.createElement('button');b.type='button';b.className='gallery-card';b.innerHTML='<strong>'+escapeHtml(title)+'</strong><span>'+escapeHtml(sub)+'</span>';b.onclick=action;return b;};
@@ -3975,7 +3975,7 @@
       function renderChapters(cid){const chapters=[...new Set(rows.filter(r=>r.classId===cid).map(r=>r.chapterId))];body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回班级 / Back</button></div><div class="gallery-grid"></div>';body.querySelector('[data-back]').onclick=renderClasses;const g=body.querySelector('.gallery-grid');chapters.forEach(ch=>g.appendChild(card(chapterName(ch),'已审核作业 / Reviewed work',()=>renderAssignments(cid,ch))));}
       function renderAssignments(cid,ch){const items=defs.filter(d=>rows.some(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===d.assignmentId));body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回章节 / Back</button></div><div class="gallery-grid"></div>';body.querySelector('[data-back]').onclick=()=>renderChapters(cid);const g=body.querySelector('.gallery-grid');items.forEach(d=>{const n=rows.filter(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===d.assignmentId).length;g.appendChild(card(d.titleZh+' · '+d.titleEn,n+' 份已审核作业 / approved submissions',()=>renderSubmissions(cid,ch,d.assignmentId)));});}
       function renderSubmissions(cid,ch,aid){
-        const items=rows.filter(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===aid);
+        const items=rows.filter(r=>r.classId===cid&&r.chapterId===ch&&r.assignmentId===aid).sort((a,b)=>(b.pinned===true)-(a.pinned===true));
         body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回作业 / Back</button></div><p class="material-tree-note">请选择学生姓名查看该学生的公开作品 / Select a student to view the published work.</p><div class="gallery-grid"></div>';
         body.querySelector('[data-back]').onclick=()=>renderAssignments(cid,ch);
         const g=body.querySelector('.gallery-grid');
@@ -5513,7 +5513,7 @@
         '<p class="material-tree-note">按学生当前所属班级统计；转班后，历史记录随学生归入新班。成绩下载遵循当前班级筛选。 / Reports follow current class membership.</p>' +
         '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
       '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>' +
-      '<section class="settings-tab-panel" data-settings-panel="assignments"><div class="analytics-toolbar"><select id="assignment-class"><option value="*">全部班级 / All classes</option></select><button type="button" class="btn-ghost" id="assignment-refresh">刷新作业</button></div><p class="material-tree-note">第一版默认收集第一章两项作业，不设置截止日期；学生可多次提交，教师端默认显示最后一次。</p><div id="assignment-dashboard"><div class="material-empty">进入本页后读取提交情况。</div></div></section>';
+      '<section class="settings-tab-panel" data-settings-panel="assignments"><div class="analytics-toolbar"><select id="assignment-class"><option value="*">全部班级 / All classes</option></select><button type="button" class="btn-ghost" id="assignment-refresh">刷新作业</button><button type="button" class="btn-ghost" id="showcase-add">新增教师示范作品</button></div><p class="material-tree-note">第一版默认收集第一章两项作业，不设置截止日期；学生可多次提交，教师端默认显示最后一次。</p><div id="assignment-dashboard"><div class="material-empty">进入本页后读取提交情况。</div></div></section>';
 
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
@@ -5616,6 +5616,7 @@
       finally { assignmentRefresh.disabled=false; assignmentClass.disabled=false; }
     };
     assignmentRefresh?.addEventListener('click', refreshAssignments); assignmentClass?.addEventListener('change', refreshAssignments);
+    body.querySelector('#showcase-add')?.addEventListener('click', async () => { const title=prompt('示范作品标题 / Title','火塘 / Huotang'); if(!title)return; const videoUrl=prompt('COS 视频 HTTPS 地址 / COS video URL',''); if(!videoUrl)return; try { await assignmentCall('teacher-showcase-save',{title,videoUrl,classId:assignmentClass.value==='*'?'':assignmentClass.value,chapterId:'chapter-1',assignmentId:'mosuo-commentary-video',studentName:'教师示范作品',pinned:true,status:'approved'}); alert('教师示范作品已公开。'); await refreshAssignments(); } catch(error){ alert('保存失败：'+error.message); } });
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-settings-tab');
