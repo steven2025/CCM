@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跨文化维度研究 · 学术研究导航</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   Design tokens —— 学术档案 / 手稿质感
+   世界: 论文手稿、档案卡片、坐标网格、维度测量
+   配色: 纸感暖白底 + 墨蓝主色 + 赭红朱砂强调
+   签名元素: 细网格坐标纸底纹 + 档案式眉标编号 + 可拖动演进标尺
+   ============================================================ */
+:root{
+  --paper: #F5F2EB;
+  --paper-2:#ECE7DC;
+  --card:  #FFFFFF;
+  --ink:   #233447;
+  --ink-2: #47586E;
+  --ink-3: #8390A0;
+  --line:  #E2DBCE;
+  --accent:#C0552D;
+  --accent-deep:#9E3F1E;
+  --accent-soft:#F6E8DD;
+  --blue:#3D6287;
+  --teal:#2F7D6B;
+  --gold:#B5832D;
+  --rust:#B5482B;
+  --stage1:#3D6287;
+  --stage2:#2F7D6B;
+  --stage3:#B5832D;
+  --stage4:#B5482B;
+  --font-display:"Noto Serif SC","Songti SC","SimSun",serif;
+  --font-body:"Noto Sans SC","Microsoft YaHei","PingFang SC",sans-serif;
+  --shadow:0 1px 2px rgba(35,52,71,.05), 0 8px 24px rgba(35,52,71,.06);
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.75;
+  font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+/* 坐标纸网格底纹 —— 签名元素之一 */
+body::before{
+  content:"";
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(35,52,71,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(35,52,71,.035) 1px, transparent 1px);
+  background-size:34px 34px;
+}
+::selection{background:var(--accent-soft);}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.35;font-weight:700;}
+button{font-family:inherit;cursor:pointer;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* ============================================================
+   顶部导航
+   ============================================================ */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,248,243,.94);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:1240px;margin:0 auto;padding:0 22px;
+  height:64px;display:flex;align-items:center;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:11px;margin-right:6px;flex-shrink:0;}
+.brand-mark{
+  width:38px;height:38px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(140deg,var(--ink),var(--blue));
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 3px 8px rgba(35,52,71,.25);
+}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.5px;line-height:1.15;}
+.brand-sub{font-size:11px;color:var(--ink-3);letter-spacing:2.5px;text-transform:uppercase;}
+.main-nav{display:flex;align-items:center;gap:2px;flex:1;justify-content:flex-end;}
+.nav-item{position:relative;list-style:none;}
+.nav-item > a{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 13px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink-2);
+  transition:background .18s,color .18s;
+}
+.nav-item > a:hover{background:var(--paper-2);color:var(--ink);}
+.nav-item.active > a{color:var(--accent-deep);background:var(--accent-soft);font-weight:600;}
+.nav-item .caret{width:10px;height:10px;transition:transform .2s;}
+.has-sub:hover .caret{transform:rotate(180deg);}
+.sub{
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(6px);
+  min-width:176px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);padding:7px;
+  opacity:0;visibility:hidden;transition:opacity .18s,transform .18s,visibility .18s;
+  z-index:120;
+}
+.has-sub:hover .sub,.nav-item.open .sub{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+.sub a{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;
+  font-size:13.8px;color:var(--ink-2);transition:background .15s,color .15s;
+}
+.sub a:hover{background:var(--paper);color:var(--accent-deep);}
+.sub a.active{color:var(--accent-deep);background:var(--accent-soft);font-weight:600;}
+.nav-burger{
+  display:none;margin-left:auto;width:40px;height:40px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card);align-items:center;justify-content:center;color:var(--ink);
+}
+
+/* ============================================================
+   主内容区
+   ============================================================ */
+.page-body{position:relative;z-index:1;}
+.container{max-width:1180px;margin:0 auto;padding:34px 22px 80px;}
+.view{display:none;animation:fadeUp .45s ease;}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+/* 眉标 —— 签名元素之二：档案编号 */
+.view-head{margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--line);}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:2.5px;color:var(--accent);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent);}
+.view-head h2{font-size:clamp(24px,3.2vw,32px);color:var(--ink);letter-spacing:.5px;}
+.view-head .lead{color:var(--ink-2);font-size:15.5px;margin-top:8px;max-width:820px;}
+
+h3.sec{margin:34px 0 16px;font-size:20px;color:var(--ink);display:flex;align-items:center;gap:10px;}
+h3.sec .idx{
+  font-size:12px;font-weight:700;color:#fff;background:var(--ink);
+  border-radius:5px;padding:2px 8px;letter-spacing:1px;font-family:var(--font-body);
+}
+h4.sub{font-size:16.5px;color:var(--ink);margin:18px 0 8px;}
+
+p{color:var(--ink-2);margin-bottom:12px;}
+p b,li b{color:var(--ink);font-weight:600;}
+.lead-strong{font-size:16.5px;color:var(--ink);line-height:1.9;}
+
+/* 卡片体系 */
+.grid{display:grid;gap:16px;}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(270px,1fr));}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;transition:transform .18s,box-shadow .18s,border-color .18s;
+}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#cfc6b4;}
+.card h4{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.card .card-icon{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:#fff;flex-shrink:0;}
+.card p{font-size:14px;margin-bottom:0;color:var(--ink-2);}
+.tag{
+  display:inline-block;font-size:12px;font-weight:600;color:var(--ink-2);
+  background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 11px;
+  margin:2px 4px 2px 0;
+}
+.tag.accent{color:var(--accent-deep);background:var(--accent-soft);border-color:#e6c9b6;}
+
+/* 提示块 */
+.tip{
+  background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--radius);padding:16px 20px;margin:18px 0;
+  font-size:14px;color:var(--ink-2);
+}
+.tip b{color:var(--ink);}
+.note-line{font-size:12.5px;color:var(--ink-3);margin-top:8px;}
+
+/* ============================================================
+   总览页 Hero
+   ============================================================ */
+.hero{
+  background:linear-gradient(150deg,#233447 0%,#2d4562 55%,#3d6287 100%);
+  border-radius:16px;color:#F4F1EA;padding:42px 40px;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:300px;height:300px;
+  border:1px solid rgba(255,255,255,.12);border-radius:50%;
+  box-shadow:0 0 0 40px rgba(255,255,255,.05),0 0 0 80px rgba(255,255,255,.03);
+}
+.hero .kicker{font-size:12.5px;letter-spacing:3px;color:#c9d4e0;text-transform:uppercase;margin-bottom:12px;}
+.hero h1{font-size:clamp(28px,4vw,42px);font-weight:900;letter-spacing:1px;line-height:1.25;}
+.hero .sub{margin-top:14px;max-width:720px;color:#d6dee8;font-size:16px;line-height:1.9;}
+.hero .stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
+.stat{
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;padding:12px 20px;min-width:128px;
+}
+.stat .num{font-family:var(--font-display);font-size:26px;font-weight:900;color:#fff;}
+.stat .lbl{font-size:12.5px;color:#b9c6d4;margin-top:2px;}
+
+.path-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;margin-top:26px;counter-reset:path;}
+.path-step{
+  position:relative;background:var(--card);border:1px solid var(--line);border-right:none;
+  padding:16px 20px;min-height:118px;border-radius:0;
+}
+.path-step:first-child{border-radius:12px 0 0 12px;}
+.path-step:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0;}
+.path-step .pno{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:2px;}
+.path-step h4{font-size:15.5px;margin:6px 0 4px;}
+.path-step p{font-size:13px;margin:0;color:var(--ink-3);}
+.path-step::after{
+  content:"→";position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-size:12px;z-index:2;
+}
+.path-step:last-child::after{display:none;}
+
+/* ============================================================
+   时间线（可拖动）
+   ============================================================ */
+.tl-panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px 22px;box-shadow:var(--shadow);}
+.tl-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.tl-toolbar .hint{font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px;}
+.tl-btns{display:flex;gap:8px;}
+.tl-btn{
+  width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--paper);
+  color:var(--ink);display:grid;place-items:center;transition:background .15s,color .15s;
+}
+.tl-btn:hover{background:var(--ink);color:#fff;}
+.tl-viewport{
+  overflow-x:auto;overflow-y:hidden;cursor:grab;padding:14px 6px 8px;
+  scrollbar-width:thin;scrollbar-color:var(--accent) var(--paper-2);
+  -webkit-user-select:none;user-select:none;touch-action:pan-y;
+}
+.tl-viewport:active{cursor:grabbing;}
+.tl-viewport::-webkit-scrollbar{height:6px;}
+.tl-viewport::-webkit-scrollbar-track{background:var(--paper-2);border-radius:6px;}
+.tl-viewport::-webkit-scrollbar-thumb{background:var(--accent);border-radius:6px;}
+.tl-track{position:relative;display:flex;gap:0;min-width:max-content;padding:0 30px;}
+.tl-node{
+  position:relative;width:232px;flex-shrink:0;padding:0 14px 0 16px;
+  cursor:pointer;
+}
+.tl-node .axis{
+  position:relative;height:64px;
+}
+.tl-node .axis::before{
+  content:"";position:absolute;left:0;right:0;top:31px;height:2px;
+  background:linear-gradient(90deg,var(--line),var(--accent));
+}
+.tl-node .dot{
+  position:absolute;top:31px;left:50%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50%;background:#fff;border:3.5px solid var(--accent);
+  transition:transform .2s,box-shadow .2s;
+}
+.tl-node:hover .dot,.tl-node.on .dot{transform:translate(-50%,-50%) scale(1.35);box-shadow:0 0 0 6px var(--accent-soft);}
+.tl-node .year{
+  position:absolute;top:0;left:0;right:0;text-align:center;
+  font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--ink);letter-spacing:.5px;
+}
+.tl-node .st-label{
+  position:absolute;top:44px;left:0;right:0;text-align:center;
+  font-size:11px;font-weight:600;letter-spacing:1px;color:var(--ink-3);
+}
+.tl-node .tcard{
+  margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:11px;
+  padding:12px 13px;transition:background .18s,border-color .18s,transform .18s;
+}
+.tl-node:hover .tcard,.tl-node.on .tcard{background:#fff;border-color:var(--accent);transform:translateY(-2px);}
+.tl-node .tcard .t{font-weight:600;font-size:13.8px;color:var(--ink);line-height:1.5;}
+.tl-node .tcard .d{font-size:12px;color:var(--ink-3);margin-top:4px;line-height:1.55;}
+.tl-detail{
+  margin-top:18px;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;
+  padding:18px 20px;min-height:88px;transition:opacity .25s;
+}
+.tl-detail h4{font-size:17px;color:var(--ink);display:flex;align-items:center;gap:10px;}
+.tl-detail .meta{font-size:12.5px;color:var(--accent-deep);font-weight:600;margin:6px 0 8px;letter-spacing:.5px;}
+.tl-detail p{font-size:14px;margin-bottom:8px;}
+.tl-detail .jump{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;font-weight:600;color:var(--accent-deep);}
+.tl-detail .jump:hover{text-decoration:underline;}
+
+/* ============================================================
+   理论 / 研究者 / 方法页面
+   ============================================================ */
+.dim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:18px 0;}
+.dim{
+  background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);
+  border-radius:var(--radius);padding:16px 18px;
+}
+.dim .dim-code{font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--accent-deep);letter-spacing:1px;}
+.dim h5{font-size:14.5px;color:var(--ink);margin:4px 0 6px;}
+.dim p{font-size:13.2px;color:var(--ink-2);margin:0;}
+.profile{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:var(--shadow);margin-bottom:26px;
+}
+.profile-head{
+  display:flex;align-items:center;gap:18px;padding:22px 24px;
+  background:linear-gradient(140deg,var(--ink),var(--blue));color:#fff;
+}
+.profile-head .avatar{
+  width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);display:grid;place-items:center;flex-shrink:0;
+}
+.profile-head h3{font-size:21px;color:#fff;}
+.profile-head .role{font-size:13px;color:#c9d4e0;margin-top:3px;}
+.profile-body{padding:24px;}
+.fact-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+.fact{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13px;color:var(--ink-2);}
+.fact b{color:var(--ink);}
+table.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+.tbl th{background:var(--ink);color:#fff;font-weight:600;padding:10px 12px;text-align:left;}
+.tbl td{border:1px solid var(--line);padding:10px 12px;color:var(--ink-2);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:var(--paper);}
+.tbl th:first-child{border-radius:8px 0 0 0;}
+.tbl th:last-child{border-radius:0 8px 0 0;}
+.tbl-wrap{overflow-x:auto;}
+
+/* 霍夫斯泰德雷达图 */
+.chart-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:20px 0;}
+.chart-box h4{font-size:15.5px;margin-bottom:4px;}
+.chart-box .src{font-size:12px;color:var(--ink-3);margin-bottom:8px;}
+#radarChart{width:100%;min-height:360px;}
+
+/* 脑图 */
+.mindmap-panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);overflow-x:auto;}
+.mindmap-panel svg{display:block;width:100%;height:auto;min-width:760px;}
+.mm-node{cursor:pointer;}
+.mm-node rect{transition:fill .15s,stroke .15s,filter .15s;}
+.mm-node:hover rect,.mm-node.on rect{filter:drop-shadow(0 3px 6px rgba(35,52,71,.18));}
+.mm-node text{pointer-events:none;font-family:var(--font-body);}
+.mm-link{stroke:var(--line);stroke-width:1.6;fill:none;}
+
+/* ============================================================
+   文献库 + 备注
+   ============================================================ */
+.upload-zone{
+  border:1.6px dashed #c9bfab;border-radius:14px;background:var(--card);
+  padding:34px 24px;text-align:center;transition:background .2s,border-color .2s;
+}
+.upload-zone.drag{background:var(--accent-soft);border-color:var(--accent);}
+.upload-zone .ic{color:var(--ink-3);margin-bottom:10px;}
+.upload-zone .t{font-weight:600;color:var(--ink);font-size:15px;}
+.upload-zone .s{font-size:13px;color:var(--ink-3);margin-top:4px;}
+.upload-btn{
+  margin-top:16px;display:inline-flex;align-items:center;gap:8px;
+  background:var(--ink);color:#fff;border:none;border-radius:9px;padding:10px 20px;
+  font-size:14px;font-weight:600;transition:background .18s;
+}
+.upload-btn:hover{background:var(--blue);}
+.file-list{margin-top:22px;}
+.file-item{
+  display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+  border-radius:11px;padding:12px 16px;margin-bottom:10px;transition:box-shadow .15s;
+}
+.file-item:hover{box-shadow:var(--shadow);}
+.file-item .fi{width:38px;height:38px;border-radius:9px;background:var(--accent-soft);color:var(--accent-deep);display:grid;place-items:center;flex-shrink:0;}
+.file-item .fn{font-weight:600;font-size:14px;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-item .fm{font-size:12px;color:var(--ink-3);flex-shrink:0;}
+.file-item .fop{display:flex;gap:6px;flex-shrink:0;}
+.fop button{
+  border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 11px;
+  font-size:12.5px;color:var(--ink-2);transition:background .15s,color .15s;
+}
+.fop button:hover{background:var(--ink);color:#fff;}
+.pdf-frame-wrap{display:none;margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;position:relative;}
+.pdf-frame-wrap.open{display:block;}
+.pdf-frame-wrap .close{
+  position:absolute;top:22px;right:22px;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+  background:var(--paper);display:grid;place-items:center;color:var(--ink);z-index:3;
+}
+.pdf-frame{width:100%;height:640px;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.empty-note{text-align:center;color:var(--ink-3);font-size:13.5px;padding:22px 0;}
+
+.note-box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);}
+.note-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.note-toolbar .save{
+  margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+  background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-weight:600;font-size:13.5px;
+  transition:background .15s;
+}
+.note-toolbar .save:hover{background:var(--accent-deep);}
+.note-toolbar .exp{
+  display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--line);
+  border-radius:9px;padding:9px 14px;font-weight:500;font-size:13.5px;color:var(--ink-2);
+}
+.note-toolbar .exp:hover{background:var(--paper-2);}
+.note-toolbar .status{font-size:12.5px;color:var(--ink-3);}
+.note-box textarea{
+  width:100%;min-height:320px;border:1px solid var(--line);border-radius:12px;padding:16px;
+  font-family:var(--font-body);font-size:14.5px;line-height:1.9;color:var(--ink);resize:vertical;
+  background:var(--paper);outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.note-box textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.note-count{font-size:12.5px;color:var(--ink-3);margin-top:8px;text-align:right;}
+
+/* 页脚 */
+.site-footer{border-top:1px solid var(--line);padding:30px 0 40px;background:var(--paper-2);}
+.footer-inner{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--ink-3);}
+.footer-inner b{color:var(--ink-2);}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width:900px){
+  .nav-burger{display:flex;}
+  .main-nav{
+    position:fixed;top:64px;left:0;right:0;background:rgba(250,248,243,.98);
+    flex-direction:column;align-items:stretch;padding:12px 16px 20px;gap:2px;
+    border-bottom:1px solid var(--line);box-shadow:var(--shadow);
+    max-height:calc(100vh - 64px);overflow-y:auto;
+    transform:translateY(-8px);opacity:0;visibility:hidden;transition:.22s;
+  }
+  .main-nav.open{transform:none;opacity:1;visibility:visible;}
+  .nav-item > a{padding:11px 12px;font-size:15px;}
+  .nav-item{position:static;}
+  .nav-item.has-sub > a::after{content:"▾";margin-left:auto;font-size:11px;color:var(--ink-3);}
+  .nav-item.has-sub.open > a::after{transform:rotate(180deg);}
+  .sub{
+    position:static;transform:none;box-shadow:none;border:none;background:transparent;padding:0 0 0 12px;
+    min-width:0;opacity:1;visibility:visible;display:none;
+  }
+  .has-sub.open .sub{display:block;}
+  .sub a{padding:9px 10px;}
+  .caret{display:none;}
+}
+@media (max-width:720px){
+  .container{padding:22px 14px 60px;}
+  .hero{padding:30px 22px;}
+  .hero .stats{gap:10px;}
+  .stat{min-width:104px;padding:10px 14px;}
+  .path-step{border-right:1px solid var(--line);border-radius:12px!important;margin-bottom:10px;}
+  .path-step::after{display:none;}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+  .profile-head{flex-direction:column;align-items:flex-start;gap:10px;}
+  #radarChart{min-height:300px;}
+  .pdf-frame{height:440px;}
+  .tl-toolbar{flex-direction:column;align-items:flex-start;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+  html{scroll-behavior:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== 顶部导航 ===================== -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#/overview" aria-label="跨文化维度研究首页">
+      <span class="brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg>
+      </span>
+      <span>
+        <span class="brand-name">跨文化维度研究</span>
+        <span class="brand-sub">Cross-Cultural Dimensions</span>
+      </span>
+    </a>
+    <button class="nav-burger" id="navBurger" aria-label="打开导航" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="main-nav" id="mainNav" aria-label="主导航">
+      <div class="nav-item" data-group="overview">
+        <a href="#/overview">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>
+          研究总览
+        </a>
+      </div>
+      <div class="nav-item" data-group="timeline">
+        <a href="#/timeline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          发展时间线
+        </a>
+      </div>
+      <div class="nav-item has-sub" data-group="stage">
+        <a href="#/stage-1">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.4 1 2.5h6c0-1.1.3-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg>
+          核心理论
+          <svg class="caret" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 3.5L5 7l3.5-3.5"/></svg>
+        </a>
+        <div class="sub">
+          <a href="#/stage-1">早期探索阶段</a>
+          <a href="#/stage-2">经典量化阶段</a>
+          <a href="#/stage-3">拓展修正阶段</a>
+          <a href="#/stage-4">当代前沿阶段</a>
+        </div>
+      </div>
+      <div class="nav-item has-sub" data-group="researcher">
+        <a href="#/researcher-1">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          核心研究者
+          <svg class="caret" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 3.5L5 7l3.5-3.5"/></svg>
+        </a>
+        <div class="sub">
+          <a href="#/researcher-1">克拉克洪 &amp; 斯托特贝克</a>
+          <a href="#/researcher-2">霍夫斯泰德</a>
+          <a href="#/researcher-3">施瓦茨</a>
+          <a href="#/researcher-4">英格尔哈特</a>
+          <a href="#/researcher-5">GLOBE 团队</a>
+        </div>
+      </div>
+      <div class="nav-item has-sub" data-group="method">
+        <a href="#/method-qual">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg>
+          研究方法
+          <svg class="caret" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 3.5L5 7l3.5-3.5"/></svg>
+        </a>
+        <div class="sub">
+          <a href="#/method-qual">定性研究</a>
+          <a href="#/method-quan">定量研究</a>
+          <a href="#/method-mix">混合研究</a>
+        </div>
+      </div>
+      <div class="nav-item" data-group="framework">
+        <a href="#/framework">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 16v5M5 8l7 3 7-3M5 16l7-3 7 3"/><circle cx="5" cy="8" r="2"/><circle cx="19" cy="8" r="2"/><circle cx="5" cy="16" r="2"/><circle cx="19" cy="16" r="2"/><circle cx="12" cy="13" r="2"/></svg>
+          理论框架
+        </a>
+      </div>
+      <div class="nav-item has-sub" data-group="lib">
+        <a href="#/library">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          资料库
+          <svg class="caret" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 3.5L5 7l3.5-3.5"/></svg>
+        </a>
+        <div class="sub">
+          <a href="#/library">文献上传与预览</a>
+          <a href="#/notes">研究备注</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== 主内容区 ===================== -->
+<div class="page-body">
+<main class="container">
+
+<!-- ===================== 视图：研究总览 ===================== -->
+<section class="view" id="view-overview">
+  <div class="hero">
+    <div class="kicker">Cross-Cultural Dimension Research · Navigation</div>
+    <h1>跨文化维度研究体系</h1>
+    <p class="sub">以国家 / 群体为单位提炼文化核心差异、构建可量化可对比维度模型的学术领域。本导航完整收录研究时间线、核心研究者、主要理论与研究详细过程，统一在主内容区切换展示。</p>
+    <div class="stats">
+      <div class="stat"><div class="num">4</div><div class="lbl">大研究阶段</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">核心研究者 / 团队</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">大理论模型</div></div>
+      <div class="stat"><div class="num">29</div><div class="lbl">项文化维度指标</div></div>
+      <div class="stat"><div class="num">100+</div><div class="lbl">覆盖国家 / 地区</div></div>
+    </div>
+  </div>
+
+  <h3 class="sec"><span class="idx">01</span>研究演进路径</h3>
+  <div class="path-steps">
+    <div class="path-step"><div class="pno">STAGE 01</div><h4>定性框架搭建</h4><p>前维度时期，以价值取向等定性框架描绘文化差异。</p></div>
+    <div class="path-step"><div class="pno">STAGE 02</div><h4>定量体系构建</h4><p>霍夫斯泰德以 IBM 大样本数据构建可打分维度。</p></div>
+    <div class="path-step"><div class="pno">STAGE 03</div><h4>模型修正完善</h4><p>施瓦茨、WVS、GLOBE 覆盖全球、区分层面。</p></div>
+    <div class="path-step"><div class="pno">STAGE 04</div><h4>机制与演化深化</h4><p>转向心理机制、本土化与动态演化研究。</p></div>
+  </div>
+
+  <h3 class="sec"><span class="idx">02</span>四大研究阶段速览</h3>
+  <div class="grid grid-4">
+    <div class="card" style="border-top:3px solid var(--stage1)">
+      <h4><span class="card-icon" style="background:var(--stage1)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l3 1v11l-3 1zM9 5l3 1v11l-3-1zM15 7l3 1v11l-3-1z"/></svg></span>早期探索</h4>
+      <p>克拉克洪 &amp; 斯托特贝克提出五大价值取向，奠定文化对比底层框架。</p>
+      <div style="margin-top:10px"><span class="tag">1961</span><span class="tag">价值取向理论</span></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--stage2)">
+      <h4><span class="card-icon" style="background:var(--stage2)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg></span>经典量化</h4>
+      <p>霍夫斯泰德六维度体系，首个可量化、可跨国家对比的标准模型。</p>
+      <div style="margin-top:10px"><span class="tag">1967–1980</span><span class="tag">六维度</span></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--stage3)">
+      <h4><span class="card-icon" style="background:var(--stage3)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.5"/></svg></span>拓展修正</h4>
+      <p>施瓦茨七维、英格尔哈特双维、GLOBE 九维，覆盖全球多元文化。</p>
+      <div style="margin-top:10px"><span class="tag">1981–2004</span><span class="tag">多模型并立</span></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--stage4)">
+      <h4><span class="card-icon" style="background:var(--stage4)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a5 5 0 0 1 5 5c0 2-1 3-2 4h-6c-1-1-2-2-2-4a5 5 0 0 1 5-5zM12 13v5M9 21h6"/></svg></span>当代前沿</h4>
+      <p>规避生态谬误、本土化、动态演化与心理机制研究。</p>
+      <div style="margin-top:10px"><span class="tag">2000s 至今</span><span class="tag">多方法融合</span></div>
+    </div>
+  </div>
+
+  <h3 class="sec"><span class="idx">03</span>五大理论模型一览</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>价值取向理论</h4><p>克拉克洪 &amp; 斯托特贝克，1961。五类基础价值取向，纯定性分析框架。</p></div>
+    <div class="card"><h4>霍夫斯泰德六维度</h4><p>1980 起逐步完善，可量化、可打分的国家文化对比工具。</p></div>
+    <div class="card"><h4>施瓦茨文化价值理论</h4><p>1992 起，区分个体与国家层面，七维度环形模型。</p></div>
+    <div class="card"><h4>英格尔哈特现代化理论</h4><p>基于 WVS 的双维度宏观模型，强调文化动态演化。</p></div>
+    <div class="card"><h4>GLOBE 九维度</h4><p>1991–2004，62 国协作，区分实践文化与价值文化。</p></div>
+    <div class="card"><h4>研究方法体系</h4><p>定性归纳 → 定量验证 → 混合 / 实验 / 追踪的完整范式。</p></div>
+  </div>
+
+  <div class="tip"><b>核心研究定位：</b>文化维度研究的所有得分与结论均以<b>国家 / 群体</b>为单位聚合，仅用于群体间对比分析，严禁套用至个体行为预判，以避免生态谬误。可前往「<b>理论框架</b>」查看完整脑图，或从顶部导航逐项浏览。</div>
+</section>
+
+<!-- ===================== 视图：发展时间线 ===================== -->
+<section class="view" id="view-timeline">
+  <div class="view-head">
+    <span class="eyebrow">Timeline · 1961 — Present</span>
+    <h2>跨文化维度研究发展时间线</h2>
+    <p class="lead">沿时间轴完整呈现从早期价值取向研究到当代前沿的演进过程。<b>拖动</b>标尺浏览全部节点，或使用两侧按钮翻页；点击节点查看详细内容。</p>
+  </div>
+
+  <div class="tl-panel">
+    <div class="tl-toolbar">
+      <span class="hint">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v4M16 3v4M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+        按住左右拖动 · 也可用键盘 ← → 移动
+      </span>
+      <div class="tl-btns">
+        <button class="tl-btn" id="tlPrev" aria-label="向前">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="tl-btn" id="tlNext" aria-label="向后">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tl-viewport" id="tlViewport" tabindex="0" role="list" aria-label="研究时间线">
+      <div class="tl-track" id="tlTrack"></div>
+    </div>
+    <div class="tl-detail" id="tlDetail"></div>
+  </div>
+</section>
+
+<!-- ===================== 视图：阶段一 ===================== -->
+<section class="view" id="view-stage-1">
+  <div class="view-head">
+    <span class="eyebrow" style="color:var(--stage1)">Stage 01 · 前维度理论时期</span>
+    <h2>第一阶段：早期跨文化探索</h2>
+    <p class="lead">该阶段为跨文化维度研究奠基期。学界摒弃单一文化视角，开始系统梳理不同文化的核心价值差异，以<b>定性归纳</b>为核心，搭建文化对比的基础框架，尚未形成量化维度体系。</p>
+  </div>
+
+  <h3 class="sec"><span class="idx">核心理论</span>价值取向理论（Kluckhohn &amp; Strodtbeck, 1961）</h3>
+  <p class="lead-strong">核心逻辑：所有人类社会均面临五类基础生存与发展问题，不同文化的差异化应答，构成文化差异的本质。</p>
+
+  <h4 class="sub">五大核心价值取向</h4>
+  <div class="dim-grid">
+    <div class="dim"><div class="dim-code">O1</div><h5>人性取向</h5><p>界定对人性的基本认知，分为人性本善、人性本恶、善恶混合三类，直接影响社会教育、治理与容错机制。</p></div>
+    <div class="dim"><div class="dim-code">O2</div><h5>人与自然关系</h5><p>包含人支配自然、顺从自然、人与自然和谐共生三种模式，影响社会生产方式与发展路径。</p></div>
+    <div class="dim"><div class="dim-code">O3</div><h5>时间取向</h5><p>分为过去导向（重传统）、现在导向（重当下）、未来导向（重规划），影响国民消费、储蓄与发展决策。</p></div>
+    <div class="dim"><div class="dim-code">O4</div><h5>活动取向</h5><p>存在型（安于现状）、成长型（自我迭代）、行动型（实干进取），影响个体工作价值观与社会活力。</p></div>
+    <div class="dim"><div class="dim-code">O5</div><h5>人际关系取向</h5><p>涵盖个体主义、集体主义、等级制三种关系模式，是后续跨文化组织管理研究的核心基础。</p></div>
+  </div>
+
+  <h3 class="sec"><span class="idx">研究过程</span>方法与数据来源</h3>
+  <p>克拉克洪与斯托特贝克采用<b>田野民族志 + 半结构化深度访谈</b>，选取美国五大典型亚文化社群开展实地调研，通过质性编码与归纳分析，提炼出五类通用价值取向模型。研究以定性归纳为主，无量化打分体系，侧重文化特征的质性界定与对比。</p>
+
+  <h3 class="sec"><span class="idx">评价</span>阶段优势与局限</h3>
+  <div class="grid grid-2">
+    <div class="card"><h4 style="color:var(--teal)">优势</h4><p>首次系统化定义文化差异的分析框架，打破「文化无差异」认知，为后续量化维度研究提供理论底层逻辑。</p></div>
+    <div class="card"><h4 style="color:var(--rust)">局限</h4><p>纯定性研究，无量化评分标准，无法开展精准跨国家对比，维度划分颗粒度较粗。</p></div>
+  </div>
+  <div class="tip">相关研究者详见 <b>核心研究者 → 克拉克洪 &amp; 斯托特贝克</b>。</div>
+</section>
+
+<!-- ===================== 视图：阶段二 ===================== -->
+<section class="view" id="view-stage-2">
+  <div class="view-head">
+    <span class="eyebrow" style="color:var(--stage2)">Stage 02 · 经典维度量化时代</span>
+    <h2>第二阶段：经典维度量化时代（霍夫斯泰德）</h2>
+    <p class="lead">该阶段是跨文化研究的里程碑，实现了文化研究从<b>定性思辨到定量实证</b>的跨越，首次构建标准化、可打分、可跨国家对比的文化维度体系，成为全球跨文化研究的通用工具。</p>
+  </div>
+
+  <h3 class="sec"><span class="idx">核心成果</span>霍夫斯泰德文化维度模型</h3>
+  <p>初始构建 4 个核心维度，后续迭代扩充至 6 个维度。核心定义：<b>文化是区分一群人与另一群人的集体心理程序</b>，维度为国家层面聚合特征，不适用于个体。</p>
+
+  <div class="dim-grid">
+    <div class="dim"><div class="dim-code">PDI</div><h5>权力距离</h5><p>社会对权力、资源不平等分配的接纳程度。高权力距离文化认可等级差异，低权力距离文化追求平等协商。</p></div>
+    <div class="dim"><div class="dim-code">IDV</div><h5>个人主义-集体主义</h5><p>个人主义优先关注个体利益与独立发展；集体主义强调群体归属、团队利益与关系和谐。</p></div>
+    <div class="dim"><div class="dim-code">MAS</div><h5>男性化-女性化</h5><p>男性化取向崇尚竞争、成就、物质成功；女性化取向侧重关怀、包容、生活质量与人际和谐。</p></div>
+    <div class="dim"><div class="dim-code">UAI</div><h5>不确定性规避</h5><p>社会对模糊、未知、不确定场景的容忍度。高规避文化依赖规则制度，低规避文化包容创新与变数。</p></div>
+    <div class="dim"><div class="dim-code">LTO</div><h5>长期-短期导向</h5><p>长期导向重视长远发展、隐忍、节俭与传承；短期导向关注即时收益、传统礼仪与当下享受。</p></div>
+    <div class="dim"><div class="dim-code">IVR</div><h5>放纵-克制</h5><p>放纵文化允许个体欲望释放、重视休闲；克制文化强调自我约束与自律。</p></div>
+  </div>
+
+  <h3 class="sec"><span class="idx">实证数据</span>六维度国家画像对比</h3>
+  <div class="chart-box">
+    <h4>中国 · 美国 · 日本 · 德国 六维度雷达对比</h4>
+    <div class="src">数据来源：Hofstede Insights 国家维度得分（0–100 分制），分数越高代表该维度的倾向越强。</div>
+    <div id="radarChart"></div>
+  </div>
+
+  <h3 class="sec"><span class="idx">研究过程</span>数据与方法</h3>
+  <p>依托 IBM 全球跨国企业，在 <b>1967–1973</b> 年间采集约 <b>11.7 万份员工问卷</b>（覆盖 70 余国子公司，最初聚焦 40 个最大经济体），通过<b>因子分析</b>对海量题项降维提炼，剥离企业组织环境干扰，纯粹提取国家层面文化差异，为各国文化赋予标准化维度得分。</p>
+  <div class="grid grid-2">
+    <div class="card"><h4 style="color:var(--teal)">优势</h4><p>大样本实证支撑、可量化对比、体系成熟，适配跨文化管理、国际贸易、跨文化沟通研究。</p></div>
+    <div class="card"><h4 style="color:var(--rust)">局限</h4><p>初始样本仅为 IBM 企业员工，样本单一；存在生态谬误风险，易被误用解释个体行为；西方视角偏重。</p></div>
+  </div>
+  <div class="tip">维度演进：1980 年提出 <b>4 维</b>（PDI / IDV / MAS / UAI）→ 1991 年基于中国价值观调查加入 <b>LTO 长期导向</b> → 2010 年加入 <b>IVR 放纵-克制</b>，形成完整六维体系。</div>
+</section>
+
+<!-- ===================== 视图：阶段三 ===================== -->
+<section class="view" id="view-stage-3">
+  <div class="view-head">
+    <span class="eyebrow" style="color:var(--stage3)">Stage 03 · 拓展与修正</span>
+    <h2>第三阶段：拓展与修正</h2>
+    <p class="lead">针对霍夫斯泰德理论的样本缺陷与西方中心局限，学界开展大规模修正与拓展，新增多套权威维度模型，扩大调研样本、覆盖非西方文化，并区分<b>个体价值观与国家文化价值观</b>、<b>理想文化与现实文化</b>。</p>
+  </div>
+
+  <h3 class="sec"><span class="idx">拓展一</span>施瓦茨文化价值理论</h3>
+  <p>弥补霍夫斯泰德样本单一问题，覆盖 60+ 国家，严格区分个体层面价值与国家聚合文化价值，构建 7 大文化维度：<b>嵌入性、阶层（等级）、掌控、智性自主、情感自主、平等主义、和谐</b>。核心优势是适配非西方本土文化，维度划分更精细。</p>
+
+  <h3 class="sec"><span class="idx">拓展二</span>英格尔哈特世界价值观调查（WVS）</h3>
+  <p>从现代化动态视角切入，提出两大宏观文化维度：<b>传统价值观 vs 世俗-理性价值观</b>、<b>生存价值观 vs 自我表达价值观</b>。核心观点：经济现代化与社会发展会推动文化代际迭代，文化具备<b>动态演化</b>特征，打破文化静态认知。</p>
+
+  <h3 class="sec"><span class="idx">拓展三</span>GLOBE 全球领导力研究项目</h3>
+  <p>聚焦跨文化组织与领导力研究，提出 <b>9 大文化维度</b>，并严格区分<b>实践文化（As Is，社会真实行为）</b>与<b>价值文化（Should Be，社会理想）</b>，修正过往理论混淆现实与理想的缺陷，成为跨文化管理领域核心研究参照。</p>
+
+  <div class="grid grid-2">
+    <div class="card"><h4 style="color:var(--teal)">阶段贡献</h4><p>维度模型覆盖全球多元文化，区分个体 / 文化层面与现实 / 理想层面，解释力与适配性显著提升。</p></div>
+    <div class="card"><h4 style="color:var(--rust)">阶段局限</h4><p>各模型维度划分口径不一，跨国数据质量参差，不同模型间结论的整合与互证仍需深化。</p></div>
+  </div>
+  <div class="tip">三大拓展分别对应研究者页的<b>施瓦茨</b>、<b>英格尔哈特</b>与<b>GLOBE 团队</b>。</div>
+</section>
+
+<!-- ===================== 视图：阶段四 ===================== -->
+<section class="view" id="view-stage-4">
+  <div class="view-head">
+    <span class="eyebrow" style="color:var(--stage4)">Stage 04 · 当代反思与前沿</span>
+    <h2>第四阶段：当代反思与前沿研究（2000 年后）</h2>
+    <p class="lead">当代跨文化维度研究跳出「单一维度打分对比」的传统路径，转向<b>机制研究、本土化研究、动态演化</b>，修正过往研究误区，适配全球化、多元文化融合的新时代背景。</p>
+  </div>
+
+  <h3 class="sec"><span class="idx">核心</span>研究观点与突破</h3>
+  <div class="grid grid-2">
+    <div class="card"><h4>规避生态谬误</h4><p>明确国家文化维度分数是<b>群体聚合结果</b>，绝对不能直接推导、预判个体认知与行为，厘清宏观与微观研究边界。</p></div>
+    <div class="card"><h4>重视本土化研究</h4><p>重视非西方本土文化概念，拒绝用西方维度强行套用东方、东南亚、中东等本土文化体系。</p></div>
+    <div class="card"><h4>关注动态演化</h4><p>摒弃文化静态认知，研究全球化、移民、互联网传播带来的文化融合、亚文化分化与文化代际变迁。</p></div>
+    <div class="card"><h4>深挖底层机制</h4><p>从「文化是什么差异」转向「文化如何影响认知、归因、决策、沟通」，结合心理学实验揭示底层作用逻辑。</p></div>
+  </div>
+
+  <h3 class="sec"><span class="idx">方法</span>多方法融合范式</h3>
+  <p>融合行为启动实验、情景模拟实验、跨代追踪调研、元分析、多组分层对比等方法，告别单一问卷调研，实现定性、定量、实验研究的深度融合，研究结论更严谨、更具说服力。</p>
+  <div class="tip">详细方法说明见 <b>研究方法 → 混合研究</b>。</div>
+</section>
+
+<!-- ===================== 视图：研究者 1 ===================== -->
+<section class="view" id="view-researcher-1">
+  <div class="profile">
+    <div class="profile-head">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div>
+        <h3>克拉克洪 &amp; 斯托特贝克</h3>
+        <div class="role">Florence Kluckhohn &amp; Fred Strodtbeck · 跨文化价值研究奠基人</div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="fact-row">
+        <span class="fact"><b>核心贡献</b>价值取向理论</span>
+        <span class="fact"><b>代表作</b>《价值取向的变奏》(1961)</span>
+        <span class="fact"><b>方法</b>田野民族志 + 深度访谈</span>
+      </div>
+      <h4 class="sub">研究定位</h4>
+      <p>跨文化价值研究奠基人，开创文化价值取向分析框架，为后续所有跨文化维度研究提供底层理论逻辑。</p>
+      <h4 class="sub">主要研究贡献与观点</h4>
+      <ul>
+        <li>提出人类社会<b>五大基础价值取向</b>，界定文化差异的核心分析维度，搭建首个系统化跨文化对比体系。</li>
+        <li>主张文化差异并非随机，而是社会应对基础生存问题的<b>系统性应答结果</b>，具备稳定性与规律性。</li>
+        <li>打破单一文化研究视角，推动学界以对比视角研究不同民族、社群的文化差异。</li>
+      </ul>
+      <h4 class="sub">研究过程与方法</h4>
+      <p>采用<b>田野民族志 + 半结构化深度访谈</b>，选取美国五大典型亚文化社群开展实地调研，通过质性编码、归纳分析，提炼出五类通用价值取向模型。研究以定性归纳为主，无量化打分体系，侧重文化特征的质性界定与对比。</p>
+    </div>
+  </div>
+  <div class="tip">对应阶段：<b>核心理论 → 早期探索阶段</b>。</div>
+</section>
+
+<!-- ===================== 视图：研究者 2 ===================== -->
+<section class="view" id="view-researcher-2">
+  <div class="profile">
+    <div class="profile-head">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div>
+        <h3>霍夫斯泰德（Geert Hofstede）</h3>
+        <div class="role">1928–2020 · 荷兰心理学家 · 跨文化量化维度研究创始人</div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="fact-row">
+        <span class="fact"><b>核心贡献</b>六维度模型</span>
+        <span class="fact"><b>代表作</b>《文化的后果》(1980)</span>
+        <span class="fact"><b>样本</b>约 11.7 万 IBM 员工</span>
+      </div>
+      <h4 class="sub">研究定位</h4>
+      <p>跨文化量化维度研究创始人，构建全球应用最广泛的文化维度理论，奠定现代跨文化研究的学科基础。</p>
+      <h4 class="sub">主要研究贡献与观点</h4>
+      <ul>
+        <li>定义文化为「<b>集体心理程序</b>」，区分群体文化差异与个体特质差异，厘清学科核心概念。</li>
+        <li>首创可量化、可跨国家对比的文化维度体系，从 4 维迭代至 6 维，成为跨文化管理、传播学、社会学通用研究工具。</li>
+        <li>验证国家文化对组织管理、员工行为、企业制度、沟通模式的显著影响，推动跨文化实证研究发展。</li>
+      </ul>
+      <h4 class="sub">研究过程与方法</h4>
+      <p>依托 IBM 全球跨国企业，采集 <b>40 个国家（后扩展至 50 余国）约 11.7 万份员工问卷</b>，通过<b>因子分析</b>对海量题项降维提炼，剥离企业组织环境干扰，纯粹提取国家层面文化差异，为各国文化赋予标准化维度得分。</p>
+      <p>研究基础时间跨度为 <b>1967–1973</b>，1980 年出版《文化的后果》提出四维度；1991 年引入基于中国价值观调查（彭迈克等）的长期导向维度；2010 年补充放纵-克制维度。</p>
+    </div>
+  </div>
+  <div class="tip">维度详情与雷达图见 <b>核心理论 → 经典量化阶段</b>。</div>
+</section>
+
+<!-- ===================== 视图：研究者 3 ===================== -->
+<section class="view" id="view-researcher-3">
+  <div class="profile">
+    <div class="profile-head">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div>
+        <h3>施瓦茨（Shalom Schwartz）</h3>
+        <div class="role">以色列社会心理学家 · 文化价值理论构建者</div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="fact-row">
+        <span class="fact"><b>核心贡献</b>七维度文化价值理论</span>
+        <span class="fact"><b>代表成果</b>1992 年起</span>
+        <span class="fact"><b>样本</b>60+ 国家</span>
+      </div>
+      <h4 class="sub">研究定位</h4>
+      <p>霍夫斯泰德理论的核心修正者，完善文化价值分层体系，适配全球多区域、多类型文化研究。</p>
+      <h4 class="sub">主要研究贡献与观点</h4>
+      <ul>
+        <li>严格区分<b>个体层面价值观</b>与<b>国家文化聚合价值观</b>，解决过往研究层级混淆问题。</li>
+        <li>构建 7 大文化维度环形模型（嵌入性、阶层、掌控、智性自主、情感自主、平等主义、和谐），适配性强，覆盖大量非西方发展中国家与小众文化。</li>
+        <li>揭示文化价值的内在逻辑关联，形成闭环文化价值体系，提升理论解释力。</li>
+      </ul>
+      <h4 class="sub">研究过程与方法</h4>
+      <p>开展 <b>60+ 国家大样本跨群体调研</b>，涵盖教师、学生、普通民众等多元群体，通过<b>多维尺度分析（MDS）</b>构建可视化文化价值环形结构，实现多维度、多层级的文化量化对比。</p>
+    </div>
+  </div>
+  <div class="tip">对应阶段：<b>核心理论 → 拓展修正阶段</b>。</div>
+</section>
+
+<!-- ===================== 视图：研究者 4 ===================== -->
+<section class="view" id="view-researcher-4">
+  <div class="profile">
+    <div class="profile-head">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <div>
+        <h3>英格尔哈特（Ronald Inglehart）</h3>
+        <div class="role">1934–2021 · 美国政治学家 · 文化动态演化研究代表</div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="fact-row">
+        <span class="fact"><b>核心贡献</b>双维度现代化理论</span>
+        <span class="fact"><b>平台</b>世界价值观调查 WVS</span>
+        <span class="fact"><b>起始</b>1981 年</span>
+      </div>
+      <h4 class="sub">研究定位</h4>
+      <p>文化动态演化研究代表，依托世界价值观调查（WVS），开创宏观文化现代化研究范式。</p>
+      <h4 class="sub">主要研究贡献与观点</h4>
+      <ul>
+        <li>提出双维度宏观文化模型，将全球文化划分为<b>传统-世俗理性</b>、<b>生存-自我表达</b>两大维度。</li>
+        <li>核心论证：经济现代化、社会发展、代际更替会持续推动文化迭代升级，文化具备<b>动态演化</b>特征。</li>
+        <li>基于长期追踪数据，解释全球文化变迁趋势与区域文化差异成因。</li>
+      </ul>
+      <h4 class="sub">研究过程与方法</h4>
+      <p>主持<b>世界价值观调查（WVS）</b>，开展跨国、跨代际长期追踪抽样调研，通过因子分析聚合社会信念、宗教、家庭、性别、生活态度等指标，形成宏观文化维度，构建文化动态变迁模型。</p>
+    </div>
+  </div>
+  <div class="tip">对应阶段：<b>核心理论 → 拓展修正阶段</b>。</div>
+</section>
+
+<!-- ===================== 视图：研究者 5 ===================== -->
+<section class="view" id="view-researcher-5">
+  <div class="profile">
+    <div class="profile-head">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      <div>
+        <h3>GLOBE 团队</h3>
+        <div class="role">Global Leadership &amp; Organizational Behavior Effectiveness · 跨国研究联盟</div>
+      </div>
+    </div>
+    <div class="profile-body">
+      <div class="fact-row">
+        <span class="fact"><b>核心贡献</b>九维度模型</span>
+        <span class="fact"><b>覆盖</b>62 个国家</span>
+        <span class="fact"><b>时间</b>1991–2004</span>
+      </div>
+      <h4 class="sub">研究定位</h4>
+      <p>跨文化领导力与组织行为研究标杆团队，修正经典维度理论缺陷，聚焦组织场景落地应用。</p>
+      <h4 class="sub">主要研究贡献与观点</h4>
+      <ul>
+        <li>区分<b>实践文化（As Is）</b>与<b>理想价值文化（Should Be）</b>，解决传统理论概念混淆的核心问题。</li>
+        <li>构建 9 大组织文化维度，精准适配企业管理、团队领导、跨文化组织协作研究。</li>
+        <li>建立文化维度与领导有效性的关联模型，实现理论与管理实践的深度结合。</li>
+      </ul>
+      <h4 class="sub">研究过程与方法</h4>
+      <p>全球多国学者联合开展大型跨国研究，覆盖 <b>62 个国家</b>，以企业中层管理者为核心样本，结合<b>问卷量化调研 + 深度定性访谈</b>，双向验证文化维度对组织行为与领导模式的影响机制，2004 年出版标志性成果《Culture, Leadership, and Organizations》。</p>
+    </div>
+  </div>
+  <div class="tip">对应阶段：<b>核心理论 → 拓展修正阶段</b>。</div>
+</section>
+
+<!-- ===================== 视图：方法-定性 ===================== -->
+<section class="view" id="view-method-qual">
+  <div class="view-head">
+    <span class="eyebrow">Method · Qualitative</span>
+    <h2>研究方法：定性研究体系</h2>
+    <p class="lead">定性研究是跨文化维度研究的基础方法，多用于理论初创阶段，核心用于挖掘文化本质、提炼核心维度、界定文化特征。</p>
+  </div>
+  <h3 class="sec"><span class="idx">方法</span>核心方法类型</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>田野民族志</h4><p>研究者深入目标文化社群长期驻场观察、沉浸式体验，记录文化行为、习俗、价值观，提炼原生文化特征。</p></div>
+    <div class="card"><h4>半结构化访谈</h4><p>针对本土居民、行业从业者、文化研究者开展访谈，收集一手文化认知与行为资料。</p></div>
+    <div class="card"><h4>质性编码归纳</h4><p>对访谈素材、民俗文本、社会制度文本进行质性编码，归纳共性文化规律，提炼维度框架。</p></div>
+  </div>
+  <h3 class="sec"><span class="idx">评价</span>适用场景与优缺点</h3>
+  <div class="grid grid-2">
+    <div class="card"><h4 style="color:var(--teal)">适用与优点</h4><p>适用理论初创、未知文化探索、本土文化特征挖掘。优点：贴合文化原生性、挖掘深度强、不局限预设框架。</p></div>
+    <div class="card"><h4 style="color:var(--rust)">局限</h4><p>无法量化对比、主观性较强、样本规模有限、结论推广性受限。</p></div>
+  </div>
+  <div class="tip">典型范例：<b>克拉克洪 &amp; 斯托特贝克</b>价值取向理论。</div>
+</section>
+
+<!-- ===================== 视图：方法-定量 ===================== -->
+<section class="view" id="view-method-quan">
+  <div class="view-head">
+    <span class="eyebrow">Method · Quantitative</span>
+    <h2>研究方法：定量研究体系</h2>
+    <p class="lead">定量研究是现代跨文化维度研究的核心方法，实现文化研究的标准化、可对比、可验证，是主流学术成果的核心支撑。</p>
+  </div>
+  <h3 class="sec"><span class="idx">方法</span>核心方法类型</h3>
+  <div class="grid grid-2">
+    <div class="card"><h4>大样本问卷调研</h4><p>设计标准化文化量表，跨国、跨群体大规模抽样，获取可量化数据。</p></div>
+    <div class="card"><h4>因子分析</h4><p>对海量问卷题项降维处理，提炼核心文化维度，是霍夫斯泰德理论的核心方法。</p></div>
+    <div class="card"><h4>多维尺度分析（MDS）</h4><p>构建文化维度可视化模型，对比不同国家文化距离与特征差异（施瓦茨环形模型）。</p></div>
+    <div class="card"><h4>相关与回归分析</h4><p>验证文化维度与社会发展、企业管理、个体行为的关联强度与因果方向。</p></div>
+  </div>
+  <h3 class="sec"><span class="idx">评价</span>适用场景与优缺点</h3>
+  <div class="grid grid-2">
+    <div class="card"><h4 style="color:var(--teal)">适用与优点</h4><p>适用跨国家文化对比、维度模型验证、文化影响机制实证。优点：数据客观、可量化、可对比、可重复验证。</p></div>
+    <div class="card"><h4 style="color:var(--rust)">局限</h4><p>容易忽略文化特殊性、依赖量表设计、存在样本偏差风险。</p></div>
+  </div>
+  <div class="tip">典型范例：<b>霍夫斯泰德六维度</b>、<b>施瓦茨七维度</b>、<b>WVS</b>。</div>
+</section>
+
+<!-- ===================== 视图：方法-混合 ===================== -->
+<section class="view" id="view-method-mix">
+  <div class="view-head">
+    <span class="eyebrow">Method · Mixed &amp; Experimental</span>
+    <h2>研究方法：混合研究范式</h2>
+    <p class="lead">当代主流研究范式，融合定性与定量方法优势，规避单一方法缺陷，兼顾文化深度与数据严谨性。</p>
+  </div>
+  <h3 class="sec"><span class="idx">流程</span>研究设计流程</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>① 定性挖掘</h4><p>通过定性访谈、田野观察挖掘本土文化特征、优化量表题项。</p></div>
+    <div class="card"><h4>② 定量验证</h4><p>通过大样本定量调研、统计分析验证维度模型与作用机制。</p></div>
+    <div class="card"><h4>③ 质性解读</h4><p>结合质性结论解读量化数据，提升研究深度与说服力。</p></div>
+  </div>
+  <h3 class="sec"><span class="idx">前沿</span>拓展方法</h3>
+  <div class="grid grid-3">
+    <div class="card"><h4>行为实验</h4><p>通过情景启动、行为模拟实验，验证文化对个体认知、决策的影响。</p></div>
+    <div class="card"><h4>元分析</h4><p>整合全球多地区、多时段研究成果，修正研究偏差，提炼普适结论。</p></div>
+    <div class="card"><h4>纵向追踪法</h4><p>跨年度追踪文化变迁，研究文化动态演化特征与驱动因素。</p></div>
+  </div>
+  <div class="tip">典型范例：<b>GLOBE 项目</b>（问卷 + 访谈双向验证）、<b>当代前沿研究</b>。</div>
+</section>
+
+<!-- ===================== 视图：理论框架脑图 ===================== -->
+<section class="view" id="view-framework">
+  <div class="view-head">
+    <span class="eyebrow">Framework · Mind Map</span>
+    <h2>跨文化维度研究 · 理论框架脑图</h2>
+    <p class="lead">四大研究阶段及其代表性理论 / 维度的完整关系图。点击任意节点，可跳转到对应的专题详情页。</p>
+  </div>
+  <div class="mindmap-panel">
+    <div id="mindmap"></div>
+  </div>
+  <h3 class="sec"><span class="idx">总览</span>研究演进总览表</h3>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:16%">阶段</th><th style="width:26%">核心目标</th><th style="width:30%">核心研究方法</th><th>关键成果与局限</th></tr></thead>
+      <tbody>
+        <tr><td><b>早期探索</b></td><td>搭建文化对比基础框架</td><td>田野民族志、定性访谈、质性编码</td><td>奠定理论基础，无量化体系，无法精准跨区对比</td></tr>
+        <tr><td><b>经典量化</b></td><td>构建可量化的标准化文化维度</td><td>大样本问卷、因子分析、量化打分</td><td>体系成熟应用广，样本单一、西方视角局限</td></tr>
+        <tr><td><b>拓展修正</b></td><td>修正缺陷、覆盖全球多元文化</td><td>多国大样本调研、MDS 分析、分层建模</td><td>维度完善，区分个体 / 文化、现实 / 理想</td></tr>
+        <tr><td><b>当代前沿</b></td><td>深挖机制、动态演化</td><td>混合研究、行为实验、元分析、追踪调研</td><td>规避研究谬误，聚焦动态性与底层机制</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="tip"><b>整体研究主线：</b><b>定性框架搭建 → 定量体系构建 → 模型修正完善 → 机制与演化深化</b>，实现从「描述文化差异」到「解释文化成因、预测文化演化、指导跨文化实践」的进阶。</div>
+</section>
+
+<!-- ===================== 视图：文献库 ===================== -->
+<section class="view" id="view-library">
+  <div class="view-head">
+    <span class="eyebrow">Library · PDF</span>
+    <h2>文献资源库 · PDF 上传与预览</h2>
+    <p class="lead">上传并预览跨文化维度研究相关 PDF 文献、学位论文、期刊综述、专著节选与调研数据报告。支持多文件上传、点击在线预览与移除。</p>
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <div class="ic">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+    </div>
+    <div class="t">将 PDF 文件拖拽到此处，或点击选择文件</div>
+    <div class="s">支持格式：PDF · 多文件上传 · 本次会话内可在线预览</div>
+    <button class="upload-btn" id="pickBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+      选择 PDF 文件
+    </button>
+    <input type="file" id="pdfInput" accept="application/pdf,.pdf" multiple hidden>
+  </div>
+
+  <div class="file-list" id="fileList">
+    <div class="empty-note" id="fileEmpty">尚未上传文献，可上传后在此管理。</div>
+  </div>
+
+  <div class="pdf-frame-wrap" id="pdfWrap">
+    <button class="close" id="pdfClose" aria-label="关闭预览">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <iframe class="pdf-frame" id="pdfFrame" title="PDF 预览"></iframe>
+  </div>
+
+  <div class="tip"><b>说明：</b>本模块为预留拓展区，当前在浏览器本地会话内完成上传与预览（无需后端）。后续可迭代新增分类归档、关键词检索与云端持久化存储。建议归类：经典理论原著、各研究者核心文献、跨文化综述、实证研究报告、课程课件与课题资料。</div>
+</section>
+
+<!-- ===================== 视图：研究备注 ===================== -->
+<section class="view" id="view-notes">
+  <div class="view-head">
+    <span class="eyebrow">Notes · Memo</span>
+    <h2>研究备注 · 自定义文本存档</h2>
+    <p class="lead">记录研究批注、文献心得、课题思路、论文写作要点与课堂笔记。文本自动保存至本机浏览器，支持随时编辑、导出为文本文件。</p>
+  </div>
+  <div class="note-box">
+    <div class="note-toolbar">
+      <span class="status" id="noteStatus">备注将自动保存</span>
+      <button class="exp" id="noteExport">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        导出 .txt
+      </button>
+      <button class="save" id="noteSave">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        保存备注
+      </button>
+    </div>
+    <textarea id="noteArea" placeholder="在这里写下你的研究批注、文献心得、课题思考……"></textarea>
+    <div class="note-count" id="noteCount">0 字</div>
+  </div>
+  <div class="tip"><b>隐私说明：</b>备注仅保存在当前浏览器本地（localStorage），不经过网络，更换设备或清除浏览器数据后不可恢复，建议定期导出备份。</div>
+</section>
+
+</main>
+</div>
+
+<!-- ===================== 页脚 ===================== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div><b>跨文化维度研究 · 学术研究导航</b><br>单页导航式学术参考 · 四大阶段 / 五大研究者 / 五大理论 / 29 项维度</div>
+    <div>数据与事实整理自公开学术资料（Hofstede Insights 国家得分、各研究者代表文献等），仅供教学与学术研究参考。</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js" integrity="sha384-pPi0zxBAoDu6+JXW/C68UZLvBUUtU+7zonhif43rqj7pxsGyqyqzcian2Rj37Rss" crossorigin="anonymous"></script>
+<script>
+/* ============================================================
+   视图路由
+   ============================================================ */
+var VIEW_GROUPS = {
+  'overview':'overview','timeline':'timeline','framework':'framework',
+  'stage-1':'stage','stage-2':'stage','stage-3':'stage','stage-4':'stage',
+  'researcher-1':'researcher','researcher-2':'researcher','researcher-3':'researcher',
+  'researcher-4':'researcher','researcher-5':'researcher',
+  'method-qual':'method','method-quan':'method','method-mix':'method',
+  'library':'lib','notes':'lib'
+};
+function currentView(){
+  var h = location.hash.replace(/^#\/?/,'');
+  return VIEW_GROUPS[h] ? h : 'overview';
+}
+function showView(id){
+  var views = document.querySelectorAll('.view');
+  for (var i=0;i<views.length;i++) views[i].classList.remove('active');
+  var el = document.getElementById('view-'+id);
+  if (el) el.classList.add('active');
+  // 高亮导航
+  var items = document.querySelectorAll('.nav-item');
+  for (var j=0;j<items.length;j++){
+    items[j].classList.toggle('active', items[j].getAttribute('data-group') === VIEW_GROUPS[id]);
+  }
+  var subs = document.querySelectorAll('.sub a');
+  for (var k=0;k<subs.length;k++){
+    var href = subs[k].getAttribute('href').replace(/^#\/?/,'');
+    subs[k].classList.toggle('active', href === id);
+  }
+  window.scrollTo({top:0,behavior:'auto'});
+  closeMobileNav();
+  if (id==='timeline' && typeof renderTimelineActive==='function') renderTimelineActive();
+  if (id==='framework' && typeof renderMindMap==='function') renderMindMap();
+}
+window.addEventListener('hashchange', function(){ showView(currentView()); });
+
+/* ============================================================
+   移动端导航
+   ============================================================ */
+function closeMobileNav(){
+  document.getElementById('mainNav').classList.remove('open');
+  document.getElementById('navBurger').setAttribute('aria-expanded','false');
+}
+document.getElementById('navBurger').addEventListener('click', function(){
+  var nav = document.getElementById('mainNav');
+  var open = nav.classList.toggle('open');
+  this.setAttribute('aria-expanded', open ? 'true':'false');
+});
+var hasSubs = document.querySelectorAll('.nav-item.has-sub');
+for (var hi=0; hi<hasSubs.length; hi++){
+  hasSubs[hi].addEventListener('click', function(e){
+    if (window.innerWidth <= 900){
+      // 移动端：点击父项展开/收起子菜单
+      if (e.target.tagName === 'A' && this.classList.contains('open')){
+        // 允许跳转
+      } else {
+        e.preventDefault();
+        this.classList.toggle('open');
+      }
+    }
+  });
+}
+
+/* ============================================================
+   时间线
+   ============================================================ */
+var TIMELINE = [
+  {year:'1961', stage:'早期探索', code:'ST.01', title:'克拉克洪 & 斯托特贝克：《价值取向的变奏》',
+   desc:'提出五大基础价值取向（人性、人与自然、时间、活动、人际关系），首次系统化定义文化差异的分析框架。',
+   link:{view:'researcher-1', text:'查看研究者详情'}},
+  {year:'1967–1973', stage:'经典量化', code:'ST.02', title:'霍夫斯泰德主持 IBM 全球员工调查',
+   desc:'采集约 11.7 万份问卷、覆盖 70 余国子公司，以因子分析剥离组织环境干扰，成为文化维度量化的数据底座。',
+   link:{view:'researcher-2', text:'查看研究者详情'}},
+  {year:'1980', stage:'经典量化', code:'ST.03', title:'霍夫斯泰德《文化的后果》出版',
+   desc:'基于 IBM 数据提出权力距离、个人主义、男性化、不确定性规避四维度，开启可量化跨文化对比时代。',
+   link:{view:'stage-2', text:'查看六维模型'}},
+  {year:'1981', stage:'拓展修正', code:'ST.04', title:'英格尔哈特主持世界价值观调查（WVS）首轮',
+   desc:'跨国、跨代际追踪调研启动，为文化动态演化与现代化研究奠定实证基础。',
+   link:{view:'researcher-4', text:'查看研究者详情'}},
+  {year:'1991', stage:'经典量化', code:'ST.05', title:'长期导向维度加入（中国价值观调查）',
+   desc:'彭迈克等基于儒家工作动力研究，为霍夫斯泰德体系补充长期-短期导向第五维度。',
+   link:{view:'researcher-2', text:'查看研究者详情'}},
+  {year:'1992', stage:'拓展修正', code:'ST.06', title:'施瓦茨提出文化价值理论',
+   desc:'区分个体价值与国家文化聚合价值，构建嵌入性、阶层、掌控、自主、平等主义、和谐等七维度环形模型。',
+   link:{view:'researcher-3', text:'查看研究者详情'}},
+  {year:'1991–2004', stage:'拓展修正', code:'ST.07', title:'GLOBE 全球领导力与组织行为有效性研究',
+   desc:'62 个国家研究者协作，提出九大文化维度，区分实践文化（As Is）与价值文化（Should Be），2004 年出版标志性成果。',
+   link:{view:'researcher-5', text:'查看研究者详情'}},
+  {year:'2010', stage:'经典量化', code:'ST.08', title:'放纵-克制维度加入',
+   desc:'基于世界价值观调查数据，霍夫斯泰德体系完善为六维度，成为今日通用框架。',
+   link:{view:'stage-2', text:'查看六维模型'}},
+  {year:'2000s 至今', stage:'当代前沿', code:'ST.09', title:'机制、本土化与动态演化研究',
+   desc:'跨文化研究转向心理机制、本土概念、文化变迁，形成定性与定量、实验与追踪融合的多元范式。',
+   link:{view:'stage-4', text:'查看当代前沿'}}
+];
+
+var tlTrack = document.getElementById('tlTrack');
+var tlViewport = document.getElementById('tlViewport');
+var tlDetail = document.getElementById('tlDetail');
+var tlCurrent = 2;
+
+function renderTimeline(){
+  tlTrack.innerHTML = '';
+  for (var i=0;i<TIMELINE.length;i++){
+    var it = TIMELINE[i];
+    var node = document.createElement('div');
+    node.className = 'tl-node' + (i===tlCurrent?' on':'');
+    node.setAttribute('data-i', i);
+    node.setAttribute('role','listitem');
+    node.innerHTML =
+      '<div class="axis"><div class="year">'+it.year+'</div><div class="dot"></div><div class="st-label">'+it.code+' · '+it.stage+'</div></div>'+
+      '<div class="tcard"><div class="t">'+it.title+'</div><div class="d">'+it.desc+'</div></div>';
+    tlTrack.appendChild(node);
+  }
+  var nodes = tlTrack.querySelectorAll('.tl-node');
+  for (var j=0;j<nodes.length;j++){
+    nodes[j].addEventListener('click', function(){ selectNode(parseInt(this.getAttribute('data-i'))); });
+  }
+  renderDetail();
+}
+function renderDetail(){
+  var it = TIMELINE[tlCurrent];
+  var nodes = tlTrack.querySelectorAll('.tl-node');
+  for (var i=0;i<nodes.length;i++) nodes[i].classList.toggle('on', i===tlCurrent);
+  tlDetail.innerHTML =
+    '<h4><span class="idx" style="background:var(--accent);padding:2px 8px;border-radius:5px;color:#fff;font-size:12px;">'+it.code+'</span>'+it.year+' · '+it.title+'</h4>'+
+    '<div class="meta">研究阶段：'+it.stage+'</div>'+
+    '<p>'+it.desc+'</p>'+
+    '<a class="jump" href="#/'+it.link.view+'">'+it.link.text+' →</a>';
+}
+function selectNode(i){
+  tlCurrent = i;
+  renderDetail();
+  // 将节点滚动到可视区中央
+  var node = tlTrack.querySelectorAll('.tl-node')[i];
+  var target = node.offsetLeft - (tlViewport.clientWidth - node.offsetWidth)/2;
+  tlViewport.scrollTo({left:Math.max(0,target), behavior:'smooth'});
+}
+function renderTimelineActive(){ if (tlTrack.children.length===0) renderTimeline(); }
+
+// 拖动
+var dragging = false, startX = 0, startLeft = 0;
+tlViewport.addEventListener('pointerdown', function(e){
+  if (e.target.closest('.tl-node')) return; // 让点击节点优先
+  dragging = true; startX = e.clientX; startLeft = tlViewport.scrollLeft;
+  tlViewport.setPointerCapture(e.pointerId);
+});
+tlViewport.addEventListener('pointermove', function(e){
+  if (!dragging) return;
+  var dx = e.clientX - startX;
+  tlViewport.scrollLeft = startLeft - dx;
+});
+['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+  tlViewport.addEventListener(ev, function(){ dragging = false; });
+});
+document.getElementById('tlPrev').addEventListener('click', function(){
+  tlViewport.scrollBy({left:-280, behavior:'smooth'});
+});
+document.getElementById('tlNext').addEventListener('click', function(){
+  tlViewport.scrollBy({left:280, behavior:'smooth'});
+});
+tlViewport.addEventListener('keydown', function(e){
+  if (e.key==='ArrowLeft'){ tlViewport.scrollBy({left:-280,behavior:'smooth'}); e.preventDefault(); }
+  if (e.key==='ArrowRight'){ tlViewport.scrollBy({left:280,behavior:'smooth'}); e.preventDefault(); }
+});
+renderTimeline();
+
+/* ============================================================
+   理论框架脑图（SVG）
+   ============================================================ */
+var MM = {
+  root:{label:'跨文化维度研究', y:460},
+  stages:[
+    {label:'早期探索\n1961', y:130, color:'#3D6287', view:'stage-1', kids:[
+      {label:'价值取向理论\n五大价值取向', x:610, y:130, color:'#3D6287', view:'stage-1'}
+    ]},
+    {label:'经典量化\n1967–1980', y:350, color:'#2F7D6B', view:'stage-2', kids:[
+      {label:'PDI 权力距离', x:610, y:240, color:'#2F7D6B', view:'stage-2'},
+      {label:'IDV 个人主义', x:830, y:240, color:'#2F7D6B', view:'stage-2'},
+      {label:'MAS 男性化', x:610, y:350, color:'#2F7D6B', view:'stage-2'},
+      {label:'UAI 不确定性规避', x:830, y:350, color:'#2F7D6B', view:'stage-2'},
+      {label:'LTO 长期导向', x:610, y:460, color:'#2F7D6B', view:'stage-2'},
+      {label:'IVR 放纵-克制', x:830, y:460, color:'#2F7D6B', view:'stage-2'}
+    ]},
+    {label:'拓展修正\n1981–2004', y:570, color:'#B5832D', view:'stage-3', kids:[
+      {label:'施瓦茨\n七维度', x:610, y:525, color:'#B5832D', view:'researcher-3'},
+      {label:'英格尔哈特\n双维度 (WVS)', x:610, y:600, color:'#B5832D', view:'researcher-4'},
+      {label:'GLOBE\n九维度', x:610, y:675, color:'#B5832D', view:'researcher-5'}
+    ]},
+    {label:'当代前沿\n2000s 至今', y:790, color:'#B5482B', view:'stage-4', kids:[
+      {label:'生态谬误规避', x:610, y:740, color:'#B5482B', view:'stage-4'},
+      {label:'本土化研究', x:830, y:740, color:'#B5482B', view:'stage-4'},
+      {label:'动态演化', x:610, y:860, color:'#B5482B', view:'stage-4'},
+      {label:'心理机制', x:830, y:860, color:'#B5482B', view:'stage-4'}
+    ]}
+  ]
+};
+var mmRendered = false;
+function renderMindMap(){
+  if (mmRendered) return;
+  mmRendered = true;
+  var boxW = 190, boxH = 58, rootX = 60, rootW = 210;
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(svgNS,'svg');
+  svg.setAttribute('viewBox','0 0 1120 920');
+  svg.setAttribute('role','img');
+  svg.setAttribute('aria-label','跨文化维度研究理论框架脑图');
+  var defs = document.createElementNS(svgNS,'defs');
+  var arrow = document.createElementNS(svgNS,'marker');
+  arrow.setAttribute('id','arrow');
+  arrow.setAttribute('viewBox','0 0 10 10');
+  arrow.setAttribute('refX','9'); arrow.setAttribute('refY','5');
+  arrow.setAttribute('markerWidth','7'); arrow.setAttribute('markerHeight','7');
+  arrow.setAttribute('orient','auto-start-reverse');
+  arrow.innerHTML = '<path d="M0 0L10 5L0 10z" fill="#C7BDA9"/>';
+  defs.appendChild(arrow);
+  svg.appendChild(defs);
+
+  var stageX = 300, stageW = 210;
+  var linkColor = '#C7BDA9';
+
+  function addLink(x1,y1,x2,y2,curve){
+    var path = document.createElementNS(svgNS,'path');
+    var d = 'M'+x1+' '+y1+' C'+(x1+curve)+' '+y1+','+(x2-curve)+' '+y2+','+x2+' '+y2;
+    path.setAttribute('d',d);
+    path.setAttribute('class','mm-link');
+    path.setAttribute('marker-end','url(#arrow)');
+    svg.appendChild(path);
+  }
+  function addNode(cx, cy, w, h, label, color, view, isRoot){
+    var g = document.createElementNS(svgNS,'g');
+    g.setAttribute('class','mm-node');
+    g.setAttribute('tabindex','0');
+    g.setAttribute('role','button');
+    g.setAttribute('aria-label', label.replace(/\n/g,'，'));
+    var rect = document.createElementNS(svgNS,'rect');
+    rect.setAttribute('x', cx - w/2);
+    rect.setAttribute('y', cy - h/2);
+    rect.setAttribute('width', w);
+    rect.setAttribute('height', h);
+    rect.setAttribute('rx','12');
+    if (isRoot){ rect.setAttribute('fill','#233447'); }
+    else { rect.setAttribute('fill','#ffffff'); rect.setAttribute('stroke', color); rect.setAttribute('stroke-width','1.8'); }
+    g.appendChild(rect);
+    var lines = label.split('\n');
+    lines.forEach(function(txt, i){
+      var t = document.createElementNS(svgNS,'text');
+      t.setAttribute('x', cx);
+      t.setAttribute('y', cy + (lines.length===1 ? 5 : (i - (lines.length-1)/2)*17));
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('font-size', lines.length===1 ? 14 : 13.5);
+      t.setAttribute('font-weight','600');
+      t.setAttribute('fill', isRoot ? '#fff' : '#233447');
+      t.innerHTML = txt;
+      g.appendChild(t);
+    });
+    g.addEventListener('click', function(){ location.hash = '#/'+view; });
+    g.addEventListener('keydown', function(e){ if(e.key==='Enter') location.hash='#/'+view; });
+    svg.appendChild(g);
+    return {cx:cx, cy:cy};
+  }
+
+  // 根节点
+  addNode(rootX + rootW/2, MM.root.y, rootW, 66, MM.root.label, '#233447', 'overview', true);
+  var rootRight = rootX + rootW;
+  // 阶段节点 + 连线
+  MM.stages.forEach(function(st){
+    var stageCY = st.y;
+    addNode(stageX + stageW/2, stageCY, stageW, 62, st.label, st.color, st.view, false);
+    addLink(rootRight, MM.root.y + 8, stageX, stageCY, 40);
+    st.kids.forEach(function(kd){
+      var ky = kd.y;
+      addNode(kd.x, ky, boxW, boxH, kd.label, kd.color, kd.view, false);
+      addLink(stageX + stageW, stageCY, kd.x - boxW/2, ky, 30);
+    });
+  });
+  var wrap = document.getElementById('mindmap');
+  wrap.innerHTML = '';
+  wrap.appendChild(svg);
+}
+
+/* ============================================================
+   霍夫斯泰德雷达图（ECharts）
+   ============================================================ */
+function initRadar(){
+  var el = document.getElementById('radarChart');
+  if (!el || typeof echarts === 'undefined') return;
+  var chart = echarts.init(el);
+  var indicators = [
+    {name:'权力距离\nPDI', max:100},
+    {name:'个人主义\nIDV', max:100},
+    {name:'男性化\nMAS', max:100},
+    {name:'不确定性规避\nUAI', max:100},
+    {name:'长期导向\nLTO', max:100},
+    {name:'放纵-克制\nIVR', max:100}
+  ];
+  chart.setOption({
+    color:['#B5482B','#3D6287','#B5832D','#2F7D6B'],
+    tooltip:{trigger:'item', confine:true},
+    legend:{data:['中国','美国','日本','德国'], type:'scroll', bottom:0},
+    radar:{
+      indicator: indicators,
+      radius:'62%',
+      center:['50%','46%'],
+      splitArea:{areaStyle:{color:['rgba(61,98,135,.03)','rgba(61,98,135,.06)']}},
+      axisName:{color:'#47586E', fontSize:12}
+    },
+    series:[{
+      type:'radar',
+      data:[
+        {name:'中国', value:[80,20,66,30,87,24]},
+        {name:'美国', value:[40,91,62,46,26,68]},
+        {name:'日本', value:[54,46,95,92,88,42]},
+        {name:'德国', value:[35,67,66,65,83,40]}
+      ],
+      areaStyle:{opacity:.14},
+      lineStyle:{width:2}
+    }]
+  });
+  new ResizeObserver(function(){ chart.resize(); }).observe(el);
+}
+initRadar();
+
+/* ============================================================
+   文献 PDF 上传预览
+   ============================================================ */
+var pdfFiles = [];
+var zone = document.getElementById('uploadZone');
+var input = document.getElementById('pdfInput');
+var list = document.getElementById('fileList');
+var empty = document.getElementById('fileEmpty');
+var wrapFrame = document.getElementById('pdfWrap');
+var frame = document.getElementById('pdfFrame');
+
+document.getElementById('pickBtn').addEventListener('click', function(){ input.click(); });
+input.addEventListener('change', function(){ addFiles(input.files); input.value=''; });
+
+['dragenter','dragover'].forEach(function(ev){
+  zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.add('drag'); });
+});
+['dragleave','drop'].forEach(function(ev){
+  zone.addEventListener(ev, function(e){ e.preventDefault(); zone.classList.remove('drag'); });
+});
+zone.addEventListener('drop', function(e){ addFiles(e.dataTransfer.files); });
+
+function fmtSize(b){
+  if (b < 1024) return b+' B';
+  if (b < 1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(1)+' MB';
+}
+function addFiles(files){
+  for (var i=0;i<files.length;i++){
+    var f = files[i];
+    if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) continue;
+    pdfFiles.push({file:f, url:null, id:Date.now()+'_'+i});
+  }
+  renderFileList();
+}
+function renderFileList(){
+  list.innerHTML = '';
+  if (pdfFiles.length===0){
+    list.appendChild(empty);
+    return;
+  }
+  pdfFiles.forEach(function(item, idx){
+    var row = document.createElement('div');
+    row.className = 'file-item';
+    row.innerHTML =
+      '<span class="fi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 18h4"/></svg></span>'+
+      '<span class="fn" title="'+item.file.name+'">'+item.file.name+'</span>'+
+      '<span class="fm">'+fmtSize(item.file.size)+'</span>'+
+      '<span class="fop">'+
+        '<button data-act="preview" data-i="'+idx+'">预览</button>'+
+        '<button data-act="del" data-i="'+idx+'">移除</button>'+
+      '</span>';
+    row.querySelector('[data-act="preview"]').addEventListener('click', function(){ previewPdf(idx); });
+    row.querySelector('[data-act="del"]').addEventListener('click', function(){
+      pdfFiles.splice(idx,1); renderFileList();
+    });
+    list.appendChild(row);
+  });
+}
+function previewPdf(idx){
+  var item = pdfFiles[idx];
+  if (!item.url) item.url = URL.createObjectURL(item.file);
+  frame.src = item.url;
+  wrapFrame.classList.add('open');
+  wrapFrame.scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('pdfClose').addEventListener('click', function(){
+  wrapFrame.classList.remove('open');
+  frame.src = '';
+});
+
+/* ============================================================
+   研究备注（localStorage 持久化）
+   ============================================================ */
+var noteArea = document.getElementById('noteArea');
+var noteStatus = document.getElementById('noteStatus');
+var noteCount = document.getElementById('noteCount');
+var NOTE_KEY = 'ccd_research_notes_v1';
+var noteTimer = null;
+
+function loadNote(){
+  try {
+    var saved = localStorage.getItem(NOTE_KEY);
+    if (saved) noteArea.value = saved;
+  } catch(e){}
+  updateCount();
+}
+function saveNote(silent){
+  try {
+    localStorage.setItem(NOTE_KEY, noteArea.value);
+    if (!silent){
+      noteStatus.textContent = '已保存 ' + new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      noteStatus.textContent = '备注将自动保存';
+    }
+  } catch(e){
+    noteStatus.textContent = '保存失败：浏览器存储不可用';
+  }
+}
+function updateCount(){
+  noteCount.textContent = noteArea.value.length + ' 字';
+}
+noteArea.addEventListener('input', function(){
+  updateCount();
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(function(){ saveNote(true); }, 600);
+});
+document.getElementById('noteSave').addEventListener('click', function(){ saveNote(false); });
+document.getElementById('noteExport').addEventListener('click', function(){
+  var blob = new Blob([noteArea.value], {type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '跨文化维度研究-研究备注.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+loadNote();
+
+/* 初始化路由 */
+showView(currentView());
+</script>
+</body>
+</html>
