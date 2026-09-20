@@ -9,7 +9,8 @@
   const currentSlide=()=>document.querySelector('.slide:not([hidden])');
   const update=()=>{
     const n=Number(currentSlide()?.dataset.slide||0);
-    button.hidden=n<8;
+    const shouldHide=n<8;
+    if(button.hidden!==shouldHide) button.hidden=shouldHide;
   };
   button.addEventListener('click',()=>{
     if(typeof window.CCMOpenTaskModal==='function') window.CCMOpenTaskModal(target,'跨文化维度指数查询 / Cultural Dimensions Index');
