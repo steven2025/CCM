@@ -1,0 +1,739 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<base href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/T-company/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T公司严经理的跨文化沟通困惑 · 互动案例</title>
+<style>
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  :root { --accent: #e8933a; --gold: #f5c542; --coral: #ff7f50; --saffron: #FF9933; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:#1a1a1a; color:#3a2e1f; min-height:100vh; }
+  .container { max-width:1200px; margin:0 auto; padding:20px; }
+  .start-screen { text-align:center; padding:60px 20px; }
+  .info-card { background:#3a2e1f; padding:16px; border-radius:10px; transition:all .3s ease; }
+  .info-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(91,155,213,0.15); }
+  @keyframes breathe { 0%,100% { box-shadow:0 0 20px rgba(91,155,213,0.3); } 50% { box-shadow:0 0 40px rgba(91,155,213,0.6); } }
+  .btn-ready { animation:breathe 2s ease-in-out infinite !important; }
+  .countdown-ring { width:54px; height:54px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#d4955a; position:relative; margin:0 6px; }
+  .countdown-ring svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
+  .start-screen h1 { font-size:32px; margin-bottom:16px; color:#fff; }
+  .start-screen p { font-size:16px; color:#a08060; margin-bottom:32px; line-height:1.8; max-width:600px; margin-left:auto; margin-right:auto; }
+  .btn { display:inline-block; padding:14px 40px; background:#b8763a; color:#fff; border:none; border-radius:8px; font-size:16px; cursor:pointer; transition:all .2s; }
+  .btn:hover { background:#8b5a2b; transform:translateY(-1px); }
+  .main-layout { display:none; grid-template-columns:180px 1fr; gap:16px; min-height:80vh; }
+  .nav-panel { background:rgba(58,46,31,0.92); border-radius:12px; padding:16px; position:relative; isolation:isolate; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+  .nav-panel::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 13px;
+    padding: 1.5px;
+    background: conic-gradient(from var(--border-angle), transparent 0deg, transparent 300deg, var(--accent) 340deg, #ffffff 355deg, var(--accent) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: borderRotate 4s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  @keyframes borderRotate { to { --border-angle: 360deg; } }
+  .nav-panel::after, .player-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    background:
+      linear-gradient(#d4955a, #d4955a) top left / 20px 2px,
+      linear-gradient(#d4955a, #d4955a) top left / 2px 20px,
+      linear-gradient(#d4955a, #d4955a) top right / 20px 2px,
+      linear-gradient(#d4955a, #d4955a) top right / 2px 20px,
+      linear-gradient(#d4955a, #d4955a) bottom left / 20px 2px,
+      linear-gradient(#d4955a, #d4955a) bottom left / 2px 20px,
+      linear-gradient(#d4955a, #d4955a) bottom right / 20px 2px,
+      linear-gradient(#d4955a, #d4955a) bottom right / 2px 20px;
+    background-repeat: no-repeat;
+  }
+  .marker-shelf { margin-top: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .marker-shelf .marker { display: none; width: 208px; height: 208px; opacity: 0; transform: scale(0.8); }
+  .marker-shelf .marker.show { display: block; animation: markerIn 0.6s cubic-bezier(.2,.9,.3,1.3) forwards; }
+  @keyframes markerIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .marker-boston.show { animation: markerIn 0.6s cubic-bezier(.2,.9,.3,1.3) forwards, floatY 3s ease-in-out 0.6s infinite; filter: drop-shadow(0 0 12px rgba(245,197,66,.7)); }
+  @keyframes floatY { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1); } }
+  .marker-india.show { animation: markerIn 0.6s cubic-bezier(.2,.9,.3,1.3) forwards, lotusSpin 10s linear 0.6s infinite; }
+  @keyframes lotusSpin { from { transform: rotate(0deg) scale(1); } to { transform: rotate(360deg) scale(1); } }
+  .marker-india.show .petal { animation: petalGlow 2.4s ease-in-out infinite; }
+  .marker-india.show .p2 { animation-delay: .3s; }
+  .marker-india.show .p3 { animation-delay: .6s; }
+  .marker-india.show .p4 { animation-delay: .9s; }
+  .marker-india.show .p5 { animation-delay: 1.2s; }
+  @keyframes petalGlow { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+  .marker-meeting.show { animation: markerIn 0.6s cubic-bezier(.2,.9,.3,1.3) forwards, micPulse 1.5s ease-in-out 0.6s infinite; }
+  @keyframes micPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .marker-meeting.show .wave { animation: waveOut 1.5s ease-out infinite; }
+  .marker-meeting.show .w2 { animation-delay: .3s; }
+  .marker-meeting.show .w3 { animation-delay: .6s; }
+  @keyframes waveOut { 0% { opacity: 0; transform: translateX(0) scale(1); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateX(8px) scale(1.15); } }
+  .marker-watermark { position: absolute; right: -30px; bottom: -30px; width: 220px; height: 220px; opacity: 0.15; pointer-events: none; z-index: 1; animation: watermarkFloat 6s ease-in-out infinite; }
+  .marker-watermark svg { width: 100%; height: 100%; display: block; }
+  @keyframes watermarkFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+  @media (max-width: 820px) {
+    .marker-shelf { flex-direction: row; margin-top: 10px; }
+    .marker-shelf .marker { width: 48px; height: 48px; }
+    .marker-watermark { width: 80px; height: 80px; bottom: -10px; right: -10px; }
+  }
+  .scene-nav-item { padding:10px 12px; margin-bottom:8px; border-radius:8px; cursor:pointer; font-size:13px; color:#a08060; transition:all .2s; }
+  .scene-nav-item.active { background:#b8763a; color:#fff; }
+  .player-panel { background:rgba(44,32,16,0.92); border-radius:12px; padding:20px; display:flex; flex-direction:column; position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+  .scene-title { font-size:18px; color:#fff; margin-bottom:4px; }
+  .scene-desc { font-size:12px; color:#8b6914; margin-bottom:12px; }
+  .progress-bar { height:3px; background:#5a4a3a; border-radius:2px; margin-bottom:12px; overflow:hidden; }
+  .progress-fill { height:100%; background:#b8763a; transition:width .3s; }
+  .player-area { position:relative; flex:1; background:#000; border-radius:8px; min-height:480px; overflow:hidden; }
+  video, .player-area img { width:100%; height:100%; object-fit:cover; display:block; }
+  .overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); z-index:10; padding:24px; }
+  .overlay.show { display:flex; }
+  .typewriter-text { font-size:18px; line-height:1.8; text-align:center; color:#fff; margin-bottom:28px; max-width:680px; min-height:60px; }
+  .typewriter-cursor { display:inline-block; width:2px; height:1.1em; background:#b8763a; vertical-align:middle; animation:blink 0.8s infinite; }
+  @keyframes blink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+  .choice-3d { display:block; width:90%; max-width:520px; padding:18px 24px; margin:10px 0; border:none; border-radius:14px; font-size:16px; font-weight:600; color:#fff; cursor:pointer; text-align:center; transition:all .25s cubic-bezier(.2,.8,.3,1.2); position:relative; box-shadow:0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+  .choice-3d:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 12px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-3d:active { transform:translateY(0) scale(0.98); }
+  .choice-success { background:linear-gradient(135deg,#d4a04a,#b88030); }
+  .choice-success:hover { box-shadow:0 12px 30px rgba(82,196,26,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-fail { background:linear-gradient(135deg,#fa541c,#d4380d); }
+  .choice-fail:hover { box-shadow:0 12px 30px rgba(250,84,28,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-neutral { background:linear-gradient(135deg,#d4955a,#8b5a2b); }
+  .choice-neutral:hover { box-shadow:0 12px 30px rgba(74,108,247,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .reflect-card { background:rgba(30,42,74,0.95); border-radius:14px; padding:24px; max-width:640px; width:90%; max-height:85%; overflow-y:auto; }
+  .reflect-card h3 { font-size:16px; margin-bottom:16px; color:#fff; }
+  .reflect-q { margin-bottom:14px; font-size:14px; line-height:1.6; color:#c0a888; }
+  .reflect-q label { display:block; padding:8px 12px; margin:6px 0; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; transition:background .2s; }
+  .reflect-q label:hover { background:rgba(255,255,255,0.1); }
+  .reflect-q input { margin-right:8px; }
+  .summary-screen { display:none; text-align:center; padding:60px 20px; }
+  .summary-screen h2 { font-size:28px; margin-bottom:24px; color:#fff; }
+  @keyframes zoom-in { from { transform:scale(1.0); } to { transform:scale(1.15); } }
+  @keyframes zoom-out { from { transform:scale(1.15); } to { transform:scale(1.0); } }
+  @keyframes pan-left { from { transform:scale(1.12) translateX(4%); } to { transform:scale(1.12) translateX(-4%); } }
+  @keyframes pan-right { from { transform:scale(1.12) translateX(-4%); } to { transform:scale(1.12) translateX(4%); } }
+  .player-progress { position:absolute; bottom:0; left:0; right:0; height:6px; background:rgba(255,255,255,0.15); z-index:5; cursor:pointer; }
+  .player-progress-fill { height:100%; background:#b8763a; width:0%; transition:width .1s linear; }
+  .subtitle-bar { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); max-width:80%; padding:10px 20px; background:rgba(0,0,0,0.75); border-radius:8px; color:#fff; font-size:16px; line-height:1.6; text-align:center; z-index:4; pointer-events:none; transition:opacity 0.4s ease; opacity:1; }
+  .play-pause-btn { position:absolute; bottom:16px; right:16px; width:48px; height:48px; border-radius:50%; background:rgba(184,118,58,0.9); border:none; color:#fff; font-size:20px; cursor:pointer; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,0.3); transition:all .2s; }
+  .play-pause-btn:hover { background:#d4955a; transform:scale(1.08); }
+  .player-controls { display:flex; justify-content:center; align-items:center; gap:14px; padding:12px 0 4px; }
+  .ctrl-btn { padding:8px 22px; border-radius:20px; background:#3a2e1f; border:1px solid rgba(108,180,245,0.35); color:#d4955a; font-size:14px; cursor:pointer; transition:all .2s; }
+  .ctrl-btn:hover { background:#4a3728; color:#fff; border-color:#d4955a; }
+  .ctrl-speed { min-width:60px; font-weight:600; }
+.postmark-stamp-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px;}
+.letter-overlay{position:fixed;inset:0;background:rgba(8,15,28,0.78);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.letter-overlay.show{display:flex;animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.letter-paper{max-width:580px;width:100%;max-height:88vh;overflow-y:auto;background-color:#f6efd9;background-image:repeating-linear-gradient(0deg,transparent 0,transparent 31px,rgba(122,74,30,0.2) 31px,rgba(122,74,30,0.2) 32px);padding:42px 50px 38px;border-radius:6px;color:#2c2417;font-family:'Kaiti SC','STKaiti','楷体','KaiTi',serif;line-height:2;font-size:15.5px;box-shadow:0 22px 60px rgba(0,0,0,0.6),inset 0 0 0 1px rgba(122,74,30,0.15);position:relative;animation:paperIn .55s cubic-bezier(.2,.8,.3,1.15);}
+@keyframes paperIn{from{transform:translateY(28px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.letter-paper .close-x{position:absolute;top:12px;left:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#7a4a1e;opacity:.55;line-height:1;}
+.letter-paper .close-x:hover{opacity:1;}
+.letter-paper .corner-stamp{position:absolute;top:18px;right:18px;width:68px;height:80px;background:linear-gradient(135deg,#c84a4a 0%,#9a3030 100%);color:#fff7d6;font-size:10.5px;line-height:1.35;padding:6px 4px;text-align:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,0.2),0 2px 6px rgba(0,0,0,0.3);transform:rotate(8deg);display:flex;align-items:center;justify-content:center;letter-spacing:1px;font-family:'PingFang SC',sans-serif;font-weight:600;}
+.letter-paper h2{font-family:inherit;text-align:center;font-size:22px;color:#7a4a1e;margin:0 0 18px;letter-spacing:4px;border-bottom:1px solid rgba(122,74,30,0.3);padding-bottom:10px;}
+.letter-paper h3{font-family:inherit;font-size:16px;color:#7a4a1e;margin:18px 0 4px;letter-spacing:2px;}
+.letter-paper .entry{border-left:3px solid rgba(122,74,30,0.3);padding-left:14px;margin:14px 0;}
+.letter-paper p{margin:6px 0;text-indent:2em;}
+.letter-paper .footer-cta{text-align:center;margin-top:22px;padding-top:14px;border-top:1px dashed rgba(122,74,30,0.4);color:#7a4a1e;font-size:14.5px;font-family:'PingFang SC',sans-serif;}
+@keyframes butterflyFloat{0%,100%{transform:rotate(8deg) translateY(0)}50%{transform:rotate(12deg) translateY(-8px)}}
+@keyframes butterflyFly{0%,100%{transform:translate(0,0) rotate(-5deg)}33%{transform:translate(-50px,-40px) rotate(10deg)}66%{transform:translate(-90px,-80px) rotate(-8deg)}}
+</style>
+</head>
+<body><div id="startBg" style="position:fixed;inset:0;background:linear-gradient(180deg,#f0e2c4 0%,#e8d5a8 50%,#f0e2c4 100%);z-index:-2;pointer-events:none;"></div><div id="sceneBg" style="position:fixed;inset:0;background-size:cover;background-position:center;opacity:0.6;display:none;;z-index:-1;pointer-events:none;"></div>
+<div class="letter-overlay" id="letterOverlay" onclick="if(event.target===this)closeLetter()">
+  <div class="letter-paper">
+    <button class="close-x" onclick="closeLetter()" aria-label="关闭">×</button>
+    <div class="corner-stamp">AIR&nbsp;MAIL<br>BEIJING→BOSTON</div>
+    <h2>严经理的出差日记</h2>
+    <div class="entry"><h3>出发前夜 · 北京</h3>
+      <p>明天就要飞波士顿了。这是入职 T 公司后第一次带队出国——跟项目经理 Daniel 合作了半年，隔着屏幕聊过无数版方案，却还没见过一面。</p>
+      <p>刘工把家乡特产装进礼盒，认认真真包了三层。我翻来覆去想：见面怎么寒暄？聊些什么？礼盒什么时机送？</p>
+      <p>我想，节奏放慢些、热情些，应该没什么错。可又隐隐觉得——"入乡随俗"四个字，可能没那么简单。</p>
+    </div>
+    <div class="entry"><h3>第一笔 · 波士顿落地</h3>
+      <p>下了飞机满心期待地等着接机。手机一亮，却是 Daniel 的消息：已为您叫了一辆 Uber，机场出口等候。</p>
+      <p>没有接机、没有接风宴，连人影都没见到。我愣在那儿，"入乡随俗"这四个字，第一次敲在心上。</p>
+    </div>
+    <div class="entry"><h3>第二笔 · 总部办公室</h3>
+      <p>第三天，隔壁会议室突然激烈起来。客户催货、产线要赶工，员工代表竟拿着 PPT 进去一条条据理力争。我以为会被驳回，结果——John 同意了员工的说法。</p>
+      <p>在国内，几乎没人敢这样跟领导讨价还价。我满脑子问号。</p>
+    </div>
+    <div class="entry"><h3>第三笔 · 阿米尔</h3>
+      <p>阿米尔来汇合那天，见面第一句话就问我年薪多少。我以为听错了。后来找他帮个忙，他爽快解决，转身却提了个请求——麻烦你把这件事写成感谢信，抄送全组。</p>
+      <p>印度式沟通，到底是怎样的逻辑？</p>
+    </div>
+    <div class="entry"><h3>第四笔 · 项目例会</h3>
+      <p>轮到阿米尔汇报。数十页 PPT，声情并茂。他负责的进展我只做了六成，他台上讲出了九成。会后他发来消息得意地问：今天发挥得不错吧？</p>
+      <p>我一时不知怎么回复。</p>
+    </div>
+    <div class="entry"><h3>第五笔 · 年度大会</h3>
+      <p>公司年度总结大会，各国技术骨干齐聚。美国同事现场"开火"：安装流程有大问题！主持人转向亚洲区——全场安静，无人举手。</p>
+      <p>我握着笔，手心出汗。</p>
+    </div>
+    <p>现在我从波士顿回到北京，桌上摊着三个月攒下的文件。这些当时让我手足无措的瞬间，慢慢有了答案。</p>
+    <p>这一次，让我们再走一遍——替我做一次选择。你会比我更懂"入乡随俗"吗？</p>
+    <div class="footer-cta">点击下方"开始案例"，跟我一起去美国</div>
+  </div>
+</div>
+<div class="container">
+  <div class="start-screen" id="startScreen" style="padding:20px 16px;min-height:100vh;position:relative;">
+    <div style="position:absolute;top:30px;left:-80px;width:340px;opacity:0.35;transform:rotate(-25deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_5.png" style="width:100%;"></div>
+    <div style="position:absolute;top:-10px;left:20px;width:180px;opacity:0.5;transform:rotate(-10deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_1.png" style="width:100%;"></div>
+    <div style="position:absolute;top:10px;right:0;width:120px;opacity:0.6;transform:rotate(8deg);pointer-events:none;z-index:0;animation:butterflyFloat 6s ease-in-out infinite;"><img src="T-company/素材/cut_15.png" style="width:100%;"></div>
+    <div style="position:absolute;bottom:80px;left:22%;width:130px;opacity:0.4;transform:rotate(-30deg);pointer-events:none;z-index:0;animation:butterflyFly 8s ease-in-out infinite;"><img src="T-company/素材/cut_15.png" style="width:100%;"></div>
+    <div style="position:absolute;bottom:120px;left:-60px;width:300px;opacity:0.28;transform:rotate(-18deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_22.png" style="width:100%;"></div>
+    <div style="position:absolute;bottom:-20px;right:-40px;width:280px;opacity:0.22;transform:rotate(10deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_20.png" style="width:100%;"></div>
+    <div style="position:absolute;top:380px;left:40px;width:100px;opacity:0.45;transform:rotate(-30deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_5.png" style="width:100%;"></div>
+    <div style="position:absolute;bottom:250px;right:30px;width:110px;opacity:0.5;transform:rotate(40deg);pointer-events:none;z-index:0;"><img src="T-company/素材/cut_18.png" style="width:100%;"></div>
+    
+    <div style="position:relative;z-index:1;max-width:860px;margin:0 auto 8px;text-align:right;">
+      <div style="font-size:11px;line-height:1.7;color:#8b6914;">案例原文：荆竹翠、王茆、郭宏利、蔡沐（北京交通大学经济管理学院）<br>改编：段雨萱 · 重庆工商大学<br>指导：鄢清华 · 重庆工商大学</div>
+    </div>
+    <div style="position:relative;z-index:1;max-width:860px;margin:0 auto 4px;text-align:center;">
+      <h1 style="font-size:52px;font-family:Kaiti SC,STKaiti,楷体,serif;color:#4a2e10;letter-spacing:6px;text-shadow:0 2px 8px rgba(139,90,43,0.2);line-height:1.3;">"入乡随俗"有点难？</h1>
+      <p style="font-size:22px;font-family:Kaiti SC,STKaiti,楷体,serif;color:#7a4a20;letter-spacing:5px;margin-top:4px;">——T公司严经理的跨文化沟通困惑</p>
+      <img src="T-company/素材/cut_24.png" style="width:200px;margin:8px auto 0;display:block;opacity:0.6;">
+    </div>
+    <div style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:860px;margin:20px auto 14px;text-align:left;">
+      <div style="position:relative;background:rgba(255,252,245,0.85);padding:20px 22px;border:1.5px solid #c9a96e;box-shadow:0 4px 16px rgba(100,60,20,0.1);">
+        <div style="position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:3px solid #8b4513;border-left:3px solid #8b4513;"></div>
+        <div style="position:absolute;top:-1px;right:-1px;width:18px;height:18px;border-top:3px solid #8b4513;border-right:3px solid #8b4513;"></div>
+        <div style="position:absolute;bottom:-1px;left:-1px;width:18px;height:18px;border-bottom:3px solid #8b4513;border-left:3px solid #8b4513;"></div>
+        <div style="position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:3px solid #8b4513;border-right:3px solid #8b4513;"></div>
+        <h3 style="font-size:15px;color:#8b4513;margin-bottom:10px;letter-spacing:2px;font-family:Kaiti SC,STKaiti,楷体,serif;">📖 案例背景</h3>
+        <p style="font-size:13px;line-height:1.9;color:#4a3728;">T公司医疗集团，总部位于美国波士顿，业务遍布全球100多个国家。严经理是北京研发中心的研发部经理，入职半年，第一次带队到美国总部出差三个月，跟进体外诊断设备跨国研发项目。</p>
+      </div>
+      <div style="position:relative;background:rgba(255,252,245,0.85);padding:20px 22px;border:1.5px solid #c9a96e;box-shadow:0 4px 16px rgba(100,60,20,0.1);">
+        <div style="position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:3px solid #8b4513;border-left:3px solid #8b4513;"></div>
+        <div style="position:absolute;top:-1px;right:-1px;width:18px;height:18px;border-top:3px solid #8b4513;border-right:3px solid #8b4513;"></div>
+        <div style="position:absolute;bottom:-1px;left:-1px;width:18px;height:18px;border-bottom:3px solid #8b4513;border-left:3px solid #8b4513;"></div>
+        <div style="position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:3px solid #8b4513;border-right:3px solid #8b4513;"></div>
+        <div style="position:absolute;top:-125px;right:-95px;width:250px;opacity:0.6;transform:rotate(75deg);pointer-events:none;z-index:0;overflow:hidden;"><img src="T-company/素材/cut_8.png" style="width:100%;"></div>
+        <h3 style="font-size:15px;color:#8b4513;margin-bottom:10px;letter-spacing:2px;font-family:Kaiti SC,STKaiti,楷体,serif;">👤 主人公</h3>
+        <p style="font-size:13px;line-height:1.9;color:#4a3728;"><strong style="color:#3a2e1f;font-size:14px;">严经理</strong> · 北京研发中心研发部经理<br>医疗诊断仪器研发专家，技术过硬，职场严谨。初到美国，在五个场景里遭遇五种不同的"沟通方式"。</p>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;max-width:860px;margin:0 auto 16px;text-align:left;">
+      <div id="guideHeader" onclick="toggleGuide()" style="position:relative;background:rgba(255,252,245,0.7);padding:12px 18px;border:1.5px solid #c9a96e;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:14px;color:#8b4513;letter-spacing:2px;font-family:Kaiti SC,STKaiti,楷体,serif;">🎮 操作指引</span>
+        <span id="guideArrow" style="color:#8b4513;transition:transform .3s;">▼</span>
+      </div>
+      <div id="guideBody" style="background:rgba(255,252,245,0.7);padding:0 18px;max-height:0;overflow:hidden;transition:max-height .4s ease, padding .3s ease;border:1.5px solid #c9a96e;border-top:none;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 0;">
+          <span style="background:rgba(180,120,60,0.15);padding:5px 12px;border-radius:14px;font-size:12px;color:#8b5a2b;">① 观看引入段</span><span style="color:#8b6914;">→</span>
+          <span style="background:rgba(180,120,60,0.15);padding:5px 12px;border-radius:14px;font-size:12px;color:#8b5a2b;">② 替严经理选策略</span><span style="color:#8b6914;">→</span>
+          <span style="background:rgba(180,120,60,0.15);padding:5px 12px;border-radius:14px;font-size:12px;color:#8b5a2b;">③ 两条路径都看完</span><span style="color:#8b6914;">→</span>
+          <span style="background:rgba(180,120,60,0.15);padding:5px 12px;border-radius:14px;font-size:12px;color:#8b5a2b;">④ 反思题+截图</span><span style="color:#8b6914;">→</span>
+          <span style="background:rgba(180,120,60,0.15);padding:5px 12px;border-radius:14px;font-size:12px;color:#8b5a2b;">⑤ 下一场景</span>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;margin:10px 0;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;">
+        <span id="stampBtn" onclick="openLetter()" style="cursor:pointer;display:inline-block;">
+          <img src="T-company/素材/cut_2.png" style="width:100px;filter:drop-shadow(0 4px 12px rgba(100,50,20,0.3));transition:transform .3s;" onmouseover="this.style.transform='rotate(-5deg) scale(1.06)'" onmouseout="this.style.transform='rotate(0)'">
+        </span>
+        <span style="color:#8b6914;font-size:12px;letter-spacing:1px;">点击信封 · 阅读严经理的出差日记</span>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;font-size:13px;color:#6b4423;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <span>了解案例背景</span>
+      <span class="countdown-ring" id="cdRing">
+        <svg width="54" height="54"><circle cx="27" cy="27" r="23" fill="none" stroke="rgba(180,120,60,0.2)" stroke-width="3"/><circle id="cdProgress" cx="27" cy="27" r="23" fill="none" stroke="#8b4513" stroke-width="3" stroke-dasharray="144.5" stroke-dashoffset="0" stroke-linecap="round"/></svg>
+        <span id="countdown" style="position:relative;z-index:1;color:#8b4513;">10</span>
+      </span>
+      <span>秒</span>
+    </div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <button class="btn" id="startBtn" onclick="startGame()" disabled style="opacity:0.4;cursor:not-allowed;padding:14px 52px;font-size:17px;font-family:Kaiti SC,STKaiti,楷体,serif;letter-spacing:3px;background:linear-gradient(135deg,#8b4513,#b8763a);">▶ 开始案例</button>
+      <div style="font-size:12px;color:#8b6914;">约15分钟 · 5个跨文化场景 · 学生自学</div>
+    </div>
+  </div>
+  <div class="main-layout" id="mainLayout" style="position:relative;">
+    <div class="nav-panel" style="position:relative;z-index:1;">
+      <div style="font-size:12px;color:#666;margin-bottom:12px;">场景进度</div>
+      <div id="sceneNav"></div><div class="marker-shelf" id="markerShelf">
+  <svg class="marker marker-boston" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffe680"/><stop offset="50%" stop-color="#f5c542"/><stop offset="100%" stop-color="#d4941e"/>
+      </linearGradient>
+      <linearGradient id="brickGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#e8c9a0"/><stop offset="100%" stop-color="#c9a87c"/>
+      </linearGradient>
+      <filter id="glowGold"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect x="12" y="46" width="40" height="7" rx="1.5" fill="url(#brickGrad)"/>
+    <rect x="12" y="46" width="40" height="2" rx="1" fill="#fff" opacity=".25"/>
+    <rect x="16" y="34" width="32" height="12" rx="1" fill="url(#brickGrad)"/>
+    <rect x="20" y="36" width="3" height="8" fill="#8b6b4a" opacity=".45"/>
+    <rect x="28" y="36" width="3" height="8" fill="#8b6b4a" opacity=".45"/>
+    <rect x="36" y="36" width="3" height="8" fill="#8b6b4a" opacity=".45"/>
+    <rect x="44" y="36" width="3" height="8" fill="#8b6b4a" opacity=".45"/>
+    <path d="M32 14 C22 14 16 24 16 34 L48 34 C48 24 42 14 32 14Z" fill="#e8d4b8"/>
+    <path d="M32 14 C22 14 16 24 16 34 L48 34 C48 24 42 14 32 14Z" fill="url(#brickGrad)" opacity=".6"/>
+    <path d="M32 8 C26 10 24 16 24 20 L40 20 C40 16 38 10 32 8Z" fill="url(#goldGrad)" filter="url(#glowGold)"/>
+    <circle cx="32" cy="7" r="2.5" fill="url(#goldGrad)" filter="url(#glowGold)"/>
+    <rect x="31" y="2" width="2" height="5" rx="1" fill="url(#goldGrad)"/>
+    <ellipse cx="28" cy="12" rx="4" ry="2" fill="#fff" opacity=".35"/>
+  </svg>
+  <svg class="marker marker-india" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="petalPink" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffd4c4"/><stop offset="100%" stop-color="#e8958a"/>
+      </linearGradient>
+      <linearGradient id="petalGold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffe680"/><stop offset="100%" stop-color="#e8a020"/>
+      </linearGradient>
+    </defs>
+    <path class="petal p1" d="M32 6 C20 18 18 30 32 40 C46 30 44 18 32 6Z" fill="url(#petalPink)" opacity=".5"/>
+    <path class="petal p2" d="M8 18 C20 22 28 30 30 42 C16 42 8 32 8 18Z" fill="url(#petalPink)" opacity=".45"/>
+    <path class="petal p3" d="M56 18 C44 22 36 30 34 42 C48 42 56 32 56 18Z" fill="url(#petalPink)" opacity=".45"/>
+    <path class="petal p4" d="M16 44 C24 36 30 34 32 44 C26 52 20 52 16 44Z" fill="url(#petalPink)" opacity=".55"/>
+    <path class="petal p5" d="M48 44 C40 36 34 34 32 44 C38 52 44 52 48 44Z" fill="url(#petalPink)" opacity=".55"/>
+    <path d="M32 16 C26 24 24 32 32 38 C40 32 38 24 32 16Z" fill="#ffb8a8" opacity=".8"/>
+    <circle cx="32" cy="34" r="5" fill="url(#petalGold)"/>
+    <circle cx="32" cy="34" r="2.5" fill="#fff" opacity=".5"/>
+    <circle cx="29" cy="32" r="1" fill="#fff" opacity=".7"/>
+    <circle cx="35" cy="33" r="1" fill="#fff" opacity=".7"/>
+    <path d="M22 46 Q32 56 42 46" stroke="#7fb069" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <svg class="marker marker-meeting" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="micBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#e0e0e0"/><stop offset="50%" stop-color="#9e9e9e"/><stop offset="100%" stop-color="#616161"/>
+      </linearGradient>
+      <linearGradient id="micGrill" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb366"/><stop offset="100%" stop-color="#e8762a"/>
+      </linearGradient>
+      <filter id="glowRed"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect x="24" y="8" width="16" height="26" rx="8" fill="url(#micBody)"/>
+    <rect x="24" y="8" width="16" height="26" rx="8" fill="url(#micGrill)" opacity=".6"/>
+    <line x1="28" y1="10" x2="28" y2="32" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <line x1="32" y1="10" x2="32" y2="32" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <line x1="36" y1="10" x2="36" y2="32" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <line x1="26" y1="14" x2="38" y2="14" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <line x1="26" y1="20" x2="38" y2="20" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <line x1="26" y1="26" x2="38" y2="26" stroke="#fff" stroke-width="1" opacity=".25"/>
+    <circle cx="32" cy="6" r="2" fill="#ff9933" filter="url(#glowRed)"/>
+    <path d="M20 28 C20 38 26 44 32 44 C38 44 44 38 44 28" stroke="url(#micBody)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="30" y="44" width="4" height="10" rx="1" fill="url(#micBody)"/>
+    <rect x="24" y="54" width="16" height="3" rx="1.5" fill="url(#micBody)"/>
+    <path class="wave w1" d="M48 18 C54 24 54 34 48 40" stroke="#ffb366" stroke-width="2.5" fill="none" stroke-linecap="round" filter="url(#glowRed)"/>
+    <path class="wave w2" d="M54 14 C62 22 62 36 54 44" stroke="#ffb366" stroke-width="2.5" fill="none" stroke-linecap="round" filter="url(#glowRed)"/>
+    <path class="wave w3" d="M16 18 C10 24 10 34 16 40" stroke="#ffb366" stroke-width="2.5" fill="none" stroke-linecap="round" filter="url(#glowRed)"/>
+  </svg>
+</div>
+    </div>
+    <div class="player-panel" style="position:relative;z-index:1;background:rgba(255,252,245,0.92);border-radius:12px;padding:20px;box-shadow:0 8px 32px rgba(100,60,20,0.15);">
+      <div class="scene-title" id="sceneTitle"></div>
+      <div class="scene-desc" id="sceneDesc"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="player-area" id="playerArea">
+        <video id="videoPlayer" style="display:none;" controls playsinline></video>
+        <div class="overlay" id="overlay"></div>
+      </div>
+      <div class="player-controls">
+        <button class="ctrl-btn" id="prevBtn">&#9668; 上一段</button>
+        <button class="ctrl-btn ctrl-speed" id="speedBtn">1x</button>
+        <button class="ctrl-btn" id="nextBtn">下一段 &#9658;</button>
+      </div>
+    </div>
+  </div>
+  <div class="summary-screen" id="summaryScreen">
+    <h2>案例完成</h2>
+    <p style="color:#a08060;line-height:1.8;max-width:600px;margin:0 auto 32px;">五个场景讲完了。严经理从困惑走向理解——跨文化沟通没有标准答案，但每一次选择背后，都是对另一种文化的理解与尊重。</p>
+    <div style="text-align:left;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <div style="font-size:14px;color:#c0a888;margin-bottom:6px;">1. 五个场景中，哪个文化差异最出乎你意料？为什么？</div>
+        <textarea style="width:100%;height:50px;background:#2c2010;color:#e8d8c0;border:1px solid #5a4a3a;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#c0a888;margin-bottom:6px;">2. 如果你是严经理，重来一次，哪个场景的做法你会调整？怎么调？</div>
+        <textarea style="width:100%;height:50px;background:#2c2010;color:#e8d8c0;border:1px solid #5a4a3a;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#c0a888;margin-bottom:6px;">3. 跨文化沟通中，"入乡随俗"和"坚持自己的方式"，边界在哪？</div>
+        <textarea style="width:100%;height:50px;background:#2c2010;color:#e8d8c0;border:1px solid #5a4a3a;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+    </div>
+    <button class="btn" style="margin-top:24px;" onclick="alert('感谢完成！你的思考已记录，课堂上老师会组织分享讨论。')">完成案例</button>
+  </div>
+</div>
+<script>
+const scenes = [
+  { id:'s1', name:'波士顿·接机之惑', title:'场景一：波士顿 · 接机之惑', desc:'Daniel不接机，只叫了一辆Uber。',
+    intro:[
+      {type:'imageaudio',image:'T-company/s1-boston/s1_scene1.jpg',audio:'T-company/s1-boston/s1_shot1_voice.wav',motion:'zoom-in'},
+      {type:'imageaudio',image:'T-company/s1-boston/s1_scene2.jpg',audio:'T-company/s1-boston/s1_shot2_voice.wav',motion:'pan-left'},
+      {type:'imageaudio',image:'T-company/s1-boston/s1_scene2.jpg',audio:'T-company/s1-boston/s1_shot3_voice.wav',motion:'zoom-out'}
+    ],
+    choices:[
+      {key:'A',label:'当晚约Daniel见面，把礼盒当面送出表接风之意',outcome:'fail',path:[
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene2.jpg',audio:'T-company/s1-boston/s1a_1_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene3.jpg',audio:'T-company/s1-boston/s1a_2_voice.wav',motion:'pan-right'},
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene3.jpg',audio:'T-company/s1-boston/s1a_3_voice.wav',motion:'zoom-out'}
+      ]},
+      {key:'B',label:'收起礼盒，发邮件致谢并确认次日工作安排',outcome:'success',path:[
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene2.jpg',audio:'T-company/s1-boston/s1b_1_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene3.jpg',audio:'T-company/s1-boston/s1b_2_voice.wav',motion:'pan-left'},
+        {type:'imageaudio',image:'T-company/s1-boston/s1_scene3.jpg',audio:'T-company/s1-boston/s1b_3_voice.wav',motion:'zoom-out'}
+      ]}
+    ],
+    reflect:{type:'checkbox',question:'在美国商务接待中，Daniel不接机只叫Uber，最合适的理解是？（多选）',options:['美方觉得合作不重要，随便应付','高效务实是常态，接待从简不等于不重视','出差是自己的事，本来就不需要公司出面接待','其他（在讨论中补充）'],correct:[1,2],explanation:'美国商务文化讲究效率与公私分明，接待从简是常态，不代表不重视合作。把时间和精力留给真正的工作，恰恰是这里表达尊重的方式。期待"接风宴"式的热情接待，是中国式人情社会的习惯，不是放之四海皆准的规则。'}
+  },
+  { id:'s2', name:'波士顿·办公室规则', title:'场景二：波士顿 · 办公室规则', desc:'员工敢跟领导讨价还价，午休却不谈工作。',
+    intro:[
+      {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2_shot1_voice.wav',motion:'zoom-in'},
+      {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2_shot2_voice.wav',motion:'pan-right'},
+      {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2_shot3_voice.wav',motion:'zoom-out'},
+      {type:'imageaudio',image:'T-company/s2-office/s2_scene2.jpg',audio:'T-company/s2-office/s2_shot4_voice.wav',motion:'zoom-in'}
+    ],
+    choices:[
+      {key:'A',label:'找机会委婉提醒John"员工这样挑战不妥"',outcome:'fail',path:[
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2a_1_voice.wav',motion:'pan-left'},
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2a_2_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene1.jpg',audio:'T-company/s2-office/s2a_3_voice.wav',motion:'zoom-out'}
+      ]},
+      {key:'B',label:'向当地同事请教理解，把疑问留到工作时间',outcome:'success',path:[
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene3.jpg',audio:'T-company/s2-office/s2b_1_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene3.jpg',audio:'T-company/s2-office/s2b_2_voice.wav',motion:'pan-left'},
+        {type:'imageaudio',image:'T-company/s2-office/s2_scene3.jpg',audio:'T-company/s2-office/s2b_3_voice.wav',motion:'zoom-out'}
+      ]}
+    ],
+    reflect:{type:'checkbox',question:'美国员工向领导"据理力争"、John最终接受，以及午休不谈工作，反映的是？（多选）',options:['员工不服从管理，公司缺乏权威','平等沟通，言之有理即被采纳','公私分明，尊重个人时间','其他（在讨论中补充）'],correct:[1,2],explanation:'美国职场文化强调对事不对人的平等沟通——员工可以有理有据地表达异议，领导采纳的是建议而不是"屈服"；同时公私分明，非工作时间不谈工作是心照不宣的规则。这两点合起来，才是"员工据理力争"和"午休拒绝谈工作"的完整逻辑。'}
+  },
+  { id:'s3', name:'阿米尔·开门见山', title:'场景三：阿米尔 · 开门见山', desc:'一见面就问收入，帮忙后要求写夸张感谢信。',
+    intro:[
+      {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene1.jpg',audio:'T-company/s3-amir-direct/s3_shot1_voice.wav',motion:'zoom-in'},
+      {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene1.jpg',audio:'T-company/s3-amir-direct/s3_shot2_voice.wav',motion:'pan-right'},
+      {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene2.jpg',audio:'T-company/s3-amir-direct/s3_shot3_voice.wav',motion:'zoom-in'}
+    ],
+    choices:[
+      {key:'A',label:'按阿米尔要求配合，把感谢信功劳写足',outcome:'success',path:[
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene2.jpg',audio:'T-company/s3-amir-direct/s3a_1_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene3.jpg',audio:'T-company/s3-amir-direct/s3a_2_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene3.jpg',audio:'T-company/s3-amir-direct/s3a_3_voice.wav',motion:'pan-left'}
+      ]},
+      {key:'B',label:'委婉建议"还是如实写比较好"',outcome:'fail',path:[
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene2.jpg',audio:'T-company/s3-amir-direct/s3b_1_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene3.jpg',audio:'T-company/s3-amir-direct/s3b_2_voice.wav',motion:'pan-right'},
+        {type:'imageaudio',image:'T-company/s3-amir-direct/s3_scene3.jpg',audio:'T-company/s3-amir-direct/s3b_3_voice.wav',motion:'zoom-out'}
+      ]}
+    ],
+    reflect:{type:'checkbox',question:'阿米尔一见面就问收入、帮忙后要求写夸张感谢信并抄送全组，反映印度式沟通的特点是？（多选）',options:['说话直接，不绕弯子','重视自我展示和获得认可','爱炫耀，不务实','其他（在讨论中补充）'],correct:[0,1],explanation:'印度式沟通的两个显著特点：一是直接坦诚，问收入这类私人问题在印度同事看来并不冒犯；二是重视自我展示与获得认可，夸张感谢信不是吹牛，而是大方呈现自己价值、争取合理认可的表达方式。用"炫耀""不务实"去理解，恰恰是文化误读。'}
+  },
+  { id:'s4', name:'阿米尔·例会表现', title:'场景四：阿米尔 · 例会表现', desc:'六成进展讲出九成效果，会后主动要认可。',
+    intro:[
+      {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene1.jpg',audio:'T-company/s4-amir-direct/s4_shot1_voice.wav',motion:'zoom-in'},
+      {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene1.jpg',audio:'T-company/s4-amir-direct/s4_shot2_voice.wav',motion:'pan-right'},
+      {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene1.jpg',audio:'T-company/s4-amir-direct/s4_shot3_voice.wav',motion:'zoom-out'},
+      {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene2.jpg',audio:'T-company/s4-amir-direct/s4_shot4_voice.wav',motion:'zoom-in'}
+    ],
+    choices:[
+      {key:'A',label:'回一个肯定的表情，认可他的表现',outcome:'success',path:[
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene2.jpg',audio:'T-company/s4-amir-direct/s4a_1_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene3.jpg',audio:'T-company/s4-amir-direct/s4a_2_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene3.jpg',audio:'T-company/s4-amir-direct/s4a_3_voice.wav',motion:'pan-left'}
+      ]},
+      {key:'B',label:'委婉提醒"数据和实际进展有出入"',outcome:'fail',path:[
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene2.jpg',audio:'T-company/s4-amir-direct/s4b_1_voice.wav',motion:'pan-right'},
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene2.jpg',audio:'T-company/s4-amir-direct/s4b_2_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s4-amir-direct/s4_scene3.jpg',audio:'T-company/s4-amir-direct/s4b_3_voice.wav',motion:'zoom-out'}
+      ]}
+    ],
+    reflect:{type:'checkbox',question:'阿米尔例会把六成进展讲出九成效果、会后主动要认可，你如何看待？（多选）',options:['夸大事实，不诚实','印度式表达习惯——充分展示成果、主动寻求认可','汇报的本质是沟通成果，不是数据审计','其他（在讨论中补充）'],correct:[1,2],explanation:'阿米尔的汇报风格是印度式沟通的延续：把成果讲足、把问题讲轻，是"展示价值、争取认可"的表达习惯；而汇报作为沟通行为，重点在于让团队看到进展与价值，而非逐项审计数据。用"不诚实"来定性，是从中国式低调严谨的视角出发的文化误读。'}
+  },
+  { id:'s5', name:'大会·谁先开口', title:'场景五：大会 · 谁先开口', desc:'美国人踊跃吐槽，亚洲人集体沉默。',
+    intro:[
+      {type:'imageaudio',image:'T-company/s5-conference/s5_scene1.jpg',audio:'T-company/s5-conference/s5_shot1_voice.wav',motion:'zoom-in'},
+      {type:'imageaudio',image:'T-company/s5-conference/s5_scene1.jpg',audio:'T-company/s5-conference/s5_shot2_voice.wav',motion:'pan-right'},
+      {type:'imageaudio',image:'T-company/s5-conference/s5_scene1.jpg',audio:'T-company/s5-conference/s5_shot3_voice.wav',motion:'zoom-out'},
+      {type:'imageaudio',image:'T-company/s5-conference/s5_scene2.jpg',audio:'T-company/s5-conference/s5_shot4_voice.wav',motion:'zoom-in'}
+    ],
+    choices:[
+      {key:'A',label:'像美国同事一样当场举手提问',outcome:'neutral',path:[
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene2.jpg',audio:'T-company/s5-conference/s5a_1_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene3.jpg',audio:'T-company/s5-conference/s5a_2_voice.wav',motion:'zoom-in'},
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene3.jpg',audio:'T-company/s5-conference/s5a_3_voice.wav',motion:'pan-left'}
+      ]},
+      {key:'B',label:'保持沉默，会后私下请教',outcome:'neutral',path:[
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene2.jpg',audio:'T-company/s5-conference/s5b_1_voice.wav',motion:'zoom-out'},
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene3.jpg',audio:'T-company/s5-conference/s5b_2_voice.wav',motion:'pan-right'},
+        {type:'imageaudio',image:'T-company/s5-conference/s5_scene3.jpg',audio:'T-company/s5-conference/s5b_3_voice.wav',motion:'zoom-out'}
+      ]}
+    ],
+    reflect:{type:'discussion',question:'同一场会议，美国人踊跃吐槽、亚洲人集体缄默、王工请示后发言，三种表现的差异根源是什么？请和搭档讨论后记下你的立场。'}
+  }
+];
+const subtitleMap = {
+  'T-company/s1-boston/s1_shot1_voice.wav': '从北京飞往波士顿的航班上，严经理望着窗外，心情激动。这是他入职T公司以来第一次海外出差，目的地是美国总部，要见的是项目经理Daniel——一个在电话和视频里合作了半年的老搭档。',
+  'T-company/s1-boston/s1_shot2_voice.wav': '飞机落地前，严经理让下属刘工把礼盒拿出来，准备一见面就送给Daniel。然而飞机刚落地，收到的却是Daniel的一条信息：严先生您好，已经为您叫了一辆Uber在机场出口等候，请您查收。',
+  'T-company/s1-boston/s1_shot3_voice.wav': '严经理愣住了。没有接机，没有接风宴，连人影都没见到。他只好让刘工把礼盒收起来，坐上Uber直奔酒店。望着窗外的波士顿街景，他忍不住在心里嘀咕：入乡随俗，看来要慢慢适应。',
+  'T-company/s1-boston/s1a_1_voice.wav': '到了酒店，严经理越想越觉得少了点什么。他拨通Daniel的电话，热情地说：晚上有空吗？我带了点家乡特产，想当面送给你。电话那头沉默了一下：今晚我有安排了，明天办公室见吧。',
+  'T-company/s1-boston/s1a_2_voice.wav': '第二天办公室见面，Daniel客气而疏远，寒暄两句就直奔工作。严经理把礼盒递过去，Daniel道了谢，随手放在桌上，没有再提起。',
+  'T-company/s1-boston/s1a_3_voice.wav': '一周后，严经理发现那个礼盒还放在Daniel的办公桌角落，原封未动。他有些失落：这份心意，好像没送到点上。',
+  'T-company/s1-boston/s1b_1_voice.wav': '严经理把礼盒收进箱子，给Daniel回了一封邮件：感谢您安排的接机，我已顺利到达酒店，期待明天的见面。Daniel很快回复：欢迎！明天上午十点，会议室见。',
+  'T-company/s1-boston/s1b_2_voice.wav': '第二天见面，Daniel主动迎上来握手：严，终于见面了！两人从项目聊到彼此，整整聊了一个下午。',
+  'T-company/s1-boston/s1b_3_voice.wav': '离开时Daniel说：需要什么，随时找我。严经理忽然明白：简洁的接待不是冷淡，把时间留给真正的工作，就是这里表达尊重的方式。',
+  'T-company/s2-office/s2_shot1_voice.wav': '到总部第三天，严经理还在熟悉环境，隔壁会议室里却传来一阵激烈的讨论。大客户突然催单，要求十二天内交货，比预期提前了五天。产线经理John提出让员工加班赶工，取消近两周的周末。',
+  'T-company/s2-office/s2_shot2_voice.wav': '产线员工们愁容满面，派了代表走进会议室。代表打开PPT，一条条列举无法按时完成的原因：根据职责规定，我们已经完成了该做的工作；赶工对产品、机器、人力，都不是最佳决定。',
+  'T-company/s2-office/s2_shot3_voice.wav': '严经理本以为员工会被驳回，结果出乎意料——John同意了员工的说法，不要求加班，改成增加生产线、提高效率。严经理不敢相信：在国内，几乎没有人敢和领导这样讨价还价。',
+  'T-company/s2-office/s2_shot4_voice.wav': '同事告诉他：这里的领导很开明，觉得不妥可以直接沟通，言之有理就会被采纳。严经理决定找John聊聊，约在午休时间。John平淡地接受了，却一路只谈天气不谈工作，严经理吃了闭门羹。他后来才懂：非工作时间不谈工作，是这里心照不宣的规则。',
+  'T-company/s2-office/s2a_1_voice.wav': '严经理找了个机会，委婉地对John说：员工这样直接和领导争论，会不会影响管理权威？',
+  'T-company/s2-office/s2a_2_voice.wav': 'John有些意外：为什么会影响？他们说的是事实，我采纳的是合理的建议。严经理张了张嘴，发现自己把国内的管理逻辑带到了这里。',
+  'T-company/s2-office/s2a_3_voice.wav': '那天之后，John对严经理依然客气，却少了几分自然的亲近。严经理意识到：在这里，提醒别人维护权威，反而显得自己不懂规矩。',
+  'T-company/s2-office/s2b_1_voice.wav': '严经理没有急着发表看法。午休过后，他找了一位在当地工作多年的中国同事，问：员工这样和领导争，真的没问题吗？',
+  'T-company/s2-office/s2b_2_voice.wav': '同事笑了：这里讲究对事不对人。员工言之有理，领导就会采纳；领导也希望大家及时反馈问题，这不算冒犯。',
+  'T-company/s2-office/s2b_3_voice.wav': '第二天下午，严经理约John在办公室正式请教上午的事，John详细解释了决策的考量。严经理发现：把问题留在工作时间，用对事不对人的方式沟通，反而聊得最透彻。',
+  'T-company/s3-amir-direct/s3_shot1_voice.wav': '到总部一周后，印度同事阿米尔也来汇合。阿米尔是项目组的软件负责人，见面第一句话就让严经理措手不及：严，你年薪多少？',
+  'T-company/s3-amir-direct/s3_shot2_voice.wav': '严经理愣了几秒。才认识几分钟，就问收入？他含糊带过，心里直犯嘀咕：印度人交流，都这么直接吗？',
+  'T-company/s3-amir-direct/s3_shot3_voice.wav': '后来严经理的访问权限受限，找阿米尔帮忙。阿米尔爽快解决，还告诉他几个常用网站。严经理正要道谢，阿米尔却提了个请求：麻烦你把这件事写成一封感谢信，发给我老板，抄送全组同事。',
+  'T-company/s3-amir-direct/s3a_1_voice.wav': '严经理虽然觉得匪夷所思，还是照做了。阿米尔又拿来修改，把措辞改得格外夸张：问题不解决将无法正常办公；这是非常复杂难办的问题；阿米尔花费巨大功夫，耐心手把手指导。',
+  'T-company/s3-amir-direct/s3a_2_voice.wav': '严经理看着满屏的溢美之词，硬着头皮发了出去。阿米尔非常高兴，拍着他的肩膀：严，你是个真诚的朋友！',
+  'T-company/s3-amir-direct/s3a_3_voice.wav': '此后阿米尔在项目上格外主动，帮严经理解决了不少难题。严经理慢慢明白：在印度同事的文化里，充分表达感谢、大方展示自己的价值，不是吹嘘，而是正常而真诚的交流方式。',
+  'T-company/s3-amir-direct/s3b_1_voice.wav': '严经理委婉地说：阿米尔，感谢是真的，不过措辞是不是太夸张了？还是如实写比较好吧？',
+  'T-company/s3-amir-direct/s3b_2_voice.wav': '阿米尔脸上的笑容淡了：严，我花了很多时间帮你，这份功劳应该被看到。他不再坚持，语气却明显冷淡了。',
+  'T-company/s3-amir-direct/s3b_3_voice.wav': '那之后，阿米尔对严经理依然客气，却少了最初的热情。严经理后来才懂：在印度同事的文化里，主动展示价值、争取认可，是工作能力的一部分。他那句"低调"的建议，反而让对方觉得不被尊重。',
+  'T-company/s4-amir-direct/s4_shot1_voice.wav': '项目例会上，轮到阿米尔汇报。严经理暗暗替他捏了把汗——上会前两人刚为一个棘手的技术问题发愁，严经理担心他要挨批评。',
+  'T-company/s4-amir-direct/s4_shot2_voice.wav': '结果阿米尔一开口，全场就安静了。数十页PPT，大量的数据和图纸，他声情并茂像讲故事一样，把成果讲得清清楚楚，还提出了几个创新设想。至于那个棘手的问题，他只简单带过。',
+  'T-company/s4-amir-direct/s4_shot3_voice.wav': '严经理心里清楚：阿米尔负责的进展实际只做到六成，台上却讲出了九成。Daniel问他软件组的数据表格，他明明没听清，也先一口应下：有。会后悄悄发信息问严经理：刚刚问了什么表格？',
+  'T-company/s4-amir-direct/s4_shot4_voice.wav': '会后，阿米尔发来一条信息：难题总算过去了，你看我发挥得是不是还不错？后面跟了一个得意的表情。严经理握着手机，一时不知怎么回复。',
+  'T-company/s4-amir-direct/s4a_1_voice.wav': '严经理想了想，回了一个肯定的表情。阿米尔秒回一连串笑脸，看得出是真的开心。',
+  'T-company/s4-amir-direct/s4a_2_voice.wav': '第二天，阿米尔主动和严经理讨论起那个棘手问题，两人一起梳理出了新思路。他说：严，你懂我！',
+  'T-company/s4-amir-direct/s4a_3_voice.wav': '严经理慢慢理解了：印度同事把自我展示和寻求认可当作正常表达，肯定对方的价值，就是最好的合作基础。',
+  'T-company/s4-amir-direct/s4b_1_voice.wav': '严经理斟酌着回复：阿米尔，讲得确实精彩。不过有几处数据和实际进展，会不会有点出入？',
+  'T-company/s4-amir-direct/s4b_2_voice.wav': '消息发出去，阿米尔很久没有回复。第二天见面，他依然笑着打招呼，那份热络却明显收了回去。',
+  'T-company/s4-amir-direct/s4b_3_voice.wav': '后来严经理听说，阿米尔在别的场合评价他：严是个好人，就是太较真。严经理苦笑：他不过是想得到一句认可，我却给了他一堂数据课。',
+  'T-company/s5-conference/s5_shot1_voice.wav': '一个半月后，公司年度总结大会召开。严经理受邀参加诊断类业务专场，各国技术骨干齐聚一堂，还有同事通过线上方式同步参会。',
+  'T-company/s5-conference/s5_shot2_voice.wav': '问答环节，美国同事率先开火：前段时间设备底座零部件出现质量问题，安装环节也没注意，维修团队要一台一台检查，浪费了大量人力！另一位美国同事立刻附和：我们这边安装流程也有大问题！',
+  'T-company/s5-conference/s5_shot3_voice.wav': '严经理听得目瞪口呆：这样大胆的话，也能在大会上直接说？技术专家们却认真回应，一一给出建议。主持人转向亚洲区：亚洲市场这边，有什么需要说的吗？',
+  'T-company/s5-conference/s5_shot4_voice.wav': '会场瞬间安静。包括严经理在内，没有一位亚洲同事开口。片刻后，线上公屏出现一条留言：请问我可以进行分享吗？——是中国同事王工。一位美国同事用略带不耐烦的语气说：不用拘谨，请直接讲吧！',
+  'T-company/s5-conference/s5a_1_voice.wav': '严经理深吸一口气，举起了手。他用英语把自己的问题说清楚：S城维保的数字化转型，设备智能诊断的数据来源怎么设计？',
+  'T-company/s5-conference/s5a_2_voice.wav': '专家认真听完，现场给出了思路，还夸他问题提得好。散会后，几位美国同事主动过来和他交换名片：你讲得很清楚！',
+  'T-company/s5-conference/s5a_3_voice.wav': '严经理感到一种从未有过的参与感。他的问题被专家当场解答，散会后还有两位美国同事主动过来交换名片。他意识到，在这个环境里，提问本身就是一种贡献——你不是在添麻烦，而是在推动对话。',
+  'T-company/s5-conference/s5b_1_voice.wav': '严经理没有开口。他把想问的问题记在笔记本上，会后找到技术专家，私下请教了维保数字化转型的细节。',
+  'T-company/s5-conference/s5b_2_voice.wav': '专家很耐心：这个问题很有价值，刚才会上怎么不问？严经理笑了笑：我更习惯会后这样交流。',
+  'T-company/s5-conference/s5b_3_voice.wav': '回到酒店，严经理把专家的建议整理成笔记。私下交流确实从容，问题也聊得更透。但他也意识到，刚才在会上沉默的那几分钟，错过了让整个团队认识自己的机会。两种方式没有对错，只是他开始思考：下次，能不能既从容，又勇敢地举起手？'
+};
+let currentScene=0, watchedPaths=[], pathIdx=0, playGen=0;
+let overlay=document.getElementById('overlay'), vid=document.getElementById('videoPlayer');
+let unlockedScenes = 1;
+let playbackRate = 1;
+const speeds = [0.5, 0.75, 1, 1.5, 2];
+let speedIdx = 2;
+// 倒计时
+let countdownSec = 10;
+const cdTotal = 10;
+const cdTimer = setInterval(() => {
+  countdownSec--;
+  document.getElementById('countdown').textContent = countdownSec;
+  const pct = Math.max(0, countdownSec / cdTotal);
+  const circumference = 2 * Math.PI * 23;
+  document.getElementById('cdProgress').setAttribute('stroke-dashoffset', circumference * (1 - pct));
+  if (countdownSec <= 0) {
+    clearInterval(cdTimer);
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('startBtn').style.opacity = '1';
+    document.getElementById('startBtn').style.cursor = 'pointer';
+    document.getElementById('startBtn').classList.add('btn-ready');
+    document.getElementById('countdown').textContent = 'GO';
+  }
+}, 1000);
+
+function startGame(){document.getElementById('sceneBg').style.display='block';document.getElementById('startBg').style.display='none';{document.getElementById('startScreen').style.display='none';document.getElementById('mainLayout').style.display='grid';var allAudios=[];scenes.forEach(function(s){s.intro.forEach(function(seg){if(seg.audio)allAudios.push(seg.audio);});s.choices.forEach(function(c){c.path.forEach(function(seg){if(seg.audio)allAudios.push(seg.audio);});});});var unlocker=new Audio(allAudios[0]);unlocker.play().then(function(){unlocker.pause();unlocker.currentTime=0;});buildNav();loadScene(0);}}
+function updateMarker(){
+  const shelf = document.getElementById("markerShelf");
+  const watermark = document.getElementById("markerWatermark");
+  if(!shelf) return;
+  const sceneId = scenes[currentScene].id;
+  let type = "boston";
+  if(sceneId === "s3" || sceneId === "s4") type = "india";
+  else if(sceneId === "s5") type = "meeting";
+  shelf.querySelectorAll(".marker").forEach(el=>{ el.classList.remove("show"); });
+  const target = shelf.querySelector(".marker-" + type);
+  if(target){ void target.offsetWidth; target.classList.add("show"); }
+  if(watermark && target){
+    const clone = target.cloneNode(true);
+    clone.classList.remove("show");
+    watermark.innerHTML = "";
+    watermark.appendChild(clone);
+  }
+}
+function buildNav(){const nav=document.getElementById('sceneNav');nav.innerHTML='';scenes.forEach((s,i)=>{const d=document.createElement('div');d.className='scene-nav-item'+(i===currentScene?' active':'');if(i<unlockedScenes){d.textContent=(i+1)+'. '+s.name;d.onclick=()=>loadScene(i);}else{d.textContent='🔒 '+(i+1)+'. '+s.name;d.style.opacity='0.4';d.style.cursor='not-allowed';}nav.appendChild(d);});updateMarker();}
+function loadScene(idx){if(currentAudioRef){try{currentAudioRef.pause();currentAudioRef=null;}catch(e){}}currentScene=idx;watchedPaths=[];buildNav();const s=scenes[idx];const bg=document.getElementById('sceneBg');if(idx<=1){bg.style.backgroundImage='url(T-company/素材/波士顿.jpg)';}else if(idx<=3){bg.style.backgroundImage='url(T-company/素材/印度.jpg)';}else{bg.style.backgroundImage='url(T-company/素材/会场.jpg)';}document.getElementById('sceneTitle').textContent=s.title;document.getElementById('sceneDesc').textContent=s.desc;overlay.classList.remove('show');overlay.innerHTML='';playSegments(s.intro,()=>{setTimeout(()=>showChoiceOverlay(null),500);},0,true);}
+function typewriter(el,text,speed,done){el.innerHTML='';let i=0;function tick(){if(i<text.length){el.innerHTML=text.substring(0,i+1)+'<span class="typewriter-cursor"></span>';i++;setTimeout(tick,speed);}else{el.innerHTML=text;if(done)done();}}tick();}
+function showChoiceOverlay(chosenKey){const s=scenes[currentScene];overlay.innerHTML='';overlay.classList.add('show');const title=document.createElement('div');title.className='typewriter-text';overlay.appendChild(title);const btnWrap=document.createElement('div');btnWrap.style.cssText='display:flex;flex-direction:column;align-items:center;width:100%;';overlay.appendChild(btnWrap);
+if(chosenKey===null){typewriter(title,'严经理接下来会选择哪种做法？',60);s.choices.forEach((c,i)=>{setTimeout(()=>{const btn=document.createElement('button');btn.className='choice-3d choice-neutral';btn.textContent='做法'+(i+1)+'：'+c.label;btn.onclick=()=>choosePath(c.key);btnWrap.appendChild(btn);},1200+i*300);});}
+else{const chosen=s.choices.find(c=>c.key===chosenKey);const other=s.choices.find(c=>c.key!==chosenKey);let msg=chosen.outcome==='fail'?'这个做法带来了一些问题。我们再看看另一种做法会有什么结果。':'这个做法让事情更顺利了。让我们再看看另一种做法会怎样。';typewriter(title,msg,50,()=>{const btn=document.createElement('button');btn.className='choice-3d '+(other.outcome==='success'?'choice-success':(other.outcome==='neutral'?'choice-neutral':'choice-fail'));btn.textContent=other.label;btn.onclick=()=>choosePath(other.key);btnWrap.appendChild(btn);});}}
+function choosePath(key){overlay.classList.remove('show');overlay.innerHTML='';const s=scenes[currentScene];const c=s.choices.find(x=>x.key===key);playSegments(c.path,()=>{setTimeout(()=>{watchedPaths.push(key);if(watchedPaths.length<2){showChoiceOverlay(key);}else{showReflectOverlay();}},500);});}
+function showReflectOverlay(){
+  const s=scenes[currentScene];
+  overlay.innerHTML='';
+  overlay.classList.add('show');
+  const title=document.createElement('div');
+  title.className='typewriter-text';
+  overlay.appendChild(title);
+  const card=document.createElement('div');
+  card.className='reflect-card';
+  let html='<h3>场景反思</h3><div class="reflect-q"><strong>'+s.reflect.question+'</strong><br><br>';
+  if(s.reflect.type==='checkbox'){
+    s.reflect.options.forEach((opt,i)=>{
+      html+='<label><input type="checkbox" name="r'+i+'" value="'+i+'">'+opt+'</label>';
+    });
+    html+='</div><button class="choice-3d choice-neutral" style="margin-top:16px;" onclick="submitReflect(this)">提交答案</button>';
+  }else{
+    html+='<label style="color:#b8763a;">💬 讨论模式：请和搭档讨论后记下你的立场，系统不强制作答。</label>';
+    html+='</div><button class="choice-3d choice-neutral" style="margin-top:16px;" onclick="nextScene()">'+(currentScene===scenes.length-1?'查看总体反思':'进入下一场景')+'</button>';
+  }
+  card.innerHTML=html;
+  overlay.appendChild(card);
+  typewriter(title,'两种做法都看完了，你怎么看？',50);
+}
+function submitReflect(btn){
+  const s=scenes[currentScene];
+  const checked=[];
+  document.querySelectorAll('.reflect-q input[type=checkbox]:checked').forEach(cb=>checked.push(parseInt(cb.value)));
+  const correct=s.reflect.correct||[];
+  const isRight=checked.length===correct.length&&checked.every(v=>correct.includes(v));
+  const card=btn.parentElement;
+  let feedback='';
+  if(isRight){
+    feedback='<div style="margin-top:16px;padding:14px;background:rgba(212,160,74,0.15);border-radius:10px;border-left:4px solid #d4a04a;"><strong style="color:#b88030;">✓ 理解正确</strong><br><br><span style="font-size:14px;line-height:1.7;color:#c0a888;">'+s.reflect.explanation+'</span></div>';
+  }else{
+    feedback='<div style="margin-top:16px;padding:14px;background:rgba(250,84,28,0.15);border-radius:10px;border-left:4px solid #fa541c;"><strong style="color:#fa541c;">✗ 再想想</strong><br><br><span style="font-size:14px;line-height:1.7;color:#c0a888;">正确答案是第'+(correct.map(i=>i+1).join('、'))+'项。'+s.reflect.explanation+'</span></div>';
+  }
+  feedback+='<button class="choice-3d choice-neutral" style="margin-top:14px;" onclick="saveScreenshot()">📸 截图并下载学习记录</button>';
+  feedback+='<button class="choice-3d choice-success" style="margin-top:14px;" onclick="nextScene()">'+(currentScene===scenes.length-1?'查看总体反思':'进入下一场景')+'</button>';
+  btn.style.display='none';
+  card.insertAdjacentHTML('beforeend',feedback);
+}
+function saveScreenshot(){
+  const overlay=document.getElementById('overlay');
+  html2canvas(overlay,{backgroundColor:'#1e2a4a',scale:2}).then(canvas=>{
+    const link=document.createElement('a');
+    link.download='跨文化案例_学习记录_场景'+(currentScene+1)+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+function nextScene(){overlay.classList.remove('show');overlay.innerHTML='';if(currentScene<scenes.length-1){unlockedScenes=Math.max(unlockedScenes,currentScene+2);loadScene(currentScene+1);}else{document.getElementById('mainLayout').style.display='none';document.getElementById('summaryScreen').style.display='block';}}
+let currentSegs=null,currentDone=null,currentAudioRef=null;
+function playSegments(segs,done,startIdx,requireClick){
+  const gen=++playGen;
+  currentSegs=segs;
+  currentDone=done;
+  pathIdx=startIdx||0;
+  requireClick=requireClick||false;
+  const pa=document.getElementById('playerArea');
+  pa.querySelectorAll('img,.subtitle-bar,.player-progress,.play-pause-btn,.big-play-overlay').forEach(function(el){el.remove();});
+  function next(){
+    if(gen!==playGen)return;
+    if(pathIdx>=segs.length){done();return;}
+    const seg=segs[pathIdx];
+    vid.style.display='none';
+    const oldImg=pa.querySelector('img');
+    if(oldImg)oldImg.remove();
+    if(seg.type==='video'){
+      vid.src=seg.src;vid.style.display='block';
+      vid.onended=()=>{pathIdx++;next();};
+      vid.play().catch(()=>{});
+    }
+    else if(seg.type==='audio'){
+      const a=new Audio(seg.src);currentAudioRef=a;
+      a.playbackRate=playbackRate;
+      a.onended=()=>{pathIdx++;next();};
+      a.play().catch(()=>{});
+    }
+    else if(seg.type==='imageaudio'){
+      const img=document.createElement('img');
+      img.src=seg.image;
+      const motion=seg.motion||'zoom-in';
+      img.style.animation=motion+' 10s ease-out forwards';
+      pa.appendChild(img);
+      const a=new Audio(seg.audio);
+      currentAudioRef=a;
+      const subBar=document.createElement('div');
+      subBar.className='subtitle-bar';
+      pa.appendChild(subBar);
+      const progBar=document.createElement('div');
+      progBar.className='player-progress';
+      const progFill=document.createElement('div');
+      progFill.className='player-progress-fill';
+      progBar.appendChild(progFill);
+      pa.appendChild(progBar);
+      progBar.addEventListener('click',function(e){
+        var rect=progBar.getBoundingClientRect();
+        var pct=(e.clientX-rect.left)/rect.width;
+        if(a.duration)a.currentTime=pct*a.duration;
+      });
+      const subText=subtitleMap[seg.audio]||'';
+      a.addEventListener('timeupdate',function(){
+        if(a.duration){
+          var pct=a.currentTime/a.duration;
+          progFill.style.width=(pct*100)+'%';
+          var len=Math.floor(pct*subText.length);
+          subBar.textContent=subText.substring(0,len);
+        }
+      });
+      const ppBtn=document.createElement('button');
+      ppBtn.className='play-pause-btn';
+      let started=false;
+      function startPlay(){
+        if(started)return;
+        started=true;
+        a.playbackRate=playbackRate;
+        a.play().catch(()=>{});
+      }
+      ppBtn.textContent=(requireClick&&pathIdx===0)?'▶':'⏸';
+      if(!(requireClick&&pathIdx===0)){startPlay();}
+      ppBtn.onclick=()=>{
+        if(!started){startPlay();ppBtn.textContent='⏸';return;}
+        if(a.paused){a.play();ppBtn.textContent='⏸';}
+        else{a.pause();ppBtn.textContent='▶';}
+      };
+      pa.appendChild(ppBtn);
+      a.onended=()=>{
+        subBar.style.opacity='0';
+        setTimeout(function(){
+          ppBtn.remove();subBar.remove();progBar.remove();
+          pathIdx++;next();
+        },400);
+      };
+    }
+    else if(seg.type==='videoaudio'){
+      vid.src=seg.video;vid.style.display='block';
+      const a=new Audio(seg.audio);
+      currentAudioRef=a;
+      a.playbackRate=playbackRate;
+      vid.play();a.play();
+      a.onended=()=>{pathIdx++;next();};
+    }
+  }
+  next();
+}
+function seekSegment(delta){if(!currentSegs||!currentDone)return;if(currentAudioRef){try{currentAudioRef.pause();}catch(e){}}var newIdx=pathIdx+delta;if(newIdx<0)newIdx=0;if(newIdx>=currentSegs.length)newIdx=currentSegs.length-1;playSegments(currentSegs,currentDone,newIdx);}
+document.getElementById('speedBtn').onclick=function(){speedIdx=(speedIdx+1)%speeds.length;playbackRate=speeds[speedIdx];document.getElementById('speedBtn').textContent=playbackRate+'x';if(currentAudioRef)currentAudioRef.playbackRate=playbackRate;};
+document.getElementById('prevBtn').onclick=function(){seekSegment(-1);};
+document.getElementById('nextBtn').onclick=function(){seekSegment(1);};
+function toggleGuide(){const b=document.getElementById('guideBody');const a=document.getElementById('guideArrow');if(b.style.maxHeight&&b.style.maxHeight!=='0px'){b.style.maxHeight='0px';b.style.padding='0 18px';a.style.transform='rotate(0)';}else{b.style.maxHeight='200px';b.style.padding='12px 18px';a.style.transform='rotate(180deg)';}}
+function openLetter(){ document.getElementById('letterOverlay').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeLetter(){ document.getElementById('letterOverlay').classList.remove('show'); document.body.style.overflow=''; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLetter(); });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>

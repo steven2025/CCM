@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<base href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/pingfanglunyi/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平方轮椅出海记 · 跨文化沟通互动案例</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:#1a1a2e; color:#eee; min-height:100vh; }
+  .container { max-width:1200px; margin:0 auto; padding:20px; }
+  .start-screen { text-align:center; padding:80px 20px; }
+  .start-screen h1 { font-size:32px; margin-bottom:16px; color:#fff; }
+  .start-screen p { font-size:16px; color:#aaa; margin-bottom:32px; line-height:1.8; max-width:600px; margin-left:auto; margin-right:auto; }
+  .btn { display:inline-block; padding:14px 40px; background:#4a6cf7; color:#fff; border:none; border-radius:8px; font-size:16px; cursor:pointer; transition:all .2s; }
+  .btn:hover { background:#3a5ce5; transform:translateY(-1px); }
+  .main-layout { display:none; grid-template-columns:180px 1fr; gap:16px; min-height:80vh; }
+  .nav-panel { background:#16213e; border-radius:12px; padding:16px; }
+  .scene-nav-item { padding:10px 12px; margin-bottom:8px; border-radius:8px; cursor:pointer; font-size:13px; color:#aaa; transition:all .2s; }
+  .scene-nav-item.active { background:#4a6cf7; color:#fff; }
+  .player-panel { background:#0f0f23; border-radius:12px; padding:20px; display:flex; flex-direction:column; }
+  .scene-title { font-size:18px; color:#fff; margin-bottom:4px; }
+  .scene-desc { font-size:12px; color:#888; margin-bottom:12px; }
+  .progress-bar { height:3px; background:#333; border-radius:2px; margin-bottom:12px; overflow:hidden; }
+  .progress-fill { height:100%; background:#4a6cf7; transition:width .3s; }
+  .player-area { position:relative; flex:1; background:#000; border-radius:8px; min-height:480px; overflow:hidden; }
+  video, .player-area img { width:100%; height:100%; object-fit:cover; display:block; }
+  .overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); z-index:10; padding:24px; }
+  .overlay.show { display:flex; }
+  .typewriter-text { font-size:18px; line-height:1.8; text-align:center; color:#fff; margin-bottom:28px; max-width:680px; min-height:60px; }
+  .typewriter-cursor { display:inline-block; width:2px; height:1.1em; background:#4a6cf7; vertical-align:middle; animation:blink 0.8s infinite; }
+  @keyframes blink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+  .choice-3d { display:block; width:90%; max-width:520px; padding:18px 24px; margin:10px 0; border:none; border-radius:14px; font-size:16px; font-weight:600; color:#fff; cursor:pointer; text-align:center; transition:all .25s cubic-bezier(.2,.8,.3,1.2); position:relative; box-shadow:0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2); }
+  .choice-3d:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 12px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-3d:active { transform:translateY(0) scale(0.98); }
+  .choice-success { background:linear-gradient(135deg,#52c41a,#389e0d); }
+  .choice-success:hover { box-shadow:0 12px 30px rgba(82,196,26,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-fail { background:linear-gradient(135deg,#fa541c,#d4380d); }
+  .choice-fail:hover { box-shadow:0 12px 30px rgba(250,84,28,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .choice-neutral { background:linear-gradient(135deg,#4a6cf7,#2f4bd6); }
+  .choice-neutral:hover { box-shadow:0 12px 30px rgba(74,108,247,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .reflect-card { background:rgba(30,42,74,0.95); border-radius:14px; padding:24px; max-width:640px; width:90%; max-height:85%; overflow-y:auto; }
+  .reflect-card h3 { font-size:16px; margin-bottom:16px; color:#fff; }
+  .reflect-q { margin-bottom:14px; font-size:14px; line-height:1.6; color:#ccc; }
+  .reflect-q label { display:block; padding:8px 12px; margin:6px 0; background:rgba(255,255,255,0.05); border-radius:8px; cursor:pointer; transition:background .2s; }
+  .reflect-q label:hover { background:rgba(255,255,255,0.1); }
+  .reflect-q input { margin-right:8px; }
+  .summary-screen { display:none; text-align:center; padding:60px 20px; }
+  .summary-screen h2 { font-size:28px; margin-bottom:24px; color:#fff; }
+  @keyframes kb { from { transform:scale(1); } to { transform:scale(1.08); } }
+  .subtitle-bar { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); max-width:80%; padding:10px 20px; background:rgba(0,0,0,0.7); border-radius:8px; color:#fff; font-size:16px; line-height:1.6; text-align:center; z-index:4; pointer-events:none; }
+  .play-pause-btn { position:absolute; bottom:20px; right:20px; width:56px; height:56px; border-radius:50%; background:rgba(74,108,247,0.9); border:none; color:#fff; font-size:22px; cursor:pointer; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,0.3); transition:all .2s; }
+  .play-pause-btn:hover { background:#4a6cf7; transform:scale(1.08); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="start-screen" id="startScreen" style="padding:24px 20px;">
+    <div style="background:linear-gradient(90deg,rgba(74,108,247,0.15),rgba(74,108,247,0.05));border-left:3px solid #4a6cf7;padding:10px 16px;max-width:900px;margin:0 auto 16px;text-align:left;border-radius:0 8px 8px 0;">
+      <div style="font-size:12px;line-height:1.6;color:#8fb0ff;">案例原文：王颖晖、石玥莹、廖茂君（西北工业大学管理学院）、朱剑（常熟市平方轮椅有限公司）<br>互动案例改编：鄢清华 · 重庆工商大学</div>
+    </div>
+    <h1 style="font-size:24px;margin-bottom:4px;">平方轮椅出海记</h1>
+    <p style="font-size:13px;color:#888;margin-bottom:14px;">跨文化沟通互动教学案例</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:900px;margin:0 auto 12px;text-align:left;">
+      <div style="background:#16213e;padding:14px;border-radius:10px;">
+        <h3 style="font-size:13px;color:#4a6cf7;margin-bottom:6px;">📖 案例背景</h3>
+        <p style="font-size:12px;line-height:1.6;color:#ccc;">常熟市平方轮椅有限公司，2010年成立，全链条轮椅制造，年产3.6万辆，通过CE/FDA认证。朱剑带领公司从长三角走向世界，在莫斯科、法国、欧洲定价、东京、新加坡五个市场，遭遇五种完全不同的"做生意的方式"。</p>
+      </div>
+      <div style="background:#16213e;padding:14px;border-radius:10px;">
+        <h3 style="font-size:13px;color:#4a6cf7;margin-bottom:6px;">👤 主人公</h3>
+        <p style="font-size:12px;line-height:1.6;color:#ccc;"><strong style="color:#fff;">朱剑</strong> · 平方轮椅董事长/CEO<br>理工科出身，常驻车间。2017年巴黎获2024残奥会主办权，他看到了欧洲无障碍市场的蓝海。</p>
+      </div>
+    </div>
+    <div style="max-width:900px;margin:0 auto 14px;text-align:left;">
+      <div style="background:#16213e;padding:12px 14px;border-radius:10px;">
+        <h3 style="font-size:13px;color:#4a6cf7;margin-bottom:4px;">🎮 操作指引</h3>
+        <p style="font-size:12px;line-height:1.7;color:#ccc;">1. 观看引入段 → 2. 替朱剑选策略 → 3. 两条路径都看完 → 4. 完成反思题并截图保存 → 5. 解锁下一场景</p>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#888;margin-bottom:10px;">⏱ 了解案例背景 <span id="countdown" style="color:#4a6cf7;font-weight:600;">0:10</span></div>
+    <button class="btn" id="startBtn" onclick="startGame()" disabled style="opacity:0.4;cursor:not-allowed;padding:12px 36px;">开始案例</button>
+  </div>
+  <div class="main-layout" id="mainLayout">
+    <div class="nav-panel">
+      <div style="font-size:12px;color:#666;margin-bottom:12px;">场景进度</div>
+      <div id="sceneNav"></div>
+    </div>
+    <div class="player-panel">
+      <div class="scene-title" id="sceneTitle"></div>
+      <div class="scene-desc" id="sceneDesc"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="player-area" id="playerArea">
+        <video id="videoPlayer" style="display:none;" controls playsinline></video>
+        <div class="overlay" id="overlay"></div>
+      </div>
+    </div>
+  </div>
+  <div class="summary-screen" id="summaryScreen">
+    <h2>案例完成</h2>
+    <p style="color:#aaa;line-height:1.8;max-width:600px;margin:0 auto 32px;">五个国家的故事讲完了。跨文化沟通没有标准答案，但每一次选择背后，都是对另一种文化的理解与尊重。</p>
+    <div style="max-width:600px;margin:0 auto;text-align:left;">
+      <div style="background:#1e2a4a;padding:24px;border-radius:12px;">
+        <h3 style="margin-bottom:16px;">总体反思</h3>
+        <div style="margin-bottom:12px;font-size:14px;">1. 五个场景中，哪个国家的做法最出乎你的意料？</div>
+        <textarea style="width:100%;height:80px;background:#0f0f23;color:#eee;border:1px solid #333;border-radius:6px;padding:10px;font-size:13px;" placeholder="写下你的想法..."></textarea>
+        <div style="margin:16px 0 12px;font-size:14px;">2. 如果重来一次，你会在哪个场景做出不同的选择？</div>
+        <textarea style="width:100%;height:80px;background:#0f0f23;color:#eee;border:1px solid #333;border-radius:6px;padding:10px;font-size:13px;" placeholder="写下你的想法..."></textarea>
+        <div style="margin:16px 0 12px;font-size:14px;">3. 用一句话<h2 style="font-size:22px;margin-bottom:16px;">总体反思</h2>
+    <p style="font-size:14px;color:#888;margin-bottom:20px;">以下问题供你思考，可简要写下想法，也可留空——课堂上老师会组织分享讨论。</p>
+    <div style="text-align:left;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:18px;">
+      <div>
+        <div style="font-size:14px;color:#ccc;margin-bottom:6px;">1. 五个场景中，哪个决策最出乎你意料？为什么？</div>
+        <textarea style="width:100%;height:50px;background:#0f0f23;color:#eee;border:1px solid #333;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#ccc;margin-bottom:6px;">2. 如果你是朱剑，重来一次，哪个国家的策略你会调整？怎么调？</div>
+        <textarea style="width:100%;height:50px;background:#0f0f23;color:#eee;border:1px solid #333;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+      <div>
+        <div style="font-size:14px;color:#ccc;margin-bottom:6px;">3. 跨文化沟通中，"入乡随俗"和"坚持自己的方式"，边界在哪？</div>
+        <textarea style="width:100%;height:50px;background:#0f0f23;color:#eee;border:1px solid #333;border-radius:6px;padding:8px;font-size:13px;box-sizing:border-box;" placeholder="（选填）"></textarea>
+      </div>
+    </div>
+    <button class="btn" style="margin-top:24px;" onclick="alert('感谢完成！你的思考已记录，课堂上老师会组织分享讨论。')">完成案例</button>
+  </div>
+</div>
+<script>
+const scenes = [
+  { id:'s1', name:'莫斯科 · 酒桌信任', title:'场景一：莫斯科 · 酒桌信任', desc:'朱剑初到莫斯科，与安德烈在冬夜餐厅碰面。',
+    intro:[{type:'imageaudio',image:'s1-moscow/s1_scene1.jpg',audio:'s1-moscow/s1_shot1_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene2.jpg',audio:'s1-moscow/s1_shot2_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene3.jpg',audio:'s1-moscow/s1_shot3_voice.wav'}],
+    choices:[
+      {key:'A',label:'趁热打铁，借酒意把合作框架拿出来谈',outcome:'fail',path:[{type:'imageaudio',image:'s1-moscow/s1_scene4.jpg',audio:'s1-moscow/s1a_1_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene5.jpg',audio:'s1-moscow/s1a_2_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene6.jpg',audio:'s1-moscow/s1a_3_voice.wav'}]},
+      {key:'B',label:'先不谈生意，继续喝酒聊天，等安德烈主动开口',outcome:'success',path:[{type:'imageaudio',image:'s1-moscow/s1_scene7.jpg',audio:'s1-moscow/s1b_1_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene8.jpg',audio:'s1-moscow/s1b_2_voice.wav'},{type:'imageaudio',image:'s1-moscow/s1_scene9.jpg',audio:'s1-moscow/s1b_3_voice.wav'}]}
+    ],
+    reflect:{type:'checkbox',question:'在俄罗斯商务宴请中，哪种做法更合适？（多选）',options:['伏特加只是助兴，真正的生意还是要回办公室谈','酒桌就是喝酒交朋友的地方，不要在酒桌上谈工作','其他（在讨论中补充）','气氛到了、信任到位了，可以主动谈合作'],correct:[1,3],explanation:'俄罗斯商务文化的节奏是：酒桌是建立信任的核心场所。先在酒桌上交朋友——伏特加一杯接一杯，聊家乡聊家人，信任到位了生意自然来。一上桌就掏合同是大忌，对方会觉得你只认钱不认人。但反过来，伏特加不只是助兴，真正的信任就是在酒桌上建立的，不是回到办公室靠合同谈出来的。'}
+  },
+  { id:'s2', name:'苏州 · 茶馆报价', title:'场景二：苏州 · 茶馆报价', desc:'法国老牌贸易商杰克对轮椅价格提出质疑。',
+    intro:[{type:'imageaudio',image:'s2-france/s2_scene1.jpg',audio:'s2-france/s2_shot1_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene2.jpg',audio:'s2-france/s2_shot2_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene3.jpg',audio:'s2-france/s2_shot3_voice.wav'}],
+    choices:[
+      {key:'A',label:'判断杰克嫌贵，直接报个高价再让几个点',outcome:'fail',path:[{type:'imageaudio',image:'s2-france/s2_scene4.jpg',audio:'s2-france/s2a_1_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene2.jpg',audio:'s2-france/s2a_2_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene3.jpg',audio:'s2-france/s2a_3_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene5.jpg',audio:'s2-france/s2a_4_voice.wav'}]},
+      {key:'B',label:'不急着报价，先问清楚欧洲市场的分销链条',outcome:'success',path:[{type:'imageaudio',image:'s2-france/s2_scene4.jpg',audio:'s2-france/s2b_1_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene3.jpg',audio:'s2-france/s2b_2_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene4.jpg',audio:'s2-france/s2b_3_voice.wav'},{type:'imageaudio',image:'s2-france/s2_scene6.jpg',audio:'s2-france/s2b_4_voice.wav'}]}
+    ],
+    reflect:{type:'discussion',question:'两种报价策略，你觉得哪种更适合欧洲市场？请和搭档讨论后记下你的立场。'}
+  },
+  { id:'s3', name:'欧洲 · 价格之惑', title:'场景三：欧洲 · 价格之惑', desc:'在中国便宜是优势，在欧洲便宜反而是嫌疑。',
+    intro:[{type:'imageaudio',image:'s3-pricing/s3_scene1.jpg',audio:'s3-pricing/s3_shot1_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene2.jpg',audio:'s3-pricing/s3_shot2_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene_intro_new.jpg',audio:'s3-pricing/s3_intro_new_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene3.jpg',audio:'s3-pricing/s3_shot3_voice.wav'}],
+    choices:[
+      {key:'A',label:'涨价配质保，对标德国老牌厂家',outcome:'fail',path:[{type:'imageaudio',image:'s3-pricing/s3_scene4.jpg',audio:'s3-pricing/s3a_1_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene5.jpg',audio:'s3-pricing/s3a_2_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene6.jpg',audio:'s3-pricing/s3a_3_voice.wav'}]},
+      {key:'B',label:'不报价，先请客户看工厂、见用户、试样机',outcome:'success',path:[{type:'imageaudio',image:'s3-pricing/s3_scene7.jpg',audio:'s3-pricing/s3b_1_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene8.jpg',audio:'s3-pricing/s3b_2_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene9.jpg',audio:'s3-pricing/s3b_3_voice.wav'},{type:'imageaudio',image:'s3-pricing/s3_scene10.jpg',audio:'s3-pricing/s3b_4_voice.wav'}]}
+    ],
+    reflect:{type:'checkbox',question:'在欧洲市场，价格低为什么反而会失去信任？（多选）',options:['欧洲消费者只买贵的，便宜没好货','价格低意味着品牌力不足，售后没保障','欧洲市场有成熟的价格锚点，偏离太多会引起怀疑','其他（在讨论中补充）'],correct:[1,2],explanation:'欧洲市场有成熟的价格锚点。轮椅作为医疗康复产品，消费者倾向于相信有品牌、有售后保障的产品。价格过低会让客户怀疑：是不是质量减配？是不是售后没人管？不是欧洲人只买贵的，而是低价偏离了他们心中『合格产品』的价格预期。'}
+  },
+  { id:'s4', name:'东京 · 关系入场券', title:'场景四：东京 · 关系入场券', desc:'日本代理商上岛先生说："我们这里，不这样做生意。"',
+    intro:[{type:'imageaudio',image:'s4-japan/s4_scene1.jpg',audio:'s4-japan/s4_shot1_voice.wav'},{type:'imageaudio',image:'s4-japan/s4_scene2.jpg',audio:'s4-japan/s4_shot2_voice.wav'},{type:'imageaudio',image:'s4-japan/s4_scene3.jpg',audio:'s4-japan/s4_shot3_voice.wav'}],
+    choices:[
+      {key:'A',label:'配合上岛的节奏，先逛两天再谈生意',outcome:'success',path:[{type:'imageaudio',image:'s4-japan/s4_scene4.jpg',audio:'s4-japan/s4a_1_voice.wav'},{type:'imageaudio',image:'s4-japan/s4_scene5.jpg',audio:'s4-japan/s4a_2_voice.wav'}]},
+      {key:'B',label:'直接在桌上摆合同，问三个关键问题就签',outcome:'fail',path:[{type:'imageaudio',image:'s4-japan/s4_scene6.jpg',audio:'s4-japan/s4b_1_voice.wav'},{type:'imageaudio',image:'s4-japan/s4_scene7.jpg',audio:'s4-japan/s4b_2_voice.wav'}]}
+    ],
+    reflect:{type:'checkbox',question:'在日本商务中，先谈关系再谈生意你怎么看？（多选）',options:['效率太低，但这是日本的规矩，必须入乡随俗','关系本身就是生意的一部分，不是浪费时间','看情况，小生意可以快，大生意需要慢','其他（在讨论中补充）'],correct:[1,2],explanation:'在日本商务中，信任是通过时间和相处建立的，不是靠合同条款建立的。陪逛浅草寺、不谈生意的两天，不是浪费时间，而是上岛在确认朱剑这个人值不值得合作。关系到位了，生意条款自然好谈；关系没到位，合同写得再细也没用。'}
+  },
+  { id:'s5', name:'新加坡 · 格局博弈', title:'场景五：新加坡 · 格局博弈', desc:'林先生说："你这个价，做不下去。"——但他不是在砍价。',
+    intro:[{type:'imageaudio',image:'s5-singapore/s5_scene1.jpg',audio:'s5-singapore/s5_shot1_voice.wav'},{type:'imageaudio',image:'s5-singapore/s5_scene2.jpg',audio:'s5-singapore/s5_shot2_voice.wav'},{type:'imageaudio',image:'s5-singapore/s5_scene3.jpg',audio:'s5-singapore/s5_shot3_voice.wav'}],
+    choices:[
+      {key:'A',label:'把新加坡作为东南亚总部，和林先生谈大格局',outcome:'success',path:[{type:'imageaudio',image:'s5-singapore/s5_scene4.jpg',audio:'s5-singapore/s5a_1_voice.wav'},{type:'imageaudio',image:'s5-singapore/s5_scene5.jpg',audio:'s5-singapore/s5a_2_voice.wav'}]},
+      {key:'B',label:'按照华人的做事方式，先让一步表诚意',outcome:'fail',path:[{type:'imageaudio',image:'s5-singapore/s5_scene6.jpg',audio:'s5-singapore/s5b_1_voice.wav'},{type:'imageaudio',image:'s5-singapore/s5_scene7.jpg',audio:'s5-singapore/s5b_2_voice.wav'}]}
+    ],
+    reflect:{type:'discussion',question:'新加坡客户要的是"格局"不是"价格"，这和其他四个国家有什么本质不同？请和搭档讨论。'}
+  }
+];
+const subtitleMap = {
+  's1-moscow/s1_shot1_voice.wav': '莫斯科，冬夜。朱剑走进一家老牌餐厅，俄罗斯代理商安德烈已经在等他了。窗外飘着雪，壁炉烧得正旺。',
+  's1-moscow/s1_shot2_voice.wav': '安德烈高大魁梧，一杯伏特加下去，话匣子就开了。从莫斯科的冬天聊到他孙子的芭蕾课，从卫国战争聊到朱剑的老家。',
+  's1-moscow/s1_shot3_voice.wav': '酒过三巡，两个人已经称兄道弟。朱剑心想：俄罗斯人真热情，这事儿成了。',
+  's1-moscow/s1a_1_voice.wav': '朱剑趁着酒兴，从包里拿出合作方案：独家代理、年度框架价、售后条款，一条一条摆到安德烈面前。',
+  's1-moscow/s1a_2_voice.wav': '安德烈看完方案，脸上的笑收了。他把方案轻轻推回来，端起酒杯：朱，今天喝酒，不谈工作。',
+  's1-moscow/s1a_3_voice.wav': '第二天，安德烈的秘书打来电话：朱先生，合作的事我们再研究研究。这一研究，就没了下文。',
+  's1-moscow/s1b_1_voice.wav': '朱剑把方案收回包里。安德烈很高兴，又叫了一轮伏特加：朱，再来一杯！',
+  's1-moscow/s1b_2_voice.wav': '两人从卫国战争聊到孙子的芭蕾课，喝到后半夜，拍着肩膀称兄道弟。',
+  's1-moscow/s1b_3_voice.wav': '第三天早上，安德烈主动打电话：朱，昨天聊得好。我们谈谈合作吧。那天上午，所有条款全部敲定。',
+  's2-france/s2_shot1_voice.wav': '2019年，苏州同里古镇的一家茶馆。法国贸易商杰克坐在朱剑对面，茶已经换了三道。',
+  's2-france/s2_shot2_voice.wav': '杰克六十岁上下，白发梳得一丝不苟，是那种九十年代就开始往中国跑的老牌贸易商。桌上，杰克慢悠悠地转着茶杯，半天没碰朱剑递过去的样品图册。',
+  's2-france/s2_shot3_voice.wav': '朱先生，他终于开口，语气像在谈天气，你们的轮椅，质量我信。不过，在欧洲，价格不是这么个卖法。',
+  's2-france/s2a_1_voice.wav': '朱剑一听价格不这么个卖法，立刻反应过来：杰克是嫌贵。他心算了一下，报了个比国内高百分之三十的出厂价，又让了五个点。',
+  's2-france/s2a_2_voice.wav': '杰克听完，笑了笑，端起茶杯：朱先生，你很精明。但这个数字，我在里昂仓库里压了三年都没卖完。朱剑心里一紧，又让了三个点。',
+  's2-france/s2a_3_voice.wav': '杰克放下茶杯，礼貌地起身：今天聊得很愉快。这样，我们内部讨论一下。之后半年，杰克那边一直是讨论中。',
+  's2-france/s2a_4_voice.wav': '直到第二年广交会，朱剑在展位上看见杰克的儿子马丁，正拿着另一家中国轮椅厂的样品拍照，父子俩笑得很开心。',
+  's2-france/s2b_1_voice.wav': '朱剑没有急着报价。他问杰克：在欧洲，一台轮椅从出厂到患者手里，要经过几手？杰克眼睛亮了一下：进口商、批发商、康复中心、医生处方，再加两个物流商。',
+  's2-france/s2b_2_voice.wav': '朱剑点点头：那您觉得，谁在这个链条里最不开心？杰克沉默了一会儿，笑了：康复中心，他们压价最狠，却要负责售后。',
+  's2-france/s2b_3_voice.wav': '朱剑笑了：我的轮椅，不要您垫资。您拿样品去三家康复中心，患者试了愿意买，您再下单。杰克坐直了：你知道这意味着什么？',
+  's2-france/s2b_4_voice.wav': '朱剑说：意味着您不压货，不压资金。我把出厂价让给您一半的利润空间，但我不要独家。三个月后，杰克从里昂打来电话：朱，你的轮椅在三家康复中心都留下了。这个生意，我们做。',
+  's3-pricing/s3_shot1_voice.wav': '朱剑带着样品到欧洲，以为价格优势是杀手锏。',
+  's3-pricing/s3_shot2_voice.wav': '客户拿着价格单，皱着眉摇头。',
+  's3-pricing/s3_intro_new_voice.wav': '朱剑到欧洲前，做足了功课：他的轮椅质量对标德国品牌，但价格只有一半。他以为这是杀手锏。结果第一场展会，他报完价，客户的第一反应不是太便宜了买它，而是这么便宜，能用多久？他开始困惑：在中国，价格低是优势；在欧洲，怎么反而成了嫌疑？',
+  's3-pricing/s3_shot3_voice.wav': '朱剑在咖啡馆里困惑。',
+  's3-pricing/s3a_1_voice.wav': '朱剑决定涨价，对标德国品牌。',
+  's3-pricing/s3a_2_voice.wav': '客户收到高价单，更怀疑了。',
+  's3-pricing/s3a_3_voice.wav': '客户走向竞品展位。',
+  's3-pricing/s3b_1_voice.wav': '朱剑邀请客户参观工厂。',
+  's3-pricing/s3b_2_voice.wav': '客户参观生产线，印象深刻。',
+  's3-pricing/s3b_3_voice.wav': '带客户见真实用户。',
+  's3-pricing/s3b_4_voice.wav': '握手成交。',
+  's4-japan/s4_shot1_voice.wav': '东京，三月。朱剑见到了日本代理商上岛先生。上岛六十出头，头发花白，说话永远带三分笑，茶换了三轮，合作的事一个字没提。',
+  's4-japan/s4_shot2_voice.wav': '朱剑忍不住了，把产品图册往前一递。上岛看了一眼，把图册轻轻推回来，笑着说：朱先生，我们这里，不这样做生意。',
+  's4-japan/s4_shot3_voice.wav': '朱剑愣了。在中国，茶喝三轮合同都签了，在东京，茶喝三轮图册还没递出去。',
+  's4-japan/s4a_1_voice.wav': '朱剑把合同收进包里。第二天早上，上岛来电话，说：朱先生，今天天气好，我带你去逛逛。两人去了浅草寺，又去了皇居周边散步。一整天，上岛一句生意没提，朱剑也一句没问。',
+  's4-japan/s4a_2_voice.wav': '第三天早上，上岛主动敲开朱剑的房门：朱先生，昨天聊得好。我们谈合作吧。那天上午，价格、独家、售后，所有条款一个上午全部敲定。上岛说：前两天不是浪费时间，是确认你这个人值不值得合作。',
+  's4-japan/s4b_1_voice.wav': '朱剑没把上岛的话当回事。茶还没喝完，他直接把合同摊在桌上：上岛先生，我们就三个关键问题，确认了就签。上岛脸上的笑收了，端起茶杯，半天没说话。',
+  's4-japan/s4b_2_voice.wav': '那天下午，上岛客气地结束了会面。三个月后，朱剑从行业消息听说：上岛最终选了另一家中国供应商，那家的人在东京陪他逛了整整一周。',
+  's5-singapore/s5_shot1_voice.wav': '新加坡，滨海湾。朱剑见到了代理商林先生。林先生是第三代华裔，普通话带点闽南口音，开门见山：朱总，你这个价，做不下去。',
+  's5-singapore/s5_shot2_voice.wav': '朱剑愣了：他报的价已经比欧洲低了百分之十五。林先生笑了：朱总，我不是嫌你贵，我是嫌你小。',
+  's5-singapore/s5_shot3_voice.wav': '朱剑没听懂。新加坡这么小的市场，做大做小有什么区别？',
+  's5-singapore/s5a_1_voice.wav': '朱剑没有急着让价。他问林先生：如果我把新加坡作为东南亚总部，你能覆盖多少个国家？林先生眼睛亮了：我可以帮你覆盖马来西亚、泰国、印尼、菲律宾，四个国家的渠道。',
+  's5-singapore/s5a_2_voice.wav': '朱剑拍了板：价格我不让，但我给你东南亚五国的独家，利润空间我让出来一半。林先生站起来，伸出手：朱总，这才是做生意的格局。',
+  's5-singapore/s5b_1_voice.wav': '朱剑以为林先生在砍价。他当场表态：一台轮椅，我再让五块钱。林先生脸上的笑淡了：朱总，我不是在跟你算一台轮椅的账，我是在跟你算一个市场的账。',
+  's5-singapore/s5b_2_voice.wav': '那次会面不欢而散。林先生最后说了一句：朱总，你把新加坡当一个小市场在做，我只能把你当一个小供应商来看。'
+};
+let currentScene=0, watchedPaths=[], pathIdx=0, playGen=0;
+let overlay=document.getElementById('overlay'), vid=document.getElementById('videoPlayer');
+let unlockedScenes = 1;
+// 倒计时
+let countdownSec = 10;
+const cdTimer = setInterval(() => {
+  countdownSec--;
+  const m = Math.floor(countdownSec/60);
+  const s = countdownSec%60;
+  document.getElementById('countdown').textContent = m + ':' + (s<10?'0':'') + s;
+  if (countdownSec <= 0) {
+    clearInterval(cdTimer);
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('startBtn').style.opacity = '1';
+    document.getElementById('startBtn').style.cursor = 'pointer';
+    document.getElementById('countdown').textContent = '可以开始了';
+  }
+}, 1000);
+
+function startGame(){document.getElementById('startScreen').style.display='none';document.getElementById('mainLayout').style.display='grid';buildNav();loadScene(0);}
+function buildNav(){const nav=document.getElementById('sceneNav');nav.innerHTML='';scenes.forEach((s,i)=>{const d=document.createElement('div');d.className='scene-nav-item'+(i===currentScene?' active':'');if(i<unlockedScenes){d.textContent=(i+1)+'. '+s.name;d.onclick=()=>loadScene(i);}else{d.textContent='🔒 '+(i+1)+'. '+s.name;d.style.opacity='0.4';d.style.cursor='not-allowed';}nav.appendChild(d);});}
+function loadScene(idx){currentScene=idx;watchedPaths=[];buildNav();const s=scenes[idx];document.getElementById('sceneTitle').textContent=s.title;document.getElementById('sceneDesc').textContent=s.desc;overlay.classList.remove('show');overlay.innerHTML='';playSegments(s.intro,()=>{setTimeout(()=>showChoiceOverlay(null),500);});}
+function typewriter(el,text,speed,done){el.innerHTML='';let i=0;function tick(){if(i<text.length){el.innerHTML=text.substring(0,i+1)+'<span class="typewriter-cursor"></span>';i++;setTimeout(tick,speed);}else{el.innerHTML=text;if(done)done();}}tick();}
+function showChoiceOverlay(chosenKey){const s=scenes[currentScene];overlay.innerHTML='';overlay.classList.add('show');const title=document.createElement('div');title.className='typewriter-text';overlay.appendChild(title);const btnWrap=document.createElement('div');btnWrap.style.cssText='display:flex;flex-direction:column;align-items:center;width:100%;';overlay.appendChild(btnWrap);
+if(chosenKey===null){typewriter(title,'朱剑接下来会选择哪种策略？',60);s.choices.forEach((c,i)=>{setTimeout(()=>{const btn=document.createElement('button');btn.className='choice-3d choice-neutral';btn.textContent='策略'+(i+1)+'：'+c.label;btn.onclick=()=>choosePath(c.key);btnWrap.appendChild(btn);},1200+i*300);});}
+else{const chosen=s.choices.find(c=>c.key===chosenKey);const other=s.choices.find(c=>c.key!==chosenKey);let msg=chosen.outcome==='fail'?'你的这个策略导致了不良后果。我们再看看另一种策略会有什么结果。':'感谢你为朱剑选择了这个策略，促成了合作。让我们再看看另一种策略会导致什么后果。';typewriter(title,msg,50,()=>{const btn=document.createElement('button');btn.className='choice-3d '+(other.outcome==='success'?'choice-success':'choice-fail');btn.textContent=other.label;btn.onclick=()=>choosePath(other.key);btnWrap.appendChild(btn);});}}
+function choosePath(key){overlay.classList.remove('show');overlay.innerHTML='';const s=scenes[currentScene];const c=s.choices.find(x=>x.key===key);playSegments(c.path,()=>{setTimeout(()=>{watchedPaths.push(key);if(watchedPaths.length<2){showChoiceOverlay(key);}else{showReflectOverlay();}},500);});}
+function showReflectOverlay(){
+  const s=scenes[currentScene];
+  overlay.innerHTML='';
+  overlay.classList.add('show');
+  const title=document.createElement('div');
+  title.className='typewriter-text';
+  overlay.appendChild(title);
+  const card=document.createElement('div');
+  card.className='reflect-card';
+  let html='<h3>场景反思</h3><div class="reflect-q"><strong>'+s.reflect.question+'</strong><br><br>';
+  if(s.reflect.type==='checkbox'){
+    s.reflect.options.forEach((opt,i)=>{
+      html+='<label><input type="checkbox" name="r'+i+'" value="'+i+'">'+opt+'</label>';
+    });
+    html+='</div><button class="choice-3d choice-neutral" style="margin-top:16px;" onclick="submitReflect(this)">提交答案</button>';
+  }else{
+    html+='<label style="color:#4a6cf7;">💬 讨论模式：请和搭档讨论后记下你的立场，系统不强制作答。</label>';
+    html+='</div><button class="choice-3d choice-neutral" style="margin-top:16px;" onclick="nextScene()">'+(currentScene===scenes.length-1?'查看总体反思':'进入下一场景')+'</button>';
+  }
+  card.innerHTML=html;
+  overlay.appendChild(card);
+  typewriter(title,'两种路径都看完了，你怎么看？',50);
+}
+function submitReflect(btn){
+  const s=scenes[currentScene];
+  const checked=[];
+  document.querySelectorAll('.reflect-q input[type=checkbox]:checked').forEach(cb=>checked.push(parseInt(cb.value)));
+  const correct=s.reflect.correct||[];
+  const isRight=checked.length===correct.length&&checked.every(v=>correct.includes(v));
+  const card=btn.parentElement;
+  let feedback='';
+  if(isRight){
+    feedback='<div style="margin-top:16px;padding:14px;background:rgba(82,196,26,0.15);border-radius:10px;border-left:4px solid #52c41a;"><strong style="color:#52c41a;">✓ 理解正确</strong><br><br><span style="font-size:14px;line-height:1.7;color:#ccc;">'+s.reflect.explanation+'</span></div>';
+  }else{
+    feedback='<div style="margin-top:16px;padding:14px;background:rgba(250,84,28,0.15);border-radius:10px;border-left:4px solid #fa541c;"><strong style="color:#fa541c;">✗ 再想想</strong><br><br><span style="font-size:14px;line-height:1.7;color:#ccc;">正确答案是选项2和选项3。'+s.reflect.explanation+'</span></div>';
+  }
+  feedback+='<button class=\"choice-3d choice-neutral\" style=\"margin-top:14px;\" onclick=\"saveScreenshot()">📸 截图并下载学习记录</button>';
+  feedback+='<button class="choice-3d choice-success" style="margin-top:14px;" onclick="nextScene()">'+(currentScene===scenes.length-1?'查看总体反思':'进入下一场景')+'</button>';
+  btn.style.display='none';
+  card.insertAdjacentHTML('beforeend',feedback);
+}
+function saveScreenshot(){
+  const overlay=document.getElementById('overlay');
+  html2canvas(overlay,{backgroundColor:'#1e2a4a',scale:2}).then(canvas=>{
+    const link=document.createElement('a');
+    link.download='跨文化案例_学习记录_场景'+(currentScene+1)+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+function nextScene(){overlay.classList.remove('show');overlay.innerHTML='';if(currentScene<scenes.length-1){unlockedScenes=Math.max(unlockedScenes,currentScene+2);loadScene(currentScene+1);}else{document.getElementById('mainLayout').style.display='none';document.getElementById('summaryScreen').style.display='block';}}
+function playSegments(segs,done){const gen=++playGen;pathIdx=0;const pa=document.getElementById('playerArea');function next(){if(gen!==playGen)return;if(pathIdx>=segs.length){done();return;}const seg=segs[pathIdx];vid.style.display='none';const oldImg=pa.querySelector('img');if(oldImg)oldImg.remove();
+if(seg.type==='video'){vid.src=seg.src;vid.style.display='block';vid.onended=()=>{pathIdx++;next();};vid.play().catch(()=>{});}
+else if(seg.type==='audio'){const a=new Audio(seg.src);a.onended=()=>{pathIdx++;next();};a.play().catch(()=>{});}
+else if(seg.type==='imageaudio'){
+      const img=document.createElement('img');
+      img.src=seg.image;
+      img.style.animation='kb 12s ease-out forwards';
+      pa.appendChild(img);
+      const a=new Audio(seg.audio);
+      // 字幕条
+      const subBar=document.createElement('div');
+      subBar.className='subtitle-bar';
+      pa.appendChild(subBar);
+      // 字幕打字机
+      const subText=subtitleMap[seg.audio]||'';
+      let subIdx=0;
+      let subTimer=null;
+      function subTick(){
+        if(subIdx<=subText.length){
+          subBar.textContent=subText.substring(0,subIdx);
+          subIdx++;
+        }
+      }
+      a.addEventListener('loadedmetadata',()=>{
+        const dur=a.duration*1000;
+        const perChar=subText.length>0?dur/subText.length:100;
+        subTimer=setInterval(subTick,perChar);
+      });
+      a.play();
+      // 播放/暂停按钮
+      const ppBtn=document.createElement('button');
+      ppBtn.className='play-pause-btn';
+      ppBtn.textContent='⏸';
+      ppBtn.onclick=()=>{
+        if(a.paused){a.play();ppBtn.textContent='⏸';}
+        else{a.pause();ppBtn.textContent='▶';}
+      };
+      pa.appendChild(ppBtn);
+      a.onended=()=>{clearInterval(subTimer);ppBtn.remove();subBar.remove();pathIdx++;next();};
+    }
+else if(seg.type==='videoaudio'){vid.src=seg.video;vid.style.display='block';const a=new Audio(seg.audio);vid.play();a.play();a.onended=()=>{pathIdx++;next();};}}next();}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>
