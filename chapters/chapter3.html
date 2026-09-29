@@ -36,7 +36,7 @@
   .slide{max-width:1000px;margin:0 auto;padding:.8rem 1.2rem 2.5rem;display:none;min-height:calc(100vh - 2.6rem)}
   .slide.active{display:block}
   .section-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c-primary);border-left:4px solid var(--c-accent);padding-left:.5rem;margin-bottom:.3rem;font-weight:700}
-  .slide-title{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.15;color:var(--c-ink);margin-bottom:.2rem;letter-spacing:-.01em;font-weight:800}
+  .slide-title{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.15;color:var(--c-ink);margin-bottom:.2rem;letter-spacing:-.01em;font-weight:800;overflow-wrap:anywhere}
   .slide-subtitle{font-size:.88rem;color:var(--c-sub);margin-bottom:.7rem}
   .en,.zh{display:block}
   .en{font-weight:600}
@@ -131,9 +131,88 @@
   body.lecture .anim{opacity:0;transform:translateY(6px);transition:all .3s}
   body.lecture .anim.revealed{opacity:1;transform:none}
 
-  @media(max-width:640px){
+  /* Responsive shell: desktop, tablet and phone */
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{min-width:0;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
+  img,video,canvas,svg{max-width:100%}
+  button,select,textarea,input{font:inherit}
+  .topbar{box-shadow:0 1px 8px rgba(15,27,45,.06)}
+  #navLabel{min-width:0;font-weight:700;color:var(--c-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #pageNum{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .nav-btns{display:flex;gap:.35rem;flex-shrink:0}
+  #pageJump{min-width:0}
+  .slide{width:100%}
+  .slide:first-of-type>div:first-child{padding-top:clamp(3rem,15vh,9rem)!important}
+  .page-foot{padding-bottom:max(.35rem,env(safe-area-inset-bottom));gap:1rem}
+  .page-foot span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card,.scenario-box,.concept,.reflect-box,.choice-opt,.match-item{overflow-wrap:anywhere}
+  table{max-width:100%}
+
+  @media(max-width:1024px){
+    :root{--fs-base:clamp(16px,1.8vw,18px)}
+    .topbar{flex-wrap:wrap;padding:.55rem .8rem;gap:.45rem}
+    #navLabel{flex:1 1 45%}
+    .topbar .mode-toggle{margin-left:0}
+    .topbar button,.topbar select,.choice-opt,.match-item,.match-actions button{min-height:40px}
+    .slide{max-width:920px;padding:1rem 1.1rem 3.25rem}
+    .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .page-foot{max-width:none;padding-left:1rem;padding-right:1rem}
+  }
+
+  @media(max-width:760px){
+    :root{--fs-base:16px}
+    .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:.5rem .65rem;gap:.4rem .55rem}
+    #navLabel{grid-column:1;grid-row:1;font-size:.82rem}
+    #pageNum{grid-column:2;grid-row:1;margin:0!important;font-size:.76rem!important;text-align:right}
+    .nav-btns{grid-column:1 / -1;grid-row:2;display:grid;grid-template-columns:1fr 1fr}
+    .nav-btns button{width:100%;border-radius:9px!important;padding:.45rem .55rem!important}
+    #pageJump{grid-column:1;grid-row:3;width:100%;max-width:none!important;min-height:42px;padding:.45rem .55rem!important;border-radius:8px!important}
+    .topbar .mode-toggle{grid-column:2;grid-row:3;justify-self:end;white-space:nowrap}
+    .topbar .mode-toggle button{min-height:36px;padding:.35rem .65rem}
+    .slide{padding:.85rem .75rem 3.5rem;min-height:calc(100dvh - 8.5rem)}
+    .slide-title{font-size:clamp(1.35rem,6vw,1.7rem);line-height:1.2}
+    .section-label{font-size:.68rem}
     .grid-2,.grid-3,.match-grid{grid-template-columns:1fr}
-    .slide{padding:.8rem 1rem 2.5rem}
+    .slide [style*="display:grid"]{grid-template-columns:1fr!important;gap:.65rem!important}
+    .slide [style*="display:flex"]{max-width:100%}
+    .bubble{max-width:86%}
+    .pair{grid-template-columns:1fr}
+    .pair .lang{justify-self:start}
+    .choice-opt,.match-item{padding:.65rem .75rem;font-size:.9rem}
+    .match-actions{flex-wrap:wrap}
+    .match-actions button{flex:1 1 140px}
+    .reflect-box textarea{min-height:96px}
+    table{display:block;width:100%!important;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:normal}
+    th,td{min-width:128px}
+    .page-foot{font-size:.62rem;letter-spacing:.04em;padding:.4rem .7rem;gap:.5rem}
+  }
+
+  @media(max-width:420px){
+    .topbar{grid-template-columns:1fr;padding:.45rem .5rem;position:sticky}
+    #navLabel{grid-column:1;grid-row:1;font-size:.76rem;padding-right:4.5rem}
+    #pageNum{position:absolute;top:.55rem;right:.55rem;display:block!important}
+    .nav-btns{grid-column:1;grid-row:2}
+    #pageJump{grid-column:1;grid-row:3}
+    .topbar .mode-toggle{grid-column:1;grid-row:4;display:flex!important;width:100%;justify-self:stretch}
+    .topbar .mode-toggle button{flex:1;min-height:38px;padding:.3rem .48rem;font-size:.7rem}
+    .slide{padding:.75rem .6rem 3.5rem}
+    .slide:first-of-type .slide-title{font-size:clamp(1.55rem,8vw,1.9rem)!important;line-height:1.12}
+    .card,.scenario-box,.concept,.reflect-box{border-radius:9px;padding:.65rem}
+    .avatar{width:32px;height:32px}
+    .bubble{font-size:.84rem;padding:.5rem .65rem}
+    .page-foot span:first-child{max-width:75vw}
+    #ccmNotesLauncher{top:auto!important;right:8px!important;bottom:44px!important;max-width:48vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  }
+
+  @media(max-height:600px) and (orientation:landscape){
+    .slide:first-of-type>div:first-child{padding-top:1rem!important}
+    .topbar{position:relative}
+    .slide{min-height:auto}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
   }
 </style>
 </head>
@@ -204,7 +283,7 @@
     <span class="zh">先看一个真实的跨文化困境</span>
   </h1>
 
-  <a href="T-company/T-company.html" target="_blank" class="card accent" style="max-width:560px;margin-top:1rem;cursor:pointer;display:block;text-decoration:none;color:inherit">
+  <a href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/T-company/T-company.html" target="_top" class="card accent" style="max-width:560px;margin-top:1rem;cursor:pointer;display:block;text-decoration:none;color:inherit">
     <div style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#b8742a;font-weight:700">互动案例 · Interactive Case</div>
     <div style="font-size:1.05rem;font-weight:700;margin:.3rem 0">
       <span class="en">"It's a bit hard to 'do as the Romans do'"</span>
@@ -2065,7 +2144,7 @@
     <span class="zh" style="font-size:.8rem">你已经学完了 3.1 的五个口头沟通差异。下面这个案例里，中国电动轮椅企业出海到 5 个国家，每个场景都会用到至少一个维度。</span>
   </div>
 
-  <a href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/pingfanglunyi/pingfang.html" target="_blank" class="card accent anim" data-order="3" style="max-width:560px;margin:1rem auto;cursor:pointer;text-align:center;display:block;text-decoration:none;color:inherit">
+  <a href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/pingfanglunyi/pingfang.html" target="_top" class="card accent anim" data-order="3" style="max-width:560px;margin:1rem auto;cursor:pointer;text-align:center;display:block;text-decoration:none;color:inherit">
     <div style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#b8742a;font-weight:700">综合案例 · Interactive Case</div>
     <div style="font-size:1.05rem;font-weight:700;margin:.3rem 0">
       <span class="en">The Wheelchair Goes Global / 平方轮椅出海记</span>
@@ -3011,8 +3090,8 @@
 </section>
 
 <div class="page-foot">
-  <span>3.1.1 直接与委婉 / Directness & Indirectness</span>
-  <span id="pageNum">09 / 58</span>
+  <span id="pageFootLabel">第三章 · 封面</span>
+  <span id="pageFootNum">01 / 66</span>
 </div>
 
 <script>
@@ -3206,6 +3285,8 @@
     document.getElementById('pageNum').textContent = String(num).padStart(2,'0') + ' / ' + TOTAL;
     const nav = navLabels[i] ? navLabels[i][1] : '第三章';
     document.getElementById('navLabel').textContent = nav;
+    document.getElementById('pageFootLabel').textContent = nav;
+    document.getElementById('pageFootNum').textContent = String(num).padStart(2,'0') + ' / ' + TOTAL;
     if(document.body.classList.contains('lecture')){
       const anims = slides[i].querySelectorAll('.anim');
       anims.forEach(a=>a.classList.remove('revealed'));
