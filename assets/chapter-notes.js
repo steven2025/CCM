@@ -4,7 +4,9 @@
   const chapterId=document.body.dataset.chapterId||location.pathname.match(/chapter([0-9]+)/i)?.[1]&&`chapter-${location.pathname.match(/chapter([0-9]+)/i)[1]}`||'chapter';
   const key=`ccm-notes:${chapterId}`;
   const auth=()=>window.CCMHostAuth||window.CCMAuth||null;
-  const current=()=>slides.find(s=>!s.hidden)||slides[0];
+  // 章节模板有两种翻页约定：旧版通过 hidden 控制，新版通过 .active 控制。
+  // 优先采用显式的 .active，避免未设置 hidden 的非当前页被误判为当前页。
+  const current=()=>slides.find(s=>s.classList.contains('active'))||slides.find(s=>!s.hidden)||slides[0];
   const pageId=()=>current()?.dataset.slide||String(slides.indexOf(current())+1);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let notes={}; try{notes=JSON.parse(localStorage.getItem(key)||'{}')||{};}catch{}
