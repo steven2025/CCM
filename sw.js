@@ -1,8 +1,8 @@
-/* v31: interactive chapter HTML; cache ONLY the neutral offline explanation page. */
+/* v34: chapter 3 reliable UTF-8 downloads; cache ONLY the neutral offline explanation page. */
 'use strict';
 const BASE = new URL('./', self.location.href);
 const CACHE_PREFIX = 'ccm-pwa-' + encodeURIComponent(BASE.pathname) + '-';
-const CACHE_NAME = CACHE_PREFIX + 'v31';
+const CACHE_NAME = CACHE_PREFIX + 'v34';
 const OFFLINE_URL = new URL('offline.html', BASE).href;
 
 self.addEventListener('install', event => {
