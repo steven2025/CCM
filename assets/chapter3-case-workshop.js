@@ -65,7 +65,7 @@
     try{const r=await fetch(urls(c).md,{cache:'no-store'});if(!r.ok)throw Error();mdPre.textContent=await r.text();mdLoaded.add(c.id);}catch{mdPre.textContent='MD预览暂时无法加载，请使用左侧“下载MD脚本”。';}
   }
   function ensurePdfJs(){
-    if(!pdfJsPromise)pdfJsPromise=import(new URL('pdfjs/pdf.min.mjs',SCRIPT_BASE).href).then(lib=>{lib.GlobalWorkerOptions.workerSrc=new URL('pdfjs/pdf.worker.min.mjs',SCRIPT_BASE).href;return lib;});
+    if(!pdfJsPromise)pdfJsPromise=import(new URL('../pdfjs/pdf.mjs',SCRIPT_BASE).href).then(lib=>{lib.GlobalWorkerOptions.workerSrc=new URL('../pdfjs/pdf.worker.mjs',SCRIPT_BASE).href;return lib;});
     return pdfJsPromise;
   }
   function updatePdfControls(){
