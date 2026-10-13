@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/pwa/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
   <link rel="stylesheet" href="./assets/pwa.css">
-  <script src="./assets/pwa.js" defer></script>
+  <script src="./assets/pwa.js?v=20261013-6" defer></script>
   <link rel="stylesheet" href="./assets/student-manager.css?v=29">
   <script src="./assets/student-manager.js?v=29" defer></script>
   <script src="./assets/subtitle-json.js?v=30"></script>
@@ -1916,7 +1916,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-09-03-v30';
+  const PLATFORM_VERSION = 'frontend-2026-10-13-v36';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -5588,27 +5588,44 @@
       1:'摩梭与汉族社会的性别与家庭角色对比', 2:'摩梭大家庭结构及走婚习俗的形成与影响因素', 3:'外部世界对摩梭文化的刻板印象',
       4:'旅游业对摩梭文化的影响', 5:'泸沽湖旅游的核心吸引力与可持续性'
     };
-    const openTopicAdmin = async () => {
-      assignmentContainer.innerHTML = '<div class="login-status-line">正在读取摩梭文化选题登记...</div>';
+    const chapter3TopicTitles = {
+      1:'MMG外派高管的文化适应', 2:'诺唯赞全球化战略的跨文化突围', 3:'中信戴卡文化在墨西哥工厂落地', 4:'四达时代文化“走出去”',
+      5:'Ale在意大利餐厅的管理困境', 6:'思和科技跨国并购薪酬整合', 7:'爱菊粮油哈萨克斯坦本土化', 8:'V公司收购韩国T公司后的整合'
+    };
+    let currentTopicAssignment = null;
+    let topicRequestVersion = 0;
+    const openTopicAdmin = async (assignmentId = 'mosuo-commentary-video') => {
+      currentTopicAssignment = assignmentId;
+      const requestVersion = ++topicRequestVersion;
+      const isChapter3 = assignmentId === 'chapter3-interactive-case-video';
+      const activeTitles = isChapter3 ? chapter3TopicTitles : topicTitles;
+      const topicLabel = isChapter3 ? '第三章案例选题登记' : '摩梭文化口播视频 · 选题登记';
+      assignmentContainer.innerHTML = '<div class="login-status-line">正在读取选题登记...</div>';
       try {
-        const payload = await assignmentCall('topic-choice-admin-list',{classId:assignmentClass.value || '*'}), classNames=new Map((payload.classes||[]).map(item=>[item.classId,item.name]));
-        const cards=(payload.topics||[]).map(item=>'<button type="button" class="analytics-card" data-topic-filter="'+item.topicId+'" style="text-align:left;cursor:pointer"><strong>'+item.count+' / 4</strong><span>Topic '+item.topicId+' · '+escapeHtml(topicTitles[item.topicId]||'')+'</span></button>').join('');
+        const payload = await assignmentCall('topic-choice-admin-list',{assignmentId, classId:assignmentClass.value}), classNames=new Map((payload.classes||[]).map(item=>[item.classId,item.name]));
+        if (requestVersion !== topicRequestVersion) return;
+        assignmentClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + (payload.classes || []).map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + '</option>').join('');
+        assignmentClass.value = payload.classId;
+        const cards=(payload.topics||[]).map(item=>'<button type="button" class="analytics-card" data-topic-filter="'+item.topicId+'" style="text-align:left;cursor:pointer"><strong>'+item.count+(payload.classId==='*'?' 人 · 每班上限 '+item.capacity:' / '+item.capacity)+'</strong><span>Topic '+item.topicId+' · '+escapeHtml(activeTitles[item.topicId]||'')+'</span></button>').join('');
         const renderRows = topicId => {
-          const selected=(payload.rows||[]).filter(row=>topicId==='unselected'?!row.topicId:Number(row.topicId)===Number(topicId));
-          const bodyRows=selected.map(row=>'<tr><td>'+escapeHtml(row.studentId)+'</td><td>'+escapeHtml(row.name)+'</td><td>'+escapeHtml(classNames.get(row.classId)||'未分班')+'</td><td>'+(row.topicId?'Topic '+row.topicId+' · '+escapeHtml(topicTitles[row.topicId]||''):'未选题')+'</td><td>'+(row.updatedAt?escapeHtml(new Date(row.updatedAt).toLocaleString()):'—')+'</td></tr>').join('');
+          const selected=(payload.rows||[]).filter(row=>topicId==='all'?true:topicId==='unselected'?!row.topicId:Number(row.topicId)===Number(topicId));
+          const bodyRows=selected.map(row=>'<tr><td>'+escapeHtml(row.studentId)+'</td><td>'+escapeHtml(row.name)+'</td><td>'+escapeHtml(classNames.get(row.classId)||'未分班')+'</td><td>'+(row.topicId?'Topic '+row.topicId+' · '+escapeHtml(activeTitles[row.topicId]||''):'未选题')+'</td><td>'+(row.updatedAt?escapeHtml(new Date(row.updatedAt).toLocaleString()):'—')+'</td></tr>').join('');
           assignmentContainer.querySelector('[data-topic-table]').innerHTML=bodyRows||'<tr><td colspan="5">暂无学生</td></tr>';
-          assignmentContainer.querySelector('[data-topic-caption]').textContent=topicId==='unselected'?'尚未选题学生':'Topic '+topicId+' · '+(topicTitles[topicId]||'');
+          assignmentContainer.querySelector('[data-topic-caption]').textContent=topicId==='all'?'全部学生':topicId==='unselected'?'尚未选题学生':'Topic '+topicId+' · '+(activeTitles[topicId]||'');
         };
         const unselected=(payload.rows||[]).filter(row=>!row.topicId).length;
-        assignmentContainer.innerHTML='<div class="analytics-subnav"><button type="button" data-topic-back>← 返回作业提交</button><button type="button" class="active">摩梭文化口播视频 · 选题登记</button><button type="button" data-topic-unselected>未选题 '+unselected+' 人</button><button type="button" data-topic-export>导出 CSV</button></div><div class="analytics-cards">'+cards+'</div><div class="analytics-panel"><div class="analytics-panel-title" data-topic-caption>点击上方题目查看学生</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>选题</th><th>最后更新时间</th></tr></thead><tbody data-topic-table><tr><td colspan="5">请选择一个题目</td></tr></tbody></table></div></div>';
-        assignmentContainer.querySelector('[data-topic-back]').onclick=refreshAssignments; assignmentContainer.querySelector('[data-topic-unselected]').onclick=()=>renderRows('unselected'); assignmentContainer.querySelectorAll('[data-topic-filter]').forEach(button=>button.onclick=()=>renderRows(button.dataset.topicFilter));
-        assignmentContainer.querySelector('[data-topic-export]').onclick=()=>{const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';const rows=[['学号','姓名','班级','选题编号','选题名称','最后更新时间'],...(payload.rows||[]).map(row=>[row.studentId,row.name,classNames.get(row.classId)||'未分班',row.topicId||'',row.topicId?topicTitles[row.topicId]:'未选题',row.updatedAt||''])];const csv='\uFEFF'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='第一章-摩梭文化选题登记.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);};
-      } catch(error){assignmentContainer.innerHTML='<div class="login-status-line error">选题登记读取失败：'+escapeHtml(error.message)+'</div>';}
+        assignmentContainer.innerHTML='<div class="analytics-subnav"><button type="button" data-topic-back>← 返回作业提交</button><button type="button" class="active">'+escapeHtml(topicLabel)+'</button><button type="button" data-topic-all>全部学生</button><button type="button" data-topic-unselected>未选题 '+unselected+' 人</button><button type="button" data-topic-export>导出 CSV</button></div><div class="analytics-cards">'+cards+'</div><div class="analytics-panel"><div class="analytics-panel-title" data-topic-caption>点击上方题目查看学生</div><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>选题</th><th>最后更新时间</th></tr></thead><tbody data-topic-table><tr><td colspan="5">请选择一个题目</td></tr></tbody></table></div></div>';
+        assignmentContainer.querySelector('[data-topic-back]').onclick=refreshAssignments; assignmentContainer.querySelector('[data-topic-all]').onclick=()=>renderRows('all'); assignmentContainer.querySelector('[data-topic-unselected]').onclick=()=>renderRows('unselected'); assignmentContainer.querySelectorAll('[data-topic-filter]').forEach(button=>button.onclick=()=>renderRows(button.dataset.topicFilter));
+        assignmentContainer.querySelector('[data-topic-export]').onclick=()=>{const quote=value=>'"'+String(value??'').replaceAll('"','""')+'"';const rows=[['学号','姓名','班级','选题编号','选题名称','最后更新时间'],...(payload.rows||[]).map(row=>[row.studentId,row.name,classNames.get(row.classId)||'未分班',row.topicId||'',row.topicId?activeTitles[row.topicId]:'未选题',row.updatedAt||''])];const csv='\uFEFF'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=(isChapter3?'第三章-案例选题登记':'第一章-摩梭文化选题登记')+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);};
+        renderRows('all');
+      } catch(error){if(requestVersion !== topicRequestVersion) return;assignmentContainer.innerHTML='<div class="login-status-line error">选题登记读取失败：'+escapeHtml(error.message)+'</div>';}
     };
     const refreshAssignments = async () => {
+      currentTopicAssignment = null;
+      ++topicRequestVersion;
       if (!assignmentContainer) return; assignmentRefresh.disabled = true; assignmentClass.disabled = true; assignmentContainer.innerHTML = '<div class="login-status-line">正在读取作业提交情况...</div>';
       try {
-        const payload = await assignmentCall('assignments-admin-list', { classId: assignmentClass.value || '*' });
+        const payload = await assignmentCall('assignments-admin-list', { classId: assignmentClass.value });
         latestAssignmentsPayload = payload;
         const classNames = new Map((payload.classes || []).map(item => [item.classId,item.name]));
         assignmentClass.innerHTML = '<option value="*">全部班级 / All classes</option><option value="">未分班 / Unassigned</option>' + (payload.classes || []).map(item => '<option value="' + escapeHtml(item.classId) + '">' + escapeHtml(item.name) + '</option>').join(''); assignmentClass.value = payload.classId;
@@ -5616,16 +5633,18 @@
           const rows = (payload.rows || []).filter(row => row.assignmentId === item.assignmentId), submitted = rows.filter(row => row.submission);
           const table = rows.map(row => '<tr><td>' + escapeHtml(row.studentId) + '</td><td>' + escapeHtml(row.name) + '</td><td>' + escapeHtml(classNames.get(row.classId) || '未分班') + '</td><td><span class="assignment-state ' + (row.submission ? 'submitted">' + (row.submission.status === 'approved' ? '已公开' : '未公开') : 'missing">未提交') + '</span></td><td>' + (row.submission ? escapeHtml(row.submission.fileName) : '—') + '</td><td>' + (row.submission ? Number(row.submission.version || 1) : '—') + '</td><td>' + (row.submission ? escapeHtml(new Date(row.submission.submittedAt).toLocaleString()) : '—') + '</td><td>' + (row.submission ? '<button type="button" class="btn-ghost" data-assignment-review="approved" data-assignment-id="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">公开</button> <button type="button" class="btn-ghost" data-assignment-review="hidden" data-assignment-id="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">取消公开</button> <button type="button" class="btn-ghost" data-assignment-review="needs-revision" data-assignment-id="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">退回</button> <button type="button" class="btn-ghost" data-assignment-download="' + escapeHtml(item.assignmentId) + '" data-student-id="' + escapeHtml(row.studentId) + '">下载</button>' : '—') + '</td></tr>').join('');
           const topicButton=item.assignmentId==='mosuo-commentary-video'?'<button type="button" class="btn-ghost" data-topic-admin style="margin-bottom:9px">查看选题登记 / Topic Registration</button>':'';
-          return '<div class="analytics-panel" style="margin-bottom:12px"><div class="analytics-panel-title">第一章 · ' + escapeHtml(item.titleZh) + ' / ' + escapeHtml(item.titleEn) + '　<span style="color:#86efac">已交 ' + submitted.length + '</span> / 应交 ' + rows.length + '　· 无截止日期</div>'+topicButton+'<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>状态</th><th>最后文件</th><th>提交次数</th><th>最后提交</th><th>操作</th></tr></thead><tbody>' + table + '</tbody></table></div></div>';
-        }).join(''); assignmentContainer.innerHTML = groups || '<div class="analytics-empty">暂无作业数据。</div>';
-        assignmentContainer.querySelector('[data-topic-admin]')?.addEventListener('click',openTopicAdmin);
+          return '<div class="analytics-panel" style="margin-bottom:12px"><div class="analytics-panel-title">' + escapeHtml({'chapter-1':'第一章','chapter-2':'第二章','chapter-3':'第三章'}[item.chapterId] || item.chapterId || '') + ' · ' + escapeHtml(item.titleZh) + ' / ' + escapeHtml(item.titleEn) + '　<span style="color:#86efac">已交 ' + submitted.length + '</span> / 应交 ' + rows.length + '　· 无截止日期</div>'+topicButton+'<div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>学号</th><th>姓名</th><th>班级</th><th>状态</th><th>最后文件</th><th>提交次数</th><th>最后提交</th><th>操作</th></tr></thead><tbody>' + table + '</tbody></table></div></div>';
+        }).join(''); assignmentContainer.innerHTML = '<div class="analytics-subnav"><button type="button" data-chapter3-topic-admin>第三章案例选题登记 / Chapter 3 Topics</button></div>' + (groups || '<div class="analytics-empty">暂无作业数据。</div>');
+        assignmentContainer.querySelector('[data-chapter3-topic-admin]').onclick=()=>openTopicAdmin('chapter3-interactive-case-video');
+        assignmentContainer.querySelector('[data-topic-admin]')?.addEventListener('click',()=>openTopicAdmin());
         assignmentContainer.querySelectorAll('[data-assignment-download]').forEach(button => button.onclick = async () => { button.disabled=true; try { const result=await assignmentCall('assignment-download-url',{assignmentId:button.dataset.assignmentDownload,studentId:button.dataset.studentId}); const a=document.createElement('a'); a.href=result.url; a.download=result.fileName || ''; a.target='_blank'; a.rel='noopener'; a.click(); } catch(error){ alert('下载失败：'+error.message); } finally { button.disabled=false; } });
         assignmentContainer.querySelectorAll('[data-assignment-review]').forEach(button => button.onclick = async () => { button.disabled=true; try { await assignmentCall('assignment-review',{assignmentId:button.dataset.assignmentId,studentId:button.dataset.studentId,status:button.dataset.assignmentReview}); await refreshAssignments(); } catch(error){ alert('审核失败：'+error.message); button.disabled=false; } });
         assignmentsLoaded = true;
       } catch(error) { assignmentContainer.innerHTML = '<div class="login-status-line error">作业读取失败：' + escapeHtml(error.message) + '</div>'; }
       finally { assignmentRefresh.disabled=false; assignmentClass.disabled=false; }
     };
-    assignmentRefresh?.addEventListener('click', refreshAssignments); assignmentClass?.addEventListener('change', refreshAssignments);
+    const refreshAssignmentView = () => currentTopicAssignment ? openTopicAdmin(currentTopicAssignment) : refreshAssignments();
+    assignmentRefresh?.addEventListener('click', refreshAssignmentView); assignmentClass?.addEventListener('change', refreshAssignmentView);
     body.querySelector('#showcase-add')?.addEventListener('click', async () => { const title=prompt('示范作品标题 / Title','火塘 / Huotang'); if(!title)return; const videoUrl=prompt('COS 视频 HTTPS 地址 / COS video URL',''); if(!videoUrl)return; const defs=latestAssignmentsPayload.assignments||[]; if(!defs.length){alert('请先刷新作业列表 / Refresh assignments first');return;} const choice=prompt('请选择作业编号 / Choose assignment number:\n'+defs.map((d,i)=>(i+1)+'. '+d.titleZh+' · '+d.titleEn).join('\n'),'1'); const selected=defs[Number(choice)-1]; if(!selected){alert('作业编号无效 / Invalid assignment');return;} const classes=latestAssignmentsPayload.classes||[]; const classChoice=prompt('请选择班级编号（可留空表示全部班级）/ Choose class number:\n'+classes.map((c,i)=>(i+1)+'. '+c.name).join('\n'),''); const selectedClass=classes[Number(classChoice)-1]; try { await assignmentCall('teacher-showcase-save',{title,videoUrl,classId:selectedClass?.classId||'',chapterId:selected.chapterId,assignmentId:selected.assignmentId,studentName:'教师示范作品',pinned:true,status:'approved'}); alert('教师示范作品已公开并归入：'+selected.titleZh); await refreshAssignments(); } catch(error){ alert('保存失败：'+error.message); } });
     body.querySelectorAll('.settings-tab').forEach(tab => {
       tab.addEventListener('click', () => {
