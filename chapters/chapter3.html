@@ -2159,10 +2159,10 @@
       </div>
       <div class="match-col">
         <div class="col-title">时间观 / Time Orientation</div>
-        <div class="match-item" data-side="right" data-id="rt1">单线时间 / Monochronic</div>
-        <div class="match-item" data-side="right" data-id="rt2">多向时间 / Polychronic</div>
-        <div class="match-item" data-side="right" data-id="rt3">单线时间 / Monochronic</div>
-        <div class="match-item" data-side="right" data-id="rt4">多向时间 / Polychronic</div>
+        <div class="match-item" data-side="right" data-id="rt1">单线时间：按小时切分日程</div>
+        <div class="match-item" data-side="right" data-id="rt2">多向时间：同时处理多项任务</div>
+        <div class="match-item" data-side="right" data-id="rt3">单线时间：严格划分时段边界</div>
+        <div class="match-item" data-side="right" data-id="rt4">多向时间：时间可随情境延展</div>
       </div>
     </div>
     <div class="match-feedback" id="timeFb"></div>
@@ -4153,18 +4153,19 @@
     l4: '"你很有潜力"通常不是表扬，是委婉的鞭策。'
   };
   let selLeft = null, done = 0, attempts = 0;
-  const items = document.querySelectorAll('.match-item');
   const matchFb = document.getElementById('matchFb');
+  const matchSlide = matchFb.closest('.slide');
+  const items = matchSlide.querySelectorAll('.match-item');
   items.forEach(item=>{
     item.onclick = ()=>{
       if(item.classList.contains('matched')) return;
       if(item.dataset.side==='left'){
-        document.querySelectorAll('.match-item[data-side="left"]').forEach(i=>i.classList.remove('selected'));
+        matchSlide.querySelectorAll('.match-item[data-side="left"]').forEach(i=>i.classList.remove('selected'));
         item.classList.add('selected');
         selLeft = item.dataset.id;
       } else {
         if(!selLeft){ matchFb.className='match-feedback show try'; matchFb.textContent='先点左边的中文话，再点右边的意思。'; return; }
-        const leftEl = document.querySelector(`.match-item[data-id="${selLeft}"]`);
+        const leftEl = matchSlide.querySelector(`.match-item[data-id="${selLeft}"]`);
         attempts++; document.getElementById('matchAttempts').textContent = attempts;
         if(correct[selLeft]===item.dataset.id){
           leftEl.classList.remove('selected'); leftEl.classList.add('matched');
@@ -4191,8 +4192,8 @@
     matchFb.className='match-feedback';
   };
   document.getElementById('btnShowAnswers').onclick = ()=>{
-    document.querySelectorAll('.match-item[data-side="left"]').forEach(l=>{
-      const r = document.querySelector(`.match-item[data-id="${correct[l.dataset.id]}"]`);
+    matchSlide.querySelectorAll('.match-item[data-side="left"]').forEach(l=>{
+      const r = matchSlide.querySelector(`.match-item[data-id="${correct[l.dataset.id]}"]`);
       l.classList.add('matched'); r.classList.add('matched');
     });
     done=4; document.getElementById('matchDone').textContent='4';
@@ -4209,8 +4210,9 @@
     c4: '"你是个聪明人" = 你应该懂我的意思，不用我说明。'
   };
   let ctxSelLeft = null, ctxDone = 0, ctxAttempts = 0;
-  const ctxItems = document.querySelectorAll('#contextFb').closest('.slide').querySelectorAll('.match-item');
   const ctxFb = document.getElementById('contextFb');
+  const ctxSlide = ctxFb.closest('.slide');
+  const ctxItems = ctxSlide.querySelectorAll('.match-item');
 
   ctxItems.forEach(item=>{
     item.onclick = ()=>{
@@ -4221,7 +4223,7 @@
         ctxSelLeft = item.dataset.id;
       } else {
         if(!ctxSelLeft){ ctxFb.className='match-feedback show try'; ctxFb.textContent='先点左边的行为，再点右边的时间观。'; return; }
-        const leftEl = document.querySelector(`.match-item[data-id="${ctxSelLeft}"]`);
+        const leftEl = ctxSlide.querySelector(`.match-item[data-id="${ctxSelLeft}"]`);
         ctxAttempts++; document.getElementById('contextAttempts').textContent = ctxAttempts;
         if(correctCtx[ctxSelLeft]===item.dataset.id){
           leftEl.classList.remove('selected'); leftEl.classList.add('matched');
@@ -4252,6 +4254,7 @@
   let timeSelLeft = null, timeDone = 0, timeAttempts = 0;
   const timeItems = document.getElementById('timeFb').closest('.slide').querySelectorAll('.match-item');
   const timeFb = document.getElementById('timeFb');
+  const timeSlide = timeFb.closest('.slide');
 
   timeItems.forEach(item=>{
     item.onclick = ()=>{
@@ -4262,7 +4265,7 @@
         timeSelLeft = item.dataset.id;
       } else {
         if(!timeSelLeft){ timeFb.className='match-feedback show try'; timeFb.textContent='先点左边的行为，再点右边的时间观。'; return; }
-        const leftEl = document.querySelector(`.match-item[data-id="${timeSelLeft}"]`);
+        const leftEl = timeSlide.querySelector(`.match-item[data-id="${timeSelLeft}"]`);
         timeAttempts++; document.getElementById('timeAttempts').textContent = timeAttempts;
         if(correctTime[timeSelLeft]===item.dataset.id){
           leftEl.classList.remove('selected'); leftEl.classList.add('matched');
