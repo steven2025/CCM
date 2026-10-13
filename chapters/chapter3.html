@@ -86,6 +86,59 @@
   .scenario-box{background:#fff;border-radius:12px;padding:.6rem .85rem;margin:.4rem 0;box-shadow:var(--c-shadow-md)}
   .scenario-box .quote{font-size:.88rem;padding:.3rem 0 .3rem .8rem;border-left:3px solid var(--c-accent);margin:.3rem 0}
 
+  .business-card-layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(420px,1.25fr);gap:1.1rem;align-items:start;margin-top:.65rem}
+  .business-card-copy{min-width:0;display:flex;flex-direction:column;gap:.55rem}
+  .business-card-copy .scenario-box,.business-card-copy .choice-q{margin:0}
+  .business-card-media{min-width:0;margin:0;background:#0b1424;border-radius:14px;padding:.55rem;box-shadow:var(--c-shadow-md)}
+  .business-card-media video{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:9px}
+  .business-card-media figcaption{padding:.55rem .25rem .15rem;color:#fff;text-align:center;font-size:.78rem;font-weight:700;letter-spacing:.03em}
+  .business-card-media.portrait-media{width:min(100%,380px);justify-self:center}
+  .business-card-media.portrait-media video{aspect-ratio:9/16}
+
+  .barrier-progress{margin-top:.65rem}
+  .barrier-step{min-height:210px}
+  .barrier-step[hidden]{display:none}
+  .barrier-controls{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.75rem}
+  .barrier-dots{display:flex;align-items:center;gap:.45rem}
+  .barrier-dot{width:12px;height:12px;padding:0;border:2px solid var(--c-primary);border-radius:50%;background:#fff;cursor:pointer;transition:all .2s}
+  .barrier-dot.active{background:var(--c-primary);transform:scale(1.15)}
+  .barrier-next{border:0;border-radius:18px;padding:.5rem 1rem;background:var(--c-primary);color:#fff;font-weight:700;cursor:pointer;box-shadow:var(--c-shadow);min-width:118px}
+  .barrier-next:disabled{background:#7394a0;cursor:default;box-shadow:none}
+  .cq-test-action{display:flex;justify-content:center;margin-top:.5rem}
+  .cq-test-link{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.52rem 1.05rem;border-radius:20px;background:var(--c-primary);color:#fff;text-decoration:none;font-size:.85rem;font-weight:700;box-shadow:var(--c-shadow);transition:transform .2s,box-shadow .2s}
+  .cq-test-link:hover{transform:translateY(-1px);box-shadow:var(--c-shadow-md)}
+  .cq-test-link:focus-visible{outline:3px solid var(--c-accent);outline-offset:3px}
+
+  .byram-layout{display:grid;grid-template-columns:minmax(300px,1.05fr) minmax(280px,.95fr);gap:.85rem;align-items:start;margin-top:.45rem}
+  .byram-points{display:flex;flex-direction:column;gap:.3rem}
+  .byram-points .card{margin:0;padding:.45rem .65rem}
+  .byram-reading{background:#fff;border-radius:12px;padding:.7rem;box-shadow:var(--c-shadow-md)}
+  .byram-reading h2{font-size:.9rem;color:var(--c-primary);margin:0 0 .45rem}
+  .reading-open{width:100%;border:1.5px solid var(--c-line);border-radius:10px;background:var(--c-primary-bg);color:var(--c-primary);padding:.58rem .65rem;margin-top:.4rem;text-align:left;cursor:pointer;font-weight:700;font-family:inherit;line-height:1.35;transition:all .2s}
+  .reading-open:hover{border-color:var(--c-primary);transform:translateY(-1px)}
+  .reading-open .en{display:block;font-size:.72rem;font-weight:600;color:var(--c-sub);margin-top:.12rem}
+
+  .reading-modal[hidden]{display:none}
+  .reading-modal{position:fixed;inset:0;z-index:300;pointer-events:none}
+  .reading-window{position:fixed;left:8vw;top:8vh;width:min(780px,84vw);height:min(650px,82vh);min-width:320px;min-height:190px;background:#fff;border:1px solid var(--c-line);border-radius:14px;box-shadow:0 18px 55px rgba(15,44,54,.3);overflow:hidden;resize:both;pointer-events:auto;display:flex;flex-direction:column}
+  .reading-window.is-fullscreen{inset:0!important;width:100vw!important;height:100dvh!important;max-width:none;border-radius:0;resize:none}
+  .reading-window.is-minimized{width:min(440px,88vw)!important;height:auto!important;min-height:0;resize:none}
+  .reading-window.is-minimized .reading-window-body{display:none}
+  .reading-window-bar{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.48rem .65rem;background:var(--c-primary);color:#fff;cursor:move;user-select:none;touch-action:none}
+  .reading-window-label{font-size:.78rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reading-window-tools{display:flex;gap:.3rem;flex-shrink:0}
+  .reading-window-tools button{width:32px;height:30px;border:1px solid rgba(255,255,255,.35);border-radius:7px;background:rgba(255,255,255,.13);color:#fff;cursor:pointer;font-size:.9rem}
+  .reading-window-tools button:hover{background:rgba(255,255,255,.25)}
+  .reading-window-body{padding:1rem 1.1rem;overflow:auto;overscroll-behavior:contain;line-height:1.65}
+  .reading-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;border-bottom:1px solid var(--c-line);padding-bottom:.65rem;margin-bottom:.7rem}
+  .reading-title-row h2{font-size:1.05rem;color:var(--c-ink);line-height:1.35;margin:0}
+  .reading-title-row h2 .en{display:block;font-size:.78rem;color:var(--c-sub);margin-top:.18rem;font-weight:600}
+  .reading-download{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border-radius:18px;padding:.48rem .75rem;background:var(--c-accent);color:#fff;text-decoration:none;font-size:.75rem;font-weight:700}
+  .reading-content h3{font-size:.9rem;color:var(--c-primary);margin:.75rem 0 .25rem}
+  .reading-content p,.reading-content li{font-size:.82rem}
+  .reading-content ul{padding-left:1.2rem;margin:.3rem 0}
+  .reading-content .english-summary{color:#425b64;background:var(--c-primary-bg);border-radius:10px;padding:.65rem .75rem;margin-top:.65rem}
+
   /* 试错选择题 */
   .choice-q{margin:.5rem 0}
   .choice-q .q{font-size:1rem;font-weight:700;margin-bottom:.35rem}
@@ -157,6 +210,7 @@
     .slide{max-width:920px;padding:1rem 1.1rem 3.25rem}
     .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
     .page-foot{max-width:none;padding-left:1rem;padding-right:1rem}
+    .business-card-layout{grid-template-columns:minmax(260px,.85fr) minmax(360px,1.15fr);gap:.85rem}
   }
 
   @media(max-width:760px){
@@ -173,6 +227,11 @@
     .slide-title{font-size:clamp(1.35rem,6vw,1.7rem);line-height:1.2}
     .section-label{font-size:.68rem}
     .grid-2,.grid-3,.match-grid{grid-template-columns:1fr}
+    .business-card-layout{grid-template-columns:1fr}
+    .byram-layout{grid-template-columns:1fr}
+    .reading-window{left:3vw;top:7vh;width:94vw;height:82vh;min-width:0;resize:none}
+    .reading-title-row{flex-direction:column}
+    .business-card-media{width:min(100%,680px);justify-self:center}
     .slide [style*="display:grid"]{grid-template-columns:1fr!important;gap:.65rem!important}
     .slide [style*="display:flex"]{max-width:100%}
     .bubble{max-width:86%}
@@ -2849,25 +2908,37 @@
 
 <!-- ============ 3.4 礼仪 · 试错 ============ -->
 <section class="slide" data-slide="45" data-page-type="试错 · Try It First">
-  <div class="section-label anim" data-order="0">3.4 · 试错</div>
+  <div class="section-label anim" data-order="0">3.4 · 名片礼仪 / Business Card Etiquette</div>
   <h1 class="slide-title anim" data-order="1">
-    <span class="en">The Business Card</span>
-    <span class="zh">那张名片</span>
+    <span class="en">Business Card Etiquette</span>
+    <span class="zh">名片礼仪</span>
   </h1>
 
-  <div class="scenario-box anim" data-order="2">
-    <span class="en" style="font-size:.85rem;font-weight:600">You meet a Japanese client. He hands you his business card with both hands.</span>
-    <span class="zh" style="font-size:.8rem">你见一个日本客户。他双手递上名片。</span>
-  </div>
+  <div class="business-card-layout anim" data-order="2">
+    <div class="business-card-copy">
+      <div class="scenario-box">
+        <span class="en" style="font-size:.85rem;font-weight:600">You meet a Japanese client. He hands you his business card with both hands.</span>
+        <span class="zh" style="font-size:.8rem">你见到一位日本客户，他双手递上名片。</span>
+      </div>
 
-  <div class="choice-q anim" data-order="3">
-    <div class="q" style="font-size:.85rem">你接过名片，第一件事应该做什么？</div>
-    <div class="choice-opts">
-      <div class="choice-opt" data-pick="A">立刻放进口袋</div>
-      <div class="choice-opt" data-pick="B">认真看几秒，再放在桌上</div>
-      <div class="choice-opt" data-pick="C">拿笔在上面记东西</div>
+      <div class="choice-q">
+        <div class="q" style="font-size:.9rem">你接过名片后，第一件事应该做什么？</div>
+        <div class="choice-opts">
+          <div class="choice-opt" data-pick="A">A · 立刻放进口袋</div>
+          <div class="choice-opt" data-pick="B">B · 认真看几秒，再放在桌上</div>
+          <div class="choice-opt" data-pick="C">C · 拿笔在名片上记东西</div>
+        </div>
+        <div class="choice-fb" id="cardFb"></div>
+      </div>
     </div>
-    <div class="choice-fb" id="cardFb"></div>
+
+    <figure class="business-card-media">
+      <video controls playsinline preload="metadata" title="名片礼仪">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/business%20card.mp4" type="video/mp4">
+        您的浏览器不支持视频播放。
+      </video>
+      <figcaption>名片礼仪 / Business Card Etiquette</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -2938,82 +3009,82 @@
   </div>
 </section>
 
-<!-- ============ 3.4 情景 · 礼盒 ============ -->
+<!-- ============ 3.4 情景 · 商务送礼 ============ -->
 <section class="slide" data-slide="48" data-page-type="情境思考 · Scenario">
-  <div class="section-label anim" data-order="0">情境思考</div>
+  <div class="section-label anim" data-order="0">3.4 · 商务场合的送礼学问 / Business Gift Etiquette</div>
   <h1 class="slide-title anim" data-order="1">
-    <span class="en">The Gift Box</span>
-    <span class="zh">那份礼盒</span>
+    <span class="en">When a Thoughtful Gift Feels Too Expensive</span>
+    <span class="zh">一份用心却贵重的礼物</span>
   </h1>
 
-  <div class="scenario-box anim" data-order="2">
-    <span class="en" style="font-size:.85rem;font-weight:600">严经理从北京带了礼盒给美国同事 Daniel。他递过去时，Daniel 客气地放在桌上，再也没提起。</span>
-    <span class="zh" style="font-size:.8rem">严经理从北京带了礼盒给美国同事 Daniel。他递过去时，Daniel 客气地放在桌上，再也没提起。</span>
-  </div>
+  <div class="business-card-layout anim" data-order="2">
+    <div class="business-card-copy">
+      <div class="scenario-box">
+        <span class="zh" style="font-size:.84rem">严经理知道美国同事 Daniel 爱运动，特意为他选购了一副知名国产品牌“韵音”的骨传导运动耳机，价值约 200 美元。Daniel 接过礼物很开心，当面拆开并表示感谢；认出品牌、估计出价格后，他突然显得有些吃惊、迟疑和尴尬，但仍礼貌地再次致谢。严经理事后觉得有些奇怪。</span>
+      </div>
 
-  <div class="choice-q anim" data-order="3">
-    <div class="q" style="font-size:.85rem">Daniel 为什么不当面拆？</div>
-    <div class="choice-opts">
-      <div class="choice-opt" data-pick="A">他不喜欢这个礼物</div>
-      <div class="choice-opt" data-pick="B">在美国文化里，收礼时不当面拆是客气</div>
-      <div class="choice-opt" data-pick="C">他忘记了</div>
+      <div class="choice-q">
+        <div class="q" style="font-size:.9rem">Daniel 的反应为什么发生了变化？</div>
+        <div class="choice-opts">
+          <div class="choice-opt" data-pick="A">A · 他不喜欢骨传导耳机</div>
+          <div class="choice-opt" data-pick="B">B · 他认为当面拆开礼物不礼貌</div>
+          <div class="choice-opt" data-pick="C">C · 他估计礼物价值约 200 美元，可能超过公司规定的 50 美元礼品申报限额</div>
+          <div class="choice-opt" data-pick="D">D · 他认为国产品牌不适合作为商务礼物</div>
+        </div>
+        <div class="choice-fb" id="giftFb"></div>
+      </div>
     </div>
-    <div class="choice-fb" id="giftFb"></div>
+
+    <figure class="business-card-media portrait-media">
+      <video controls playsinline preload="metadata" title="商务场合的送礼学问">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/songli.mp4" type="video/mp4">
+        您的浏览器暂不支持视频播放。
+      </video>
+      <figcaption>商务场合的送礼学问</figcaption>
+    </figure>
   </div>
 </section>
 
-<!-- ============ 3.4 反思 ============ -->
-<section class="slide" data-slide="49" data-page-type="反思 · Reflection">
-  <div class="section-label anim" data-order="0">反思</div>
-  <h1 class="slide-title anim" data-order="1">
-    <span class="en">Your Turn</span>
-    <span class="zh">轮到你了</span>
-  </h1>
+<!-- 3.5 心理障碍 · 分步学习 -->
+<section class="slide" data-slide="50" data-page-type="理论知识点 · 分步学习">
+  <div class="section-label anim" data-order="0">3.5 · 分步学习</div>
+  <h1 class="slide-title anim" data-order="1"><span class="en">Psychological Barriers in Cross-Cultural Communication</span><span class="zh">跨文化沟通中的心理障碍</span></h1>
 
-  <div class="reflect-box anim" data-order="2">
-    <q>
-      <span class="en">You give a German client a clock as a gift. What might go wrong?</span>
-      <span class="zh">你给德国客户送一只钟，会出什么问题？</span>
-    </q>
-    <textarea placeholder="写下你的分析…"></textarea>
+  <div class="barrier-progress anim" data-order="2" id="barrierProgress">
+    <div class="barrier-step" data-barrier-step="0">
+      <div class="concept"><span class="en">See the barriers first, then build the ability to respond.</span><span class="zh">先识别心理障碍，再培养跨文化应对能力。</span></div>
+      <div class="grid-2" style="margin-top:.65rem">
+        <div class="card primary"><span style="font-size:.85rem;font-weight:700">三种心理障碍</span><div style="font-size:.8rem;margin-top:.3rem">民族中心主义 / 刻板印象 / 基本归因错误</div></div>
+        <div class="card primary"><span style="font-size:.85rem;font-weight:700">两种能力模型</span><div style="font-size:.8rem;margin-top:.3rem">文化智商 CQ / Byram 跨文化能力 IC</div></div>
+      </div>
+    </div>
+
+    <div class="barrier-step" data-barrier-step="1" hidden>
+      <div class="concept"><span class="en"><b>Ethnocentrism:</b> The belief that your own culture is the “normal” or “correct” way to do things.</span><span class="zh"><b>民族中心主义：</b>认为自己的文化是“正常的”或“正确的”做事方式。</span></div>
+      <div class="card accent" style="margin-top:.65rem"><span style="font-size:.85rem;font-weight:700">典型表现</span><div style="font-size:.8rem;margin-top:.25rem">· “我们一直都是这么做的”<br>· “他们那样做真奇怪”<br>· 用自己的文化标准评判对方</div></div>
+    </div>
+
+    <div class="barrier-step" data-barrier-step="2" hidden>
+      <div class="concept"><span class="en"><b>Stereotype:</b> Oversimplified, generalized beliefs about a group.</span><span class="zh"><b>刻板印象：</b>对一个群体过于简化、一概而论的信念。</span></div>
+      <div class="card accent" style="margin-top:.65rem"><span style="font-size:.85rem;font-weight:700">重要提醒</span><div style="font-size:.8rem;margin-top:.25rem">刻板印象不一定“完全错误”，但会把群体倾向当成个人事实，让我们忽略真实的个体差异。</div></div>
+    </div>
+
+    <div class="barrier-controls">
+      <div class="barrier-dots" aria-label="学习进度">
+        <button class="barrier-dot active" type="button" data-step-target="0" aria-label="第1步" aria-current="step"></button>
+        <button class="barrier-dot" type="button" data-step-target="1" aria-label="第2步"></button>
+        <button class="barrier-dot" type="button" data-step-target="2" aria-label="第3步"></button>
+      </div>
+      <button class="barrier-next" id="barrierNext" type="button">下一步 1/3 →</button>
+    </div>
   </div>
-
-  <div class="card primary anim" data-order="3">
-    <span class="zh" style="font-size:.8rem">提示：中文"送钟"谐音什么？西方送钟又有什么含义？</span>
-  </div>
-</section>
-
-<!-- 3.5 总览 -->
-<section class="slide" data-slide="50" data-page-type="理论转场">
-  <div class="section-label anim" data-order="0">理论转场 · 3.5</div>
-  <h1 class="slide-title anim" data-order="1"><span class="en">Overcoming Cross-Cultural Barriers</span><span class="zh">跨文化障碍怎么破</span></h1>
-  <div class="grid-2 anim" data-order="2">
-    <div class="card primary"><span class="en" style="font-size:.85rem;font-weight:700">三种心理障碍</span><div style="font-size:.8rem;margin-top:.3rem">民族中心主义 / 刻板印象 / 基本归因错误</div></div>
-    <div class="card primary"><span class="en" style="font-size:.85rem;font-weight:700">两种能力模型</span><div style="font-size:.8rem;margin-top:.3rem">文化智商 CQ / Byram 跨文化能力 IC</div></div>
-  </div>
-</section>
-
-<!-- 3.5.1 民族中心主义 -->
-<section class="slide" data-slide="51" data-page-type="理论知识点">
-  <div class="section-label anim" data-order="0">3.5.1 · 心理障碍</div>
-  <h1 class="slide-title anim" data-order="1"><span class="en">Ethnocentrism</span><span class="zh">民族中心主义</span></h1>
-  <div class="concept anim" data-order="2"><span class="en">The belief that your own culture is the "normal" or "correct" way to do things.</span><span class="zh">认为自己的文化是"正常的"或"正确的"做事方式。</span></div>
-  <div class="card accent anim" data-order="3"><span class="en" style="font-size:.85rem;font-weight:700">典型表现</span><div style="font-size:.8rem;margin-top:.2rem">· "我们一直都是这么做的"<br>· "他们那样做真奇怪"<br>· 用自己的文化标准评判对方</div></div>
-</section>
-
-<!-- 3.5.2 刻板印象 -->
-<section class="slide" data-slide="52" data-page-type="理论知识点">
-  <div class="section-label anim" data-order="0">3.5.2 · 心理障碍</div>
-  <h1 class="slide-title anim" data-order="1"><span class="en">Stereotype</span><span class="zh">刻板印象</span></h1>
-  <div class="concept anim" data-order="2"><span class="en">Oversimplified, generalized beliefs about a group.</span><span class="zh">对一个群体过于简化、一概而论的信念。</span></div>
-  <div class="card accent anim" data-order="3"><span class="en" style="font-size:.85rem;font-weight:700">注意</span><div style="font-size:.8rem;margin-top:.2rem">刻板印象不等于"完全错"——但会让你忽略个体差异。</div></div>
 </section>
 
 <!-- 3.5.3 基本归因错误（试错） -->
 <section class="slide" data-slide="53" data-page-type="试错">
   <div class="section-label anim" data-order="0">3.5.3 · 试错</div>
   <h1 class="slide-title anim" data-order="1"><span class="en">Why Was He Late?</span><span class="zh">他为什么迟到？</span></h1>
-  <div class="scenario-box anim" data-order="2"><span class="en" style="font-size:.85rem;font-weight:600">Your Indian colleague is 20 minutes late. No apology.</span><span class="zh" style="font-size:.8rem">你的印度同事开会迟到了 20 分钟，没有道歉。</span></div>
+  <div class="scenario-box anim" data-order="2"><span class="en" style="font-size:.85rem;font-weight:600">Your Thai colleague is 20 minutes late. No apology.</span><span class="zh" style="font-size:.8rem">你的泰国同事开会迟到了 20 分钟，没有道歉。</span></div>
   <div class="choice-q anim" data-order="3">
     <div class="q" style="font-size:.85rem">你的第一反应是：</div>
     <div class="choice-opts">
@@ -3022,7 +3093,7 @@
     </div>
     <div class="choice-fb" id="attributionFb"></div>
   </div>
-  <div class="concept anim" data-order="4"><span class="en">If you picked A, you just committed the Fundamental Attribution Error.</span><span class="zh" style="font-size:.82rem">如果你选了 A，你刚刚犯了基本归因错误——把行为归因于性格，而不是情境。</span></div>
+  <div class="concept anim" id="attributionReveal" data-order="4" hidden><span class="en">If you picked A, you just committed the Fundamental Attribution Error.</span><span class="zh" style="font-size:.82rem">如果你选了 A，你刚刚犯了基本归因错误——把行为归因于性格，而不是情境。</span></div>
 </section>
 
 <!-- 3.5.4 CQ -->
@@ -3036,20 +3107,86 @@
     <div class="card primary"><span style="font-size:.85rem"><b>行为 Behavioral</b><br>能调整言行</span></div>
     <div class="card primary"><span style="font-size:.85rem"><b>动机 Motivational</b><br>有动力跨文化互动</span></div>
   </div>
+  <div class="cq-test-action anim" data-order="4">
+    <a class="cq-test-link" href="https://steven2025.github.io/CQ-Test/" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开文化智商测试">
+      文化智商测试 · Cultural Intelligence Test →
+    </a>
+  </div>
 </section>
 
 <!-- 3.5.5 Byram -->
 <section class="slide" data-slide="55" data-page-type="理论知识点">
   <div class="section-label anim" data-order="0">3.5.5 · 能力模型</div>
   <h1 class="slide-title anim" data-order="1"><span class="en">Byram's Intercultural Competence</span><span class="zh">Byram 跨文化能力</span></h1>
-  <div style="margin:.4rem 0" class="anim" data-order="2">
-    <div class="card primary" style="margin:.3rem 0"><span style="font-size:.85rem"><b>Attitude 态度</b>：好奇、开放</span></div>
-    <div class="card primary" style="margin:.3rem 0"><span style="font-size:.85rem"><b>Knowledge 知识</b>：了解双方文化</span></div>
-    <div class="card primary" style="margin:.3rem 0"><span style="font-size:.85rem"><b>Interpreting 解释技能</b>：解释对方行为</span></div>
-    <div class="card primary" style="margin:.3rem 0"><span style="font-size:.85rem"><b>Interaction 互动技能</b>：灵活应对</span></div>
-    <div class="card primary" style="margin:.3rem 0"><span style="font-size:.85rem"><b>Critical awareness 批判意识</b>：不盲从，能反思</span></div>
+  <div class="byram-layout anim" data-order="2">
+    <div class="byram-points">
+      <div class="card primary"><span style="font-size:.84rem"><b>Attitudes 态度</b>：保持好奇、开放，并能暂时放下成见</span></div>
+      <div class="card primary"><span style="font-size:.84rem"><b>Knowledge 知识</b>：了解双方社会群体、文化实践与互动规则</span></div>
+      <div class="card primary"><span style="font-size:.84rem"><b>Interpreting &amp; Relating 解释与关联</b>：解释对方行为，并与自身文化经验比较</span></div>
+      <div class="card primary"><span style="font-size:.84rem"><b>Discovery &amp; Interaction 发现与互动</b>：在真实交流中获取新知识并灵活行动</span></div>
+      <div class="card primary"><span style="font-size:.84rem"><b>Critical Cultural Awareness 批判性文化意识</b>：依据明确标准反思双方文化</span></div>
+    </div>
+    <aside class="byram-reading">
+      <h2>延伸阅读 · Further Reading</h2>
+      <button class="reading-open" type="button" data-reading="guide">
+        跨文化维度语言教学：教师实用导论
+        <span class="en">Developing the Intercultural Dimension in Language Teaching</span>
+      </button>
+      <button class="reading-open" type="button" data-reading="aie">
+        跨文化相遇自传
+        <span class="en">Autobiography of Intercultural Encounters</span>
+      </button>
+    </aside>
   </div>
 </section>
+
+<!-- Byram 延伸阅读浮动弹窗 -->
+<div class="reading-modal" id="readingModal" hidden>
+  <section class="reading-window" id="readingWindow" role="dialog" aria-modal="false" aria-labelledby="readingWindowLabel">
+    <header class="reading-window-bar" id="readingDragHandle">
+      <div class="reading-window-label" id="readingWindowLabel">延伸阅读 · Further Reading</div>
+      <div class="reading-window-tools">
+        <button type="button" id="readingMinimize" title="缩回 / Minimize" aria-label="缩回弹窗">—</button>
+        <button type="button" id="readingFullscreen" title="全屏或还原 / Fullscreen or restore" aria-label="全屏显示">□</button>
+        <button type="button" id="readingClose" title="关闭 / Close" aria-label="关闭弹窗">×</button>
+      </div>
+    </header>
+    <div class="reading-window-body">
+      <article class="reading-content" data-reading-content="guide" hidden>
+        <div class="reading-title-row">
+          <h2>跨文化维度语言教学：教师实用导论<span class="en">Developing the Intercultural Dimension in Language Teaching: A Practical Introduction for Teachers</span></h2>
+          <a class="reading-download" href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/guide_dimintercult_en.pdf" target="_blank" rel="noopener noreferrer" download>下载 PDF · Download</a>
+        </div>
+        <h3>主要观点（中文）</h3>
+        <p>本指南认为，跨文化教育的目标不是让学习者模仿某个“标准母语者”，也不是背诵某个国家的固定文化知识，而是培养能够在不同身份、价值观和交流规则之间建立理解的“跨文化沟通者与调解者”。文化不断变化，每个人也拥有多重身份，因此不能把国籍或群体标签直接等同于个人。</p>
+        <ul>
+          <li><b>能力结构：</b>跨文化能力由态度、知识、解释与关联技能、发现与互动技能，以及批判性文化意识共同构成。</li>
+          <li><b>学习方法：</b>通过真实材料、文化比较、访问与交流、学习者自主调查和反思活动，发现差异背后的社会意义。</li>
+          <li><b>教师角色：</b>教师不必知道所有国家的全部文化，而应帮助学生提出问题、检验刻板印象，并从对方视角理解沟通过程。</li>
+          <li><b>评价方式：</b>不能只测事实记忆，还应观察学习者如何解释文化事件、调整判断、形成尊重平等的互动方式；档案袋和持续反思比一次性测验更合适。</li>
+        </ul>
+        <div class="english-summary"><b>Key ideas (English)</b><br>This guide presents intercultural learners as speakers and mediators rather than imitators of an ideal native speaker. It links attitudes, knowledge, interpreting and relating, discovery and interaction, and critical cultural awareness. Teaching should use inquiry, comparison, authentic encounters and reflection, while assessment should value the learner’s developing ability to understand people as complex individuals.</div>
+      </article>
+
+      <article class="reading-content" data-reading-content="aie" hidden>
+        <div class="reading-title-row">
+          <h2>跨文化相遇自传<span class="en">Autobiography of Intercultural Encounters</span></h2>
+          <a class="reading-download" href="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/PREMS%20041122%20GBR%202508%20AIE%20Text%20A4%20Web%20%281%29.pdf" target="_blank" rel="noopener noreferrer" download>下载 PDF · Download</a>
+        </div>
+        <h3>主要观点（中文）</h3>
+        <p>《跨文化相遇自传》不是传统意义上的“自传”，而是一套有步骤的反思工具。学习者选择一次印象深刻的跨文化接触，重新梳理发生了什么、当时如何感受和判断、对方可能如何理解，以及这次经历会怎样影响自己以后的行动。</p>
+        <ul>
+          <li><b>从经历出发：</b>关注面对面、媒体或网络中的真实文化接触，把生活经验转化为学习材料。</li>
+          <li><b>区分事实与解释：</b>先描述实际发生的事情，再识别自己的推测、情绪、价值判断和文化预设。</li>
+          <li><b>转换视角：</b>尝试理解其他参与者的身份、处境和可能感受，避免只用自己的文化标准解释事件。</li>
+          <li><b>反思与行动：</b>总结学到了什么、还需要了解什么，以及以后遇到类似情况时可以怎样沟通和行动。</li>
+          <li><b>适用范围：</b>资料包含标准学习者版本、低龄学习者版本及教师指导，可用于个人反思、课堂讨论和跨文化项目。</li>
+        </ul>
+        <div class="english-summary"><b>Key ideas (English)</b><br>The AIE is a guided reflection tool for learning from a significant intercultural encounter. Learners revisit events, emotions, assumptions and different perspectives, distinguish observation from interpretation, and decide what they can learn or do next. It includes standard and younger-learner versions with guidance for facilitators.</div>
+      </article>
+    </div>
+  </section>
+</div>
 
 <!-- 3.5.6 谈判 -->
 <section class="slide" data-slide="56" data-page-type="管理行动">
@@ -3077,16 +3214,39 @@
   <div class="card primary anim" data-order="3"><span class="zh" style="font-size:.8rem">核心：不是"谁对谁错"，而是"不同文化跑的是不同的程序"。</span></div>
 </section>
 
-<!-- MMG 学生工坊 -->
+<!-- 互动视频案例选题工坊 -->
 <section class="slide" data-slide="58" data-page-type="任务页">
   <div class="section-label anim" data-order="0">学生工坊 · Workshop</div>
-  <h1 class="slide-title anim" data-order="1"><span class="en">Build Your Own Case with AI</span><span class="zh">用豆包设计跨文化互动案例</span></h1>
-  <div class="scenario-box anim" data-order="2"><span style="font-size:.88rem">你已经看了两个完整案例（严经理、平方轮椅），也学完了本章所有知识点。现在轮到你：选一个真实案例文本，用豆包把它做成互动教学案例。</span></div>
-  <div class="grid-2 anim" data-order="3">
-    <div class="card accent" style="cursor:pointer"><span style="font-size:.85rem;font-weight:700">① MMG 案例文本</span><div style="font-size:.8rem;margin-top:.2rem">首位母国外派高管的文化适应过程</div></div>
-    <div class="card primary" style="cursor:pointer"><span style="font-size:.85rem;font-weight:700">② 豆包提示词模板</span><div style="font-size:.8rem;margin-top:.2rem">读案例 → 拆场景 → 写策略 → 生成HTML</div></div>
+  <h1 class="slide-title anim" data-order="1"><span class="en">Interactive Video Case Project</span><span class="zh">跨文化互动视频案例选题</span></h1>
+  <div class="scenario-box case-workshop-intro anim" data-order="2">20名学生共同完成8个案例。点击案例按钮，可预览案例PDF与MD脚本、下载文件并登记选题；不同案例限2人或3人，名额以班级云端记录为准。</div>
+  <div class="case-workshop-grid anim" data-order="3">
+    <button class="case-workshop-btn" type="button" data-case-id="1"><strong>01 · MMG外派高管文化适应</strong><small>外派管理与文化适应 · 最多2人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 2人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="2"><strong>02 · 诺唯赞全球化战略</strong><small>全球协同与本地化 · 最多3人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 3人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="3"><strong>03 · 中信戴卡墨西哥工厂</strong><small>文化融合与海外工厂 · 最多2人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 2人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="4"><strong>04 · 四达时代非洲国际化</strong><small>文化传播与非洲市场 · 最多3人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 3人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="5"><strong>05 · Ale意大利餐厅困境</strong><small>沟通与变革管理 · 最多2人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 2人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="6"><strong>06 · 思和科技薪酬整合</strong><small>跨国并购与薪酬公平 · 最多3人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 3人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="7"><strong>07 · 爱菊粮油哈萨克斯坦</strong><small>人才本土化与授权 · 最多2人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 2人</span><span class="case-workshop-mine">我的选题</span></span></button>
+    <button class="case-workshop-btn" type="button" data-case-id="8"><strong>08 · V公司收购韩国T公司</strong><small>并购整合与人才保留 · 最多3人</small><span class="case-workshop-meta"><span class="case-workshop-cap">0 / 3人</span><span class="case-workshop-mine">我的选题</span></span></button>
   </div>
-  <div class="card anim" data-order="4" style="margin-top:.5rem"><span style="font-size:.85rem;font-weight:700">提交要求</span><div style="font-size:.8rem;margin-top:.2rem">每组交一个可运行的 HTML（或设计文档+草稿）。重点是"会设计互动结构"，不是"会做视频"。</div></div>
+  <div class="case-workshop-note anim" data-order="4">每人只能选择1个案例，截止前可改选。最终提交一个可运行的互动HTML、最终版MD脚本及素材来源清单。</div>
+</section>
+
+<section class="case-workshop-modal" id="caseWorkshopModal" role="dialog" aria-modal="true" aria-labelledby="caseWorkshopTitle">
+  <header class="case-workshop-head"><strong id="caseWorkshopTitle">互动视频案例</strong><button type="button" id="caseWorkshopMini" title="缩回">—</button><button type="button" id="caseWorkshopFull" title="全屏/退出全屏">⛶</button><button type="button" id="caseWorkshopClose" title="关闭">×</button></header>
+  <div class="case-workshop-body">
+    <aside class="case-workshop-info" id="caseWorkshopInfo"><div id="caseWorkshopMessage" class="case-workshop-message"></div></aside>
+    <div class="case-workshop-preview">
+      <nav class="case-workshop-tabs"><button type="button" class="active" data-case-tab="pdf">PDF预览</button><button type="button" data-case-tab="md">MD脚本预览</button></nav>
+      <div class="case-workshop-pane active" data-case-pane="pdf">
+        <div class="case-pdf-viewer" id="caseWorkshopPdf">
+          <div class="case-pdf-toolbar"><button type="button" id="casePdfPrev">← 上一页</button><span id="casePdfPage">准备加载…</span><button type="button" id="casePdfNext">下一页 →</button><button type="button" id="casePdfZoomOut" title="缩小">－</button><button type="button" id="casePdfZoomIn" title="放大">＋</button></div>
+          <div class="case-pdf-stage" id="casePdfStage"><div class="case-workshop-loading" id="casePdfStatus">正在加载PDF预览…</div><canvas id="casePdfCanvas" aria-label="案例PDF预览"></canvas></div>
+        </div>
+      </div>
+      <div class="case-workshop-pane" data-case-pane="md"><pre class="case-workshop-md" id="caseWorkshopMd"></pre></div>
+    </div>
+  </div>
 </section>
 
 <div class="page-foot">
@@ -3164,7 +3324,7 @@
     [19,'第三章 · 3.5 障碍与策略'],
     [19,'第三章 · 3.5 障碍与策略'],
     [19,'第三章 · 3.5 障碍与策略'],
-    [19,'第三章 · MMG 学生工坊'],
+    [19,'第三章 · 互动视频案例选题'],
   ];
 
   // 语音语调互动
@@ -3313,6 +3473,34 @@
   btnClass.onclick = ()=>setMode(true);
   btnSelf.onclick = ()=>setMode(false);
   setMode(true);
+
+  // 3.5 心理障碍：本页三步进度控制
+  const barrierProgress = document.getElementById('barrierProgress');
+  if(barrierProgress){
+    const barrierSteps = [...barrierProgress.querySelectorAll('.barrier-step')];
+    const barrierDots = [...barrierProgress.querySelectorAll('.barrier-dot')];
+    const barrierNext = document.getElementById('barrierNext');
+    let barrierStep = 0;
+
+    function showBarrierStep(step){
+      barrierStep = Math.max(0, Math.min(step, barrierSteps.length - 1));
+      barrierSteps.forEach((panel, index)=>{ panel.hidden = index !== barrierStep; });
+      barrierDots.forEach((dot, index)=>{
+        dot.classList.toggle('active', index === barrierStep);
+        if(index === barrierStep) dot.setAttribute('aria-current', 'step');
+        else dot.removeAttribute('aria-current');
+      });
+      const finished = barrierStep === barrierSteps.length - 1;
+      barrierNext.textContent = finished ? `完成 ${barrierStep + 1}/${barrierSteps.length} ✓` : `下一步 ${barrierStep + 1}/${barrierSteps.length} →`;
+      barrierNext.disabled = finished;
+    }
+
+    barrierDots.forEach(dot=>{
+      dot.onclick = ()=>showBarrierStep(Number(dot.dataset.stepTarget));
+    });
+    barrierNext.onclick = ()=>showBarrierStep(barrierStep + 1);
+    showBarrierStep(0);
+  }
 
   // ===== LPC 测评 =====
   const lpcBtns = document.querySelectorAll('.lpc-btn');
@@ -3815,9 +4003,12 @@
 
       // 3.5.3 基本归因错误（A=性格归因，B=情境归因）
       if(fb.id === 'attributionFb'){
+        const attributionReveal = document.getElementById('attributionReveal');
+        attributionReveal.hidden = false;
+        attributionReveal.classList.add('revealed');
         if(pick==='A'){
           fb.className = 'choice-fb show try';
-          fb.innerHTML = '<b>再想想。</b>这是性格归因——"他这个人不尊重时间"。但他可能遇到了急事、堵车、或者印度的交通确实很差。';
+          fb.innerHTML = '<b>再想想。</b>这是性格归因——“他这个人不尊重时间”。但他也可能遇到了临时状况、交通拥堵或沟通误会。';
         } else {
           fb.className = 'choice-fb show good';
           fb.innerHTML = '<b>✓ 这是情境归因。</b>基本归因错误就是：我们倾向于把别人的行为归因于性格，而把自己的行为归因于情境。';
@@ -3825,17 +4016,14 @@
         return;
       }
 
-      // 3.4 礼盒（正确答案 B）
+      // 3.4 商务送礼（正确答案 C）
       if(fb.id === 'giftFb'){
-        if(pick==='B'){
+        if(pick==='C'){
           fb.className = 'choice-fb show good';
-          fb.innerHTML = '<b>✓ 对了。</b>美国文化里，收礼时不当面拆是客气——当面拆会让送礼人尴尬。';
-        } else if(pick==='A'){
-          fb.className = 'choice-fb show try';
-          fb.innerHTML = '<b>再想想。</b>Daniel 不是不喜欢，这是美国文化的习惯。';
+          fb.innerHTML = '<b>✓ 对了。</b>Daniel 喜欢这份礼物，也理解严经理的心意；但约 200 美元的耳机超过了他所在公司规定的 50 美元礼品申报限额，因此需要申报，并按公司决定保留、上交或退回。商务送礼既涉及文化礼仪，也要考虑企业合规制度。';
         } else {
           fb.className = 'choice-fb show try';
-          fb.innerHTML = '<b>再想想。</b>他不是忘了——这是美国收礼文化。';
+          fb.innerHTML = '<b>再想想。</b>Daniel 已经开心地拆开礼物并礼貌致谢，迟疑不是因为礼物本身、拆礼方式或国产品牌，而是因为礼物价值可能触及公司的申报规定。';
         }
         return;
       }
@@ -3881,6 +4069,67 @@
     }
   }
   unlock4Btn.onclick = ()=>{ show(34); }; // 第28页试错 → 第29页解析（index 27→28）
+
+  // Byram 延伸阅读：可移动、缩放、全屏与缩回的浮动弹窗
+  const readingModal = document.getElementById('readingModal');
+  const readingWindow = document.getElementById('readingWindow');
+  const readingDragHandle = document.getElementById('readingDragHandle');
+  const readingMinimize = document.getElementById('readingMinimize');
+  const readingFullscreen = document.getElementById('readingFullscreen');
+  const readingClose = document.getElementById('readingClose');
+
+  function setReadingMinimized(minimized){
+    if(minimized){
+      readingWindow.classList.remove('is-fullscreen');
+      readingFullscreen.textContent = '□';
+      readingFullscreen.setAttribute('aria-label', '全屏显示');
+    }
+    readingWindow.classList.toggle('is-minimized', minimized);
+    readingMinimize.textContent = minimized ? '▢' : '—';
+    readingMinimize.setAttribute('aria-label', minimized ? '展开弹窗' : '缩回弹窗');
+  }
+
+  function setReadingFullscreen(fullscreen){
+    if(fullscreen) setReadingMinimized(false);
+    readingWindow.classList.toggle('is-fullscreen', fullscreen);
+    readingFullscreen.textContent = fullscreen ? '❐' : '□';
+    readingFullscreen.setAttribute('aria-label', fullscreen ? '退出全屏' : '全屏显示');
+  }
+
+  document.querySelectorAll('.reading-open').forEach(button=>{
+    button.onclick = ()=>{
+      const reading = button.dataset.reading;
+      document.querySelectorAll('[data-reading-content]').forEach(article=>{
+        article.hidden = article.dataset.readingContent !== reading;
+      });
+      readingModal.hidden = false;
+      setReadingMinimized(false);
+      readingClose.focus();
+    };
+  });
+  readingClose.onclick = ()=>{ readingModal.hidden = true; };
+  readingMinimize.onclick = ()=>setReadingMinimized(!readingWindow.classList.contains('is-minimized'));
+  readingFullscreen.onclick = ()=>setReadingFullscreen(!readingWindow.classList.contains('is-fullscreen'));
+
+  let readingDrag = null;
+  readingDragHandle.addEventListener('pointerdown', event=>{
+    if(event.target.closest('button') || readingWindow.classList.contains('is-fullscreen')) return;
+    const rect = readingWindow.getBoundingClientRect();
+    readingDrag = {x:event.clientX,y:event.clientY,left:rect.left,top:rect.top};
+    readingDragHandle.setPointerCapture(event.pointerId);
+  });
+  readingDragHandle.addEventListener('pointermove', event=>{
+    if(!readingDrag) return;
+    const maxLeft = Math.max(0, window.innerWidth - readingWindow.offsetWidth);
+    const maxTop = Math.max(0, window.innerHeight - readingDragHandle.offsetHeight);
+    readingWindow.style.left = Math.min(maxLeft, Math.max(0, readingDrag.left + event.clientX - readingDrag.x)) + 'px';
+    readingWindow.style.top = Math.min(maxTop, Math.max(0, readingDrag.top + event.clientY - readingDrag.y)) + 'px';
+  });
+  readingDragHandle.addEventListener('pointerup', ()=>{ readingDrag = null; });
+  readingDragHandle.addEventListener('pointercancel', ()=>{ readingDrag = null; });
+  document.addEventListener('keydown', event=>{
+    if(event.key === 'Escape' && !readingModal.hidden) readingModal.hidden = true;
+  });
 
   // Iwao 弹窗
   const iwaoModal = document.getElementById('iwaoModal');
@@ -4033,6 +4282,8 @@
     };
   });
 </script>
+<link rel="stylesheet" href="../assets/chapter3-case-workshop.css?v=4">
+<script src="../assets/chapter3-case-workshop.js?v=4"></script>
 <link rel="stylesheet" href="../assets/chapter-notes.css?v=5">
 <script src="../assets/chapter-notes.js?v=5"></script>
 </body>
