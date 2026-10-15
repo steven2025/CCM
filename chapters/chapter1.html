@@ -523,13 +523,13 @@ html{font-size:clamp(17px,1.35vw,20px)}
 .svg-wrap svg{width:100%;max-width:1180px}.slide-inner{min-width:0}
 .anim:not(.visible){pointer-events:none;visibility:hidden}.anim.visible{visibility:visible}
 .media-drawer{right:-480px}
-.topbar,.topbar:hover{height:var(--reader-top);padding:8px 18px;gap:16px;box-shadow:0 2px 12px #18335b0a}
-.topbar-nav{display:flex;align-items:center;gap:8px;flex:1 1 auto;justify-content:center;min-width:0}
+.topbar,.topbar:hover{height:var(--reader-top);padding:8px 18px;gap:16px;box-shadow:0 2px 12px #18335b0a;display:grid;grid-template-columns:minmax(170px,1fr) auto minmax(270px,1fr)}
+.topbar-nav{display:flex;align-items:center;gap:8px;justify-content:center;min-width:0}
 .topbar-nav .nav-btn{white-space:nowrap;padding:.38rem .95rem}
 .topbar-nav .page-picker{flex:none}.topbar-nav .page-picker select{width:min(210px,24vw);padding:6px 8px}
 #stepStatus{margin-left:6px}
-.topbar-title,.topbar:hover .topbar-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.reader-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;align-items:center}
+.topbar-title,.topbar:hover .topbar-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;justify-self:start}
+.reader-actions{display:flex;gap:7px;flex-wrap:nowrap;align-items:center;justify-self:end}
 button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
 .reader-actions button,.drawer-body button,.drawer-header button{border:1px solid #d5e0ed;border-radius:8px;background:white;color:#244569;padding:8px 10px;font-size:12px}
 .reader-actions button[aria-pressed=true]{background:#e4efff;border-color:#2563eb;color:#164fb5}
@@ -556,9 +556,9 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 #readerZoom #zoomContent svg{width:100%;height:auto;max-height:72vh}#readerZoom>p{text-align:center;font-size:12px;margin-top:24px;color:#64748b}
 .reader-zoomable{cursor:zoom-in}.reader-zoomable:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #06b6d4;outline-offset:3px}
 [hidden]{display:none!important}
-@media(max-width:900px){:root{--reader-top:132px}.topbar{align-items:flex-start;flex-direction:column;gap:6px}.topbar-nav{width:100%;flex:none;justify-content:flex-start;flex-wrap:wrap}.reader-actions{width:100%;gap:4px}.reader-actions button{font-size:11px;padding:6px 8px}.topbar-title{width:100%}.slide{padding:24px 16px}.page-picker select{width:30vw}#stepStatus{display:none}}
+@media(max-width:1120px){:root{--reader-top:116px}.topbar,.topbar:hover{display:flex;align-items:flex-start;flex-direction:column;gap:6px}.topbar-nav{width:100%;flex:none;justify-content:center;flex-wrap:nowrap}.reader-actions{position:absolute;right:18px;top:8px;width:auto;gap:4px}.reader-actions button{font-size:11px;padding:6px 8px}.topbar-title{width:calc(100% - 360px)}.slide{padding:24px 16px}.page-picker select{width:min(260px,34vw)}#stepStatus{display:none}#ccmNotesLauncher{top:122px!important;right:10px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media(max-width:600px){.slide [style*="grid-template-columns"]{grid-template-columns:1fr!important}.slide-title{overflow-wrap:anywhere}.nav-btn{padding:8px;font-size:12px}.page-picker{font-size:10px}.reader-actions{row-gap:5px}.data-table{min-width:650px}.slide-inner{overflow-x:auto}.grade-bar .label{font-size:1rem;width:130px;flex-shrink:0}}
+@media(max-width:600px){.slide [style*="grid-template-columns"]{grid-template-columns:1fr!important}.slide-title{overflow-wrap:anywhere}.nav-btn{padding:8px;font-size:12px}.page-picker{font-size:10px}.reader-actions{left:8px;right:8px;row-gap:5px;justify-content:flex-end}.data-table{min-width:650px}.slide-inner{overflow-x:auto}.grade-bar .label{font-size:1rem;width:130px;flex-shrink:0}}
 .reading-title-row{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.5rem;padding:0 1rem}
 .reading-title-row .slide-subtitle{margin-bottom:0}
 .reading-open{flex:0 0 auto;border:0;border-radius:999px;padding:.62rem 1rem;background:linear-gradient(135deg,#1d4ed8,#0891b2);color:#fff;font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.25);transition:transform .2s,box-shadow .2s}
@@ -685,7 +685,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   .mosuo-video-zone::before{font-size:.6rem;top:10px}
 }
 </style></head><body data-reader-version="1" data-chapter-id="chapter-1">
-<header class="topbar"><div class="topbar-title" id="topbarTitle">第一章 · Cross-cultural Management</div><div class="topbar-nav"><button class="nav-btn" id="prevBtn">← 上一页</button><label class="page-picker">页码 / Page <select id="pageSelect" aria-label="跳转页面"></select></label><button class="nav-btn primary" id="nextBtn">下一步 →</button><span id="stepStatus" role="status" aria-live="polite"></span></div><div class="reader-actions"><button id="picturesBtn">本页图片 <span id="pictureCount">0</span></button><button id="modeBtn" aria-pressed="false">课堂模式</button><button id="revealBtn">本页全部展开</button><button id="fullscreenBtn">全屏</button><button id="editBtn" aria-pressed="false">本机编辑</button><button id="exportBtn" hidden>导出含图片的 HTML</button></div></header>
+<header class="topbar"><div class="topbar-title" id="topbarTitle">第一章 · Cross-cultural Management</div><div class="topbar-nav"><button class="nav-btn" id="prevBtn">← 上一页</button><label class="page-picker">页码 / Page <select id="pageSelect" aria-label="跳转页面"></select></label><button class="nav-btn primary" id="nextBtn">下一步 →</button><span id="stepStatus" role="status" aria-live="polite"></span></div><div class="reader-actions"><button id="picturesBtn">本页图片 <span id="pictureCount">0</span></button><button id="fullscreenBtn">全屏</button><button id="editBtn" aria-pressed="false">本机编辑</button><button id="exportBtn" hidden>导出含图片的 HTML</button></div></header>
 <main class="stage" id="stage">
 
 <!-- ===== SLIDE 1: COVER ===== -->
@@ -2120,7 +2120,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
     $('prevBtn').disabled = page === 0;
     $('nextBtn').disabled = page === slides.length - 1 && (study || progress[page] >= maximum);
     $('nextBtn').textContent = !study && progress[page] < maximum ? '下一步 →' : '下一页 →';
-    $('modeBtn').textContent = study ? '自主阅读' : '课堂模式'; $('modeBtn').setAttribute('aria-pressed', String(study));
+    const modeButton = $('modeBtn'); if (modeButton) { modeButton.textContent = study ? '自主阅读' : '课堂模式'; modeButton.setAttribute('aria-pressed', String(study)); }
     renderImages();
   }
   function go(index) { if (busy) return; page = Math.max(0, Math.min(slides.length - 1, index)); render(); slides[page].scrollTop = 0; }
@@ -2177,8 +2177,8 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   $('addImagesBtn').onclick = () => pick();
   $('prevBtn').onclick = () => go(page - 1); $('nextBtn').onclick = next;
   $('pageSelect').onchange = e => go(Number(e.target.value));
-  $('modeBtn').onclick = () => { study = !study; render(); };
-  $('revealBtn').onclick = () => { progress[page] = orders[page].length - 1; render(); };
+  const modeButton = $('modeBtn'); if (modeButton) modeButton.onclick = () => { study = !study; render(); };
+  const revealButton = $('revealBtn'); if (revealButton) revealButton.onclick = () => { progress[page] = orders[page].length - 1; render(); };
   $('fullscreenBtn').onclick = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch { alert('当前环境不支持全屏，请使用浏览器全屏功能。'); } };
   document.addEventListener('fullscreenchange', () => { $('fullscreenBtn').textContent = document.fullscreenElement ? '退出全屏' : '全屏'; });
   $('zoomClose').onclick = () => $('readerZoom').close();
