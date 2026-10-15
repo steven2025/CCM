@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第一章 · 跨文化管理 HTML 课件</title><style>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第一章 · 跨文化管理 HTML 课件</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232563eb'/%3E%3Cstop offset='1' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='44' font-size='34' font-weight='700' text-anchor='middle' fill='white'%3EC%3C/text%3E%3C/svg%3E"><style>
 /* ============ RESET & BASE ============ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -524,18 +524,22 @@ html{font-size:clamp(17px,1.35vw,20px)}
 .anim:not(.visible){pointer-events:none;visibility:hidden}.anim.visible{visibility:visible}
 .media-drawer{right:-480px}
 .topbar,.topbar:hover{height:var(--reader-top);padding:8px 18px;gap:16px;box-shadow:0 2px 12px #18335b0a}
+.topbar-nav{display:flex;align-items:center;gap:8px;flex:1 1 auto;justify-content:center;min-width:0}
+.topbar-nav .nav-btn{white-space:nowrap;padding:.38rem .95rem}
+.topbar-nav .page-picker{flex:none}.topbar-nav .page-picker select{width:min(210px,24vw);padding:6px 8px}
+#stepStatus{margin-left:6px}
 .topbar-title,.topbar:hover .topbar-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .reader-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;align-items:center}
 button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
 .reader-actions button,.drawer-body button,.drawer-header button{border:1px solid #d5e0ed;border-radius:8px;background:white;color:#244569;padding:8px 10px;font-size:12px}
 .reader-actions button[aria-pressed=true]{background:#e4efff;border-color:#2563eb;color:#164fb5}
 #pictureCount{background:#e4efff;padding:2px 6px;border-radius:5px;margin-left:3px}
-.stage{top:var(--reader-top);bottom:var(--reader-bottom)}
+.stage{top:var(--reader-top);bottom:0}
 .slide{padding:28px 32px 36px;justify-content:flex-start}.slide-inner{margin:auto;flex-shrink:0}
 .slide[hidden]{display:none}.navbar{height:var(--reader-bottom);gap:12px;padding:8px 20px}
 .page-picker{display:flex;align-items:center;gap:8px;font-size:12px;min-width:0}.page-picker select{max-width:380px;width:30vw;padding:8px;border:1px solid #cbd8e8;border-radius:8px;color:#1e3a5f;background:white}
 #stepStatus{color:#64748b;font-size:12px}.nav-btn{font-size:13px}
-.media-drawer{top:var(--reader-top);bottom:var(--reader-bottom);height:auto;width:min(460px,100vw);max-width:100vw;z-index:200;box-shadow:-10px 0 35px #14346322}
+.media-drawer{top:var(--reader-top);bottom:0;height:auto;width:min(460px,100vw);max-width:100vw;z-index:200;box-shadow:-10px 0 35px #14346322}
 .media-drawer .drawer-body{height:calc(100% - 62px);overflow:auto}.drawer-header{height:62px}
 .editor-note{padding:10px;background:#fff7e6;color:#7c5600;font-size:12px;line-height:1.65;border-radius:8px;margin-bottom:10px}
 .reader-image-card{padding:12px;border:1px solid #dce5ef;border-radius:12px;margin:12px 0;background:white}
@@ -552,7 +556,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 #readerZoom #zoomContent svg{width:100%;height:auto;max-height:72vh}#readerZoom>p{text-align:center;font-size:12px;margin-top:24px;color:#64748b}
 .reader-zoomable{cursor:zoom-in}.reader-zoomable:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #06b6d4;outline-offset:3px}
 [hidden]{display:none!important}
-@media(max-width:900px){:root{--reader-top:108px}.topbar{align-items:flex-start;flex-direction:column;gap:6px}.reader-actions{width:100%;gap:4px}.reader-actions button{font-size:11px;padding:6px 8px}.topbar-title{width:100%}.slide{padding:24px 16px}.navbar{padding:8px;gap:6px}.page-picker select{width:30vw}#stepStatus{display:none}}
+@media(max-width:900px){:root{--reader-top:132px}.topbar{align-items:flex-start;flex-direction:column;gap:6px}.topbar-nav{width:100%;flex:none;justify-content:flex-start;flex-wrap:wrap}.reader-actions{width:100%;gap:4px}.reader-actions button{font-size:11px;padding:6px 8px}.topbar-title{width:100%}.slide{padding:24px 16px}.page-picker select{width:30vw}#stepStatus{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:600px){.slide [style*="grid-template-columns"]{grid-template-columns:1fr!important}.slide-title{overflow-wrap:anywhere}.nav-btn{padding:8px;font-size:12px}.page-picker{font-size:10px}.reader-actions{row-gap:5px}.data-table{min-width:650px}.slide-inner{overflow-x:auto}.grade-bar .label{font-size:1rem;width:130px;flex-shrink:0}}
 .reading-title-row{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.5rem;padding:0 1rem}
@@ -569,6 +573,20 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 .reading-body h4{color:#0f766e;margin:1rem 0 .35rem;font-size:1rem}.reading-body ol,.reading-body ul{padding-left:1.35rem}.reading-body li{margin:.35rem 0}
 .reading-link{display:inline-flex;align-items:center;gap:.35rem;margin-top:1rem;padding:.7rem 1.05rem;border-radius:10px;background:#1d4ed8;color:#fff;text-decoration:none;font-weight:700}.reading-source{font-size:.78rem;color:#64748b;margin-top:.65rem}
 @media(max-width:700px){.reading-title-row{flex-direction:column;gap:.65rem}.reading-win{width:94vw;height:82vh;min-width:0}.reading-body{padding:1rem}.reading-open{font-size:.82rem}}
+.brag-video-launch{width:min(720px,100%);border:0;border-radius:14px;padding:.9rem 1.2rem;background:linear-gradient(135deg,#1d4ed8,#0891b2);color:#fff;font-family:inherit;font-size:1rem;font-weight:700;line-height:1.45;cursor:pointer;box-shadow:0 7px 20px rgba(29,78,216,.28);transition:transform .2s,box-shadow .2s}
+.brag-video-launch:hover{transform:translateY(-2px);box-shadow:0 11px 28px rgba(29,78,216,.34)}
+.brag-video-window{width:min(460px,92vw);height:min(760px,86vh);max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);min-width:min(300px,calc(100vw - 16px));min-height:min(430px,calc(100vh - 16px));background:#07111f;border-color:#38bdf8}
+.brag-video-window.fullscreen{z-index:10040;inset:0!important;width:100vw!important;height:100vh!important;min-width:0;min-height:0;transform:none!important;border:0;border-radius:0;resize:none}
+.brag-video-head-actions{display:flex;align-items:center;gap:.45rem}.brag-video-head-actions button{width:auto;min-width:2rem;padding:0 .65rem;border:0;border-radius:8px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;cursor:pointer}
+.brag-video-body{display:flex;align-items:center;justify-content:center;flex:1;min-height:0;padding:12px;overflow:auto;background:#07111f}
+.brag-video-frame{height:100%;max-height:100%;max-width:100%;aspect-ratio:9/16;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.brag-video-frame video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.work-video-window{width:min(880px,94vw);height:min(600px,88vh);max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);min-width:min(420px,calc(100vw - 16px));min-height:min(300px,calc(100vh - 16px));background:#07111f;border-color:#38bdf8}
+.work-video-window.fullscreen{z-index:10040;inset:0!important;width:100vw!important;height:100vh!important;min-width:0;min-height:0;transform:none!important;border:0;border-radius:0;resize:none}
+.work-video-frame{height:100%;max-height:100%;max-width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.work-video-frame video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+@media(max-width:520px){.work-video-window{width:94vw;height:82vh;min-width:0;min-height:min(300px,calc(100vh - 16px))}}
+@media(max-width:520px){.brag-video-window{width:94vw;height:82vh;min-width:0;min-height:min(360px,calc(100vh - 16px))}.brag-video-launch{font-size:.9rem;padding:.8rem}.brag-video-head-actions button{font-size:.75rem;padding:0 .5rem}}
 .onion-practice{display:grid;grid-template-columns:minmax(390px,1.05fr) minmax(330px,.95fr);gap:1.25rem;align-items:start}
 .onion-left,.onion-right{background:rgba(255,255,255,.82);border:1.5px solid #b9cbe2;border-radius:18px;padding:1rem;box-shadow:0 6px 22px rgba(30,64,175,.08)}
 .onion-canvas{position:relative;width:min(100%,430px);aspect-ratio:1;margin:0 auto .75rem;isolation:isolate}
@@ -610,8 +628,64 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 .assignment-form{display:grid;gap:.75rem}.assignment-identity{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}.assignment-field{display:grid;gap:.28rem}.assignment-field label{font-size:.75rem;font-weight:750;color:#475569}.assignment-field input{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:.58rem .65rem;background:#f8fafc;color:#1e293b}
 .assignment-file-box{border:2px dashed #93c5fd;border-radius:12px;padding:1rem;background:#eff6ff}.assignment-file-box input{width:100%}.assignment-progress{height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}.assignment-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#7c3aed,#06b6d4);transition:width .2s}.assignment-status{min-height:1.5rem;color:#475569;font-size:.83rem}.assignment-status.error{color:#b91c1c}.assignment-status.success{color:#15803d}.assignment-submit{justify-self:end;border:0;border-radius:10px;padding:.68rem 1rem;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}.assignment-submit:disabled{opacity:.55;cursor:not-allowed}.assignment-latest{padding:.7rem .8rem;border-radius:10px;background:#f0fdf4;border:1px solid #86efac;font-size:.8rem;line-height:1.55;color:#166534}
 @media(max-width:650px){.assignment-identity{grid-template-columns:1fr}}
+/* ============ MOSUO VIDEO (slide 10) ============ */
+.mosuo-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:start}
+.mosuo-text{min-width:0}
+.mosuo-video-zone{
+  position:relative;min-height:420px;
+  border:1.5px dashed var(--border);border-radius:var(--radius);
+  background:linear-gradient(135deg,#f8fafc,#eff6ff);
+}
+.mosuo-video-zone::before{
+  content:'拖拽头部移动 · 右下角缩放 · 全屏播放';position:absolute;left:0;right:0;top:14px;
+  text-align:center;color:#b6c2d4;font-size:.78rem;font-weight:600;pointer-events:none;
+}
+.mosuo-video-box{
+  position:absolute;top:0;left:0;width:92%;
+  background:#0f172a;border:1.5px solid #2563eb;border-radius:12px;
+  box-shadow:0 10px 32px rgba(15,23,42,.28);overflow:hidden;touch-action:none;
+}
+.mosuo-video-head{
+  display:flex;align-items:center;gap:.5rem;padding:.45rem .8rem;
+  background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;
+  font-size:.85rem;font-weight:700;cursor:move;user-select:none;
+}
+.mosuo-video-head strong{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
+.mosuo-video-head button{
+  background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:8px;
+  width:34px;height:30px;font-size:.8rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.mosuo-video-head button:hover{background:rgba(255,255,255,.34)}
+.mosuo-video-body{position:relative;aspect-ratio:16/9;background:#000}
+.mosuo-video-body video{width:100%;height:100%;display:block;object-fit:contain}
+.mosuo-resize-handle{
+  position:absolute;right:0;bottom:0;width:22px;height:22px;z-index:3;
+  cursor:nwse-resize;touch-action:none;
+}
+.mosuo-resize-handle::after{
+  content:'';position:absolute;right:5px;bottom:5px;width:10px;height:10px;
+  border-right:2px solid rgba(255,255,255,.9);border-bottom:2px solid rgba(255,255,255,.9);
+}
+.mosuo-video-box:fullscreen,.mosuo-video-box.fullscreen{
+  background:#0b1220;width:100vw;height:100vh;max-width:none;max-height:none;border-radius:0;
+  display:flex;flex-direction:column;border:none;
+}
+.mosuo-video-box:fullscreen .mosuo-video-head,.mosuo-video-box.fullscreen .mosuo-video-head{flex:none}
+.mosuo-video-box:fullscreen .mosuo-video-body,.mosuo-video-box.fullscreen .mosuo-video-body{
+  flex:1;display:flex;align-items:center;justify-content:center;background:#000;aspect-ratio:auto;
+}
+.mosuo-video-box:fullscreen .mosuo-video-body video,.mosuo-video-box.fullscreen .mosuo-video-body video{
+  width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:auto;
+}
+.mosuo-video-box:fullscreen .mosuo-resize-handle,.mosuo-video-box.fullscreen .mosuo-resize-handle{display:none}
+@media (max-width:880px){
+  .mosuo-layout{grid-template-columns:1fr;gap:1.2rem}
+  .mosuo-video-zone{min-height:340px}
+  .mosuo-video-zone::before{font-size:.6rem;top:10px}
+}
 </style></head><body data-reader-version="1" data-chapter-id="chapter-1">
-<header class="topbar"><div class="topbar-title" id="topbarTitle">第一章 · Cross-cultural Management</div><div class="reader-actions"><button id="picturesBtn">本页图片 <span id="pictureCount">0</span></button><button id="modeBtn" aria-pressed="false">课堂模式</button><button id="revealBtn">本页全部展开</button><button id="fullscreenBtn">全屏</button><button id="editBtn" aria-pressed="false">本机编辑</button><button id="exportBtn" hidden>导出含图片的 HTML</button></div></header>
+<header class="topbar"><div class="topbar-title" id="topbarTitle">第一章 · Cross-cultural Management</div><div class="topbar-nav"><button class="nav-btn" id="prevBtn">← 上一页</button><label class="page-picker">页码 / Page <select id="pageSelect" aria-label="跳转页面"></select></label><button class="nav-btn primary" id="nextBtn">下一步 →</button><span id="stepStatus" role="status" aria-live="polite"></span></div><div class="reader-actions"><button id="picturesBtn">本页图片 <span id="pictureCount">0</span></button><button id="modeBtn" aria-pressed="false">课堂模式</button><button id="revealBtn">本页全部展开</button><button id="fullscreenBtn">全屏</button><button id="editBtn" aria-pressed="false">本机编辑</button><button id="exportBtn" hidden>导出含图片的 HTML</button></div></header>
 <main class="stage" id="stage">
 
 <!-- ===== SLIDE 1: COVER ===== -->
@@ -640,25 +714,37 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   </div>
 </section>
 <section class="slide" data-slide="2" data-title="Opening Case: Yingsu Industry">
-  <div class="slide-inner" style="max-width:1000px">
+  <div class="slide-inner" style="max-width:1120px">
     <h2 class="slide-title anim visible" data-order="0">Opening Case 开篇案例</h2>
-    <div class="reading-title-row anim visible" data-order="0">
-      <p class="slide-subtitle">盈塑工业 · 马来西亚工厂的跨文化管理</p>
-      <button class="reading-open" id="openCultureReading" type="button">📖 延伸阅读 / Further Reading</button>
-    </div>
-    <div class="def-box anim visible" data-order="1" style="font-size:1.05rem;line-height:1.9">
-      <p class="en"><strong>Watch the video:</strong> Cross-Cultural Management at Yingsu Industry's Malaysia Plant (5-minute commentary video)</p>
-      <p class="zh"><strong>观看视频：</strong>《盈塑工业跨文化视频案例》——盈塑工业在马来西亚工厂的跨文化管理（5 分钟口播视频）</p>
-    </div>
-    <div class="anim visible" data-order="2" style="margin-top:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.9rem 1rem;text-align:center;font-size:1rem;color:#1e3a8a;font-weight:600">
-      🎬 视频案例入口：请使用主程序视频案例入口播放（Video available via the main app's video case entrance）
-    </div>
-    <div class="card anim visible" data-order="3" style="margin-top:1.2rem">
-      <h3><span class="num">Q</span>观后思考 · Think &amp; Discuss</h3>
-      <ul>
-        <li>Why is cultural difference important for cross-cultural business management?<span class="zh">文化差异对于跨国经营管理为什么重要？</span></li>
-        <li>What is culture?<span class="zh">什么是文化？</span></li>
-      </ul>
+    <p class="slide-subtitle anim visible" data-order="0">盈塑工业 · 马来西亚工厂的跨文化管理</p>
+    <div class="mosuo-layout" style="margin-top:1.2rem">
+      <div class="mosuo-video-zone anim visible" data-order="1" style="min-height:360px" aria-label="盈塑工业案例视频区">
+        <div class="mosuo-video-box" id="yingsuVideoBox">
+          <div class="mosuo-video-head" id="yingsuVideoHead">
+            <strong>盈塑工业案例</strong>
+            <button id="yingsuVideoFullscreen" type="button" aria-pressed="false" title="全屏 / Fullscreen" aria-label="全屏播放">全屏</button>
+          </div>
+          <div class="mosuo-video-body">
+            <video id="yingsuVideo" controls playsinline preload="metadata" aria-label="盈塑工业案例">
+              <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/yingsu.mp4" type="video/mp4">
+              您的浏览器不支持视频播放。
+            </video>
+          </div>
+          <div class="mosuo-resize-handle" id="yingsuResizeHandle" title="拖拽调整大小（保持 16:9）" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="mosuo-text">
+        <div class="anim visible" data-order="2" style="margin-bottom:1.1rem;text-align:left">
+          <button class="reading-open" id="openCultureReading" type="button">📖 延伸阅读 / Further Reading</button>
+        </div>
+        <div class="card anim visible" data-order="3">
+          <h3><span class="num">Q</span>观后思考 · Think &amp; Discuss</h3>
+          <ul>
+            <li>Why is cultural difference important for cross-cultural business management?<span class="zh">文化差异对于跨国经营管理为什么重要？</span></li>
+            <li>What is culture?<span class="zh">什么是文化？</span></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -687,7 +773,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   <div class="slide-inner">
     <h2 class="slide-title anim visible" data-order="0">Cultural Differences at Workplace</h2>
     <p class="slide-subtitle anim visible" data-order="0">At Workplace · 职场中的文化差异</p>
-    <div class="anim visible" data-order="1" style="margin-bottom:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：中欧职场对比（请使用主程序视频案例入口播放）</div>
+    <div class="anim visible" data-order="1" style="margin-bottom:1rem;text-align:center"><button class="brag-video-launch" id="openWorkVideo" type="button">🎬 点击观看中欧职场对比视频</button></div>
     <div class="svg-wrap anim" data-order="2">
       <svg viewBox="0 0 880 460" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -768,7 +854,10 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 <section class="slide" data-slide="5" data-title="Cultural Interpreter">
   <div class="slide-inner">
     <h2 class="slide-title anim visible" data-order="0">Cultural Interpreter</h2>
-    <p class="slide-subtitle anim visible" data-order="0">文化翻译官 · 角色画像</p>
+    <div class="anim visible" data-order="0" style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem">
+      <p class="slide-subtitle" style="margin:0">文化翻译官 · 角色画像</p>
+      <button class="brag-video-launch" id="openInterpreterVideo" type="button" style="width:auto;margin:0;padding:.5rem 1.1rem;font-size:.95rem">🎬 点击观看文化翻译官视频</button>
+    </div>
     <div class="card-grid cols-3">
       <div class="card anim" data-order="1">
         <h3><span class="num">1</span>Core Traits 特质</h3>
@@ -802,7 +891,6 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
       </div>
     </div>
   </div>
-<div class="anim visible" data-order="9" style="margin-top:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：文化翻译官（请使用主程序视频案例入口播放）</div>
 </section>
 <section class="slide" data-slide="6" data-title="Framework of Cross-Cultural Management">
   <div class="slide-inner">
@@ -957,7 +1045,9 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   <div class="slide-inner">
     <h2 class="slide-title anim visible" data-order="0">Video Case (1): BRAG — Bragging Across Cultures</h2>
     <p class="slide-subtitle anim visible" data-order="0">Bragging Behaviors Across Cultures · 不同文化中的"炫耀"行为</p>
-    <div class="anim visible" data-order="1" style="margin-bottom:1rem;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1.5px solid #60a5fa;border-radius:12px;padding:.8rem 1rem;text-align:center;font-size:.98rem;color:#1e3a8a;font-weight:600">🎬 视频案例：BRAG — 三种文化炫耀的区别讲解（请使用主程序视频案例入口播放）</div>
+    <div class="anim visible" data-order="1" style="margin-bottom:1rem;text-align:center">
+      <button class="brag-video-launch" id="openBragVideo" type="button">🎬 视频案例：BRAG — 三种文化炫耀的区别讲解</button>
+    </div>
     <div class="anim" data-order="2" style="overflow-x:auto">
       <table class="data-table">
         <thead>
@@ -989,19 +1079,35 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   </div>
 </section>
 <section class="slide" data-slide="10" data-title="Mosuo Marriage">
-  <div class="slide-inner" style="max-width:1000px">
-    <h2 class="slide-title anim" data-order="0">Mosuo Marriage</h2>
-    <p class="slide-subtitle anim" data-order="0">摩梭婚姻</p>
-    <div class="def-box anim" data-order="1" style="font-size:1.1rem;line-height:2">
-      <p class="en"><strong>Question:</strong> In your view, what is a family?</p>
-      <p class="zh"><strong>思考问题：</strong>在你看来，什么是家庭？</p>
-    </div>
-    <div class="anim" data-order="2" style="margin-top:1.5rem">
-      <h3 style="color:var(--primary);font-size:1.2rem;margin-bottom:.8rem">Mosuo's Matrilineal Family 摩梭母系家庭</h3>
-      <p style="color:var(--text-dark);line-height:1.9;font-size:1rem">摩梭人是中国现存唯一的母系氏族社会，实行"走婚"制度——男女不结婚，男方夜间到女方家走访，白天回到自己母亲家。子女由女方家庭抚养，世系按母系计算。</p>
-    </div>
-    <div class="anim" data-order="3" style="margin-top:1rem;text-align:center;color:var(--text-light);font-size:.95rem">
-      🎬 视频 + 🖼 3张图片：摩梭文化（图片见本页图片区，视频请使用主程序的视频案例入口）
+  <div class="slide-inner" style="max-width:1180px">
+    <div class="mosuo-layout">
+      <div class="mosuo-text">
+        <h2 class="slide-title anim" data-order="0">Mosuo Marriage</h2>
+        <p class="slide-subtitle anim" data-order="0">摩梭婚姻</p>
+        <div class="def-box anim" data-order="1" style="font-size:1.1rem;line-height:2">
+          <p class="en"><strong>Question:</strong> In your view, what is a family?</p>
+          <p class="zh"><strong>思考问题：</strong>在你看来，什么是家庭？</p>
+        </div>
+        <div class="anim" data-order="2" style="margin-top:1.5rem">
+          <h3 style="color:var(--primary);font-size:1.2rem;margin-bottom:.8rem">Mosuo's Matrilineal Family 摩梭母系家庭</h3>
+          <p style="color:var(--text-dark);line-height:1.9;font-size:1rem">摩梭人是中国现存唯一的母系氏族社会，实行"走婚"制度——男女不结婚，男方夜间到女方家走访，白天回到自己母亲家。子女由女方家庭抚养，世系按母系计算。</p>
+        </div>
+      </div>
+      <div class="mosuo-video-zone anim" data-order="3" aria-label="摩梭文化视频区">
+        <div class="mosuo-video-box" id="mosuoVideoBox">
+          <div class="mosuo-video-head" id="mosuoVideoHead">
+            <strong>摩梭文化（中英双语）</strong>
+            <button id="mosuoVideoFullscreen" type="button" aria-pressed="false" title="全屏 / Fullscreen" aria-label="全屏播放">全屏</button>
+          </div>
+          <div class="mosuo-video-body">
+            <video id="mosuoVideo" controls playsinline preload="metadata" aria-label="摩梭文化（中英双语）">
+              <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/Mosuo%20Culture.mp4" type="video/mp4">
+              您的浏览器不支持视频播放。
+            </video>
+          </div>
+          <div class="mosuo-resize-handle" id="mosuoResizeHandle" title="拖拽调整大小（保持 16:9）" aria-hidden="true"></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1476,22 +1582,25 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   </div>
 </section>
 <section class="slide" data-slide="20" data-title="Culture Shock">
-  <div class="slide-inner" style="max-width:800px;text-align:center">
+  <div class="slide-inner" style="max-width:1100px;text-align:center">
     <h2 class="slide-title anim" data-order="0" style="font-size:2.2rem">2. Culture Shock</h2>
     <p class="slide-subtitle anim" data-order="0" style="font-size:1.3rem">文化休克（文化休克）</p>
-    <div class="anim" data-order="1" style="margin-top:2rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap">
-      <div style="background:linear-gradient(135deg,#bfdbfe,#93c5fd);border:1.5px solid #60a5fa;border-radius:16px;padding:2rem 2.5rem;min-width:200px">
-        <div style="font-size:2rem;margin-bottom:.5rem">🎬</div>
-        <div style="font-weight:600;color:#1e40af">Video 1</div>
-        <div style="font-size:.9rem;color:#2563eb">1.5 American in Korea</div>
+    <div style="margin-top:2rem;display:flex;gap:2rem;justify-content:center;align-items:flex-start;flex-wrap:wrap">
+      <div class="mosuo-video-zone anim" data-order="1" style="width:min(300px,42vw);min-height:600px" aria-label="American in Korea 视频区">
+        <div class="mosuo-video-box" id="koreaVideoBox">
+          <div class="mosuo-video-head" id="koreaVideoHead"><strong>American in Korea</strong><button id="koreaVideoFullscreen" type="button" aria-pressed="false" title="全屏 / Fullscreen" aria-label="全屏播放">全屏</button></div>
+          <div class="mosuo-video-body" style="aspect-ratio:9/16"><video id="koreaVideo" controls playsinline preload="metadata" aria-label="American in Korea"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.5-American%20in%20Korea.mp4" type="video/mp4">您的浏览器不支持视频播放。</video></div>
+          <div class="mosuo-resize-handle" id="koreaResizeHandle" title="拖拽调整大小（保持 9:16）" aria-hidden="true"></div>
+        </div>
       </div>
-      <div style="background:linear-gradient(135deg,#a5f3fc,#67e8f9);border:1.5px solid #22d3ee;border-radius:16px;padding:2rem 2.5rem;min-width:200px">
-        <div style="font-size:2rem;margin-bottom:.5rem">🎬</div>
-        <div style="font-weight:600;color:#0e7490">Video 2</div>
-        <div style="font-size:.9rem;color:#0891b2">1.6 Culture shock in the US</div>
+      <div class="mosuo-video-zone anim" data-order="2" style="width:min(480px,52vw);min-height:340px" aria-label="Culture shock in the US 视频区">
+        <div class="mosuo-video-box" id="usShockVideoBox">
+          <div class="mosuo-video-head" id="usShockVideoHead"><strong>Culture shock in the US</strong><button id="usShockVideoFullscreen" type="button" aria-pressed="false" title="全屏 / Fullscreen" aria-label="全屏播放">全屏</button></div>
+          <div class="mosuo-video-body"><video id="usShockVideo" controls playsinline preload="metadata" aria-label="Culture shock in the US"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/culture%20shock-study%20in%20US.mp4" type="video/mp4">您的浏览器不支持视频播放。</video></div>
+          <div class="mosuo-resize-handle" id="usShockResizeHandle" title="拖拽调整大小（保持 16:9）" aria-hidden="true"></div>
+        </div>
       </div>
     </div>
-    <p class="anim" data-order="2" style="margin-top:1.5rem;color:var(--text-light)">请使用主程序右侧的视频案例入口观看</p>
   </div>
 </section>
 <section class="slide" data-slide="21" data-title="Case: American Teacher in Japan">
@@ -1883,9 +1992,20 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
 </section>
 
 </main>
-<footer class="navbar"><button class="nav-btn" id="prevBtn">← 上一页</button><label class="page-picker">页码 / Page <select id="pageSelect" aria-label="跳转页面"></select></label><span id="stepStatus" role="status" aria-live="polite"></span><button class="nav-btn primary" id="nextBtn">下一步 →</button></footer>
 <aside class="media-drawer" id="mediaDrawer" aria-label="本页图片" aria-hidden="true"><div class="drawer-header"><h3 id="drawerTitle">本页图片</h3><button id="drawerClose" aria-label="关闭图片区">×</button></div><div class="drawer-body"><div id="imageEditor" hidden><p class="editor-note">本机草稿：图片不会上传COS，也不会同步学生。完成后请导出HTML；关闭前未导出的修改可能丢失。</p><button id="addImagesBtn">＋ 导入本页图片</button><input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden><p class="editor-note">PNG/JPG/WebP/GIF，单张≤8MB；EMF请先转换。替换和排序都只影响本页。</p></div><p id="imageStatus" role="status" aria-live="polite"></p><div id="imageList"></div></div></aside>
 <dialog id="readerZoom" aria-label="放大查看"><button id="zoomClose" aria-label="关闭放大">×</button><div id="zoomContent"></div><p>按 Esc 或点击空白处关闭</p></dialog>
+<aside class="reading-win brag-video-window" id="bragVideoWindow" role="dialog" aria-modal="true" aria-labelledby="bragVideoTitle" aria-hidden="true">
+  <div class="reading-head" id="bragVideoHead"><strong id="bragVideoTitle">🎬 BRAG</strong><div class="brag-video-head-actions"><button id="bragVideoFullscreen" type="button" aria-pressed="false">全屏</button><button class="reading-close" id="closeBragVideo" type="button" aria-label="关闭">×</button></div></div>
+  <div class="brag-video-body"><div class="brag-video-frame"><video id="bragVideo" controls playsinline preload="metadata" aria-label="BRAG 视频案例"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.1brag.mp4" type="video/mp4">您的浏览器不支持视频播放。</video></div></div>
+</aside>
+<aside class="reading-win work-video-window" id="workVideoWindow" role="dialog" aria-modal="true" aria-labelledby="workVideoTitle" aria-hidden="true">
+  <div class="reading-head" id="workVideoHead"><strong id="workVideoTitle">🎬 中欧职场对比</strong><div class="brag-video-head-actions"><button id="workVideoFullscreen" type="button" aria-pressed="false">全屏</button><button class="reading-close" id="closeWorkVideo" type="button" aria-label="关闭">×</button></div></div>
+  <div class="brag-video-body"><div class="work-video-frame"><video id="workVideo" controls playsinline preload="metadata" aria-label="中欧职场对比视频"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.3-work%20place-china-vs-europe.mp4" type="video/mp4">您的浏览器不支持视频播放。</video></div></div>
+</aside>
+<aside class="reading-win brag-video-window" id="interpreterVideoWindow" role="dialog" aria-modal="true" aria-labelledby="interpreterVideoTitle" aria-hidden="true">
+  <div class="reading-head" id="interpreterVideoHead"><strong id="interpreterVideoTitle">🎬 文化翻译官</strong><div class="brag-video-head-actions"><button id="interpreterVideoFullscreen" type="button" aria-pressed="false">全屏</button><button class="reading-close" id="closeInterpreterVideo" type="button" aria-label="关闭">×</button></div></div>
+  <div class="brag-video-body"><div class="brag-video-frame"><video id="interpreterVideo" controls playsinline preload="metadata" aria-label="文化翻译官视频案例"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter1/1.2%20culture%20interpretor.mp4" type="video/mp4">您的浏览器不支持视频播放。</video></div></div>
+</aside>
 <aside class="reading-win" id="cultureReading" role="dialog" aria-modal="true" aria-labelledby="cultureReadingTitle" aria-hidden="true">
   <div class="reading-head" id="cultureReadingHead"><strong id="cultureReadingTitle">📖 延伸阅读 / Further Reading</strong><button class="reading-close" id="closeCultureReading" type="button" aria-label="关闭">×</button></div>
   <div class="reading-body">
@@ -2124,7 +2244,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   };
   function makeReadingDraggable(win, head) {
     head.onpointerdown = e => {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button') || win.classList.contains('fullscreen')) return;
       const rect = win.getBoundingClientRect(), startX = e.clientX, startY = e.clientY;
       win.style.left = rect.left + 'px'; win.style.top = rect.top + 'px'; win.style.transform = 'none'; head.setPointerCapture(e.pointerId);
       const move = ev => { const maxX = Math.max(0, innerWidth - win.offsetWidth), maxY = Math.max(0, innerHeight - 48); win.style.left = Math.max(0,Math.min(maxX,rect.left + ev.clientX - startX)) + 'px'; win.style.top = Math.max(0,Math.min(maxY,rect.top + ev.clientY - startY)) + 'px'; };
@@ -2181,6 +2301,25 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   const setAssignmentStatus = (text, kind='') => { assignmentStatus.textContent=text; assignmentStatus.className='assignment-status '+kind; };
   const closeAssignment = () => { if (assignmentBusy) return; assignmentWindow.classList.remove('open'); assignmentWindow.setAttribute('aria-hidden','true'); };
   $('closeAssignmentSubmit').onclick = closeAssignment; makeReadingDraggable(assignmentWindow,$('assignmentSubmitHead'));
+  const bragWindow = $('bragVideoWindow'), bragVideo = $('bragVideo'), bragFullscreen = $('bragVideoFullscreen');
+  function setBragFullscreen(enabled) {
+    bragWindow.classList.toggle('fullscreen', enabled);
+    bragFullscreen.textContent = enabled ? '还原' : '全屏';
+    bragFullscreen.setAttribute('aria-pressed', String(enabled));
+  }
+  const closeBragVideo = () => {
+    bragVideo.pause(); setBragFullscreen(false); bragWindow.classList.remove('open'); bragWindow.setAttribute('aria-hidden','true'); $('openBragVideo').focus();
+  };
+  $('openBragVideo').onclick = () => { bragWindow.classList.add('open'); bragWindow.setAttribute('aria-hidden','false'); $('closeBragVideo').focus(); };
+  $('closeBragVideo').onclick = closeBragVideo;
+  bragFullscreen.onclick = () => setBragFullscreen(!bragWindow.classList.contains('fullscreen'));
+  makeReadingDraggable(bragWindow, $('bragVideoHead'));
+  window.addEventListener('resize', () => {
+    if (!bragWindow.classList.contains('open') || bragWindow.classList.contains('fullscreen')) return;
+    const rect = bragWindow.getBoundingClientRect(), width = Math.min(rect.width, innerWidth - 16), height = Math.min(rect.height, innerHeight - 16);
+    bragWindow.style.width = Math.max(Math.min(300, innerWidth - 16), width) + 'px'; bragWindow.style.height = Math.max(Math.min(360, innerHeight - 16), height) + 'px';
+    bragWindow.style.left = Math.max(8, Math.min(innerWidth - width - 8, rect.left)) + 'px'; bragWindow.style.top = Math.max(8, Math.min(innerHeight - height - 8, rect.top)) + 'px'; bragWindow.style.transform = 'none';
+  });
   async function openAssignment(id) {
     if (!chapterAuth?.id) return alert('请从主程序登录后进入本课件，再提交作业。');
     if (chapterAuth.role !== 'student') return alert('作业提交入口仅供学生使用；教师可在系统设置的“作业收集”中查看。');
@@ -2222,6 +2361,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
     readingHead.addEventListener('pointermove', move); readingHead.addEventListener('pointerup', stop); readingHead.addEventListener('pointercancel', stop);
   };
   document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && bragWindow.classList.contains('open')) { e.preventDefault(); closeBragVideo(); return; }
     if (e.key === 'Escape' && assignmentWindow.classList.contains('open') && !assignmentBusy) { e.preventDefault(); closeAssignment(); return; }
     if (e.key === 'Escape' && shockWindow.classList.contains('open')) { e.preventDefault(); closeShockWindow(); return; }
     if (e.key === 'Escape' && onionFeedback.classList.contains('open')) { e.preventDefault(); closeOnionFeedback(); return; }
@@ -2258,4 +2398,198 @@ button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.
   window.dispatchEvent(new CustomEvent('ccm-reader-images-ready'));
   status(''); drawer(false); render();
 })();
-</script><script src="../assets/chapter1-language-data.js?v=2"></script><script src="../assets/chapter1-i18n.js?v=2"></script><script src="../assets/chapter-cloud-images.js?v=32"></script><link rel="stylesheet" href="../assets/chapter-notes.css?v=3"><script src="../assets/chapter-notes.js?v=3"></script></body></html>
+</script><script src="../assets/chapter1-language-data.js?v=3"></script><script src="../assets/chapter1-i18n.js?v=2"></script><script src="../assets/chapter-cloud-images.js?v=32"></script><link rel="stylesheet" href="../assets/chapter-notes.css?v=5"><script src="../assets/chapter-notes.js?v=5"></script><script>
+/* ===== 课件视频框（多实例）：可拖动移动 / 右下角缩放（保持16:9）/ 全屏 ===== */
+(function () {
+  'use strict';
+  var PAD = 14, MIN_W = 260, HEAD_H = 40;
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function initVideoBox(box, ratio) {
+    if (!box) return;
+    var zone = box.parentElement;
+    var head = box.querySelector('.mosuo-video-head');
+    var handle = box.querySelector('.mosuo-resize-handle');
+    var fullBtn = head ? head.querySelector('button') : null;
+    if (!zone || !head || !handle || !fullBtn) return;
+    var R = ratio || 16 / 9; /* 宽高比，16:9 或 9:16 */
+
+    function boxH() { return Math.round(box.offsetWidth / R + HEAD_H); }
+
+    function constrain() {
+      var zw = zone.clientWidth, zh = zone.clientHeight;
+      var maxL = Math.max(PAD, zw - box.offsetWidth - PAD);
+      var maxT = Math.max(PAD, zh - boxH() - PAD);
+      box.style.left = clamp(parseFloat(box.style.left) || PAD, PAD, maxL) + 'px';
+      box.style.top = clamp(parseFloat(box.style.top) || PAD, PAD, maxT) + 'px';
+    }
+
+    function centerBox() {
+      var zw = zone.clientWidth, zh = zone.clientHeight;
+      if (zw < MIN_W) return; /* 页面未激活（display:none）时尺寸不可用，跳过 */
+      var w = Math.round(Math.min(zw - PAD * 2, 560));
+      box.style.width = w + 'px';
+      box.style.left = Math.max(PAD, Math.round((zw - w) / 2)) + 'px';
+      box.style.top = Math.max(PAD, Math.round((zh - boxH()) / 2)) + 'px';
+    }
+
+    /* 拖动移动（头部，排除按钮） */
+    head.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button')) return;
+      if (document.fullscreenElement) return;
+      e.preventDefault();
+      var startX = e.clientX, startY = e.clientY;
+      var origL = parseFloat(box.style.left) || PAD, origT = parseFloat(box.style.top) || PAD;
+      head.setPointerCapture(e.pointerId);
+      function mv(ev) {
+        var zw = zone.clientWidth, zh = zone.clientHeight;
+        var maxL = Math.max(PAD, zw - box.offsetWidth - PAD);
+        var maxT = Math.max(PAD, zh - boxH() - PAD);
+        box.style.left = clamp(origL + ev.clientX - startX, PAD, maxL) + 'px';
+        box.style.top = clamp(origT + ev.clientY - startY, PAD, maxT) + 'px';
+      }
+      function up() {
+        head.removeEventListener('pointermove', mv);
+        head.removeEventListener('pointerup', up);
+        head.removeEventListener('pointercancel', up);
+      }
+      head.addEventListener('pointermove', mv);
+      head.addEventListener('pointerup', up);
+      head.addEventListener('pointercancel', up);
+    });
+
+    /* 右下角缩放（保持 16:9） */
+    handle.addEventListener('pointerdown', function (e) {
+      if (document.fullscreenElement) return;
+      e.preventDefault(); e.stopPropagation();
+      var startX = e.clientX;
+      var origW = box.offsetWidth;
+      handle.setPointerCapture(e.pointerId);
+      function mv(ev) {
+        var zw = zone.clientWidth;
+        var w = clamp(origW + (ev.clientX - startX), MIN_W, Math.max(MIN_W, zw - PAD * 2));
+        box.style.width = w + 'px';
+        constrain();
+      }
+      function up() {
+        handle.removeEventListener('pointermove', mv);
+        handle.removeEventListener('pointerup', up);
+        handle.removeEventListener('pointercancel', up);
+      }
+      handle.addEventListener('pointermove', mv);
+      handle.addEventListener('pointerup', up);
+      handle.addEventListener('pointercancel', up);
+    });
+
+    /* 全屏切换（容器全屏，标题栏同时显示） */
+    fullBtn.addEventListener('click', function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else if (box.requestFullscreen) {
+        box.requestFullscreen().catch(function () { /* 用户取消或环境不支持 */ });
+      } else {
+        box.classList.add('fullscreen'); /* 降级：CSS 撑满视口 */
+      }
+    });
+    document.addEventListener('fullscreenchange', function () {
+      var isMe = document.fullscreenElement === box;
+      box.classList.toggle('fullscreen', isMe);
+      fullBtn.setAttribute('aria-pressed', String(isMe));
+      fullBtn.textContent = isMe ? '还原' : '全屏';
+      if (!document.fullscreenElement) constrain();
+    });
+
+    /* 初始化：首次进入本页时居中；窗口缩放时重新约束 */
+    centerBox();
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && zone.clientWidth >= MIN_W) centerBox();
+        });
+      });
+      io.observe(zone);
+    }
+    window.addEventListener('resize', function () {
+      if (document.fullscreenElement) return;
+      if (box.offsetWidth > zone.clientWidth - PAD * 2) centerBox(); else constrain();
+    });
+  }
+
+  initVideoBox(document.getElementById('mosuoVideoBox'), 16 / 9);
+  initVideoBox(document.getElementById('yingsuVideoBox'), 16 / 9);
+  initVideoBox(document.getElementById('koreaVideoBox'), 9 / 16);
+  initVideoBox(document.getElementById('usShockVideoBox'), 16 / 9);
+})();
+</script><script>
+/* ===== 视频弹窗（多实例）：参照第9页 BRAG 弹窗模式（打开/关闭/全屏/拖动/Esc） ===== */
+(function () {
+  'use strict';
+
+  function initDialog(winId, openId) {
+    var win = document.getElementById(winId);
+    var openBtn = document.getElementById(openId);
+    if (!win || !openBtn) return;
+    var head = win.querySelector('.reading-head');
+    var video = win.querySelector('video');
+    var fullBtn = head.querySelector('.brag-video-head-actions button');
+    var closeBtn = head.querySelector('.reading-close');
+    if (!head || !video || !fullBtn || !closeBtn) return;
+
+    function setFullscreen(enabled) {
+      win.classList.toggle('fullscreen', enabled);
+      fullBtn.setAttribute('aria-pressed', String(enabled));
+      fullBtn.textContent = enabled ? '还原' : '全屏';
+    }
+
+    function close() {
+      video.pause();
+      setFullscreen(false);
+      win.classList.remove('open');
+      win.setAttribute('aria-hidden', 'true');
+      openBtn.focus();
+    }
+
+    openBtn.onclick = function () {
+      win.classList.add('open');
+      win.setAttribute('aria-hidden', 'false');
+      closeBtn.focus();
+    };
+    closeBtn.onclick = close;
+    fullBtn.onclick = function () { setFullscreen(!win.classList.contains('fullscreen')); };
+
+    /* 拖动头部移动 */
+    head.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('button') || win.classList.contains('fullscreen')) return;
+      e.preventDefault();
+      var rect = win.getBoundingClientRect();
+      var startX = e.clientX, startY = e.clientY;
+      win.style.left = rect.left + 'px';
+      win.style.top = rect.top + 'px';
+      win.style.transform = 'none';
+      head.setPointerCapture(e.pointerId);
+      function mv(ev) {
+        var maxX = Math.max(0, window.innerWidth - win.offsetWidth);
+        var maxY = Math.max(0, window.innerHeight - win.offsetHeight - 8);
+        win.style.left = Math.max(0, Math.min(maxX, rect.left + ev.clientX - startX)) + 'px';
+        win.style.top = Math.max(0, Math.min(maxY, rect.top + ev.clientY - startY)) + 'px';
+      }
+      function up() {
+        head.removeEventListener('pointermove', mv);
+        head.removeEventListener('pointerup', up);
+        head.removeEventListener('pointercancel', up);
+      }
+      head.addEventListener('pointermove', mv);
+      head.addEventListener('pointerup', up);
+      head.addEventListener('pointercancel', up);
+    });
+
+    /* Esc 关闭 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && win.classList.contains('open')) { e.preventDefault(); close(); }
+    });
+  }
+
+  initDialog('workVideoWindow', 'openWorkVideo');
+  initDialog('interpreterVideoWindow', 'openInterpreterVideo');
+})();
+</script></body></html>
