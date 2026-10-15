@@ -426,3 +426,9 @@ STABLE_RELEASE.md
 ## 2026-10-13：教师端第三章选题登记（v36）
 
 系统设置 → 作业收集新增第三章案例选题登记，支持班级筛选、逐题人数与名单、未选题名单及CSV导出。第一章入口保留；切换班级与刷新保留当前选题视图。同步首页、PWA资源与sw.js，缓存v36。云函数未修改；线上须已部署支持chapter3-interactive-case-video的选题接口。语法、模拟交互、名额测试和副本一致性通过，真实浏览器与线上验收待完成。详见源目录PROJECT_CONTEXT.md最新记录。
+
+## 2026-10-16：互动章节右上角标题修正（v37）
+
+- 主程序updatePptView互动HTML分支提前返回，原先未更新ppt-placeholder-title，导致第二、三章沿用Chapter 1 PPT默认文字。现按当前章节显示Chapter N · Interactive Lesson。
+- 源首页与GitHub发布首页同步；assets/pwa.js、sw.js同步升级v37，PWA资源参数20261016-1。未修改章节页面、云函数及其他功能。
+- 第一至三章标题模拟、内联脚本/PWA/SW语法与发布副本一致性检查通过；未进行线上浏览器验证。

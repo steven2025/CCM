@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/pwa/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
   <link rel="stylesheet" href="./assets/pwa.css">
-  <script src="./assets/pwa.js?v=20261013-6" defer></script>
+  <script src="./assets/pwa.js?v=20261016-1" defer></script>
   <link rel="stylesheet" href="./assets/student-manager.css?v=29">
   <script src="./assets/student-manager.js?v=29" defer></script>
   <script src="./assets/subtitle-json.js?v=30"></script>
@@ -1916,7 +1916,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-10-13-v36';
+  const PLATFORM_VERSION = 'frontend-2026-10-16-v37';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -6209,6 +6209,7 @@
   async function updatePptView() {
     const interactiveUrl = interactiveChapterUrls[currentChapter];
     if (interactiveUrl) {
+      pptPlaceholderTitle.textContent = 'Chapter ' + currentChapter + ' · Interactive Lesson';
       lectureViewerTitle.textContent = '互动课件 · Interactive Lesson';
       pptLangLabel.textContent = '当前版本：中文 + English · HTML';
       pptLangSelect.style.display = 'none';
