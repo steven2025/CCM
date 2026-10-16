@@ -1,4 +1,6 @@
 (()=>{'use strict';
+const back=document.querySelector('.masthead .back');
+if(back&&window.parent!==window){back.textContent='← 返回课程介绍';back.addEventListener('click',event=>{event.preventDefault();window.parent.postMessage({type:'CCM_COURSE_DESIGN_CLOSE'},location.origin);});}
 const tabs=[...document.querySelectorAll('[data-tab]')];
 const groups={}, remembered={};
 function wrap(className,nodes){const el=document.createElement('div');el.className=className;nodes.forEach(n=>el.append(n));return el;}
