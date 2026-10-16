@@ -1634,6 +1634,8 @@
     }
 
   </style>
+<script src="assets/observer-mode.js?v=20261016-2"></script>
+<script src="assets/observer-settings.js?v=20261016-1"></script>
 </head>
 <body>
 
@@ -1916,7 +1918,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-10-16-v37';
+  const PLATFORM_VERSION = 'frontend-2026-10-16-v41';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3448,13 +3450,15 @@
     event.source.postMessage({ type: 'CCM_AUTH', auth: payload }, event.origin && event.origin !== 'null' ? event.origin : '*');
   });
 
+  function isObserver() { return getCurrentAuth().role === "observer"; }
+
   function isTeacher() {
     return getCurrentAuth().role === 'teacher';
   }
 
   function isLoggedIn() {
     const auth = getCurrentAuth();
-    return auth && (auth.role === 'student' || auth.role === 'teacher');
+    return auth && (auth.role === 'student' || auth.role === 'teacher' || auth.role === 'observer');
   }
 
   async function validateCloudLogin(id, inviteCode) {
@@ -3475,7 +3479,7 @@
   function trackPlatformEvent(eventType, details) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
-    if (!auth.id || !inviteCode) return;
+    if (!auth.id || !inviteCode || isObserver()) return;
     fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3904,7 +3908,7 @@
 
   function canUseModule(moduleKey) {
     if (isPublicModule(moduleKey)) return true;
-    if (moduleKey === 'system-settings') return isTeacher();
+    if (moduleKey === 'system-settings') return isTeacher() || isObserver();
     if (isTeacher()) return true;
     if (!isLoggedIn()) return false;
     if (/^chapter-[1-6]$/.test(moduleKey) || moduleKey === 'final-task') {
@@ -3946,7 +3950,7 @@
 
   function ensureTeacherSettingsButton() {
     let btn = mainMenu.querySelector('[data-role="system-settings"]');
-    if (!isTeacher()) {
+    if (!isTeacher() && !isObserver()) {
       if (btn) btn.remove();
       return;
     }
@@ -4014,12 +4018,12 @@
     ensureTeacherSettingsButton();
     ensureCourseGalleryButton();
     const auth = getCurrentAuth();
-    const loggedIn = auth && (auth.role === 'student' || auth.role === 'teacher');
+    const loggedIn = auth && (auth.role === 'student' || auth.role === 'teacher' || auth.role === 'observer');
     if (headerAuth) headerAuth.classList.toggle('active', !!loggedIn);
     if (scenarioAgentLauncher) scenarioAgentLauncher.classList.toggle('active', !!loggedIn);
     if (headerUserInfo) {
       headerUserInfo.textContent = loggedIn
-        ? ('👤 ' + (auth.name || '') + (auth.role === 'student' ? ' · ' + auth.id : '') + ' · ' + (auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
+        ? ('👤 ' + (auth.name || '') + (auth.role === 'student' ? ' · ' + auth.id : '') + ' · ' + (auth.role === 'observer' ? '只读观摩 / Read-only' : auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
         : '';
     }
     mainMenu.querySelectorAll('.card-btn').forEach(btn => {
@@ -5504,6 +5508,7 @@
         '<button class="settings-tab" data-settings-tab="analytics">③ 用户行为看板</button>' +
         '<button class="settings-tab" data-settings-tab="students">④ 学生管理 / Students</button>' +
         '<button class="settings-tab" data-settings-tab="assignments">⑤ 作业收集 / Assignments</button>' +
+        '<button class="settings-tab" data-settings-tab="observer">⑥ 观摩账号管理</button>' +
       '</div>' +
       '<section class="settings-tab-panel active" data-settings-panel="files">' +
         '<div class="material-tree-note">可登记 COS 文件、为已有材料增加语言版本，以及重命名、替换、删除和调整顺序。新增或替换后请到“开放与关闭”发布。</div>' +
@@ -5522,6 +5527,9 @@
         '<div id="analytics-dashboard"><div class="material-empty">点击刷新或进入本页后读取数据。</div></div>' +
       '</section><section class="settings-tab-panel" data-settings-panel="students"><div id="student-manager"></div></section>' +
       '<section class="settings-tab-panel" data-settings-panel="assignments"><div class="analytics-toolbar"><select id="assignment-class"><option value="*">全部班级 / All classes</option></select><button type="button" class="btn-ghost" id="assignment-refresh">刷新作业</button><button type="button" class="btn-ghost" id="showcase-add">新增教师示范作品</button></div><p class="material-tree-note">第一版默认收集第一章两项作业，不设置截止日期；学生可多次提交，教师端默认显示最后一次。</p><div id="assignment-dashboard"><div class="material-empty">进入本页后读取提交情况。</div></div></section>';
+
+    body.insertAdjacentHTML('beforeend','<section class="settings-tab-panel" data-settings-panel="observer"><div id="observer-account-manager"></div></section>');
+    let observerAccountManager=null;
 
     const footer = document.createElement('div');
     footer.className = 'floating-footer';
@@ -5657,6 +5665,13 @@
         saveBtn.textContent = tabName === 'files' ? '保存名称与排序' : '保存开放设置';
         if (tabName === 'analytics' && !analyticsLoaded) refreshAnalytics();
         if (tabName === 'assignments' && !assignmentsLoaded) refreshAssignments();
+        if (tabName === 'observer' && !observerAccountManager) {
+          observerAccountManager=window.CCMObserverSettings.mount(body.querySelector('#observer-account-manager'),async(action,data={})=>{
+            const auth=getCurrentAuth();
+            const response=await fetch(TEACHER_SETTINGS_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,action,id:auth.id,inviteCode:localStorage.getItem('ccm_invite_code')||''})});
+            const payload=await response.json();if(!response.ok||!payload.ok)throw Error(payload.message||'观摩账号操作失败');return payload;
+          },isObserver());
+        }
         if (tabName === 'students' && !studentManager) {
           studentManager = window.CCMStudents.mount(body.querySelector('#student-manager'), async (action, data = {}) => {
             const auth = getCurrentAuth();
@@ -6350,7 +6365,7 @@
     if (!loginOverlay) return;
     const auth = getCurrentAuth();
     if (studentNameInput && auth.id) studentNameInput.value = auth.id;
-    setLoginStatus(auth.role ? ('当前登录身份：' + auth.name + '（' + (auth.role === 'teacher' ? '教师' : '学生') + '）') : '', auth.role ? 'success' : '');
+    setLoginStatus(auth.role ? ('当前登录身份：' + auth.name + '（' + (auth.role === 'observer' ? '超级访客 · 只读观摩' : auth.role === 'teacher' ? '教师' : '学生') + '）') : '', auth.role ? 'success' : '');
     loginOverlay.classList.add('active');
     loginOverlay.setAttribute('aria-hidden', 'false');
     setTimeout(() => inviteCodeInput && inviteCodeInput.focus(), 0);
@@ -6384,7 +6399,7 @@
       }
       updateAuthUi();
       closeLoginDialog();
-      alert(result.role === 'teacher' ? '管理员登录成功，已进入教师模式。' : '学生登录成功。');
+      alert(result.role === 'observer' ? '超级访客登录成功。可体验已开放课程、查看系统设置；不能修改或提交，体验不计入正式学情。' : result.role === 'teacher' ? '管理员登录成功，已进入教师模式。' : '学生登录成功。');
       return;
     } catch (err) {
       setLoginStatus(err.isLoginRejected ? 'ID或邀请码不匹配，请检查后重试。' : '暂时无法通过腾讯云验证：' + err.message, 'error');
@@ -6399,7 +6414,7 @@
   }
 
   function openAboutCoursePage() {
-    window.location.href = './about.html';
+    window.location.href = './about.html?v=20261016-4';
   }
 
   function closeAllFloatingWindows() {

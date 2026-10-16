@@ -31,7 +31,8 @@ header h1{font-size:22px;margin:0;line-height:1.4}header .meta{opacity:.8}
 .mainnav button.active,.navrow button[aria-current="page"],.stage.active{outline:2px solid rgba(239,159,74,.8);outline-offset:2px;filter:saturate(1.15) brightness(1.05)}
 .main-menu-btn{margin-left:auto;padding:7px 12px;border-radius:8px;font-weight:650}
 @media(prefers-reduced-motion:reduce){.mainnav button,.navrow button,.stage,.main-menu-btn{transition:none}.mainnav button:hover,.navrow button:hover,.stage:hover,.main-menu-btn:hover{transform:none}}
-</style></head>
+</style><script src="assets/observer-mode.js?v=20261016-1"></script>
+</head>
 <body><a class="skip" href="#library">跳到项目列表</a><header><h1>跨文化 AI 应用项目库</h1><span class="meta">国际旅游与跨文化管理课程 · OPC 实践</span></header>
 <main class="wrap"><section class="workspace" aria-label="我的选题"><div id="selection"></div><p class="muted meta">访客草稿仅保存在本机；登录后选题、提交保存到云端，阶段笔记需点击“保存本阶段到云端”。</p></section>
 <nav class="mainnav" aria-label="主导航"><button class="back" id="nav-library" onclick="jump('library')">项目库</button><button class="back" id="nav-overview" onclick="jump('overview')">项目概览</button><button class="back" id="nav-stages" onclick="jump('stages')">阶段向导</button><button class="back" id="nav-resources" onclick="jump('resources')">平台与搜索 API</button><button class="back" id="nav-publishing" onclick="jump('publishing')">GitHub 发布</button><button class="back" id="nav-submission" onclick="jump('submission')">课程提交</button></nav><div id="mainDisplay" tabindex="-1"><section id="library"><div class="toolbar"><label>搜索项目<input id="search" type="search" placeholder="输入留学、无障碍、邮件等关键词"></label><label>项目分类<select id="cat"><option value="">全部分类</option></select></label><label>项目难度<select id="level"><option value="">全部难度</option><option>基础</option><option>进阶</option></select></label></div><p id="count" class="muted" aria-live="polite"></p><div id="cards" class="grid"></div></section>
@@ -102,6 +103,6 @@ function reselect(){showLibrary();resetFilters();jump('library');$('search').foc
 function init(){[...new Set(projects.map(p=>p.cat))].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('cat').appendChild(o);});$('search').oninput=render;$('cat').onchange=render;$('level').onchange=render;render();renderSelection();jump('library');}
 init();
 
-</script><script src="opc-project-cloud.js"></script></body></html>
+</script><script src="opc-project-cloud.js?v=20261016-1"></script></body></html>
 
 

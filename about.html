@@ -160,7 +160,7 @@
 
     .module-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
     }
 
@@ -529,6 +529,12 @@
       font-size: 0.9rem;
       margin-top: 10px;
     }
+
+    .module-card.course-design-card { background: linear-gradient(135deg,#114e69,#235f86 55%,#51447b); border: 2px solid #f5cf79; box-shadow: 0 12px 32px #071a3550; text-decoration:none; display:block; color:#fff; }
+    .course-design-card h3 { color:#ffe3a1; font-size:1.35rem; }
+    .course-design-card p { color:#edf6ff; opacity:1; }
+    .course-design-card .tag { color:#fff2c9; border-color:#f5cf7955; background:#ffffff12; }
+    .course-design-card:focus-visible { outline:3px solid #ffe3a1; outline-offset:4px; }
   </style>
 </head>
 
@@ -585,6 +591,13 @@
           <span class="tag">Chinese Student 1/2</span>
         </div>
       </article>
+
+      <a class="module-card course-design-card" href="./course-design.html?v=20261016-4" aria-label="课程设计与课程合作模式">
+        <div class="module-icon" aria-hidden="true">✦</div>
+        <h3>课程设计与课程合作模式</h3>
+        <p>了解探索式互动学习、AI 开发与产品交付，以及面向不同课程的合作方式。</p>
+        <div class="tag-row"><span class="tag">课程设计</span><span class="tag">应用成效</span><span class="tag">合作模式 →</span></div>
+      </a>
     </section>
   </main>
 
