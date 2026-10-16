@@ -535,6 +535,11 @@
     .course-design-card p { color:#edf6ff; opacity:1; }
     .course-design-card .tag { color:#fff2c9; border-color:#f5cf7955; background:#ffffff12; }
     .course-design-card:focus-visible { outline:3px solid #ffe3a1; outline-offset:4px; }
+
+    .course-design-window { width:min(1380px,calc(100vw - 24px));height:calc(100dvh - 32px);max-height:calc(100dvh - 16px); }
+    .course-design-window .floating-body { padding:0;overflow:hidden;flex:1;min-height:0;display:flex; }
+    .course-design-frame { border:0;width:100%;height:100%;flex:1;min-height:0;background:#f4f7fb; }
+    .course-design-window .floating-footer { padding:5px 12px;font-size:11px;flex:none; }
   </style>
 </head>
 
@@ -592,7 +597,7 @@
         </div>
       </article>
 
-      <a class="module-card course-design-card" href="./course-design.html?v=20261016-4" aria-label="课程设计与课程合作模式">
+      <a class="module-card course-design-card" data-open="course-design" href="./course-design.html?v=20261016-4" aria-label="课程设计与课程合作模式">
         <div class="module-icon" aria-hidden="true">✦</div>
         <h3>课程设计与课程合作模式</h3>
         <p>了解探索式互动学习、AI 开发与产品交付，以及面向不同课程的合作方式。</p>
@@ -1516,11 +1521,7 @@
       setText("cardStudentsText", t.cardStudentsText);
     }
     function goBackToMainMenu() {
-      if (window.history.length > 1 && document.referrer) {
-        window.history.back();
-      } else {
-        window.location.href = "./index.html";
-      }
+      window.location.assign(new URL('./index.html', window.location.href).href);
     }
 
     function handleInstructorPhotoError(img) {
@@ -1659,6 +1660,19 @@
       return win;
     }
 
+    function openCourseDesign() {
+      const existing=document.querySelector('.course-design-window');
+      if(existing){existing.classList.remove('minimized');existing.style.zIndex=++currentZ;return;}
+      const win=openFloatingWindow({title:'课程设计与课程合作模式',bodyHtml:'<iframe class="course-design-frame" title="课程设计与课程合作模式" src="./course-design.html?v=20261016-5"></iframe>',footer:'顶部切换栏目，左侧选择主题；图片可点击放大。'});
+      win.classList.add('course-design-window');
+      win.style.left=Math.max(8,(window.innerWidth-Math.min(1380,window.innerWidth-24))/2)+'px';
+      win.style.top='16px';
+    }
+    window.addEventListener('message',event=>{
+      if(event.origin!==location.origin||event.data?.type!=='CCM_COURSE_DESIGN_CLOSE')return;
+      const frame=document.querySelector('.course-design-frame');
+      if(frame&&event.source===frame.contentWindow){frame.closest('.floating-window').remove();document.querySelector('.course-design-card')?.focus();}
+    });
     function openPlatform() {
       const t = textSet(getLang());
       openFloatingWindow({
@@ -1725,8 +1739,9 @@
     }
 
     document.querySelectorAll("[data-open]").forEach(el => {
-      el.addEventListener("click", () => {
+      el.addEventListener("click", (event) => {
         const target = el.getAttribute("data-open");
+        if (target === "course-design") { event.preventDefault(); openCourseDesign(); }
         if (target === "platform") openPlatform();
         if (target === "instructor") openInstructor();
         if (target === "students") openStudents();
