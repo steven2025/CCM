@@ -1634,8 +1634,40 @@
     }
 
   </style>
-<script src="assets/observer-mode.js?v=20261016-2"></script>
-<script src="assets/observer-settings.js?v=20261016-1"></script>
+<script id="observer-mode-runtime">
+(()=>{'use strict';
+const reads=new Set(['observer-settings-get','login','get-materials-admin','get-analytics','students-list','assignments-list','assignments-admin-list','assignment-download-url','assignment-gallery','assignment-my-submission','teacher-showcase-list','topic-choice-list','topic-choice-mine','topic-choice-admin-list','chapter-images-list','chapter-notes-list','get-quiz-progress','opc-list','opc-record','opc-gallery','opc-download','submit-quiz-answer']);
+function observer(){try{const auth=window.parent===window?JSON.parse(localStorage.getItem('ccm_auth_user_v2')||'{}'):(window.CCMHostAuth||window.CCMAuth||JSON.parse(localStorage.getItem('ccm_auth_user_v2')||'{}'));return auth.role==='observer'||auth.readOnly===true||String(auth.id||'').trim()==='stest';}catch{return false;}}
+const checkedState=new WeakMap();
+function lockedInput(input){return !!input&&input.matches('input:not([data-search]),textarea')&&!!input.closest('[data-tool="system-settings"]');}
+
+const originalFetch=window.fetch.bind(window);window.fetch=function(input,options){if(observer()&&/tencentscf\.com/.test(String(input?.url||input))&&options?.body){let body;try{body=JSON.parse(options.body);}catch{}if(body?.action==='track-event')return Promise.resolve(new Response(JSON.stringify({ok:true,preview:true}),{headers:{'Content-Type':'application/json'}}));if(body&&!reads.has(body.action))return Promise.resolve(new Response(JSON.stringify({ok:false,readOnly:true,message:'超级访客为只读观摩账号，不能修改或提交数据'}),{status:403,headers:{'Content-Type':'application/json'}}));}return originalFetch(input,options);};
+const mutationSelector='[data-material-rename],[data-material-move],[data-assignment-review],[data-submit-html],[data-submit-file],[data-submit-name],#showcase-add,#saveCloudDraft,#assChoose,#assignmentSubmitBtn,#caseWorkshopInfo .choose,[data-save-note]';
+function mutationButton(b){if(b.closest('#student-manager')&&b.dataset.action&&!['refresh','class-select','cancel-class','cancel-edit','cancel-import'].includes(b.dataset.action))return true;if(b.matches(mutationSelector)||b.closest('[data-review],[data-custom-review]'))return true;const settings=b.closest('[data-tool="system-settings"]');return !!settings&&(/保存|新增|添加|删除|移除|重命名|替换|编辑|公开|退回|重置|停用|启用|转班|归档|审核|发布|登记|上传|↑|↓/.test(b.textContent.trim()));}
+function paint(){if(!observer()){document.querySelectorAll('[data-observer-disabled]').forEach(e=>{e.disabled=false;e.removeAttribute('data-observer-disabled');});document.querySelectorAll('.observer-banner').forEach(e=>e.remove());return;}document.querySelectorAll('[data-tool="system-settings"]').forEach(win=>{if(!win.querySelector('.observer-banner')){const banner=document.createElement('div');banner.className='observer-banner';banner.textContent='超级访客 · 只读观摩 · 可查看真实内容，不能修改或提交';banner.style.cssText='padding:8px 14px;background:#153a62;color:#ffe5a1;font-size:13px;flex:none';win.querySelector('.floating-header')?.after(banner);}win.querySelectorAll('input:not([data-search]),textarea').forEach(disable);});document.querySelectorAll('[data-review] textarea,[data-review] select,[data-custom-review] textarea,[data-custom-review] select').forEach(disable);document.querySelectorAll('button,input').forEach(b=>{if(mutationButton(b))disable(b);});}
+function disable(e){if(e.type==='checkbox')checkedState.set(e,e.checked);if(!e.disabled){e.disabled=true;e.setAttribute('data-observer-disabled','');e.title='超级访客：只读观摩';}}
+document.addEventListener('click',event=>{if(!observer())return;const label=event.target.closest('label');const input=event.target.matches('input,textarea')?event.target:label?.querySelector('input,textarea');if(lockedInput(input)){event.preventDefault();event.stopImmediatePropagation();return;}const button=event.target.closest('button');if(button&&mutationButton(button)){event.preventDefault();event.stopImmediatePropagation();}},true);
+document.addEventListener('keydown',event=>{if(observer()&&lockedInput(event.target)&&[' ','Enter'].includes(event.key)){event.preventDefault();event.stopImmediatePropagation();}},true);
+document.addEventListener('change',event=>{if(observer()&&lockedInput(event.target)){if(event.target.type==='checkbox'&&checkedState.has(event.target))event.target.checked=checkedState.get(event.target);event.preventDefault();event.stopImmediatePropagation();}},true);
+document.addEventListener('submit',event=>{if(observer()&&!event.target.matches('#cloudLoginForm')){event.preventDefault();event.stopImmediatePropagation();}},true);
+let pending=false;function schedule(){if(pending)return;pending=true;queueMicrotask(()=>{pending=false;paint();});}
+function init(){new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled']});paint();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();window.addEventListener('message',schedule);window.addEventListener('storage',schedule);
+})();
+
+</script>
+<script id="observer-settings-runtime">
+(()=>{'use strict';const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=false;
+ container.innerHTML='<div class="settings-section"><h3>观摩账号管理</h3><p class="material-tree-note">管理超级访客的启用状态与邀请码。支持多终端同时登录；变更在各终端下一次请求时生效。</p><div data-account-summary class="login-status-line">正在读取…</div><form data-observer-form><label class="settings-check"><input data-observer-enabled type="checkbox"> 启用超级访客</label><label style="display:block;margin:16px 0">新邀请码（6位数字，留空保留现有邀请码）<input data-observer-code type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="new-password" style="display:block;max-width:300px;margin-top:8px;padding:10px;border-radius:8px;border:1px solid #526079;background:#17283c;color:#fff"></label><div style="display:flex;gap:10px"><button class="btn-ghost" type="submit" data-observer-save>保存观摩账号设置</button><button class="btn-ghost" type="button" data-observer-refresh>刷新状态</button></div></form><p class="material-tree-note">邀请码不回显。更换邀请码或停用后，已登录终端的后续请求也会重新校验。</p><div data-observer-status role="status" class="login-status-line"></div></div>';
+ const q=s=>container.querySelector(s),enabled=q('[data-observer-enabled]'),code=q('[data-observer-code]'),save=q('[data-observer-save]'),refresh=q('[data-observer-refresh]'),status=q('[data-observer-status]');
+ function lock(){enabled.disabled=readOnly||busy||!account;code.disabled=readOnly||busy||!account;save.disabled=readOnly||busy||!account;refresh.disabled=busy;}
+ function render(){q('[data-account-summary]').innerHTML='<strong>'+escape(account.name)+' · '+escape(account.id)+'</strong>　'+(account.effectiveEnabled?'已启用':'已停用')+(account.enabled&&!account.effectiveEnabled?'（云端环境开关已停用）':'')+'<br>更新：'+escape(account.updatedAt?new Date(account.updatedAt).toLocaleString():'初始配置')+(account.updatedBy?' · '+escape(account.updatedBy):'');enabled.checked=account.enabled;code.value='';lock();}
+ async function load(){if(busy)return;busy=true;lock();try{account=(await api('observer-settings-get')).account;if(!account||!Number.isInteger(account.version))throw Error('请先部署支持观摩账号管理的云函数');render();status.textContent=readOnly?'只读观摩：可查看状态，不能修改。':'已读取最新配置。';}catch(e){status.textContent=e.message;}finally{busy=false;lock();}}
+ refresh.onclick=load;q('[data-observer-form]').onsubmit=async e=>{e.preventDefault();if(readOnly||busy||!account)return;const newInviteCode=code.value.trim();if(newInviteCode&&!/^\d{6}$/.test(newInviteCode)){status.textContent='新邀请码须为6位数字。';return;}busy=true;lock();try{const result=await api('observer-settings-save',{version:account.version,enabled:enabled.checked,newInviteCode});account=result.account;render();status.textContent='已保存，后续登录及请求按新配置验证。';}catch(error){code.value='';status.textContent=error.message;}finally{busy=false;lock();}};lock();load();return {refresh:load};
+}};
+})();
+
+</script>
 </head>
 <body>
 
@@ -1918,7 +1950,7 @@
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-10-16-v41';
+  const PLATFORM_VERSION = 'frontend-2026-10-16-v42';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -3450,10 +3482,10 @@
     event.source.postMessage({ type: 'CCM_AUTH', auth: payload }, event.origin && event.origin !== 'null' ? event.origin : '*');
   });
 
-  function isObserver() { return getCurrentAuth().role === "observer"; }
+  function isObserver() { const auth=getCurrentAuth(); return auth.role === "observer" || auth.readOnly === true || String(auth.id||" ").trim() === "stest"; }
 
   function isTeacher() {
-    return getCurrentAuth().role === 'teacher';
+    return getCurrentAuth().role === 'teacher' && !isObserver();
   }
 
   function isLoggedIn() {
@@ -4023,7 +4055,7 @@
     if (scenarioAgentLauncher) scenarioAgentLauncher.classList.toggle('active', !!loggedIn);
     if (headerUserInfo) {
       headerUserInfo.textContent = loggedIn
-        ? ('👤 ' + (auth.name || '') + (auth.role === 'student' ? ' · ' + auth.id : '') + ' · ' + (auth.role === 'observer' ? '只读观摩 / Read-only' : auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
+        ? ('👤 ' + (auth.name || '') + (auth.role === 'student' ? ' · ' + auth.id : '') + ' · ' + (isObserver() ? '只读观摩 / Read-only' : auth.role === 'teacher' ? '管理员 / Administrator' : '学生 / Student'))
         : '';
     }
     mainMenu.querySelectorAll('.card-btn').forEach(btn => {
@@ -4793,7 +4825,7 @@
 
   async function refreshMaterialsCatalogForRole(role) {
     try {
-      const catalog = role === 'teacher'
+      const catalog = role === 'teacher' && !isObserver()
         ? await loadAdminMaterialsCatalog()
         : await loadStudentMaterialsCatalog();
       applyMaterialsCatalog(catalog);
