@@ -280,7 +280,7 @@
 
 <div class="topbar">
   <span id="navLabel">第三章 · 跨文化沟通</span>
-  <span id="pageNum" style="font-size:.85rem;color:var(--c-sub);margin:0 .5rem">1 / 66</span>
+  <span id="pageNum" style="font-size:.85rem;color:var(--c-sub);margin:0 .5rem">1 / 64</span>
   <div class="nav-btns">
     <button id="btnPrev">← 上一页</button>
     <button id="btnNext">下一页 →</button>
@@ -3216,7 +3216,20 @@
 </section>
 
 <!-- 互动视频案例选题工坊 -->
-<section class="slide" data-slide="58" data-page-type="任务页">
+<!-- AIE reflection: stable ID preserves all existing chapter note keys. -->
+<section class="slide" data-slide="aie-reflection" data-page-type="互动反思" data-nav-label="第三章 · 跨文化相遇互动反思">
+  <div class="section-label anim" data-order="0">应用与反思 · AIE Reflection</div>
+  <h1 class="slide-title anim" data-order="1"><span class="en">What Happened Between Us?</span><span class="zh">我们之间到底发生了什么？</span></h1>
+  <p class="concept anim" data-order="2">从两段跨文化相遇中，练习区分事实与推测、理解不同视角，并形成更清晰的沟通方式。</p>
+  <div class="grid-2 anim" data-order="3">
+    <div class="card primary"><b>路线 A · 我们已经是男女朋友了吗？</b><p>林悦与 Alex：关系定义、沟通与期待。</p></div>
+    <div class="card accent"><b>路线 B · 条件很好，为什么没有心动？</b><p>陈昊与 Camille：个人感受、相处方式与偏见。</p></div>
+  </div>
+  <div class="anim" data-order="4"><button type="button" class="ccm-aie-launch" data-aie-open data-aie-url="./aie-reflection/aie-reflection.html?v=20261020-2">开始 / 继续互动 · Start / Continue</button>
+  <p style="font-size:.8rem;line-height:1.7;margin-top:12px">回答仅保存在当前浏览器，按登录账号区分；可在活动中导出个人报告，不提交教师。活动涉及成年人约会与关系讨论，可以跳过不愿回答的问题。</p></div>
+</section>
+
+<section class="slide" data-slide="58" data-page-type="任务页" data-nav-label="第三章 · 互动视频案例选题">
   <div class="section-label anim" data-order="0">学生工坊 · Workshop</div>
   <h1 class="slide-title anim" data-order="1"><span class="en">Interactive Video Case Project</span><span class="zh">跨文化互动视频案例选题</span></h1>
   <div class="scenario-box case-workshop-intro anim" data-order="2">20名学生共同完成8个案例。点击案例按钮，可预览案例PDF与MD脚本、下载文件并登记选题；不同案例限2人或3人，名额以班级云端记录为准。</div>
@@ -3252,13 +3265,13 @@
 
 <div class="page-foot">
   <span id="pageFootLabel">第三章 · 封面</span>
-  <span id="pageFootNum">01 / 66</span>
+  <span id="pageFootNum">01 / 64</span>
 </div>
 
 <script>
   const slides = document.querySelectorAll('.slide');
   let cur = 0;
-  const TOTAL = 66;
+  const TOTAL = slides.length;
   // 导航标签：根据slide索引范围显示当前模块
   const navLabels = [
     [0,'第三章 · 封面'],
@@ -3440,11 +3453,11 @@
   function show(i){
     slides.forEach((s,idx)=>s.classList.toggle('active', idx===i));
     cur = i;
-    const num = slides[i].dataset.slide;
+    const num = i + 1;
     document.getElementById('pageNum').textContent = (i+1) + ' / ' + TOTAL;
     document.getElementById('pageJump').value = i;
     document.getElementById('pageNum').textContent = String(num).padStart(2,'0') + ' / ' + TOTAL;
-    const nav = navLabels[i] ? navLabels[i][1] : '第三章';
+    const nav = slides[i].dataset.navLabel || (navLabels[i] ? navLabels[i][1] : '第三章');
     document.getElementById('navLabel').textContent = nav;
     document.getElementById('pageFootLabel').textContent = nav;
     document.getElementById('pageFootNum').textContent = String(num).padStart(2,'0') + ' / ' + TOTAL;
@@ -4290,5 +4303,7 @@
 <script src="../assets/chapter3-case-workshop.js?v=5"></script>
 <link rel="stylesheet" href="../assets/chapter-notes.css?v=5">
 <script src="../assets/chapter-notes.js?v=6"></script>
+<link rel="stylesheet" href="../assets/chapter3-aie-reflection.css?v=20261020-2">
+<script src="../assets/chapter3-aie-reflection.js?v=20261020-2"></script>
 </body>
 </html>
