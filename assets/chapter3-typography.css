@@ -1,0 +1,103 @@
+/* Second typography level approved in the five representative previews. */
+.slide { --ccm-content-scale: 1.20; font-size: calc(1rem * var(--ccm-content-scale)); }
+.slide:has(.match-game), .slide:has(.scenario-box) { --ccm-content-scale: 1.18; }
+/* Titles, navigation and auxiliary counters keep the accepted original sizes. */
+.slide-title, .section-label, .match-stats, .col-title, .match-actions,
+.slide :is(h1,h2,h3), .reading-window-tools, #tableClose { --ccm-content-scale: 1; }
+:where(.slide h1) { font-size: 2rem; }
+:where(.slide h2) { font-size: 1.5rem; }
+:where(.slide h3) { font-size: 1.17rem; }
+.slide table, #tableModal, #readingModal, #iwaoModal { --ccm-content-scale: 1.15; }
+.slide table { font-size: calc(1rem * var(--ccm-content-scale)); }
+
+@media (min-width: 900px) {
+  .slide[data-slide="10"] .scenario-box { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .2rem .8rem; }
+  .slide[data-slide="10"] .quote { min-width: 0; margin-top: .2rem; margin-bottom: .2rem; }
+  .slide[data-slide="12"].active { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); gap: 0 1rem; align-content: start; align-items: start; }
+  .slide[data-slide="12"] > .section-label, .slide[data-slide="12"] > .slide-title { grid-column: 1/-1; }
+  .slide[data-slide="12"] > .match-game { grid-column: 1; grid-row: 3; min-width: 0; }
+  .slide[data-slide="12"] > div:last-child { grid-column: 2; grid-row: 3; margin-top: 0!important; padding-top: 0!important; border-top: 0!important; min-width: 0; }
+}
+@media (max-width: 760px) {
+  .slide:has(.match-game), .slide:has(.scenario-box) { --ccm-content-scale: 1.10; }
+  .slide[data-slide="10"] .quote { padding-top: .12rem; padding-bottom: .12rem; margin-top: .16rem; margin-bottom: .16rem; }
+  .slide[data-slide="12"] .match-item { padding-top: .44rem; padding-bottom: .44rem; }
+  .slide[data-slide="12"] > div:last-child { margin-top: .5rem!important; padding-top: .35rem!important; }
+}
+/* Reserve the footer without keeping an oversized empty strip below the content. */
+.slide { padding-bottom: max(1.8rem, 34px); }
+.slide [style*="display:grid"] > * { min-width: 0; }
+@media (min-width: 900px) {
+  /* Put the context exercise and its discussion prompts beside each other. */
+  .slide[data-slide="23"].active { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:0 1rem; align-content:start; align-items:start; }
+  .slide[data-slide="23"] > .section-label, .slide[data-slide="23"] > .slide-title { grid-column:1/-1; }
+  .slide[data-slide="23"] > [data-order="2"] { grid-column:1;grid-row:3; }
+  .slide[data-slide="23"] > table { grid-column:1;grid-row:4; }
+  .slide[data-slide="23"] > #checkContextBtn { grid-column:1;grid-row:5;justify-self:start; }
+  .slide[data-slide="23"] > #contextResult { grid-column:1;grid-row:6; }
+  .slide[data-slide="23"] > [data-order="5"] { grid-column:2;grid-row:3/span 4;grid-template-columns:1fr!important;margin-top:0!important; }
+  /* The speech transcript and the listening controls share one row. */
+  .slide[data-slide="35"].active { display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 1rem;align-content:start;align-items:start; }
+  .slide[data-slide="35"] > .section-label, .slide[data-slide="35"] > .slide-title, .slide[data-slide="35"] > [data-order="2"] { grid-column:1/-1; }
+  .slide[data-slide="35"] > #toneText { grid-column:1;grid-row:4; }
+  .slide[data-slide="35"] > [data-order="4"] { grid-column:2;grid-row:4;grid-template-columns:1fr!important; }
+  .slide[data-slide="35"] .tone-opt { padding-left:.4rem!important;padding-right:.4rem!important; }
+}
+@media (max-width: 760px) {
+  /* Dense exercises keep a modest increase instead of forcing desktop proportions. */
+  .slide:is([data-slide="4"],[data-slide="9"],[data-slide="11"],[data-slide="15"],[data-slide="16"],[data-slide="20"],[data-slide="21"],[data-slide="22"],[data-slide="23"],[data-slide="24"],[data-slide="26"],[data-slide="28"],[data-slide="30"],[data-slide="30b"],[data-slide="30c"],[data-slide="35"],[data-slide="37"],[data-slide="38"],[data-slide="39"],[data-slide="40"],[data-slide="43"],[data-slide="48"],[data-slide="55"]) { --ccm-content-scale:1.10; }
+  .slide { padding-bottom:max(2rem,32px); }
+  .slide .card { padding-top:.35rem;padding-bottom:.35rem;margin-top:.25rem;margin-bottom:.25rem; }
+  .slide .concept { padding-top:.45rem;padding-bottom:.45rem;margin-top:.4rem;margin-bottom:.4rem; }
+  .slide .choice-opt { padding-top:.5rem;padding-bottom:.5rem; }
+  .slide .pair { padding-top:.3rem;padding-bottom:.3rem; }
+  .slide[data-slide="4"] > [data-order="2"] > div:first-child > div[style*="flex-direction:column"] { display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.3rem!important; }
+  .slide[data-slide="4"] > [data-order="2"] > div:first-child > div[style*="flex-direction:column"] > div:not(.card) { display:none; }
+  .slide[data-slide="4"] span { overflow-wrap:anywhere; }
+  .lpc-row { display:flex;flex-wrap:wrap;align-items:center;justify-content:center; }
+  .lpc-row > span:first-child,.lpc-row > span:last-child { width:3.6rem!important; }
+  .lpc-btn,.bd-btn { --ccm-content-scale:1.05; }
+}
+/* Dense diagrams and rating sheets use space between blocks before reducing legibility. */
+.slide[data-slide="4"] .card { padding-top:.35rem;padding-bottom:.35rem; }
+.lpc-row > span:first-child,.lpc-row > span:last-child { width:3.6rem!important; }
+.slide[data-slide="26"] > [data-order="2"] { margin-top:.4rem!important;margin-bottom:.4rem!important; }
+#lpcQuestions { row-gap:.2rem!important; }
+.slide[data-slide="22"] video { max-height:300px!important; }
+.slide[data-slide="26"] { --ccm-content-scale:1.15; }
+.slide[data-slide="40"] { --ccm-content-scale:1.10; }
+@media(max-width:760px) {
+ .slide table { --ccm-content-scale:1.10; }
+ .slide .scenario-box { padding-top:.5rem;padding-bottom:.5rem;margin-top:.3rem;margin-bottom:.3rem; }
+ .slide[data-slide="23"] th:first-child { width:70%!important; }
+ .slide[data-slide="23"] th:nth-child(2) { width:30%!important; }
+ .slide[data-slide="23"] th,.slide[data-slide="23"] td { padding-top:.25rem!important;padding-bottom:.25rem!important; }
+ .slide[data-slide="23"] > [data-order="5"] > div { padding-top:.4rem!important;padding-bottom:.4rem!important; }
+ #toneText { padding-top:.5rem!important;padding-bottom:.5rem!important; }
+ #toneText > div { margin-bottom:.1rem!important; }
+ .slide[data-slide="37"] > [data-order="2"] > div:first-child { gap:.3rem!important; }
+ .slide[data-slide="37"] .choice-opt { padding-top:.3rem!important;padding-bottom:.3rem!important; }
+}
+
+@media(max-width:760px) {
+ .slide[data-slide="35"] > [data-order="2"] { margin-bottom:.1rem!important; }
+ .slide[data-slide="37"] video { max-height:clamp(150px,42vw,175px)!important; }
+ .slide[data-slide="48"] figcaption { padding-top:.25rem; }
+ .slide[data-slide="26"] { --ccm-content-scale:1.10; }
+}
+/* Avoid baseline descender space beneath fixed-size scoring controls. */
+.bd-btn { vertical-align:middle; }
+@media(max-width:760px) {
+ #toneText { padding-top:.4rem!important;padding-bottom:.4rem!important; }
+ .slide[data-slide="37"] video { max-height:130px!important; }
+ .slide[data-slide="40"] #bdResult { min-height:160px!important; }
+}
+.slide[data-slide="40"] td:not([data-cat]) { padding-top:.08rem!important;padding-bottom:.08rem!important; }
+.slide[data-slide="40"] th { padding-top:.12rem!important;padding-bottom:.12rem!important; }
+.slide[data-slide="40"] > [data-order="2"] > div:first-child > div { margin-bottom:.4rem!important; }
+#tableModal h3,.reading-window-label { --ccm-content-scale:1; }
+/* These cells contain only fixed-size buttons, so discard the empty text strut. */
+.slide[data-slide="40"] td[data-cat] { font-size:0; }
+.slide[data-slide="40"] > [data-order="2"] > div:first-child > div:first-child { padding-top:.2rem!important;padding-bottom:.2rem!important; }
+/* Keep enlarged labels inside the decorative communication-model polygon. */
+.slide[data-slide="4"] [style*="clip-path"]:has(b) { padding-top:2rem!important;padding-bottom:1.2rem!important; }
