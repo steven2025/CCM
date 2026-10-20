@@ -1,8 +1,8 @@
-/* v40: reuse root PDF.js for chapter 3 previews; cache ONLY the neutral offline explanation page. */
+/* v42: reuse root PDF.js for chapter 3 previews; cache ONLY the neutral offline explanation page. */
 'use strict';
 const BASE = new URL('./', self.location.href);
 const CACHE_PREFIX = 'ccm-pwa-' + encodeURIComponent(BASE.pathname) + '-';
-const CACHE_NAME = CACHE_PREFIX + 'v40';
+const CACHE_NAME = CACHE_PREFIX + 'v42';
 const OFFLINE_URL = new URL('offline.html', BASE).href;
 
 self.addEventListener('install', event => {
