@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我们之间到底发生了什么？ What Happened Between Us?</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23123B46'/%3E%3Ccircle cx='24' cy='30' r='10' fill='%23F7F2E8'/%3E%3Ccircle cx='40' cy='30' r='10' fill='%23C78B45'/%3E%3Cpath d='M32 38v8' stroke='%23F7F2E8' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ===== 设计 Token ===== */
+:root{
+  --ink:#123B46;        /* 深蓝绿 */
+  --gold:#C78B45;       /* 暖金 */
+  --cream:#F7F2E8;      /* 米白 */
+  --grey:#24343A;       /* 深灰 */
+  --mist:#EAF1F3;       /* 浅蓝灰 */
+  --alert:#B85C5C;      /* 情绪提醒 */
+  --sub-zh:#F5D9A8;     /* 中文字幕（暖金） */
+  --sub-en:#BFD9E3;     /* 英文字幕（浅蓝灰） */
+  --card:#FFFFFF;
+  --border:rgba(18,59,70,.14);
+  --shadow:0 6px 24px rgba(18,59,70,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,sans-serif;
+  background:var(--ink);
+  color:var(--cream);
+  line-height:1.65;
+  min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer}
+img{max-width:100%;display:block}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ===== 视图容器 ===== */
+.view{display:none;width:100%;min-height:100vh}
+.view.active{display:block}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 64px}
+
+/* ===== 通用按钮 ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:12px 24px;border:none;border-radius:12px;
+  font-size:16px;font-weight:600;color:var(--ink);
+  background:var(--cream);box-shadow:var(--shadow);
+  transition:transform .12s,background .2s,color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn-primary{background:var(--gold);color:#fff}
+.btn-ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 2px rgba(247,242,232,.5)}
+.btn-danger{background:var(--alert);color:#fff}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.btn-sm{min-height:40px;padding:8px 16px;font-size:14px}
+
+/* ===== 首页 ===== */
+.home-topbar{padding:14px 20px 0;max-width:1040px;margin:0 auto}
+.home-layout{
+  display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:center;
+  max-width:1040px;margin:28px auto 0;padding:0 20px;
+}
+.home-left{text-align:left}
+.home-title{
+  font-size:clamp(22px,3.4vw,34px);font-weight:800;letter-spacing:.01em;
+  color:var(--cream);line-height:1.3;
+}
+.home-title-en{
+  font-size:clamp(13px,1.8vw,16px);font-weight:600;color:var(--gold);margin-top:6px;
+}
+.home-right{text-align:left}
+.home-sub{
+  font-size:clamp(13px,1.8vw,15px);color:rgba(247,242,232,.88);line-height:1.6;
+}
+.home-note{
+  margin-top:12px;font-size:12px;color:rgba(247,242,232,.62);
+  background:rgba(18,59,70,.55);border:1px solid rgba(247,242,232,.18);
+  border-radius:10px;padding:10px 14px;line-height:1.6;
+}
+
+/* 路线卡片 */
+.route-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1040px;margin:22px auto 0;padding:0 20px 48px}
+.route-card{
+  position:relative;text-align:left;background:rgba(247,242,232,.06);
+  border:1px solid rgba(247,242,232,.22);border-radius:16px;padding:22px;
+  transition:transform .15s,border-color .2s,background .2s;
+}
+.route-card:hover{transform:translateY(-3px);border-color:var(--gold);background:rgba(247,242,232,.09)}
+.route-card h3{font-size:20px;color:var(--cream);margin-bottom:2px}
+.route-card .rc-en{font-size:14px;color:var(--gold);margin-bottom:10px}
+.route-card p{font-size:14px;color:rgba(247,242,232,.82)}
+.route-card .rc-tag{
+  display:inline-block;margin-top:12px;padding:4px 10px;border-radius:20px;
+  background:rgba(199,139,69,.2);color:var(--gold);font-size:12px;
+}
+@media (max-width:640px){.route-grid{grid-template-columns:1fr}}
+
+/* ===== 播放器 ===== */
+.player-top{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 16px;background:rgba(0,0,0,.18);
+}
+.player-top .pt-back{min-height:40px;padding:6px 14px;font-size:14px}
+.player-top .pt-route{font-size:15px;font-weight:700;color:var(--gold)}
+.player-top .pt-scene{font-size:13px;color:rgba(247,242,232,.7);margin-left:auto;white-space:nowrap}
+.stage-nav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:rgba(0,0,0,.12)}
+.stage-chip{
+  flex:0 0 auto;min-height:36px;padding:6px 12px;border-radius:20px;font-size:13px;
+  border:1px solid rgba(247,242,232,.25);background:transparent;color:rgba(247,242,232,.75);
+}
+.stage-chip.done{border-color:var(--gold);color:var(--gold)}
+.stage-chip.current{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:700}
+.stage-chip.locked{opacity:.4;cursor:not-allowed}
+
+/* 舞台 */
+.stage{position:relative;width:100%;max-width:1040px;margin:0 auto;aspect-ratio:16/9;overflow:hidden;background:#0a2028}
+.stage-frame{position:absolute;inset:0}
+.stage-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stage-frame .placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;background:linear-gradient(135deg,#123B46,#0a2028);color:rgba(247,242,232,.7);
+  font-size:15px;padding:20px;text-align:center;
+}
+.stage-frame .placeholder svg{width:56px;height:56px;opacity:.5}
+
+/* 字幕条 */
+.subtitle{
+  position:absolute;left:0;right:0;bottom:48px;z-index:5;
+  padding:44px 20px 18px;background:linear-gradient(transparent,rgba(6,18,22,.86) 60%);
+}
+.subtitle .sub-zh{
+  font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--sub-zh);
+  text-shadow:0 1px 4px rgba(0,0,0,.8);line-height:1.5;
+}
+.subtitle .sub-en{
+  font-size:clamp(13px,2.2vw,17px);color:var(--sub-en);
+  text-shadow:0 1px 4px rgba(0,0,0,.8);margin-top:4px;line-height:1.5;
+}
+.subtitle .sub-speaker{
+  display:inline-block;font-size:12px;letter-spacing:.08em;color:rgba(247,242,232,.75);
+  background:rgba(0,0,0,.35);border-radius:12px;padding:2px 10px;margin-bottom:6px;
+}
+
+/* 镜头运镜动画 */
+@keyframes kZoomIn{from{transform:scale(1)}to{transform:scale(1.14)}}
+@keyframes kZoomOut{from{transform:scale(1.14)}to{transform:scale(1)}}
+@keyframes kPanLeft{from{transform:translateX(0) scale(1.08)}to{transform:translateX(-4%) scale(1.08)}}
+@keyframes kPanRight{from{transform:translateX(-4%) scale(1.08)}to{transform:translateX(0) scale(1.08)}}
+@keyframes kFade{from{opacity:0}to{opacity:1}}
+.stage-frame .m-zoom-in{animation:kZoomIn 7s ease-out forwards}
+.stage-frame .m-zoom-out{animation:kZoomOut 7s ease-out forwards}
+.stage-frame .m-pan-left{animation:kPanLeft 7s ease-out forwards}
+.stage-frame .m-pan-right{animation:kPanRight 7s ease-out forwards}
+.stage-frame .m-fade{animation:kFade 2.4s ease-out forwards}
+.stage-frame .m-freeze{animation:kFade 1.2s ease-out forwards}
+.stage-frame .m-close-up{animation:kZoomIn 5s ease-out forwards}
+.stage-frame .m-split-screen{animation:kFade 1.6s ease-out forwards}
+.stage-frame .m-montage{animation:kFade 1.4s ease-out forwards}
+@media (prefers-reduced-motion:reduce){
+  .stage-frame [class^="m-"],.stage-frame [class*=" m-"]{animation:kFade 1s ease-out forwards}
+}
+.stage-frame.paused img{animation-play-state:paused}
+.stage-frame.replay img{animation:none}
+
+/* 顶部紧凑播放控制条（浮在画面上） */
+.top-control{
+  position:absolute;top:0;left:0;right:0;z-index:9;
+  display:flex;align-items:center;gap:6px;padding:6px 10px;
+  background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0));
+  font-size:12px;color:#fff;
+}
+.top-control .icon-btn{
+  width:30px;height:30px;min-width:30px;min-height:30px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);
+  color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+.top-control .icon-btn:hover{background:rgba(255,255,255,.18)}
+.top-control .icon-btn.active{background:var(--gold);border-color:var(--gold);color:#fff}
+.top-control .pb-time{font-size:11px;color:rgba(255,255,255,.85);white-space:nowrap;flex-shrink:0}
+.top-control input[type="range"]{flex:1;accent-color:var(--gold);height:20px;min-width:40px}
+.top-control .rate-group{display:flex;gap:3px;flex-shrink:0}
+.top-control .rate-btn{
+  min-height:24px;padding:2px 8px;border-radius:6px;font-size:11px;
+  border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#fff;cursor:pointer;
+}
+.top-control .rate-btn.active{background:var(--gold);border-color:var(--gold);color:#fff}
+.top-control .rate-btn:hover{background:rgba(255,255,255,.18)}
+.rate-btn.active{background:var(--gold);color:#fff;border-color:var(--gold)}
+.skip-bar{max-width:1040px;margin:12px auto 0;padding:0 16px;text-align:right}
+
+/* ===== 互动阶段 ===== */
+.stage-body{max-width:860px;margin:0 auto;padding:28px 20px 72px}
+.stage-kicker{font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:700}
+.stage-title{font-size:clamp(22px,4vw,32px);font-weight:800;margin:6px 0 6px;color:var(--cream)}
+.stage-title-en{font-size:15px;color:rgba(247,242,232,.6);margin-bottom:18px}
+.stage-desc{font-size:15px;color:rgba(247,242,232,.85);margin-bottom:20px;max-width:68ch}
+.panel{
+  background:var(--cream);color:var(--grey);border-radius:16px;padding:20px;
+  margin-bottom:18px;box-shadow:var(--shadow);
+}
+.panel h4{font-size:17px;color:var(--ink);margin-bottom:10px;font-weight:700}
+.panel .p-en{font-size:13px;color:rgba(18,59,70,.55);margin-bottom:12px}
+.panel .hint{font-size:13px;color:rgba(18,59,70,.62);margin:8px 0 0}
+.feedback{
+  border-radius:12px;padding:12px 16px;font-size:14px;margin:12px 0;
+  background:#FDF0DC;border:1px solid rgba(199,139,69,.4);color:#6b4a1e;
+}
+.opt-list{display:flex;flex-direction:column;gap:10px}
+.opt-chips{flex-direction:row;flex-wrap:wrap;gap:8px}
+.opt-chips .check-item{width:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;margin:0}
+.opt-item{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+  background:#fff;border:1.5px solid rgba(18,59,70,.16);border-radius:12px;
+  padding:14px 16px;font-size:15px;color:var(--grey);line-height:1.5;
+  transition:border-color .15s,background .15s;
+}
+.opt-item:hover{border-color:var(--gold)}
+.opt-item.selected{border-color:var(--gold);background:#FBF1E0}
+.opt-item .oi-key{
+  flex:0 0 26px;height:26px;border-radius:50%;background:rgba(18,59,70,.08);
+  display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;
+}
+.opt-item.selected .oi-key{background:var(--gold);color:#fff}
+.opt-item textarea{width:100%;margin-top:8px}
+textarea,input[type="text"]{
+  width:100%;min-height:44px;padding:10px 12px;border:1.5px solid rgba(18,59,70,.2);
+  border-radius:10px;font-size:16px;font-family:inherit;color:var(--grey);background:#fff;
+}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+textarea:focus,input[type="text"]:focus{outline:3px solid rgba(199,139,69,.4);border-color:var(--gold)}
+
+/* 拖拽/分类 chip */
+.chip-pool{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.chip{
+  border:1.5px solid rgba(18,59,70,.22);background:#fff;color:var(--grey);
+  border-radius:20px;padding:9px 16px;font-size:14px;min-height:40px;
+  display:inline-flex;align-items:center;gap:8px;cursor:grab;
+  transition:border-color .15s,background .15s;
+}
+.chip:active{cursor:grabbing}
+.chip.selected-fact{border-color:#2E7D6B;background:#E7F3EF;color:#1F5B4D}
+.chip.selected-guess{border-color:#B85C5C;background:#FBEAEA;color:#7A3A3A}
+.chip .chip-tag{font-size:11px;opacity:.8}
+.zone-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.zone{
+  border:2px dashed rgba(18,59,70,.25);border-radius:14px;padding:14px;min-height:120px;
+  background:rgba(234,241,243,.6);
+}
+.zone h5{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.zone .z-en{font-size:12px;color:rgba(18,59,70,.55)}
+.zone .chip{margin:6px 6px 0 0;cursor:pointer}
+.zone.fact-zone h5{color:#1F5B4D}
+.zone.guess-zone h5{color:#7A3A3A}
+@media (max-width:640px){.zone-row{grid-template-columns:1fr}}
+
+/* 情绪多选 */
+.check-item{
+  display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid rgba(18,59,70,.16);
+  border-radius:10px;padding:12px 14px;font-size:15px;cursor:pointer;
+}
+.check-item input{width:20px;height:20px;accent-color:var(--gold)}
+.check-item.checked{border-color:var(--gold);background:#FBF1E0}
+
+/* 概念卡片 */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.concept-card{
+  background:#fff;border:1.5px solid rgba(18,59,70,.14);border-radius:12px;padding:14px;
+  text-align:center;transition:transform .15s,border-color .2s;
+}
+.concept-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+.concept-card .cc-no{
+  width:34px;height:34px;margin:0 auto 8px;border-radius:50%;background:var(--ink);
+  color:var(--cream);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;
+}
+.concept-card h5{font-size:15px;color:var(--ink)}
+.concept-card p{font-size:13px;color:rgba(18,59,70,.68);margin-top:4px}
+.concept-card.cur{border-color:var(--gold);background:#FBF1E0}
+
+/* 对方视角 */
+.perspective-box{
+  background:linear-gradient(135deg,#16414f,#0e303b);border-radius:16px;padding:22px;margin:14px 0;
+  border:1px solid rgba(199,139,69,.35);
+}
+.perspective-box .pv-speaker{color:var(--gold);font-size:13px;letter-spacing:.08em;margin-bottom:8px}
+.perspective-box .pv-zh{font-size:clamp(16px,2.6vw,20px);color:var(--sub-zh);font-weight:600;line-height:1.6}
+.perspective-box .pv-en{font-size:14px;color:var(--sub-en);margin-top:8px;line-height:1.6}
+
+/* 提示器分类 */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.cat-item{
+  min-height:52px;border:1.5px solid rgba(18,59,70,.2);background:#fff;border-radius:12px;
+  font-size:14px;color:var(--grey);display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;
+}
+.cat-item.selected{border-color:var(--gold);background:#FBF1E0;font-weight:600}
+
+/* 反思表单 */
+.form-step{display:none}
+.form-step.active{display:block}
+.form-step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.form-step-head .fs-no{
+  width:30px;height:30px;border-radius:50%;background:var(--gold);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;
+}
+.form-step-head h4{font-size:17px;color:var(--ink)}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+/* ===== 反思报告 ===== */
+.report-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.report-block{
+  background:var(--cream);border-radius:14px;padding:18px;color:var(--grey);
+  border-left:4px solid var(--gold);
+}
+.report-block h5{font-size:15px;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.report-block .rb-en{font-size:12px;color:rgba(18,59,70,.5);margin-bottom:8px}
+.report-block .rb-body{font-size:14px;white-space:pre-wrap;line-height:1.7}
+.byram-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.byram-card{background:var(--cream);border-radius:14px;padding:16px;color:var(--grey)}
+.byram-card h5{font-size:15px;color:var(--ink);margin-bottom:8px}
+.byram-card .bc-en{font-size:12px;color:rgba(18,59,70,.5);margin-bottom:8px}
+.byram-card ul{margin-left:18px;font-size:13.5px;line-height:1.7}
+.byram-card li{margin-bottom:4px}
+@media (max-width:640px){.byram-grid{grid-template-columns:1fr}}
+.report-actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}
+.source-note{
+  margin-top:28px;padding:16px 18px;border:1px solid rgba(247,242,232,.22);
+  border-radius:12px;font-size:13px;color:rgba(247,242,232,.72);
+  background:rgba(0,0,0,.16);line-height:1.7;
+}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(80px);
+  background:var(--gold);color:#fff;padding:12px 22px;border-radius:12px;font-size:15px;
+  box-shadow:var(--shadow);opacity:0;transition:transform .3s,opacity .3s;z-index:99;max-width:90vw;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* 模态确认 */
+.modal-mask{
+  position:fixed;inset:0;background:rgba(6,18,22,.72);display:none;align-items:center;
+  justify-content:center;z-index:100;padding:20px;
+}
+.modal-mask.show{display:flex}
+.modal-box{background:var(--cream);color:var(--grey);border-radius:16px;padding:24px;max-width:420px;width:100%}
+.modal-box h4{font-size:18px;color:var(--ink);margin-bottom:10px}
+.modal-box p{font-size:14.5px;margin-bottom:18px}
+.modal-box .modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ===== 画面浮层（阶段2-7互动叠加，铺满整个播放画面） ===== */
+.overlay{
+  position:absolute;left:0;right:0;top:0;bottom:0;z-index:8;
+  overflow-y:auto;
+  background:rgba(6,18,22,.93);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  border-radius:0;
+  padding:52px 22px 20px;color:var(--cream);
+  animation:kFade .35s ease-out;
+}
+.overlay .stage-kicker{color:var(--gold)}
+.overlay .stage-title{font-size:clamp(18px,2.6vw,24px);margin:2px 0 2px}
+.overlay .stage-title-en{font-size:12px;margin-bottom:10px}
+.overlay .stage-desc{font-size:13px;margin-bottom:12px;color:rgba(247,242,232,.82)}
+.overlay .panel{background:rgba(247,242,232,.08);color:var(--cream);box-shadow:none;border:1px solid rgba(247,242,232,.15);padding:14px;margin-bottom:12px}
+.overlay .panel h4{color:var(--cream);font-size:14px;margin-bottom:8px}
+.overlay .panel .p-en{color:rgba(247,242,232,.55);font-size:12px}
+.overlay .panel .hint{color:rgba(247,242,232,.6);font-size:12px}
+.overlay .opt-item{
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(247,242,232,.25);
+  color:var(--cream);font-size:13.5px;padding:11px 13px;
+}
+.overlay .opt-item:hover{border-color:var(--gold);background:rgba(255,255,255,.12)}
+.overlay .opt-item.selected{border-color:var(--gold);background:rgba(199,139,69,.22)}
+.overlay .opt-item .oi-key{background:rgba(255,255,255,.15);color:var(--cream)}
+.overlay .opt-item.selected .oi-key{background:var(--gold);color:#fff}
+.overlay .check-item{font-size:13.5px;color:var(--cream)}
+.overlay .check-item span{color:var(--cream)}
+.overlay .chip{
+  background:rgba(255,255,255,.1);border:1.5px solid rgba(247,242,232,.3);
+  color:var(--cream);font-size:12.5px;padding:7px 13px;
+}
+.overlay .chip .chip-tag{opacity:.7}
+.overlay .chip.selected-fact{background:rgba(46,125,107,.35);border-color:#5BB89E;color:#C9E8DE}
+.overlay .chip.selected-guess{background:rgba(184,92,92,.35);border-color:#D98A8A;color:#F2D0D0}
+.overlay .zone{border:1.5px dashed rgba(247,242,232,.3);background:rgba(247,242,232,.06)}
+.overlay .zone h5{color:var(--cream);font-size:13px}
+.overlay .zone .z-en{color:rgba(247,242,232,.5)}
+.overlay .chip{cursor:grab}
+.overlay .chip:active{cursor:grabbing}
+.overlay .chip.dragging{opacity:.45}
+.overlay .dropzone.drag-over{border-color:var(--gold)!important;background:rgba(199,139,69,.18)!important}
+.overlay .dz-empty{font-size:12px;color:rgba(247,242,232,.4)}
+
+/* 阶段4 check-item 深色适配 */
+.overlay .check-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(247,242,232,.2);
+  border-radius:10px;padding:11px 13px;margin-bottom:8px;cursor:pointer;
+  font-size:13.5px;color:var(--cream);
+}
+.overlay .check-item.checked{background:rgba(199,139,69,.22);border-color:var(--gold)}
+.overlay .check-item input{accent-color:var(--gold);width:16px;height:16px;flex-shrink:0}
+.overlay .check-item span{color:var(--cream)}
+.overlay .opt-chips .check-item{margin-bottom:0;padding:7px 12px}
+
+/* 追问问题列表 */
+.follow-q{
+  display:flex;gap:10px;align-items:flex-start;
+  background:rgba(255,255,255,.06);border-radius:10px;padding:11px 13px;margin-bottom:8px;
+  font-size:13.5px;line-height:1.55;color:var(--cream);
+}
+.follow-q .fq-num{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+}
+.overlay .concept-card{
+  background:rgba(255,255,255,.08);border:1px solid rgba(247,242,232,.25);
+  color:var(--cream);padding:12px;
+}
+.overlay .concept-card.cur{border-color:var(--gold);background:rgba(199,139,69,.18)}
+.overlay .concept-card h5{color:var(--cream);font-size:13px}
+.overlay .concept-card p{color:rgba(247,242,232,.75);font-size:12px}
+.overlay textarea,.overlay input[type="text"]{
+  background:rgba(255,255,255,.1);border:1.5px solid rgba(247,242,232,.3);
+  color:var(--cream);min-height:44px;
+}
+.overlay textarea::placeholder,.overlay input::placeholder{color:rgba(247,242,232,.45)}
+.overlay .feedback{
+  background:rgba(199,139,69,.18);border:1px solid rgba(199,139,69,.5);
+  color:#F0D9B5;font-size:13px;padding:10px 14px;border-radius:10px;margin:10px 0;
+}
+.overlay .perspective-box{background:rgba(255,255,255,.08);border:1px solid rgba(247,242,232,.2);border-radius:12px;padding:12px 14px;margin:10px 0}
+.overlay .pv-zh{font-size:14px;line-height:1.6;margin:6px 0}
+.overlay .pv-en{font-size:12px;color:rgba(247,242,232,.65);line-height:1.5}
+.overlay .form-actions{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* 阶段2 双tab */
+.fj-tabs{display:flex;gap:8px;margin-bottom:12px}
+.fj-tab{
+  flex:1;padding:10px 12px;border-radius:10px;cursor:pointer;text-align:center;
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(247,242,232,.25);
+  color:var(--cream);font-size:14px;font-weight:600;line-height:1.3;
+}
+.fj-tab small{font-weight:400;font-size:11px;opacity:.65}
+.fj-tab.active{background:rgba(199,139,69,.28);border-color:var(--gold)}
+.fj-pane .chip{margin:0 6px 8px 0}
+.fj-pane .chip.selected{background:rgba(199,139,69,.35);border-color:var(--gold);color:#F0D9B5}
+
+/* Stage navigation occupies its own row, below the task line. */
+.stage-nav-bottom{
+  position:relative;left:auto;top:auto;transform:none;z-index:6;
+  display:flex;gap:10px;align-items:center;justify-content:center;
+  width:fit-content;max-width:calc(100% - 24px);margin:12px auto;
+  background:rgba(6,18,22,.88);border:1px solid rgba(247,242,232,.2);
+  border-radius:999px;padding:6px 10px;
+}
+.stage-nav-bottom .btn{min-width:100px;padding:6px 13px;font-size:12.5px}
+.stage-nav-bottom .step-label{font-size:12px;color:rgba(247,242,232,.85);text-align:center;white-space:nowrap}
+@media print{.stage-nav-bottom{display:none!important}}
+
+/* 手机端：浮层变为下方普通块（上下布局） */
+@media (max-width:640px){
+  .home-layout{grid-template-columns:1fr;gap:14px;padding:18px 16px 0}
+  .home-left{text-align:left}
+  .stage{aspect-ratio:auto;height:auto;min-height:280px}
+  .stage-frame{position:relative;aspect-ratio:16/9}
+  .overlay{
+    position:relative;left:auto;right:auto;bottom:auto;max-height:none;
+    border-radius:14px;margin:10px 12px 0;padding:16px;animation:none;
+  }
+  .subtitle{position:relative;bottom:auto}
+  .top-control{padding:4px 6px;gap:4px}
+  .top-control .icon-btn{width:26px;height:26px;min-width:26px;min-height:26px;font-size:11px}
+  .top-control .pb-time{display:none}
+  .top-control .rate-group{display:none}
+  .stage-nav-bottom{top:auto;padding:5px 8px;gap:6px;margin:10px auto}
+  .stage-nav-bottom .btn{min-width:80px;padding:5px 10px;font-size:11.5px}
+  .stage-nav-bottom .step-label{font-size:11px}
+}
+
+/* 打印 */
+@media print{
+  body{background:#fff;color:#111}
+  .view{display:none}
+  .view.active{display:block}
+  .stage,.top-control,.stage-nav,.player-top,.btn,.report-actions,.source-note{display:none}
+  #view-report .wrap{max-width:100%;padding:0}
+  .report-block,.byram-card{break-inside:avoid;border:1px solid #ddd;box-shadow:none}
+}
+</style>
+</head>
+<body data-chapter-return="../chapter3.html">
+
+<!-- ===== 视图：首页 ===== -->
+<div class="view" id="view-home">
+  <div class="home-topbar">
+    <button class="btn btn-sm btn-ghost" id="btn-ch3">← 返回第三章 / Chapter 3</button>
+  </div>
+  <div class="home-layout">
+    <div class="home-left">
+      <h1 class="home-title">我们之间到底发生了什么？</h1>
+      <div class="home-title-en">What Happened Between Us?</div>
+    </div>
+    <div class="home-right">
+      <p class="home-sub">留学生约会、关系定义与跨文化偏见互动反思<br>
+        An Interactive Reflection on Dating, Relationship Labels and Cross-Cultural Bias</p>
+      <p class="home-note">本活动涉及成年人约会、亲密关系、拒绝和偏见讨论。你可以跳过任何不愿回答的问题。所有回答只保存在当前浏览器中。<br>
+        This activity touches on adult dating, intimacy, rejection and bias. You may skip any question. All answers stay in this browser only.</p>
+    </div>
+  </div>
+  <div class="route-grid">
+    <button class="route-card" data-route="linyue">
+      <h3>路线 A：我们已经是男女朋友了吗？</h3>
+      <div class="rc-en">Are We in a Relationship?</div>
+      <p>一次自愿的亲密经历之后，林悦认为关系已经确定，Alex 却认为双方从未讨论排他关系。</p>
+      <span class="rc-tag">中国女性留学生 × 美国男性研究生</span>
+    </button>
+    <button class="route-card" data-route="chenhao">
+      <h3>路线 B：条件很好，为什么没有心动？</h3>
+      <div class="rc-en">A Good Match on Paper, but Where Is the Chemistry?</div>
+      <p>陈昊认为自己认真、可靠、条件稳定，却一直无法进入 Camille 的情感和社交世界。</p>
+      <span class="rc-tag">中国男性留学生 × 法国女性研究生</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== 视图：故事播放器 ===== -->
+<div class="view" id="view-story">
+  <div class="player-top">
+    <button class="btn btn-sm pt-back" id="btn-story-back">返回 / Back</button>
+    <span class="pt-route" id="pt-route"></span>
+    <span class="pt-scene" id="pt-scene"></span>
+  </div>
+  <div class="stage-nav" id="stage-nav" role="tablist" aria-label="学习阶段"></div>
+  <div class="stage">
+    <div class="stage-frame" id="stage-frame">
+      <div class="top-control">
+        <button class="icon-btn" id="btn-prev" aria-label="上一镜头" title="上一镜头">◀</button>
+        <button class="icon-btn" id="btn-play" aria-label="播放/暂停" title="播放/暂停"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+        <button class="icon-btn" id="btn-next" aria-label="下一镜头" title="下一镜头">▶▶</button>
+        <button class="icon-btn" id="btn-mute" aria-label="静音" title="静音"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16.5 8.2a4.5 4.5 0 0 1 0 7.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="icon-btn" id="btn-replay" aria-label="重新播放" title="重新播放">↻</button>
+        <span class="pb-time" id="pb-time">0:00 / 0:00</span>
+        <input type="range" id="pb-slider" min="0" max="100" value="0" aria-label="播放进度">
+        <div class="rate-group" role="group" aria-label="播放速度">
+          <button class="rate-btn" data-rate="0.75">0.75×</button>
+          <button class="rate-btn active" data-rate="1">1×</button>
+          <button class="rate-btn" data-rate="1.25">1.25×</button>
+        </div>
+      </div>
+      <div class="placeholder" id="stage-placeholder" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2.4"/><path d="m5 17 5-5 3 3 3-3 3 3"/></svg>
+        <div id="placeholder-text">图片加载中…</div>
+      </div>
+      <div class="subtitle" id="subtitle" hidden>
+        <span class="sub-speaker" id="sub-speaker"></span>
+        <div class="sub-zh" id="sub-zh"></div>
+        <div class="sub-en" id="sub-en"></div>
+      </div>
+      <div class="overlay" id="overlay" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视图：互动阶段 ===== -->
+<div class="view" id="view-stage">
+  <div class="stage-body">
+    <button class="btn btn-sm btn-ghost" id="btn-stage-back" style="margin-bottom:14px">返回 / Back</button>
+    <div id="stage-content"><!-- 阶段内容由 JS 渲染 --></div>
+  </div>
+</div>
+
+<!-- ===== 视图：个人经历迁移 ===== -->
+<div class="view" id="view-mine">
+  <div class="stage-body">
+    <button class="btn btn-sm btn-ghost" id="btn-mine-back" style="margin-bottom:14px">返回 / Back</button>
+    <div id="mine-content"><!-- JS 渲染 --></div>
+  </div>
+</div>
+
+<!-- ===== 视图：反思报告 ===== -->
+<div class="view" id="view-report">
+  <div class="stage-body" id="report-body"><!-- JS 渲染 --></div>
+</div>
+
+<!-- ===== 媒体资源池（静态引用，供 JS 按镜头取用） ===== -->
+<div id="media-pool" hidden>
+  <!-- 路线A 图片 -->
+  <img id="img-ly_01" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_01.jpg" alt="国际学生活动上林悦与 Alex 初次见面握手" data-route="linyue">
+  <img id="img-ly_02" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_02.jpg" alt="咖啡馆靠窗座位两人聊天说笑" data-route="linyue">
+  <img id="img-ly_03" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_03.jpg" alt="秋日校园林荫道两人并肩散步" data-route="linyue">
+  <img id="img-ly_04" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_04.jpg" alt="朋友聚会两人与朋友围坐" data-route="linyue">
+  <img id="img-ly_05" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_05.jpg" alt="两只手机并置特写屏幕虚化" data-route="linyue">
+  <img id="img-ly_06" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_06.jpg" alt="夜晚公寓门口两人温柔拥抱" data-route="linyue">
+  <img id="img-ly_07" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_07.jpg" alt="走廊灯光下一扇关闭的房门" data-route="linyue">
+  <img id="img-ly_08" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_08.jpg" alt="次日清晨林悦独自坐在床边" data-route="linyue">
+  <img id="img-ly_09" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_09.jpg" alt="林悦在窗边捧咖啡表情温柔笃定" data-route="linyue">
+  <img id="img-ly_10" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_10.jpg" alt="林悦低头看到桌上手机表情僵住" data-route="linyue">
+  <img id="img-ly_11" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_11.jpg" alt="林悦面部特写眼眶泛红受伤困惑" data-route="linyue">
+  <img id="img-ly_12" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_12.jpg" alt="Alex 独自坐在校园长椅神情困惑" data-route="linyue">
+  <img id="img-ly_13" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_13.jpg" alt="咖啡馆两人面对面认真沟通" data-route="linyue">
+  <img id="img-ly_14" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/images/ly_14.jpg" alt="五个关系概念分屏抽象视觉" data-route="linyue">
+  <!-- 路线B 图片 -->
+  <img id="img-ch_01" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_01.jpg" alt="法国大学校园石质古典建筑全景" data-route="chenhao">
+  <img id="img-ch_02" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_02.jpg" alt="小组项目会议桌陈昊与 Camille 初次合作" data-route="chenhao">
+  <img id="img-ch_03" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_03.jpg" alt="陈昊在电脑前专注帮 Camille 处理数据" data-route="chenhao">
+  <img id="img-ch_04" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_04.jpg" alt="餐厅两人吃饭陈昊准备买单" data-route="chenhao">
+  <img id="img-ch_05" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_05.jpg" alt="校园长凳两人认真谈未来计划" data-route="chenhao">
+  <img id="img-ch_06" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_06.jpg" alt="Camille 户外跑步运动充满活力" data-route="chenhao">
+  <img id="img-ch_07" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_07.jpg" alt="陈昊独自在图书馆学习专注" data-route="chenhao">
+  <img id="img-ch_08" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_08.jpg" alt="蒙太奇分屏两个社交圈" data-route="chenhao">
+  <img id="img-ch_09" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_09.jpg" alt="陈昊有些局促地对 Camille 发出邀请" data-route="chenhao">
+  <img id="img-ch_10" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_10.jpg" alt="Camille 轻松点头微笑当作同学聚餐" data-route="chenhao">
+  <img id="img-ch_11" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_11.jpg" alt="Camille 与法国男性在攀岩处自然聊天" data-route="chenhao">
+  <img id="img-ch_12" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_12.jpg" alt="陈昊在远处看到后表情失落" data-route="chenhao">
+  <img id="img-ch_13" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_13.jpg" alt="陈昊独自在宿舍窗边沉思画面昏暗" data-route="chenhao">
+  <img id="img-ch_14" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_14.jpg" alt="Camille 独自在校园神情真诚困惑" data-route="chenhao">
+  <img id="img-ch_15" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_15.jpg" alt="左右对称偏见分屏抽象视觉" data-route="chenhao">
+  <img id="img-ch_16" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/images/ch_16.jpg" alt="陈昊神情坦诚清晰地练习表达" data-route="chenhao">
+  <!-- 路线A 音频 -->
+  <audio id="aud-ly_01" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_01_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_02" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_02_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_03" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_03_linyue.wav" preload="none"></audio>
+  <audio id="aud-ly_04" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_04_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_05" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_05_linyue.wav" preload="none"></audio>
+  <audio id="aud-ly_06" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_06_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_07" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_07_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_08" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_08_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_09" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_09_linyue.wav" preload="none"></audio>
+  <audio id="aud-ly_10" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_10_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_11" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_11_linyue.wav" preload="none"></audio>
+  <audio id="aud-ly_12" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_12_alex.wav" preload="none"></audio>
+  <audio id="aud-ly_13" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_13_narrator.wav" preload="none"></audio>
+  <audio id="aud-ly_14" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/linyue/audio/ly_14_alex.wav" preload="none"></audio>
+  <!-- 路线B 音频 -->
+  <audio id="aud-ch_01" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_01_chenhao.wav" preload="none"></audio>
+  <audio id="aud-ch_02" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_02_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_03" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_03_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_04" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_04_chenhao.wav" preload="none"></audio>
+  <audio id="aud-ch_05" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_05_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_06" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_06_camille.wav" preload="none"></audio>
+  <audio id="aud-ch_07" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_07_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_08" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_08_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_09" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_09_chenhao.wav" preload="none"></audio>
+  <audio id="aud-ch_10" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_10_camille.wav" preload="none"></audio>
+  <audio id="aud-ch_11" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_11_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_12" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_12_chenhao.wav" preload="none"></audio>
+  <audio id="aud-ch_13" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_13_chenhao.wav" preload="none"></audio>
+  <audio id="aud-ch_14" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_14_camille.wav" preload="none"></audio>
+  <audio id="aud-ch_15" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_15_narrator.wav" preload="none"></audio>
+  <audio id="aud-ch_16" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/aie-reflection/chenhao/audio/ch_16_chenhao.wav" preload="none"></audio>
+</div>
+
+<!-- ===== 模态确认 ===== -->
+<div class="modal-mask" id="modal-mask" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <h4 id="modal-title">确认</h4>
+    <p id="modal-text"></p>
+    <div class="modal-actions">
+      <button class="btn btn-sm" id="modal-cancel">取消 / Cancel</button>
+      <button class="btn btn-sm btn-danger" id="modal-ok">确认 / Confirm</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ================= 数据定义 ================= */
+// Keep reflection drafts on this device, separately for each signed-in account.
+const STORAGE_KEY = (() => {
+  let auth = {}; try { auth = JSON.parse(localStorage.getItem('ccm_auth_user_v2') || '{}') || {}; } catch {}
+  const owner = auth.id ? String(auth.role || 'student') + ':' + String(auth.id) : 'local';
+  return 'ccm_aie_relationship_reflection_v1:' + encodeURIComponent(owner);
+})();
+
+const ROUTES = {
+  linyue: {
+    id:'linyue',
+    title:'路线 A：我们已经是男女朋友了吗？',
+    titleEn:'Are We in a Relationship?',
+    routeA:'林悦', routeB:'Alex',
+    routeATag:'中国女性留学生', routeBTag:'美国男性研究生',
+    speakerName:{narrator:'旁白',linyue:'林悦（内心）',alex:'Alex（内心）'},
+    scenes:[
+      {id:'ly_01',img:'img-ly_01',aud:'aud-ly_01',speaker:'narrator',motion:'zoom-in',
+       zh:'林悦和 Alex 在一次国际学生活动中认识。',en:'Yue and Alex met at an international student event.'},
+      {id:'ly_02',img:'img-ly_02',aud:'aud-ly_02',speaker:'narrator',motion:'pan-right',
+       zh:'之后，他们一起喝咖啡、看电影、散步，互发消息，也认识了彼此的朋友。',en:'They had coffee, watched films, walked, messaged often, and met each other\'s friends.'},
+      {id:'ly_03',img:'img-ly_03',aud:'aud-ly_03',speaker:'linyue',motion:'zoom-out',
+       zh:'和他相处很轻松，他记得我说过的小事。也许，这就是恋爱的开始。',en:'Being with him feels easy. He remembers the little things I say. Maybe this is how love begins.'},
+      {id:'ly_04',img:'img-ly_04',aud:'aud-ly_04',speaker:'narrator',motion:'pan-right',
+       zh:'他们相处得越来越亲密，但从未明确讨论：是否是男女朋友、是否只和彼此约会，以及双方是否希望建立长期关系。',en:'They grew closer, but never discussed whether they were boyfriend and girlfriend, whether they dated exclusively, or whether they wanted a long-term relationship.'},
+      {id:'ly_05',img:'img-ly_05',aud:'aud-ly_05',speaker:'linyue',motion:'close-up',
+       zh:'消息越来越多，周末也总在一起。我心里已经认定了他。',en:'More and more messages. Weekends together. In my heart, I had already decided.'},
+      {id:'ly_06',img:'img-ly_06',aud:'aud-ly_06',speaker:'narrator',motion:'zoom-in',
+       zh:'那天晚上，一切都很自然。',en:'That night, everything felt natural.'},
+      {id:'ly_07',img:'img-ly_07',aud:'aud-ly_07',speaker:'narrator',motion:'freeze',
+       zh:'在双方清醒、自愿的情况下，他们发生了亲密关系。',en:'Consent to intimacy does not automatically define the relationship.'},
+      {id:'ly_08',img:'img-ly_08',aud:'aud-ly_08',speaker:'narrator',motion:'zoom-in',
+       zh:'次日清晨，阳光照进房间。对林悦来说，这段关系已经确定了。',en:'The next morning, sunlight filled the room. For Yue, the relationship was already decided.'},
+      {id:'ly_09',img:'img-ly_09',aud:'aud-ly_09',speaker:'linyue',motion:'freeze',
+       zh:'我们已经认识这么久，也如此亲密。在我看来，我们应该已经是男女朋友了。',en:'We have known each other this long and been this close. To me, we are already boyfriend and girlfriend.'},
+      {id:'ly_10',img:'img-ly_10',aud:'aud-ly_10',speaker:'narrator',motion:'freeze',
+       zh:'林悦无意中看到 Alex 手机上的交友软件仍处于使用状态。她感到被欺骗、尴尬、生气、后悔，并开始怀疑自己的判断。',en:'Yue accidentally saw the dating app still active on Alex\'s phone. She felt deceived, embarrassed, angry, regretful, and began to doubt her own judgment.'},
+      {id:'ly_11',img:'img-ly_11',aud:'aud-ly_11',speaker:'linyue',motion:'close-up',
+       zh:'他和我在一起的时候那么真诚，可为什么……是我误会了什么吗？',en:'He was so sincere with me. But why…? Did I misunderstand something?'},
+      {id:'ly_12',img:'img-ly_12',aud:'aud-ly_12',speaker:'alex',motion:'zoom-out',
+       zh:'我很在乎林悦，也喜欢和她相处。但我们从来没有讨论过是否排他。我以为我们仍处于约会和了解阶段。我没有意识到她已经把我们看作男女朋友。',en:'I care about Yue, and I enjoy spending time with her. But we never talked about exclusivity. I thought we were still dating and getting to know each other. I did not realise she already considered us boyfriend and girlfriend.'},
+      {id:'ly_13',img:'img-ly_13',aud:'aud-ly_13',speaker:'narrator',motion:'pan-right',
+       zh:'他们坐下来，第一次认真谈论这段关系。',en:'They sat down and, for the first time, talked seriously about the relationship.'},
+      {id:'ly_14',img:'img-ly_14',aud:'aud-ly_14',speaker:'alex',motion:'split-screen',
+       zh:'我很重视我们的关系，但我意识到我们可能对它有不同理解。我们现在是排他性约会吗？这段关系对你意味着什么？',en:'I value what we have, but I realise we may understand the relationship differently. Are we dating exclusively? What does this relationship mean to you?'}
+    ],
+    firstJudgment:{
+      q:'你认为发生了什么？',
+      qEn:'What Do You Think Happened?',
+      opts:[
+        {k:'A',t:'Alex 欺骗了林悦。'},
+        {k:'B',t:'Alex 只想建立短期关系。'},
+        {k:'C',t:'林悦不了解美国约会文化。'},
+        {k:'D',t:'双方从未明确讨论排他关系，目前信息不足。'},
+        {k:'E',t:'可能同时存在多种因素。'}
+      ],
+      note:'记录你的第一判断和理由。不立即显示唯一正确答案。'
+    },
+    facts:[
+      {id:'f1',t:'两人经常见面'},
+      {id:'f2',t:'双方发生了自愿的亲密关系'},
+      {id:'f3',t:'双方没有明确讨论排他关系'},
+      {id:'f4',t:'Alex 仍在使用交友软件'},
+      {id:'f5',t:'林悦已经默认双方是男女朋友'}
+    ],
+    guesses:[
+      {id:'g1',t:'Alex 一定不认真'},
+      {id:'g2',t:'林悦过于保守'},
+      {id:'g3',t:'Alex 故意欺骗林悦'},
+      {id:'g4',t:'Alex 一定认为双方只是非排他约会'}
+    ],
+    factsFeedback:'可观察事实不等于人物动机。亲密关系、排他关系、男女朋友身份和长期承诺不能相互自动推导。',
+    feelings:[
+      '被欺骗','生气','羞耻','后悔','困惑','不安全',
+      '担心提出关系会显得控制欲强','担心提出关系后会失去 Alex','其他'
+    ],
+    feelingFollow:[
+      '林悦最害怕的可能是什么？',
+      '哪些感受来自实际行为？',
+      '哪些感受来自她对关系的默认理解？',
+      '如果你是林悦，你会怎么做？'
+    ],
+    perspectivePredict:{
+      prompt:'先写下你的预测：Alex 心里可能怎么想？',
+      promptEn:'Before listening, predict: what might Alex be thinking?'
+    },
+    perspectiveVoice:{
+      speaker:'Alex',
+      zh:'我很在乎林悦，也喜欢和她相处。但我们从来没有讨论过是否排他。我以为我们仍处于约会和了解阶段。我没有意识到她已经把我们看作男女朋友。',
+      en:'I care about Yue, and I enjoy spending time with her. But we never talked about exclusivity. I thought we were still dating and getting to know each other. I did not realise she already considered us boyfriend and girlfriend.',
+      note:'Alex 也不能仅用「美国约会文化」替代沟通责任。他知道双方文化背景不同，也有责任主动确认关系、排他性、期待与边界。'
+    },
+    concepts:[
+      {no:'1',t:'同意发生亲密行为',d:'Consent to intimacy'},
+      {no:'2',t:'继续约会',d:'Keep dating'},
+      {no:'3',t:'排他性约会',d:'Exclusive dating'},
+      {no:'4',t:'使用男女朋友身份',d:'Boyfriend/girlfriend label'},
+      {no:'5',t:'长期关系承诺',d:'Long-term commitment'}
+    ],
+    communication:{
+      q:'选择一句更清晰、更尊重边界的表达方式：',
+      qEn:'Choose a clearer, boundary-respecting way to say it:',
+      opts:[
+        {k:'A',t:'“随缘吧，看感觉。”',bad:true},
+        {k:'B',t:'“我很重视我们的关系，但我意识到我们可能对它有不同理解。我们现在是排他性约会吗？这段关系对你意味着什么？”',good:true},
+        {k:'C',t:'“你应该知道我们是什么关系吧？”',bad:true}
+      ],
+      goodText:'这段表达：① 明确说明自己重视关系；② 承认双方可能有不同理解；③ 直接询问排他性；④ 询问对方眼中的关系意义。清晰不等于强势。'
+    }
+  },
+
+  chenhao: {
+    id:'chenhao',
+    title:'路线 B：条件很好，为什么没有心动？',
+    titleEn:'A Good Match on Paper, but Where Is the Chemistry?',
+    routeA:'陈昊', routeB:'Camille',
+    routeATag:'中国男性留学生', routeBTag:'法国女性研究生',
+    speakerName:{narrator:'旁白',chenhao:'陈昊（内心）',camille:'Camille（内心）'},
+    scenes:[
+      {id:'ch_01',img:'img-ch_01',aud:'aud-ch_01',speaker:'chenhao',motion:'zoom-out',
+       zh:'我可能不是最会说话的人，但我认真、可靠，也有清楚的未来计划。这些应该是长期关系中真正重要的条件。',en:'I may not be the most eloquent person, but I am serious, reliable, and have clear plans. These should be what truly matter in a long-term relationship.'},
+      {id:'ch_02',img:'img-ch_02',aud:'aud-ch_02',speaker:'narrator',motion:'pan-right',
+       zh:'两人在小组项目中认识，一起处理数据、整理报告，也几次一起吃饭。',en:'They met in a group project, worked on data and reports together, and had several meals together.'},
+      {id:'ch_03',img:'img-ch_03',aud:'aud-ch_03',speaker:'narrator',motion:'zoom-in',
+       zh:'陈昊帮助处理数据、整理报告，认真可靠。但谈话大多围绕学业、实习、工作计划、收入和生活成本。',en:'Chen Hao helped with data and reports, reliable and serious. But conversations mostly circled around studies, internships, career plans, income, and living costs.'},
+      {id:'ch_04',img:'img-ch_04',aud:'aud-ch_04',speaker:'chenhao',motion:'pan-left',
+       zh:'稳定、责任和职业能力更重要。这些，才是关系里真正重要的东西。',en:'Stability, responsibility, and career competence matter more. These are what truly matter in a relationship.'},
+      {id:'ch_05',img:'img-ch_05',aud:'aud-ch_05',speaker:'narrator',motion:'pan-right',
+       zh:'Camille 认可陈昊的可靠，却不确定：这些见面是不是约会，他喜欢她还是只是礼貌，两人除学习和职业外有什么共同生活。',en:'Camille appreciated his reliability but was unsure: were these meetings dates? Did he like her or was he just polite? What life did they share beyond study and career?'},
+      {id:'ch_06',img:'img-ch_06',aud:'aud-ch_06',speaker:'camille',motion:'zoom-out',
+       zh:'我也看重稳定和责任。但我还不知道和他一起生活是否轻松、有趣，以及我们是否真正了解彼此。',en:'I like stability and responsibility too. But I don\'t know yet whether life with him would feel easy and fun, and whether we truly know each other.'},
+      {id:'ch_07',img:'img-ch_07',aud:'aud-ch_07',speaker:'narrator',motion:'zoom-in',
+       zh:'陈昊把主要时间用于学习、实习申请、兼职和中国同学社交。他们各自的生活，几乎没有交集。',en:'Chen Hao spent his time on study, internships, part-time work, and socialising with Chinese classmates. Their lives barely overlapped.'},
+      {id:'ch_08',img:'img-ch_08',aud:'aud-ch_08',speaker:'narrator',motion:'split-screen',
+       zh:'他们的生活半径和社交圈，几乎是两条平行线。',en:'Their daily lives and social circles ran almost like two parallel lines.'},
+      {id:'ch_09',img:'img-ch_09',aud:'aud-ch_09',speaker:'chenhao',motion:'close-up',
+       zh:'周末有空的话，可以一起吃个饭。',en:'If you are free this weekend, maybe we can have a meal together.'},
+      {id:'ch_10',img:'img-ch_10',aud:'aud-ch_10',speaker:'camille',motion:'pan-right',
+       zh:'他说吃饭，我就当成同学之间的一次聚餐。',en:'He said dinner. I think of it as a friendly meal between classmates.'},
+      {id:'ch_11',img:'img-ch_11',aud:'aud-ch_11',speaker:'narrator',motion:'zoom-out',
+       zh:'后来，Camille 开始和一位喜欢攀岩、穿着随意、很会聊天的法国男性约会。',en:'Later, Camille began dating a French man who loved climbing, dressed casually, and was great at conversation.'},
+      {id:'ch_12',img:'img-ch_12',aud:'aud-ch_12',speaker:'chenhao',motion:'freeze',
+       zh:'她说欣赏认真和可靠的人，最后还是选择了法国男性。是不是法国女性根本不会考虑中国男性？',en:'She said she valued serious, reliable people, but in the end she chose a French man. Do French women simply never consider Chinese men?'},
+      {id:'ch_13',img:'img-ch_13',aud:'aud-ch_13',speaker:'chenhao',motion:'zoom-in',
+       zh:'也许从一开始，我的认真在他们眼里就不算什么。',en:'Maybe from the very start, my seriousness meant nothing to them.'},
+      {id:'ch_14',img:'img-ch_14',aud:'aud-ch_14',speaker:'camille',motion:'zoom-out',
+       zh:'陈昊很可靠，我也很尊重他。但我一直不知道他是在约我，还是只是做一个友好的同学。我们每次见面都像在讨论简历和未来计划。我很少听到他讲自己真正喜欢什么、害怕什么，或者什么事情会让他开心。我也必须承认，我可能对中国男性有一些没有认真检查过的想法。',en:'Chen Hao is reliable, and I respect him. But I never knew whether he was asking me out or just being a friendly classmate. Every conversation felt like reviewing a resume and future plans. I rarely heard what he truly likes, fears, or what makes him happy. And I have to admit, I may carry some unchecked assumptions about Chinese men.'},
+      {id:'ch_15',img:'img-ch_15',aud:'aud-ch_15',speaker:'narrator',motion:'split-screen',
+       zh:'两个人，都在心里给对方贴上了标签。标签背后，是各自没有检查过的假设。',en:'Both of them had put labels on each other. Behind those labels were assumptions neither had examined.'},
+      {id:'ch_16',img:'img-ch_16',aud:'aud-ch_16',speaker:'chenhao',motion:'zoom-in',
+       zh:'我很喜欢和你相处。你愿意这周六和我正式约会吗？',en:'I enjoy spending time with you. Would you like to go on a date with me this Saturday?'}
+    ],
+    firstJudgment:{
+      q:'你认为发生了什么？',
+      qEn:'What Do You Think Happened?',
+      opts:[
+        {k:'A',t:'Camille 只喜欢法国男性。'},
+        {k:'B',t:'法国女性更看重外形和健身。'},
+        {k:'C',t:'陈昊的表达方式没有让 Camille 感受到明确的约会意图和情感连接。'},
+        {k:'D',t:'种族化审美或偏见可能存在。'},
+        {k:'E',t:'社交圈、语言、共同兴趣、个人吸引力和偏见可能共同作用。'},
+        {k:'F',t:'信息不足，不能用单一原因解释。'}
+      ],
+      note:'没有唯一、简单的正确答案。多选对比后再继续。'
+    },
+    facts:[
+      {id:'f1',t:'陈昊认真可靠，条件稳定'},
+      {id:'f2',t:'两人见面大多谈论学业与职业'},
+      {id:'f3',t:'陈昊没有明确说过“这是约会”'},
+      {id:'f4',t:'Camille 喜欢跑步、攀岩和朋友聚会'},
+      {id:'f5',t:'Camille 开始与一位法国男性约会'}
+    ],
+    guesses:[
+      {id:'g1',t:'Camille 只喜欢法国男性'},
+      {id:'g2',t:'法国女性都看外形和健身'},
+      {id:'g3',t:'陈昊不够有趣所以不被喜欢'},
+      {id:'g4',t:'欧美女性普遍不喜欢亚洲男性'}
+    ],
+    factsFeedback:'个人吸引、文化脚本、社交机会、表达方式和社会偏见都可能影响结果，不能用一个因素解释所有经历。',
+    feelings:[
+      '失落','自我怀疑','不公平','被忽视','困惑',
+      '觉得自己条件够好却没被看见','担心永远无法进入对方的世界','开始怀疑自己的吸引力','其他'
+    ],
+    feelingFollow:[
+      '陈昊最难受的可能是什么？',
+      '哪些感受来自实际行为？',
+      '哪些感受来自他的自我评价和群体概括？',
+      '如果你是陈昊，你会怎么做？'
+    ],
+    perspectivePredict:{
+      prompt:'先写下你的预测：Camille 心里可能怎么想？',
+      promptEn:'Before listening, predict: what might Camille be thinking?'
+    },
+    perspectiveVoice:{
+      speaker:'Camille',
+      zh:'陈昊很可靠，我也很尊重他。但我一直不知道他是在约我，还是只是做一个友好的同学。我们每次见面都像在讨论简历和未来计划。我很少听到他讲自己真正喜欢什么、害怕什么，或者什么事情会让他开心。我也必须承认，我可能对中国男性有一些没有认真检查过的想法。',
+      en:'Chen Hao is reliable, and I respect him. But I never knew whether he was asking me out or just being a friendly classmate. Every conversation felt like reviewing a resume and future plans. I rarely heard what he truly likes, fears, or what makes him happy. And I have to admit, I may carry some unchecked assumptions about Chinese men.',
+      note:'即使 Camille 存在偏见，她仍有权不产生浪漫吸引，也不需要被说服接受关系。同时，文化差异不能成为隐瞒、操控或越过边界的理由。'
+    },
+    concepts:[
+      {no:'1',t:'独立性',d:'Independence'},
+      {no:'2',t:'生活方式',d:'Lifestyle'},
+      {no:'3',t:'情感表达',d:'Emotional expression'},
+      {no:'4',t:'勇气',d:'Courage'},
+      {no:'5',t:'社交连接',d:'Social connection'},
+      {no:'6',t:'身体吸引与个人偏好',d:'Attraction & preference'}
+    ],
+    structuralFactors:[
+      '法语和幽默表达','国际学生与本地学生社交圈分离','交友软件算法和种族化筛选',
+      '媒体中的亚洲男性形象','共同兴趣不足','约会邀请不明确','对方的安全考虑',
+      '签证和毕业后的长期计划','个人吸引力','生活方式','双方刻板印象','尚未遇到合适的人','多种因素共同作用'
+    ],
+    communication:{
+      q:'原表达 vs 更清晰的表达：',
+      qEn:'The vague ask vs the clearer ask:',
+      opts:[
+        {k:'原',t:'“周末有空的话可以一起吃个饭。”',bad:true},
+        {k:'新',t:'“我很喜欢和你相处。你愿意这周六和我正式约会吗？”',good:true}
+      ],
+      goodText:'清晰不等于强势。表达兴趣后，应允许对方自由接受或拒绝。明确说出“正式约会”，让对方知道这是约会邀请，而不是同学聚餐。'
+    }
+  }
+};
+
+/* ===== 阶段定义 ===== */
+const STAGES = [
+  {n:1, key:'encounter',    zh:'观看情境', en:'Encounter'},
+  {n:2, key:'firstJudgment',zh:'第一判断', en:'First Impression'},
+  {n:3, key:'facts',        zh:'事实与推测', en:'Facts & Interpretations'},
+  {n:4, key:'feelings',     zh:'我的感受', en:'My Feelings'},
+  {n:5, key:'perspective',  zh:'对方视角', en:'Their Perspective'},
+  {n:6, key:'sameDiff',     zh:'相同与不同', en:'Same & Different'},
+  {n:7, key:'communication',zh:'沟通行动', en:'Communication'},
+  {n:8, key:'mine',         zh:'个人经历迁移', en:'My Own Encounter'},
+  {n:9, key:'report',       zh:'反思报告', en:'Reflection Report'}
+];
+
+/* ===== 经历提示器数据 ===== */
+const MINE_CATEGORIES = [
+  {id:'nation',t:'国家或语言',q:['有没有一种表达或习惯让你觉得“怎么会有人这样做”？','你是否把自己的习惯当成了所有人都应遵守的标准？']},
+  {id:'region',t:'地区或方言',q:['方言或口音是否让你有过被排除或格格不入的感觉？','你会不会因为对方的口音先入为主地判断他的性格？']},
+  {id:'urban',t:'城乡成长环境',q:['城乡成长经历是否带来过作息、消费或观念的冲突？','你如何理解对方“奇怪”的生活习惯？']},
+  {id:'family',t:'家庭和代际',q:['你和父母是否对专业、就业或恋爱有不同理解？','一方认为是帮助，另一方是否感到被控制？']},
+  {id:'major',t:'专业或组织',q:['不同专业对数据、创意、速度或风险的关注是否不同？','实习生和主管对“主动汇报”是否有不同理解？']},
+  {id:'gender',t:'性别与关系',q:['对“应该如何表达关心”是否存在性别期待差异？','一段关系里，谁负责提出边界，谁负责维护边界？']},
+  {id:'religion',t:'民族或宗教',q:['节日、饮食或禁忌方面的差异是否带来过误解？','你如何区分“习俗”与“个人选择”？']},
+  {id:'interest',t:'兴趣和网络社群',q:['不同兴趣社群是否有自己的语言和规则？','你曾经把某个圈子的习惯当成普遍标准吗？']},
+  {id:'dorm',t:'校园宿舍',q:['有没有一种生活习惯让你觉得“怎么会有人这样做”？','对方是否也可能觉得你的做法奇怪？']},
+  {id:'work',t:'实习和职场',q:['不同部门对加班、请假和反馈是否有不同规则？','领导认为“不主动汇报就是缺乏责任感”，你认同吗？']},
+  {id:'other',t:'其他',q:['有没有一次让你印象深刻的“差异相遇”？','它发生在哪里，涉及哪些人？']}
+];
+
+const MINE_CASES = [
+  {id:'c1',t:'宿舍作息',d:'不同地区室友对睡觉、开灯、洗澡和打电话有不同习惯。'},
+  {id:'c2',t:'方言与排斥感',d:'同乡学生使用方言，另一名学生感到被排除。'},
+  {id:'c3',t:'实习汇报',d:'实习生认为没有问题就不必汇报，主管认为不主动汇报就是缺乏责任感。'},
+  {id:'c4',t:'家庭与就业',d:'学生想去外地工作，父母认为留在家乡才是稳定和负责。'},
+  {id:'c5',t:'不同专业合作',d:'设计专业强调体验与创意，财务专业强调成本和风险。'}
+];
+
+/* ================= 状态管理 ================= */
+function defaultState(){
+  return {
+    route:null, sceneIdx:0, stage:1, unlocked:[1],
+    storyViewed:{},
+    answers:{
+      firstJudgment:{pick:null, reasons:[], note:''},
+      facts:{},
+      feelings:[],
+      feelingFollow:['','','',''],
+      perspectivePred:'',
+      perspectiveHeard:false,
+      sameDiff:{},
+      communicationPick:null,
+      mine:{entry:null, caseId:null, catId:null,
+        steps:{
+          step1:{title:'',when:'',where:'',who:'',what:''},
+          step2:[],
+          step3:{feel:'',think:'',do:'',facts:'',guesses:''},
+          step4:{feel:'',think:'',evidence:'',alt:'',notag:''},
+          step5:{factors:[],follow:['','','','']},
+          step6:{learn:'',differ:'',ask:'',boundary:'',respect:'',action:''}
+        }
+      }
+    },
+    savedAt:null
+  };
+}
+let state = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const s = JSON.parse(raw);
+    const d = defaultState();
+    return Object.assign(d, s, {answers:Object.assign(d.answers, s.answers||{})});
+  }catch(e){ return defaultState(); }
+}
+function save(){
+  state.savedAt = new Date().toISOString();
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* ================= 工具 ================= */
+const $ = id => document.getElementById(id);
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $(id).classList.add('active');
+  const stageNav = document.getElementById('stage-nav-bottom');
+  if (stageNav) {
+    if (id === 'view-story') document.getElementById('stage-nav').after(stageNav);
+    else $(id).prepend(stageNav);
+    stageNav.style.display = (id === 'view-story' || id === 'view-mine') && state.stage <= 8 ? 'flex' : 'none';
+  }
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function confirmModal(title, text, onOk){
+  $('modal-title').textContent = title;
+  $('modal-text').textContent = text;
+  const mask = $('modal-mask');
+  mask.classList.add('show');
+  const ok = $('modal-ok'), cancel = $('modal-cancel');
+  const cleanup = ()=>{ mask.classList.remove('show'); ok.onclick=null; cancel.onclick=null; };
+  ok.onclick = ()=>{ cleanup(); onOk && onOk(); };
+  cancel.onclick = cleanup;
+}
+function esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function unlockStage(n){
+  if(!state.unlocked.includes(n)) state.unlocked.push(n);
+  state.unlocked.sort((a,b)=>a-b);
+}
+function goStage(n){
+  if(!state.unlocked.includes(n)){ toast('请先完成前面的阶段 / Complete earlier stages first'); return; }
+  state.stage = n; save();
+  if(n===1){ enterStory(); }
+  else if(n===8){ enterMine(); }
+  else if(n===9){ enterReport(); }
+  else {
+    // 阶段2-7：停在路线最后一镜，互动内容铺满画面浮层（不自动播放音频）
+    state.sceneIdx = curRoute().scenes.length - 1;
+    renderScene();
+    audio.pause();
+    renderStage(n);
+    $('overlay').hidden = false;
+    showView('view-story');
+  }
+  renderStageNav();
+  updateBottomNav();
+}
+function updateBottomNav(){
+  const n = state.stage;
+  const prev = $('btn-stage-prev'), nxt = $('btn-stage-next'), lab = $('step-label');
+  if(!prev) return;
+  // 阶段1-8：显示导航条；阶段9：隐藏
+  $('stage-nav-bottom').style.display = (n>=1 && n<=8) ? 'flex' : 'none';
+  if(n<1 || n>8) return;
+  prev.style.visibility = n<=1 ? 'hidden' : 'visible';
+  nxt.disabled = n===1 && !state.unlocked.includes(2);
+  nxt.style.display = '';
+  lab.textContent = n + '/9 ' + (STAGES[n-1]?STAGES[n-1].zh:'');
+}
+function nextStage(){
+  const n = state.stage + 1;
+  if(n>9){ enterReport(); return; }
+  unlockStage(n);
+  goStage(n);
+}
+function prevStage(){
+  if(state.stage<=1) return;
+  const n = state.stage - 1;
+  goStage(n);
+}
+
+/* ================= 阶段导航 ================= */
+function renderStageNav(){
+  const nav = $('stage-nav');
+  nav.innerHTML = STAGES.map(s=>{
+    const cls = state.stage===s.n ? 'current' : (state.unlocked.includes(s.n) ? 'done' : 'locked');
+    const clickable = state.unlocked.includes(s.n);
+    return `<button class="stage-chip ${cls}" data-n="${s.n}" ${clickable?'':'disabled'} aria-label="阶段 ${s.n}：${s.zh}">${s.n}. ${s.zh}</button>`;
+  }).join('');
+  nav.querySelectorAll('.stage-chip').forEach(ch=>{
+    ch.addEventListener('click', ()=>goStage(parseInt(ch.dataset.n,10)));
+  });
+}
+
+/* ================= 播放器 ================= */
+const ICON_PLAY = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ICON_VOL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16.5 8.2a4.5 4.5 0 0 1 0 7.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ICON_MUTE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+let autoplayAllowed = false;
+const audio = new Audio();
+let currentScene = null;
+
+function curRoute(){ return ROUTES[state.route]; }
+
+function speakerLabel(route, sp){
+  return (route.speakerName && route.speakerName[sp]) || sp;
+}
+
+function renderScene(){
+  const route = curRoute();
+  const sc = route.scenes[state.sceneIdx];
+  currentScene = sc;
+  const frame = $('stage-frame');
+  // 移除旧图
+  frame.querySelectorAll('.stage-img').forEach(el=>el.remove());
+  const srcImg = $(sc.img);
+  const img = document.createElement('img');
+  img.className = 'stage-img m-' + sc.motion;
+  img.src = srcImg ? srcImg.src : '';
+  img.alt = srcImg ? srcImg.alt : '剧情镜头';
+  img.draggable = false;
+  frame.insertBefore(img, $('subtitle'));
+  // 字幕
+  $('sub-speaker').textContent = speakerLabel(route, sc.speaker);
+  $('sub-zh').textContent = sc.zh;
+  $('sub-en').textContent = sc.en;
+  $('subtitle').hidden = false;
+  $('stage-placeholder').hidden = true;
+  // 音频
+  const srcAud = $(sc.aud);
+  if(srcAud && srcAud.src){ audio.src = srcAud.src; }
+  audio.playbackRate = currentRate;
+  audio.muted = muted;
+  audio.currentTime = 0;
+  // 镜头编号
+  $('pt-scene').textContent = `镜头 ${state.sceneIdx+1} / ${route.scenes.length}  Scene ${state.sceneIdx+1} of ${route.scenes.length}`;
+  $('pt-route').textContent = route.title;
+  updateProgressUI();
+  try{ audio.play().catch(()=>{}); }catch(e){}
+  frame.classList.remove('paused','replay');
+  updatePlayIcon();
+}
+
+function enterStory(){
+  const route = curRoute();
+  if(!route) return;
+  state.sceneIdx = Math.min(state.sceneIdx, route.scenes.length-1);
+  $('overlay').hidden = true;
+  renderScene();
+  showView('view-story');
+  renderStageNav();
+  updateBottomNav();
+}
+
+function playPause(){
+  if(audio.paused){
+    autoplayAllowed = true;
+    try{ audio.play().catch(()=>{}); }catch(e){}
+  } else {
+    audio.pause();
+  }
+  updatePlayIcon();
+}
+function updatePlayIcon(){
+  $('btn-play').innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+  $('btn-play').setAttribute('aria-label', audio.paused ? '播放' : '暂停');
+}
+function nextScene(){
+  const route = curRoute();
+  if(state.sceneIdx < route.scenes.length-1){
+    state.sceneIdx++;
+    save();
+    renderScene();
+  } else {
+    // 剧情结束：解锁阶段2，停在最后一镜等用户点下一步
+    state.storyViewed[route.id] = true;
+    unlockStage(2);
+    updateBottomNav();
+    toast('剧情观看完成，点「下一步」开始反思 / Story complete. Tap Next to begin.');
+  }
+}
+function prevScene(){
+  if(state.sceneIdx>0){ state.sceneIdx--; save(); renderScene(); }
+}
+function replayScene(){
+  const frame = $('stage-frame');
+  audio.currentTime = 0;
+  autoplayAllowed = true;
+  try{ audio.play().catch(()=>{}); }catch(e){}
+  frame.classList.add('replay');
+  setTimeout(()=>frame.classList.remove('replay'), 60);
+  updatePlayIcon();
+}
+let muted = false, currentRate = 1;
+function toggleMute(){
+  muted = !muted; audio.muted = muted;
+  $('btn-mute').classList.toggle('active', muted);
+  $('btn-mute').innerHTML = muted ? ICON_MUTE : ICON_VOL;
+}
+function setRate(r){
+  currentRate = r; audio.playbackRate = r;
+  document.querySelectorAll('.rate-btn').forEach(b=>b.classList.toggle('active', parseFloat(b.dataset.rate)===r));
+}
+audio.addEventListener('timeupdate', updateProgressUI);
+audio.addEventListener('ended', ()=>{
+  const route = curRoute();
+  if(route && state.sceneIdx < route.scenes.length-1){
+    state.sceneIdx++; save(); renderScene();
+  }
+});
+function updateProgressUI(){
+  const dur = audio.duration && isFinite(audio.duration) ? audio.duration : 0;
+  const cur = audio.currentTime || 0;
+  const pct = dur>0 ? (cur/dur)*100 : 0;
+  $('pb-slider').value = pct;
+  $('pb-time').textContent = fmt(cur) + ' / ' + fmt(dur);
+}
+function fmt(s){
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+
+/* ================= 阶段渲染 ================= */
+function renderStage(n){
+  const key = STAGES[n-1].key;
+  const box = $('overlay');
+  const route = curRoute();
+  const A = state.answers;
+  if(n===2) box.innerHTML = stageFirstJudgment(route, A);
+  else if(n===3) box.innerHTML = stageFacts(route, A);
+  else if(n===4) box.innerHTML = stageFeelings(route, A);
+  else if(n===5) box.innerHTML = stagePerspective(route, A);
+  else if(n===6) box.innerHTML = stageSameDiff(route, A);
+  else if(n===7) box.innerHTML = stageCommunication(route, A);
+  bindStageEvents(n);
+}
+
+function stageShell(st, zh, en, desc){
+  return `<div class="stage-kicker">${st}</div>
+    <h2 class="stage-title">${zh}</h2>
+    <div class="stage-title-en">${en}</div>
+    <p class="stage-desc">${desc}</p>`;
+}
+
+/* --- 阶段2：第一判断 --- */
+function stageFirstJudgment(route, A){
+  const fj = route.firstJudgment;
+  const picked = A.firstJudgment.pick;
+  const reasons = A.firstJudgment.reasons || [];
+  const facts = route.facts || [];
+  return stageShell('STAGE 2','第一判断','First Impression','先记录你的直觉判断与判断依据，不立即显示唯一正确答案。')
+    + `<div class="fj-tabs" role="tablist">
+        <button class="fj-tab active" data-tab="take">我的判断<br><small>My Take</small></button>
+        <button class="fj-tab" data-tab="why">我的依据<br><small>My Reasons</small></button>
+      </div>
+      <div class="fj-pane" id="fj-pane-take">
+        <div class="panel">
+          <h4>${esc(fj.q)}</h4>
+          <div class="p-en">${esc(fj.qEn)}</div>
+          <div class="opt-list">
+            ${fj.opts.map(o=>`<button class="opt-item ${picked===o.k?'selected':''}" data-k="${o.k}">
+              <span class="oi-key">${o.k}</span><span>${esc(o.t)}</span></button>`).join('')}
+          </div>
+          <div class="hint">${esc(fj.note)}</div>
+        </div>
+      </div>
+      <div class="fj-pane" id="fj-pane-why" hidden>
+        <div class="panel">
+          <h4>你凭什么这么判断？<br><small style="font-weight:400;color:rgba(247,242,232,.6)">Which clues shaped your impression?</small></h4>
+          <div class="chip-pool">
+            ${facts.map(f=>`<button class="chip ${reasons.includes(f.id)?'selected':''}" data-fid="${f.id}">${esc(f.t)}</button>`).join('')}
+          </div>
+          <div class="hint" style="margin-top:8px">多选 · Select all that apply</div>
+          <textarea id="fj-note" placeholder="还想补充一点……（可选 / optional）">${esc(A.firstJudgment.note||'')}</textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-fj-next">保存并下一步 / Save &amp; Continue</button>
+      </div>`;
+}
+
+/* --- 阶段3：事实与推测 --- */
+function stageFacts(route, A){
+  const all = route.facts.map(f=>({id:f.id,t:f.t,kind:'fact',v:A.facts[f.id]}))
+    .concat(route.guesses.map(g=>({id:g.id,t:g.t,kind:'guess',v:A.facts[g.id]})));
+  const factChips = all.filter(x=>x.v==='fact');
+  const guessChips = all.filter(x=>x.v==='guess');
+  const unpooled = all.filter(x=>!x.v);
+  return stageShell('STAGE 3','事实与推测','Facts and Interpretations','把候选陈述拖入下方两个框，判断哪些是画面中能直接看到的，哪些是你的推断。可来回拖动重新分类。')
+    + `<div class="panel">
+        <h4>候选内容 / Candidates</h4>
+        <div class="chip-pool dropzone" data-zone="pool" id="chip-pool">
+          ${unpooled.map(c=>`<button class="chip" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+          ${unpooled.length===0?'<span class="dz-empty">所有候选已分类 ✓</span>':''}
+        </div>
+        <div class="zone-row">
+          <div class="zone fact-zone dropzone" data-zone="fact">
+            <h5>有证据支持的陈述 <span class="z-en">Direct Observations</span></h5>
+            ${factChips.map(c=>`<button class="chip selected-fact" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+            ${factChips.length===0?'<span class="dz-empty">（拖到这里 / Drop here）</span>':''}
+          </div>
+          <div class="zone guess-zone dropzone" data-zone="guess">
+            <h5>你的推断与解释 <span class="z-en">Your Interpretations</span></h5>
+            ${guessChips.map(c=>`<button class="chip selected-guess" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+            ${guessChips.length===0?'<span class="dz-empty">（拖到这里 / Drop here）</span>':''}
+          </div>
+        </div>
+        <div class="hint">拖动即可分类 · 已分类的词也能拖到另一框或拖回候选池。</div>
+      </div>
+      <div class="feedback">${esc(route.factsFeedback)}</div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-facts-next" ${all.some(x=>!x.v)?'disabled':''}>保存并下一步 / Save &amp; Continue</button>
+      </div>`;
+}
+
+/* --- 阶段4：我的感受 --- */
+function stageFeelings(route, A){
+  const fe = route.feelings;
+  const chosen = A.feelings || [];
+  return stageShell('STAGE 4','我的感受','My Feelings','可多选。识别哪些感受来自实际行为，哪些来自你对关系的默认理解。')
+    + `<div class="fj-tabs" role="tablist">
+        <button class="fj-tab active" data-tab="feel">我的感受<br><small>My Feelings</small></button>
+        <button class="fj-tab" data-tab="follow">追问<br><small>Follow-up</small></button>
+      </div>
+      <div class="fj-pane" id="fj-pane-feel">
+        <div class="panel">
+          <h4>${esc(route.routeA)}可能有哪些感受？<span class="p-en">(可多选)</span></h4>
+          <div class="opt-list opt-chips">
+            ${fe.map((f,i)=>`<label class="check-item ${chosen.includes(f)?'checked':''}">
+              <input type="checkbox" value="${esc(f)}" ${chosen.includes(f)?'checked':''}><span>${esc(f)}</span></label>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="fj-pane" id="fj-pane-follow" hidden>
+        <div class="panel">
+          <h4>追问 / Follow-up Questions</h4>
+          <div class="hint" style="margin-bottom:10px">默读下列问题，在心里回答即可，无需填写。</div>
+          ${route.feelingFollow.map((q,i)=>`
+            <div class="follow-q"><span class="fq-num">${i+1}</span><span>${esc(q)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="form-actions"><button class="btn btn-primary" id="btn-feel-next">保存并下一步 / Save &amp; Continue</button></div>`;
+}
+
+/* --- 阶段5：对方视角 --- */
+function stagePerspective(route, A){
+  const pv = route.perspectiveVoice;
+  return stageShell('STAGE 5','对方视角','Their Perspective','先预测对方可能的想法，再播放对方的内心独白。')
+    + `<div class="panel">
+        <h4>${esc(route.perspectivePredict.prompt)}</h4>
+        <div class="p-en">${esc(route.perspectivePredict.promptEn)}</div>
+        <textarea id="pv-pred">${esc(A.perspectivePred)}</textarea>
+      </div>
+      <div class="panel">
+        <h4>${esc(pv.speaker)} 的内心独白 / Inner Voice</h4>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-pv-play">${A.perspectiveHeard?'重听独白 / Replay':'播放独白 / Play'}</button>
+        </div>
+        <div class="perspective-box" id="pv-box" ${A.perspectiveHeard?'':'hidden'}>
+          <div class="pv-speaker">${esc(pv.speaker)} — INNER VOICE</div>
+          <div class="pv-zh">${esc(pv.zh)}</div>
+          <div class="pv-en">${esc(pv.en)}</div>
+        </div>
+        <div class="hint" id="pv-note" ${A.perspectiveHeard?'':'hidden'}>${esc(pv.note)}</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-pv-next" ${A.perspectiveHeard?'':'disabled'}>保存并下一步 / Save &amp; Continue</button>
+      </div>`;
+}
+
+/* --- 阶段6：相同与不同（概念拆分） --- */
+function stageSameDiff(route, A){
+  const routeIsA = route.id==='linyue';
+  const viewed = A.sameDiff.viewed || [];
+  if(routeIsA){
+    return stageShell('STAGE 6','相同与不同','Same &amp; Different','五个关系概念不是一回事。点击每个概念了解其含义，全部浏览后继续。')
+      + `<div class="panel">
+          <h4>五个关系概念拆分 / Five Relationship Concepts</h4>
+          <div class="concept-grid">
+            ${route.concepts.map(c=>`
+              <button class="concept-card ${viewed.includes(c.no)?'cur':''}" data-no="${c.no}" data-desc="${esc(c.t)}：${esc(c.d)}">
+                <span class="cc-no">${c.no}</span>
+                <h5>${esc(c.t)}</h5>
+                <p>${esc(c.d)}</p>
+              </button>`).join('')}
+          </div>
+          <div class="hint">提示：同意发生亲密行为 ≠ 继续约会 ≠ 排他性约会 ≠ 男女朋友 ≠ 长期承诺。</div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-sd-next" ${viewed.length>=route.concepts.length?'':'disabled'}>保存并下一步 / Save &amp; Continue</button>
+        </div>`;
+  }
+  const factors = route.structuralFactors;
+  const chosenF = A.sameDiff.factors || [];
+  return stageShell('STAGE 6','相同与不同','Same &amp; Different','吸引力的六个维度与结构性因素：哪些证据充分，哪些只是假设？')
+    + `<div class="panel">
+        <h4>吸引力的六个维度 / Six Dimensions of Attraction</h4>
+        <div class="concept-grid">
+          ${route.concepts.map(c=>`<div class="concept-card cur"><span class="cc-no">${c.no}</span><h5>${esc(c.t)}</h5><p>${esc(c.d)}</p></div>`).join('')}
+        </div>
+        <div class="hint">不能把一个人的偏好概括为整个国家女性的审美。个人偏好也可能受到媒体和社会刻板印象影响。</div>
+      </div>
+      <div class="panel">
+        <h4>结构性因素多选 / Structural Factors (multi-select)</h4>
+        <div class="opt-list">
+          ${factors.map(f=>`<label class="check-item ${chosenF.includes(f)?'checked':''}">
+            <input type="checkbox" value="${esc(f)}" ${chosenF.includes(f)?'checked':''}><span>${esc(f)}</span></label>`).join('')}
+        </div>
+        <div class="hint">反馈：个人吸引、文化脚本、社交机会、表达方式和社会偏见都可能影响结果，不能用一个因素解释所有经历。</div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-sd-next">保存并下一步 / Save &amp; Continue</button>
+      </div>`;
+}
+
+/* --- 阶段7：沟通行动 --- */
+function stageCommunication(route, A){
+  const cm = route.communication;
+  const pick = A.communicationPick;
+  return stageShell('STAGE 7','沟通行动','Communication','学习明确表达边界、关系意图和期待。')
+    + `<div class="panel">
+        <h4>${esc(cm.q)}</h4>
+        <div class="p-en">${esc(cm.qEn)}</div>
+        <div class="opt-list">
+          ${cm.opts.map(o=>`<button class="opt-item ${pick===o.k?'selected':''}" data-k="${o.k}">
+            <span class="oi-key">${o.k}</span><span>${esc(o.t)}</span></button>`).join('')}
+        </div>
+      </div>
+      <div class="feedback" id="cm-feedback" ${pick===cm.opts.find(o=>o.good)?.k?'':'hidden'}>${esc(cm.goodText)}</div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-cm-next" ${pick===cm.opts.find(o=>o.good)?.k?'':'disabled'}>保存并下一步 / Save &amp; Continue</button>
+      </div>`;
+}
+
+/* ================= 阶段8：个人经历迁移 ================= */
+function enterMine(){
+  const A = state.answers;
+  showView('view-mine');
+  renderStageNav();
+  renderMine();
+}
+function renderMine(){
+  const box = $('mine-content');
+  const A = state.answers;
+  const mine = A.mine;
+  if(!mine.entry){
+    box.innerHTML = stageShell('STAGE 8','个人经历迁移','My Own Encounter','这次经历不一定发生在国外，也不一定涉及外国人。')
+      + `<div class="panel">
+          <h4>选择一个入口 / Choose an Entry</h4>
+          <div class="opt-list">
+            <button class="opt-item" data-entry="own"><span class="oi-key">1</span><span>我亲身经历过 / I Experienced It Myself</span></button>
+            <button class="opt-item" data-entry="observed"><span class="oi-key">2</span><span>我观察到过 / I Observed It</span></button>
+            <button class="opt-item" data-entry="case"><span class="oi-key">3</span><span>我暂时想不到，使用系统案例 / Use a Provided Scenario</span></button>
+          </div>
+        </div>`;
+  } else if(mine.entry==='case' && !mine.caseId){
+    box.innerHTML = stageShell('STAGE 8','个人经历迁移','My Own Encounter','选择一个与你的生活较接近的系统案例，继续完成相同的六步反思。')
+      + `<div class="panel">
+          <h4>系统备用案例 / Provided Scenarios</h4>
+          <div class="opt-list">
+            ${MINE_CASES.map(c=>`<button class="opt-item" data-case="${c.id}"><span class="oi-key">•</span><span><b>${esc(c.t)}</b>：${esc(c.d)}</span></button>`).join('')}
+          </div>
+        </div>`;
+  } else if(!mine.catId){
+    box.innerHTML = stageShell('STAGE 8','你的经历可能来自哪里？','Where Might Cultural Difference Appear?','点击分类查看启发问题，帮助你回忆一次真实的差异相遇。')
+      + `<div class="panel">
+          <h4>经历提示器 / Memory Prompts</h4>
+          <div class="cat-grid">
+            ${MINE_CATEGORIES.map(c=>`<button class="cat-item" data-cat="${c.id}">${esc(c.t)}</button>`).join('')}
+          </div>
+        </div>`;
+  } else if(mine.catId && !mine._started){
+    const cat = MINE_CATEGORIES.find(c=>c.id===mine.catId);
+    box.innerHTML = stageShell('STAGE 8','你的经历可能来自哪里？','Where Might Cultural Difference Appear?','')
+      + `<div class="panel">
+          <h4>${esc(cat.t)} / 启发问题</h4>
+          ${cat.q.map((q,i)=>`<p style="margin:8px 0">${i+1}. ${esc(q)}</p>`).join('')}
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-mine-start">开始六步反思 / Start Reflection</button>
+          <button class="btn btn-ghost" id="btn-mine-cat-back">更换分类 / Change</button>
+        </div>`;
+  } else {
+    box.innerHTML = stageShell('STAGE 8','个人反思六步表单','Six-Step Reflection','每一步自动保存。你可以跳过任何不愿回答的问题。')
+      + renderMineSteps(mine);
+  }
+  bindMineEvents();
+}
+
+function renderMineSteps(mine){
+  const S = mine.steps;
+  const stepNow = mine._step || 1;
+  const steps = [
+    {n:1,t:'经历概况',en:'What happened',body:`
+      <div class="panel"><h4>给经历起一个标题</h4><input type="text" data-f="title" value="${esc(S.step1.title)}" placeholder="例：宿舍里关于空调的争论"></div>
+      <div class="panel"><h4>什么时候发生？</h4><input type="text" data-f="when" value="${esc(S.step1.when)}" placeholder="例：大一冬天"></div>
+      <div class="panel"><h4>在哪里发生？</h4><input type="text" data-f="where" value="${esc(S.step1.where)}" placeholder="例：学校宿舍"></div>
+      <div class="panel"><h4>有哪些人？</h4><input type="text" data-f="who" value="${esc(S.step1.who)}" placeholder="例：我和两位来自南方的室友"></div>
+      <div class="panel"><h4>实际发生了什么？</h4><textarea data-f="what" placeholder="先描述能够观察到的事实，暂时不要解释动机。">${esc(S.step1.what)}</textarea></div>`},
+    {n:2,t:'为什么印象深刻',en:'Why it stands out',body:`
+      <div class="panel"><h4>印象最深的感觉（可多选）</h4>
+        <div class="opt-list">
+          ${['惊讶','开心','失望','生气','困惑','尴尬','被排斥','改变了我的看法','其他'].map(f=>`
+            <label class="check-item ${(S.step2||[]).includes(f)?'checked':''}"><input type="checkbox" value="${f}" ${(S.step2||[]).includes(f)?'checked':''}><span>${f}</span></label>`).join('')}
+        </div></div>`},
+    {n:3,t:'我的感受、想法和行为',en:'My feelings, thoughts, actions',body:`
+      <div class="panel"><h4>当时我的感受是……</h4><textarea data-f="feel">${esc(S.step3.feel)}</textarea></div>
+      <div class="panel"><h4>当时我的想法是……</h4><textarea data-f="think">${esc(S.step3.think)}</textarea></div>
+      <div class="panel"><h4>当时我实际做了……</h4><textarea data-f="do">${esc(S.step3.do)}</textarea></div>
+      <div class="panel"><h4>哪些是事实？</h4><textarea data-f="facts">${esc(S.step3.facts)}</textarea></div>
+      <div class="panel"><h4>哪些是我的推测？</h4><textarea data-f="guesses">${esc(S.step3.guesses)}</textarea></div>`},
+    {n:4,t:'对方视角',en:'Their perspective',body:`
+      <div class="panel"><h4>对方可能有什么感受？</h4><textarea data-f="feel">${esc(S.step4.feel)}</textarea></div>
+      <div class="panel"><h4>对方可能在想什么？</h4><textarea data-f="think">${esc(S.step4.think)}</textarea></div>
+      <div class="panel"><h4>我有哪些证据？</h4><textarea data-f="evidence">${esc(S.step4.evidence)}</textarea></div>
+      <div class="panel"><h4>还有哪些其他解释？</h4><textarea data-f="alt">${esc(S.step4.alt)}</textarea></div>
+      <div class="panel"><h4>如果去掉国籍、地区、性别或群体标签，我会怎样解释其行为？</h4><textarea data-f="notag">${esc(S.step4.notag)}</textarea></div>`},
+    {n:5,t:'文化透镜检查',en:'Cultural lens check',body:`
+      <div class="panel"><h4>可能因素（可多选）</h4>
+        <div class="opt-list">
+          ${['文化或群体习惯','个人性格','具体情境','权力关系','经济和资源条件','信息不足','组织制度','语言表达','社会偏见','身体吸引或个人偏好','我还不能确定','多种因素共同作用'].map(f=>`
+            <label class="check-item ${(S.step5.factors||[]).includes(f)?'checked':''}"><input type="checkbox" value="${f}" ${(S.step5.factors||[]).includes(f)?'checked':''}><span>${f}</span></label>`).join('')}
+        </div></div>
+      <div class="panel"><h4>追问</h4>
+        ${['哪些因素有证据支持？','哪些只是暂时假设？','我是否把一个人的行为概括成整个群体？','我是否忽略了制度、资源或权力因素？'].map((q,i)=>`
+          <p style="font-weight:600;margin:10px 0 6px">${i+1}. ${q}</p><textarea data-follow="${i}">${esc((S.step5.follow||[])[i]||'')}</textarea>`).join('')}
+      </div>`},
+    {n:6,t:'回顾与行动',en:'Review & action',body:`
+      <div class="panel"><h4>我学到了什么？</h4><textarea data-f="learn">${esc(S.step6.learn)}</textarea></div>
+      <div class="panel"><h4>如果重新经历，我会做什么不同的事情？</h4><textarea data-f="differ">${esc(S.step6.differ)}</textarea></div>
+      <div class="panel"><h4>我还需要询问或确认什么？</h4><textarea data-f="ask">${esc(S.step6.ask)}</textarea></div>
+      <div class="panel"><h4>我准备如何表达自己的边界？</h4><textarea data-f="boundary">${esc(S.step6.boundary)}</textarea></div>
+      <div class="panel"><h4>我将如何尊重对方的边界？</h4><textarea data-f="respect">${esc(S.step6.respect)}</textarea></div>
+      <div class="panel"><h4>下一次遇到类似情况，我会采取什么行动？</h4><textarea data-f="action">${esc(S.step6.action)}</textarea></div>`}
+  ];
+  const cur = steps.find(s=>s.n===stepNow);
+  return `<div class="form-step-head"><span class="fs-no">${cur.n}</span><h4>${cur.t} <span style="color:rgba(18,59,70,.5);font-weight:400;font-size:13px">${cur.en}</span></h4></div>
+    <div class="form-step active">${cur.body}</div>
+    <div class="form-actions">
+      ${stepNow>1?`<button class="btn" id="btn-step-prev">上一步 / Previous</button>`:''}
+      ${stepNow<6?`<button class="btn btn-primary" id="btn-step-next">保存并下一步 / Save &amp; Next</button>`
+        :`<button class="btn btn-primary" id="btn-step-done">完成反思，生成报告 / Finish &amp; Generate Report</button>`}
+      <button class="btn btn-ghost" id="btn-mine-back-top">保存并返回 / Save &amp; Back</button>
+    </div>`;
+}
+
+/* ================= 事件绑定：互动阶段 ================= */
+function bindStageEvents(n){
+  const A = state.answers;
+  const route = curRoute();
+  if(n===2){
+    // tab 切换
+    document.querySelectorAll('#overlay .fj-tab').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        document.querySelectorAll('#overlay .fj-tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        $('fj-pane-take').hidden = t.dataset.tab!=='take';
+        $('fj-pane-why').hidden = t.dataset.tab!=='why';
+      });
+    });
+    // 单选判断
+    document.querySelectorAll('#overlay .opt-item').forEach(b=>{
+      b.addEventListener('click', ()=>{ A.firstJudgment.pick = b.dataset.k; save(); renderStage(2); });
+    });
+    // 多选依据
+    document.querySelectorAll('#overlay .chip[data-fid]').forEach(ch=>{
+      ch.addEventListener('click', ()=>{
+        const id = ch.dataset.fid;
+        if(!A.firstJudgment.reasons) A.firstJudgment.reasons = [];
+        const i = A.firstJudgment.reasons.indexOf(id);
+        if(i>=0) A.firstJudgment.reasons.splice(i,1); else A.firstJudgment.reasons.push(id);
+        ch.classList.toggle('selected');
+        save();
+      });
+    });
+    const note = $('fj-note');
+    if(note) note.addEventListener('input', ()=>{ A.firstJudgment.note = note.value; save(); });
+    const next = $('btn-fj-next');
+    if(next) next.addEventListener('click', ()=>{
+      if(!A.firstJudgment.pick){ toast('请先在「我的判断」中选择一项 / Choose your take first'); return; }
+      nextStage();
+    });
+  } else if(n===3){
+    const ids = [...route.facts.map(f=>f.id), ...route.guesses.map(g=>g.id)];
+    // 拖拽：dragstart 记录 chip id
+    document.querySelectorAll('#overlay .chip[draggable="true"]').forEach(ch=>{
+      ch.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', ch.dataset.id);
+        e.dataTransfer.effectAllowed = 'move';
+        ch.classList.add('dragging');
+      });
+      ch.addEventListener('dragend', ()=>ch.classList.remove('dragging'));
+      // 触屏降级：点击在 事实→推测→未分类 间循环
+      ch.addEventListener('click', ()=>{
+        const id = ch.dataset.id;
+        const cur = A.facts[id];
+        A.facts[id] = cur==='fact' ? 'guess' : (cur==='guess' ? undefined : 'fact');
+        save(); renderStage(3);
+      });
+    });
+    // 三个放置区：候选池 / 事实 / 推测
+    document.querySelectorAll('#overlay .dropzone').forEach(dz=>{
+      dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag-over'); });
+      dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
+      dz.addEventListener('drop', e=>{
+        e.preventDefault();
+        dz.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const zone = dz.dataset.zone;
+        if(!id || ids.indexOf(id)<0) return;
+        A.facts[id] = (zone==='pool') ? undefined : zone;
+        save(); renderStage(3);
+      });
+    });
+    const next = $('btn-facts-next');
+    if(next) next.addEventListener('click', ()=>{
+      if(!ids.every(id=>A.facts[id])){ toast('请把所有候选归入事实或推测 / Categorise all items first'); return; }
+      nextStage();
+    });
+  } else if(n===4){
+    // tab 切换
+    document.querySelectorAll('#overlay .fj-tab').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        document.querySelectorAll('#overlay .fj-tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        $('fj-pane-feel').hidden = t.dataset.tab!=='feel';
+        $('fj-pane-follow').hidden = t.dataset.tab!=='follow';
+      });
+    });
+    document.querySelectorAll('#overlay input[type="checkbox"]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        A.feelings = [...document.querySelectorAll('#overlay input[type="checkbox"]:checked')].map(c=>c.value);
+        save();
+        cb.closest('.check-item').classList.toggle('checked', cb.checked);
+      });
+    });
+    const next = $('btn-feel-next');
+    if(next) next.addEventListener('click', ()=>{
+      if(!A.feelings.length){ toast('请至少选择一种感受 / Select at least one feeling'); return; }
+      nextStage();
+    });
+  } else if(n===5){
+    const pred = $('pv-pred');
+    if(pred) pred.addEventListener('input', ()=>{ A.perspectivePred = pred.value; save(); });
+    const playBtn = $('btn-pv-play');
+    if(playBtn) playBtn.addEventListener('click', ()=>{
+      const audId = route.id==='linyue' ? 'aud-ly_12' : 'aud-ch_14';
+      const srcAud = $(audId);
+      if(srcAud && srcAud.src){ audio.src = srcAud.src; }
+      audio.muted = false; // 播放独白时临时取消静音
+      audio.volume = 1;
+      audio.playbackRate = currentRate; audio.currentTime = 0;
+      autoplayAllowed = true;
+      audio.play().then(()=>{
+        A.perspectiveHeard = true; save();
+        const box = $('pv-box'), note = $('pv-note'), nxt = $('btn-pv-next');
+        if(box) box.hidden = false;
+        if(note) note.hidden = false;
+        if(nxt) nxt.disabled = false;
+        playBtn.textContent = '重听独白 / Replay';
+      }).catch(err=>{
+        toast('播放失败：' + (err && err.message ? err.message : '未知错误'));
+      });
+    });
+    const next = $('btn-pv-next');
+    if(next) next.addEventListener('click', ()=>{
+      if(!A.perspectivePred.trim()){ toast('请先写下你的预测 / Write your prediction first'); return; }
+      if(!A.perspectiveHeard){ toast('请先播放对方的内心独白 / Play the inner voice first'); return; }
+      nextStage();
+    });
+  } else if(n===6){
+    if(route.id==='linyue'){
+      document.querySelectorAll('#overlay .concept-card').forEach(c=>{
+        c.addEventListener('click', ()=>{
+          const no = c.dataset.no;
+          const viewed = A.sameDiff.viewed || (A.sameDiff.viewed=[]);
+          if(!viewed.includes(no)) viewed.push(no);
+          save(); renderStage(6);
+        });
+      });
+    } else {
+      document.querySelectorAll('#overlay input[type="checkbox"]').forEach(cb=>{
+        cb.addEventListener('change', ()=>{
+          A.sameDiff.factors = [...document.querySelectorAll('#overlay input[type="checkbox"]:checked')].map(c=>c.value);
+          save();
+          cb.closest('.check-item').classList.toggle('checked', cb.checked);
+        });
+      });
+    }
+    const next = $('btn-sd-next');
+    if(next) next.addEventListener('click', ()=>{
+      if(route.id==='linyue'){
+        if((A.sameDiff.viewed||[]).length < route.concepts.length){ toast('请先浏览全部概念 / View all concepts first'); return; }
+      } else {
+        if(!(A.sameDiff.factors||[]).length){ toast('请至少选择一项结构性因素 / Select at least one factor'); return; }
+      }
+      nextStage();
+    });
+  } else if(n===7){
+    document.querySelectorAll('#overlay .opt-item').forEach(b=>{
+      b.addEventListener('click', ()=>{ A.communicationPick = b.dataset.k; save(); renderStage(7); });
+    });
+    const next = $('btn-cm-next');
+    if(next) next.addEventListener('click', ()=>{
+      const good = route.communication.opts.find(o=>o.good).k;
+      if(A.communicationPick !== good){ toast('请选择更清晰的表达 / Choose the clearer option'); return; }
+      nextStage();
+    });
+  }
+}
+
+/* ================= 阶段8：个人经历 事件绑定 ================= */
+function bindMineEvents(){
+  const A = state.answers;
+  document.querySelectorAll('#mine-content input, #mine-content textarea').forEach(input => {
+    const persist = () => { collectMineStep(A.mine._step||1); save(); };
+    input.addEventListener('input', persist); input.addEventListener('change', persist);
+  });
+  document.querySelectorAll('#mine-content [data-entry]').forEach(b=>{
+    b.addEventListener('click', ()=>{ A.mine.entry = b.dataset.entry; A.mine._step = 1; save(); renderMine(); });
+  });
+  document.querySelectorAll('#mine-content [data-case]').forEach(b=>{
+    b.addEventListener('click', ()=>{ A.mine.caseId = b.dataset.case; A.mine._step = 1; save(); renderMine(); });
+  });
+  document.querySelectorAll('#mine-content [data-cat]').forEach(b=>{
+    b.addEventListener('click', ()=>{ A.mine.catId = b.dataset.cat; save(); renderMine(); });
+  });
+  const start = $('btn-mine-start');
+  if(start) start.addEventListener('click', ()=>{ A.mine._started = true; A.mine._step = 1; save(); renderMine(); });
+  const catBack = $('btn-mine-cat-back');
+  if(catBack) catBack.addEventListener('click', ()=>{ A.mine.catId = null; save(); renderMine(); });
+  const stepNext = $('btn-step-next'), stepPrev = $('btn-step-prev'), stepDone = $('btn-step-done'), topBack = $('btn-mine-back-top');
+  if(stepNext) stepNext.addEventListener('click', ()=>{
+    collectMineStep(A.mine._step||1);
+    A.mine._step = Math.min(6, (A.mine._step||1)+1); save(); renderMine();
+  });
+  if(stepPrev) stepPrev.addEventListener('click', ()=>{
+    collectMineStep(A.mine._step||1);
+    A.mine._step = Math.max(1, (A.mine._step||1)-1); save(); renderMine();
+  });
+  if(stepDone) stepDone.addEventListener('click', ()=>{
+    collectMineStep(6);
+    unlockStage(9); state.stage = 9; save();
+    enterReport();
+  });
+  if(topBack) topBack.addEventListener('click', ()=>{
+    collectMineStep(A.mine._step||1); save();
+    renderStageNav(); showView('view-home');
+  });
+}
+function collectMineStep(step){
+  const S = state.answers.mine.steps;
+  const box = $('mine-content');
+  const get = f => (box.querySelector(`[data-f="${f}"]`)||{}).value || '';
+  if(step===1){ ['title','when','where','who','what'].forEach(f=>S.step1[f]=get(f)); }
+  if(step===2){ S.step2 = [...box.querySelectorAll('input[type="checkbox"]:checked')].map(c=>c.value); }
+  if(step===3){ ['feel','think','do','facts','guesses'].forEach(f=>S.step3[f]=get(f)); }
+  if(step===4){ ['feel','think','evidence','alt','notag'].forEach(f=>S.step4[f]=get(f)); }
+  if(step===5){
+    S.step5.factors = [...box.querySelectorAll('input[type="checkbox"]:checked')].map(c=>c.value);
+    box.querySelectorAll('textarea[data-follow]').forEach(ta=>{ S.step5.follow[+ta.dataset.follow] = ta.value; });
+  }
+  if(step===6){ ['learn','differ','ask','boundary','respect','action'].forEach(f=>S.step6[f]=get(f)); }
+}
+
+/* ================= 阶段9：反思报告 ================= */
+function hasVal(v){ return v && (Array.isArray(v)?v.length>0:String(v).trim()!==''); }
+function enterReport(){
+  showView('view-report');
+  renderStageNav();
+  $('report-body').innerHTML = buildReport() + reportActions() + sourceNote();
+  bindReportEvents();
+}
+function mineTitle(){
+  const mine = state.answers.mine;
+  if(mine.entry){
+    if(mine.steps.step1.title) return mine.steps.step1.title;
+    if(mine.caseId) return MINE_CASES.find(c=>c.id===mine.caseId).t;
+    if(mine.catId){ const c = MINE_CATEGORIES.find(x=>x.id===mine.catId); return c ? c.t : '个人经历'; }
+    return '个人经历';
+  }
+  return curRoute().title;
+}
+function buildReport(){
+  const route = curRoute();
+  const A = state.answers;
+  const mine = A.mine;
+  const fjOpt = A.firstJudgment.pick ? route.firstJudgment.opts.find(o=>o.k===A.firstJudgment.pick) : null;
+  const fjReasonTexts = (A.firstJudgment.reasons||[]).map(id=>{const f=(route.facts||[]).find(x=>x.id===id);return f?f.t:''}).filter(Boolean);
+  const facts = route.facts.filter(f=>A.facts[f.id]==='fact').map(f=>f.t);
+  const guesses = [...route.facts, ...route.guesses].filter(g=>A.facts[g.id]==='guess').map(g=>g.t);
+  const blk = (t, en, body) => `<div class="report-block"><h5>${t}<span style="margin-left:auto;font-size:12px;color:rgba(18,59,70,.45)">${en}</span></h5><div class="rb-body">${body||'（未填写 / Not filled）'}</div></div>`;
+  const list = arr => arr.length ? arr.map(x=>'• '+esc(x)).join('\n') : '（无 / None）';
+  const parts = [];
+  parts.push(`<h2 class="stage-title">我的跨文化相遇反思图</h2><div class="stage-title-en">My Intercultural Encounter Reflection Map</div>
+    <p class="stage-desc">路线：${esc(route.title)}</p>`);
+  parts.push(`<div class="report-grid">`);
+  parts.push(blk('1. 经历标题','Encounter title', esc(mineTitle())));
+  parts.push(blk('2. 事件事实','Facts', hasVal(mine.steps.step3.facts) ? esc(mine.steps.step3.facts) : list(facts)));
+  const fjExtra = [fjReasonTexts.length?('依据：'+fjReasonTexts.join('；')):'', A.firstJudgment.note?('补充：'+A.firstJudgment.note):''].filter(Boolean).join('\n');
+  parts.push(blk('3. 第一判断','First impression', fjOpt ? `选项 ${fjOpt.k}：${esc(fjOpt.t)}${fjExtra?'\n'+fjExtra:''}` : '（未选择）'));
+  parts.push(blk('4. 情绪','Feelings', list(A.feelings)));
+  parts.push(blk('5. 实际行动','Actions taken', hasVal(mine.steps.step3.do) ? esc(mine.steps.step3.do) : (hasVal(mine.steps.step3.think)?esc(mine.steps.step3.think):'（未填写）')));
+  parts.push(blk('6. 主观推测','Interpretations', hasVal(mine.steps.step3.guesses) ? esc(mine.steps.step3.guesses) : list(guesses)));
+  parts.push(blk('7. 对方可能的视角','Their perspective', hasVal(A.perspectivePred) ? esc(A.perspectivePred) : '（未填写）'));
+  parts.push(blk('8. 判断依据','Evidence', hasVal(mine.steps.step4.evidence) ? esc(mine.steps.step4.evidence) : '（未填写）'));
+  parts.push(blk('9. 其他可能解释','Alternative explanations', hasVal(mine.steps.step4.alt) ? esc(mine.steps.step4.alt) : '（未填写）'));
+  parts.push(blk('10. 文化、个人、组织和结构因素','Cultural, personal, organisational & structural factors', list(mine.steps.step5.factors)));
+  parts.push(blk('11. 学到的内容','What I learned', hasVal(mine.steps.step6.learn) ? esc(mine.steps.step6.learn) : '（未填写）'));
+  parts.push(blk('12. 下一步行动','Next steps', hasVal(mine.steps.step6.action) ? esc(mine.steps.step6.action) : '（未填写）'));
+  parts.push(`</div>`);
+  // Byram
+  parts.push(`<h3 style="color:var(--cream);margin:26px 0 12px">Byram 五项能力 · 描述性反馈</h3>
+    <div class="stage-title-en">Byram's Five Competences — Descriptive Feedback (No Score)</div>
+    <div class="byram-grid">`);
+  byramCards(A).forEach(c=>{
+    parts.push(`<div class="byram-card"><h5>${c.t} <span style="color:rgba(18,59,70,.45);font-weight:400;font-size:12px">${c.en}</span></h5>
+      <ul>${c.items.map(i=>`<li>${i.hit?'✓ ':'○ '}${esc(i.t)}</li>`).join('')}</ul></div>`);
+  });
+  parts.push(`</div>`);
+  parts.push(`<div class="feedback" style="margin-top:18px">本反馈为描述性反思，不产生总分、排名、高低等级，也不构成心理诊断或恋爱能力诊断。</div>`);
+  return parts.join('');
+}
+function byramCards(A){
+  const any = arr => arr.some(hasVal);
+  return [
+    {t:'Attitudes 态度', en:'Attitudes', items:[
+      {t:'你愿意暂停判断并考虑其他解释', hit: hasVal(A.perspectivePred) || A.firstJudgment.pick==='E' || A.firstJudgment.pick==='F'},
+      {t:'你表现出开放和好奇', hit: any(A.feelingFollow) || hasVal(A.sameDiff.factors)},
+      {t:'你还可以进一步区分「不理解」和「不认同」', hit:false}
+    ]},
+    {t:'Knowledge 知识', en:'Knowledge', items:[
+      {t:'你注意到了文化和组织制度', hit: hasVal(A.sameDiff.factors) || (A.sameDiff.viewed||[]).length>0},
+      {t:'你开始考虑家庭、地区、语言和社会背景', hit: hasVal(mineTitle())},
+      {t:'你还可以寻找真实信息，而不是只依赖印象', hit:false}
+    ]},
+    {t:'Interpreting & Relating 解释与关联', en:'Interpreting & Relating', items:[
+      {t:'你能够比较双方视角', hit: hasVal(A.perspectivePred) && A.perspectiveHeard},
+      {t:'你区分了事实和解释', hit: Object.values(A.facts).filter(v=>v).length>0},
+      {t:'你还可以进一步说明判断依据', hit: (A.firstJudgment.reasons||[]).length>0 || hasVal(A.firstJudgment.note)}
+    ]},
+    {t:'Discovery & Interaction 发现与互动', en:'Discovery & Interaction', items:[
+      {t:'你提出了询问和核实的方法', hit: hasVal(A.communicationPick)},
+      {t:'你设计了更清晰的沟通表达', hit: true},
+      {t:'你能够尊重对方接受或拒绝的权利', hit: (A.firstJudgment.reasons||[]).length>0 || hasVal(A.firstJudgment.note)}
+    ]},
+    {t:'Critical Cultural Awareness 批判性文化意识', en:'Critical Cultural Awareness', items:[
+      {t:'你没有简单判断谁对谁错', hit: A.firstJudgment.pick==='D' || A.firstJudgment.pick==='E' || A.firstJudgment.pick==='F'},
+      {t:'你注意到了偏见、权力和社会结构', hit: hasVal(A.sameDiff.factors)},
+      {t:'你同时反思了自己和对方的假设', hit: hasVal(A.mine.steps.step5.follow.join(''))}
+    ]}
+  ];
+}
+function reportActions(){
+  return `<div class="report-actions">
+    <button class="btn btn-primary btn-sm" id="btn-report-copy">复制报告 / Copy</button>
+    <button class="btn btn-sm" id="btn-report-dl-txt">下载 TXT / Download TXT</button>
+    <button class="btn btn-sm" id="btn-report-dl-html">下载 HTML / Download HTML</button>
+    <button class="btn btn-sm" id="btn-report-print">打印 / 另存 PDF · Print</button>
+    <button class="btn btn-sm btn-ghost" id="btn-report-edit">返回编辑 / Edit</button>
+    <button class="btn btn-sm btn-ghost" id="btn-report-other">完成另一条路线 / Other Route</button>
+    <button class="btn btn-sm btn-ghost" id="btn-report-ch3">返回第三章 / Chapter 3</button>
+    <button class="btn btn-sm btn-danger" id="btn-report-clear">清除本地数据 / Clear Data</button>
+  </div>`;
+}
+function sourceNote(){
+  return `<div class="source-note">
+    <p><b>来源标注 / Sources</b></p>
+    <p>本互动活动根据欧洲委员会《跨文化相遇自传》的反思框架改编。<br>Adapted from <i>Autobiography of Intercultural Encounters</i>, Council of Europe.</p>
+    <p style="margin-top:8px">AIE 原始 PDF：https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/PREMS%20041122%20GBR%202508%20AIE%20Text%20A4%20Web%20%281%29.pdf</p>
+    <p>Byram 跨文化教学指南：https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter3/guide_dimintercult_en.pdf</p>
+    <p style="margin-top:8px"><b>免责声明 / Disclaimer</b><br>本活动用于教育和个人反思，不是标准化心理测验，不提供能力诊断、恋爱建议或个人排名。<br>This activity is for education and personal reflection. It is not a standardised psychological test and does not provide diagnoses, dating advice or personal rankings.</p>
+  </div>`;
+}
+function buildReportText(){
+  const route = curRoute();
+  const A = state.answers;
+  const mine = A.mine;
+  const lines = [];
+  lines.push('我的跨文化相遇反思图 / My Intercultural Encounter Reflection Map');
+  lines.push('路线 / Route: ' + route.title);
+  lines.push('--------------------------------------------------');
+  lines.push('经历标题: ' + mineTitle());
+  lines.push('事件事实: ' + (hasVal(mine.steps.step3.facts) ? mine.steps.step3.facts : (route.facts.filter(f=>A.facts[f.id]==='fact').map(f=>f.t).join('；')||'（未填写）')));
+  const fjOpt = A.firstJudgment.pick ? route.firstJudgment.opts.find(o=>o.k===A.firstJudgment.pick) : null;
+  const fjRt = (A.firstJudgment.reasons||[]).map(id=>{const f=(route.facts||[]).find(x=>x.id===id);return f?f.t:''}).filter(Boolean).join('；');
+  lines.push('第一判断: ' + (fjOpt ? fjOpt.k+' '+fjOpt.t + (fjRt?'（依据：'+fjRt+'）':'') + (A.firstJudgment.note?'（补充：'+A.firstJudgment.note+'）':'') : '（未选择）'));
+  lines.push('情绪: ' + (A.feelings.join('、')||'（未填写）'));
+  lines.push('实际行动: ' + (mine.steps.step3.do||'（未填写）'));
+  lines.push('主观推测: ' + (mine.steps.step3.guesses || [...route.facts,...route.guesses].filter(g=>A.facts[g.id]==='guess').map(g=>g.t).join('；') || '（未填写）'));
+  lines.push('对方可能的视角: ' + (A.perspectivePred||'（未填写）'));
+  lines.push('判断依据: ' + (mine.steps.step4.evidence||'（未填写）'));
+  lines.push('其他可能解释: ' + (mine.steps.step4.alt||'（未填写）'));
+  lines.push('文化、个人、组织和结构因素: ' + (mine.steps.step5.factors.join('；')||'（未填写）'));
+  lines.push('学到的内容: ' + (mine.steps.step6.learn||'（未填写）'));
+  lines.push('下一步行动: ' + (mine.steps.step6.action||'（未填写）'));
+  lines.push('--------------------------------------------------');
+  lines.push('Byram 五项能力（描述性反馈，不打分）:');
+  byramCards(A).forEach(c=>lines.push('  ' + c.t + ': ' + c.items.map(i=>(i.hit?'✓':'○')+' '+i.t).join('；')));
+  lines.push('--------------------------------------------------');
+  lines.push('本活动用于教育和个人反思，不是标准化心理测验，不提供能力诊断、恋爱建议或个人排名。');
+  lines.push('Adapted from Autobiography of Intercultural Encounters, Council of Europe.');
+  return lines.join('\n');
+}
+function buildReportHtml(){
+  const body = document.createElement('div');
+  body.innerHTML = buildReport();
+  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>跨文化相遇反思图</title>
+<style>body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;max-width:820px;margin:24px auto;padding:0 20px;color:#24343A;line-height:1.7}
+h2{color:#123B46}.report-block{border:1px solid #ddd;border-left:4px solid #C78B45;border-radius:10px;padding:14px 18px;margin:10px 0;white-space:pre-wrap}
+.byram-card{border:1px solid #ddd;border-radius:10px;padding:14px 18px;margin:10px 0}.feedback{border:1px solid #C78B45;background:#FDF0DC;padding:10px 14px;border-radius:8px}</style></head>
+<body data-chapter-return="../chapter3.html">${body.innerHTML}</body></html>`;
+  return html;
+}
+function bindReportEvents(){
+  const copyBtn = $('btn-report-copy');
+  if(copyBtn) copyBtn.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(buildReportText()); toast('报告已复制 / Report copied'); }
+    catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = buildReportText(); document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); toast('报告已复制 / Report copied'); }catch(err){ toast('复制失败，请手动选择 / Copy failed'); }
+      ta.remove();
+    }
+  });
+  const dlTxt = $('btn-report-dl-txt');
+  if(dlTxt) dlTxt.addEventListener('click', ()=>download('aie-reflection-report.txt', buildReportText(), 'text/plain'));
+  const dlHtml = $('btn-report-dl-html');
+  if(dlHtml) dlHtml.addEventListener('click', ()=>download('aie-reflection-report.html', buildReportHtml(), 'text/html'));
+  const printBtn = $('btn-report-print');
+  if(printBtn) printBtn.addEventListener('click', ()=>window.print());
+  const editBtn = $('btn-report-edit');
+  if(editBtn) editBtn.addEventListener('click', ()=>{ goStage(8); });
+  const otherBtn = $('btn-report-other');
+  if(otherBtn) otherBtn.addEventListener('click', ()=>{
+    const other = state.route==='linyue' ? 'chenhao' : 'linyue';
+    state.route = other; state.sceneIdx = 0; state.stage = 1;
+    if(!state.unlocked.includes(1)) state.unlocked.push(1);
+    save(); enterStory();
+    toast('开始另一条路线 / Starting the other route');
+  });
+  const ch3Btn = $('btn-report-ch3');
+  if(ch3Btn) ch3Btn.addEventListener('click', ()=>{ returnToChapter(); });
+  const clearBtn = $('btn-report-clear');
+  if(clearBtn) clearBtn.addEventListener('click', ()=>{
+    confirmModal('清除本地数据 / Clear Local Data','这会删除当前浏览器中保存的全部回答，且无法撤销。确定清除吗？', ()=>{
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      state = defaultState(); save();
+      showView('view-home'); renderStageNav();
+      toast('数据已清除 / Data cleared');
+    });
+  });
+}
+function download(name, content, type){
+  const blob = new Blob([content], {type: type+';charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+}
+
+/* ================= 初始化 ================= */
+function prevStageOrHome(){
+  audio.pause();
+  if(state.stage>1){ goStage(state.stage-1); }
+  else { showView('view-home'); renderStageNav(); }
+}
+
+function pauseActivity(){ if(state.stage===8 && state.answers.mine._started && $('view-mine').classList.contains('active')) collectMineStep(state.answers.mine._step||1); save(); audio.pause(); updatePlayIcon(); }
+function returnToChapter(){
+  pauseActivity();
+  if (window.parent !== window) window.parent.postMessage({type:'CCM_AIE_CLOSE'}, location.origin);
+  else location.href = new URL(document.body.dataset.chapterReturn, location.href).href;
+}
+window.CCMAieActivity = { pause: pauseActivity };
+window.addEventListener('pagehide', pauseActivity);
+document.addEventListener('visibilitychange', () => { if (document.hidden) pauseActivity(); });
+
+function init(){
+  $('btn-ch3').addEventListener('click', ()=>{ returnToChapter(); });
+  document.querySelectorAll('.route-card').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      autoplayAllowed = true;
+      const rid = c.dataset.route;
+      // 若切换路线或首次进入，重置到阶段1；若已有存档则恢复
+      if(!state.route || state.route!==rid){
+        state.route = rid; state.sceneIdx = 0; state.stage = 1;
+        state.unlocked = [1];
+      }
+      save();
+      // 恢复到上次离开的阶段
+      if(state.stage===1){ enterStory(); }
+      else if(state.stage===8){ enterMine(); }
+      else if(state.stage===9){ enterReport(); }
+      else { goStage(state.stage); }
+    });
+  });
+  $('btn-play').addEventListener('click', playPause);
+  $('btn-prev').addEventListener('click', prevScene);
+  $('btn-next').addEventListener('click', nextScene);
+  $('btn-mute').addEventListener('click', toggleMute);
+  $('btn-replay').addEventListener('click', replayScene);
+  $('btn-story-back').addEventListener('click', ()=>{ audio.pause(); showView('view-home'); renderStageNav(); });
+  $('btn-stage-prev').addEventListener('click', ()=>{
+    if(state.stage===8 && state.answers.mine._started){
+      const previous = $('btn-step-prev');
+      if(previous){ previous.click(); return; }
+      collectMineStep(state.answers.mine._step||1); save();
+    }
+    if(state.stage>1) goStage(state.stage-1);
+    else { audio.pause(); showView('view-home'); renderStageNav(); }
+  });
+  $('btn-stage-next').addEventListener('click', ()=>{
+    // 阶段8：触发"完成反思，生成报告"按钮
+    if(state.stage===8){
+      const action = $('btn-step-done') || $('btn-step-next') || $('btn-mine-start');
+      if(action) action.click();
+      else toast('请先选择经历入口和分类 / Choose an entry and category first');
+      return;
+    }
+    // 触发浮层内最后一个"保存并下一步"按钮（带阶段校验）
+    const ovBtns = document.querySelectorAll('#overlay .form-actions .btn');
+    const ovBtn = ovBtns.length ? ovBtns[ovBtns.length-1] : null;
+    if(ovBtn && !$('overlay').hidden){ ovBtn.click(); }
+    else nextStage();
+  });
+  $('btn-mine-back').addEventListener('click', prevStageOrHome);
+  $('pb-slider').addEventListener('input', e=>{
+    if(audio.duration && isFinite(audio.duration)){
+      audio.currentTime = (parseFloat(e.target.value)/100) * audio.duration;
+    }
+  });
+  document.querySelectorAll('.rate-btn').forEach(b=>b.addEventListener('click', ()=>setRate(parseFloat(b.dataset.rate))));
+  $('modal-cancel').addEventListener('click', ()=>{ $('modal-mask').classList.remove('show'); });
+  renderStageNav();
+  showView('view-home');
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- 全局阶段导航胶囊（浮在所有视图上方） -->
+<div class="stage-nav-bottom" id="stage-nav-bottom" style="display:none">
+  <button class="btn btn-ghost btn-sm" id="btn-stage-prev">← 上一步 / Prev</button>
+  <span class="step-label" id="step-label"></span>
+  <button class="btn btn-primary btn-sm" id="btn-stage-next">下一步 / Next →</button>
+</div>
+
+</body>
+</html>
