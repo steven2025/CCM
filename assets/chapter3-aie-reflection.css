@@ -1,0 +1,29 @@
+.ccm-aie-launch { display: inline-block; padding: 12px 20px; border: 1px solid #123b46; border-radius: 10px; background: #123b46; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.ccm-aie-launch:hover { background: #1d5360; }
+.ccm-aie-dialog {
+  width: min(1240px, 96vw);
+  max-width: 100vw;
+  height: 94vh;
+  height: 94dvh;
+  max-height: 100dvh;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #47626a;
+  border-radius: 14px;
+  background: #123b46;
+  color: #f7f2e8;
+  overflow: hidden;
+}
+.ccm-aie-dialog[open] { display: flex; flex-direction: column; }
+.ccm-aie-dialog::backdrop { background: rgb(0 0 0 / 65%); }
+.ccm-aie-dialog.expanded { width: 100vw; height: 100dvh; border-radius: 0; }
+.ccm-aie-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 10px 14px; background: #0a242b; flex: 0 0 auto; }
+.ccm-aie-head strong { font-size: 15px; }
+.ccm-aie-head > div { display: flex; gap: 8px; }
+.ccm-aie-head button { border: 1px solid #a99c7e; border-radius: 7px; padding: 7px 10px; background: #f7f2e8; color: #123b46; font: inherit; font-size: 13px; cursor: pointer; }
+.ccm-aie-dialog iframe { display: block; width: 100%; flex: 1 1 auto; min-height: 0; border: 0; background: #123b46; }
+@media (max-width: 640px) {
+  .ccm-aie-dialog { width: 100vw; height: 100dvh; border-radius: 0; }
+  .ccm-aie-head { padding: 8px; }
+  .ccm-aie-head button { padding: 6px 8px; font-size: 12px; }
+}
