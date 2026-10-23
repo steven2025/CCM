@@ -250,7 +250,7 @@
 #dlgWin{max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}
 </style>
 </head>
-<body>
+<body data-chapter-id="chapter-4">
 
 <div class="topbar">
   <span id="navLabel">第四章 · 跨文化团队及其打造</span>
@@ -2857,7 +2857,7 @@
       fb.style.display = 'none';
       const frame = document.getElementById('dlgFrame');
       frame.style.display = 'block';
-      frame.src = 'belbin-test.html?v=20261024-2&name=同学';
+      frame.src = 'belbin-test.html?v=20261024-4';
       overlay.classList.add('show');
       win.classList.remove('fullscreen');
       win.style.left = '50%';
@@ -3280,6 +3280,16 @@
   setMode(true);
   show(0);
 </script>
+<script>
+// Receive login context only from the same-origin hosting main program.
+window.addEventListener('message', function(event) {
+  if (event.source !== window.parent || event.origin !== location.origin || event.data?.type !== 'CCM_AUTH') return;
+  window.CCMHostAuth = event.data.auth || null;
+  window.dispatchEvent(new CustomEvent('ccm-auth-ready', {detail: window.CCMHostAuth}));
+});
+</script>
+<link rel="stylesheet" href="../assets/chapter-notes.css?v=5">
+<script src="../assets/chapter-notes.js?v=6"></script>
 </body>
 </html>
 

@@ -526,6 +526,7 @@
             }
         }
     </style>
+<style>.ccm-allocation-highlight{background:#ffe08a;color:#5b3200;font-weight:700;border-radius:4px;padding:.08em .2em;box-decoration-break:clone;-webkit-box-decoration-break:clone}</style>
 </head>
 <body>
 <div class="container">
@@ -1069,14 +1070,13 @@
         function saveTestResults() {
             if (!appState.currentUser) return;
             
-            const users = JSON.parse(localStorage.getItem('belbinUsers') || '{}');
-            if (users[appState.currentUser.username]) {
-                users[appState.currentUser.username].lastTestResults = {
-                    answers: appState.userAnswers,
-                    completedAt: new Date().toISOString()
-                };
-                localStorage.setItem('belbinUsers', JSON.stringify(users));
-            }
+            // Keep course assessment records separate from the legacy local login registry.
+            const accountId = window.CCMBelbinAccountId;
+            if (!accountId) return;
+            localStorage.setItem('ccm-belbin-results:' + encodeURIComponent(accountId), JSON.stringify({
+                accountId, name: appState.currentUser.name,
+                answers: appState.userAnswers, completedAt: new Date().toISOString()
+            }));
         }
 
         // 转到上一部分
@@ -1358,7 +1358,7 @@
                 const primaryRole = roleScoreArray[0];
                 interpretationHTML += `
                     <div class="interpretation-section">
-                        <h3>${appState.currentUser.name}，根据测试结果，您在团队中的主要角色是：${primaryRole.role.name}</h3>
+                        <h3>${ccmBelbinEscape(appState.currentUser.name)}，根据测试结果，您在团队中的主要角色是：${primaryRole.role.name}</h3>
                         <p><strong>主要描述：</strong>${primaryRole.role.description}</p>
                         <p><strong>优势：</strong>${primaryRole.role.strengths}</p>
                         <p><strong>可接受的弱点：</strong>${primaryRole.role.weaknesses}</p>
@@ -1372,7 +1372,7 @@
                 const secondaryRole = roleScoreArray[1];
                 interpretationHTML += `
                     <div class="interpretation-section">
-                        <h3>${appState.currentUser.name}，您在团队中的第二种角色可能是：${secondaryRole.role.name}</h3>
+                        <h3>${ccmBelbinEscape(appState.currentUser.name)}，您在团队中的第二种角色可能是：${secondaryRole.role.name}</h3>
                         <p>如果您所在的团队和您本人有需要，也可以开发和提升您的这个角色。</p>
                         <p><strong>主要描述：</strong>${secondaryRole.role.description}</p>
                         <p><strong>优势：</strong>${secondaryRole.role.strengths}</p>
@@ -1408,6 +1408,8 @@
             }
         }
 
+        function ccmBelbinEscape(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
         // 初始化应用
         function initApp() {
             initEventListeners();
@@ -1415,9 +1417,14 @@
             // 从URL参数获取学生姓名，跳过登录
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                const studentName = urlParams.get('name') || '同学';
+                let hostUser = null;
+                try { hostUser = JSON.parse(localStorage.getItem('ccm_auth_user_v2') || 'null'); } catch (_) {}
+                const accountId = hostUser?.id ? String(hostUser.id) : '';
+                const rawName = String((accountId && hostUser.name) || urlParams.get('name') || '同学').trim() || '同学';
+                const studentName = rawName.endsWith('同学') ? rawName : rawName + '同学';
+                window.CCMBelbinAccountId = accountId;
                 appState.currentUser = {
-                    username: studentName,
+                    username: accountId || 'guest',
                     name: studentName
                 };
                 showWelcomeScreen();
@@ -1793,6 +1800,15 @@
       msgs[1].textContent = t('welcome_p2');
       msgs[2].textContent = t('welcome_p3');
       msgs[3].textContent = t('welcome_p4');
+      const allocationText = msgs[3].textContent;
+      const allocationPhrase = '你有10分可以分配给这些描述';
+      if (allocationText.includes(allocationPhrase)) {
+        const [before, after] = allocationText.split(allocationPhrase);
+        const highlight = document.createElement('mark');
+        highlight.className = 'ccm-allocation-highlight';
+        highlight.textContent = allocationPhrase;
+        msgs[3].replaceChildren(document.createTextNode(before), highlight, document.createTextNode(after));
+      }
     }
     const startBtn = document.getElementById('start-test-btn');
     if(startBtn) startBtn.textContent = t('btn_start_test');
@@ -1931,7 +1947,7 @@
     if(arr.length>0){
       const r1 = roles[arr[0].i];
       html += `<div class="interpretation-section">
-        <h3>${tn('role_primary_title', appState.currentUser?.name || '', r1.name)}</h3>
+        <h3>${tn('role_primary_title', ccmBelbinEscape(appState.currentUser?.name || ''), r1.name)}</h3>
         <p><strong>${t('section_desc')}：</strong>${r1.description}</p>
         <p><strong>${t('section_strengths')}：</strong>${r1.strengths}</p>
         <p><strong>${t('section_weaknesses')}：</strong>${r1.weaknesses}</p>
@@ -1941,7 +1957,7 @@
     if(arr.length>1){
       const r2 = roles[arr[1].i];
       html += `<div class="interpretation-section">
-        <h3>${tn('role_secondary_title', appState.currentUser?.name || '', r2.name)}</h3>
+        <h3>${tn('role_secondary_title', ccmBelbinEscape(appState.currentUser?.name || ''), r2.name)}</h3>
         <p>${t('role_secondary_hint')}</p>
         <p><strong>${t('section_desc')}：</strong>${r2.description}</p>
         <p><strong>${t('section_strengths')}：</strong>${r2.strengths}</p>
