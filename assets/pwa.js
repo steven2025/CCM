@@ -101,7 +101,7 @@
   button.addEventListener('click', openDialog);
   refreshButton();
   if (canRegister()) {
-    navigator.serviceWorker.register('./sw.js?v=46', { scope: './', updateViaCache: 'none' })
+    navigator.serviceWorker.register('./sw.js?v=49', { scope: './', updateViaCache: 'none' })
       .catch(error => {
         registrationError = true;
         console.warn('[CCM PWA] Service worker registration failed:', error);
