@@ -1,0 +1,3285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第四章 · 跨文化团队及其打造 / Building a Cross-cultural Team</title>
+<style>
+  :root{
+    --fs-base: clamp(17px, 1.15vw, 19px);
+    --c-primary:#162d4d;
+    --c-primary-light:#25528a;
+    --c-primary-bg:#e8f0fa;
+    --c-accent:#d95a1a;
+    --c-accent-light:#f4884a;
+    --c-accent-bg:#fde8d8;
+    --c-ink:#0f1b2d;
+    --c-sub:#3d4f63;
+    --c-line:#cbd5e1;
+    --c-right:#059669;
+    --c-wrong:#dc2626;
+    --c-shadow:0 1px 2px rgba(15,27,45,0.08);
+    --c-shadow-md:0 2px 8px rgba(15,27,45,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:var(--fs-base)}
+  body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f1f5f9;color:var(--c-ink);line-height:1.4;-webkit-font-smoothing:antialiased}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--c-line);padding:.35rem 1.2rem;display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--c-sub)}
+  .topbar .mode-toggle{display:flex;gap:.3rem;background:#f1f5f9;padding:.2rem;border-radius:20px;margin-left:auto}
+  .topbar button{font-size:.7rem;padding:.2rem .7rem;border:none;background:transparent;border-radius:16px;cursor:pointer;color:var(--c-sub);transition:all .2s;font-weight:500}
+  .topbar button.active{background:#fff;color:var(--c-primary);box-shadow:var(--c-shadow)}
+  .topbar .spacer{flex:1}
+  .topbar .nav-btns button{background:var(--c-primary);color:#fff;box-shadow:var(--c-shadow)}
+  .topbar .nav-btns button:hover{background:var(--c-primary-light)}
+
+  .slide{margin:0 auto;padding:.8rem 2rem 2.5rem;display:none;min-height:calc(100vh - 2.6rem)}
+  .slide.active{display:block}
+  .section-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c-primary);border-left:4px solid var(--c-accent);padding-left:.5rem;margin-bottom:.3rem;font-weight:700}
+  .slide-title{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.15;color:var(--c-ink);margin-bottom:.2rem;letter-spacing:-.01em;font-weight:800}
+  .slide-subtitle{font-size:.88rem;color:var(--c-sub);margin-bottom:.7rem}
+  .en,.zh{display:block}
+  .en{font-weight:600}
+  .zh{font-weight:400;color:var(--c-sub);margin-top:.1rem}
+
+  .card{background:#fff;border:none;border-radius:10px;padding:.45rem .7rem;margin:.3rem 0;box-shadow:var(--c-shadow);transition:box-shadow .2s}
+  .card.accent{background:linear-gradient(135deg,var(--c-accent-bg),#fff5ed)}
+  .card.primary{background:linear-gradient(135deg,var(--c-primary-bg),#f0f6fc)}
+  .card .en{font-size:.88rem}
+  .card .zh{font-size:.8rem}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.5rem 0}
+  .grid-2 .card{margin:0}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin:.5rem 0}
+  .grid-3 .card{margin:0}
+  .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin:.5rem 0}
+  .grid-4 .card{margin:0}
+
+  /* 图片占位符：用户后续替换为真实图片 */
+  .img-ph{border:2px dashed var(--c-line);border-radius:10px;background:repeating-linear-gradient(45deg,#f8fafc,#f8fafc 10px,#eef2f7 10px,#eef2f7 20px);display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--c-sub);gap:.3rem;padding:1rem;text-align:center}
+  .img-ph .ph-label{font-size:.75rem;font-weight:700;color:var(--c-primary)}
+  .img-ph .ph-note{font-size:.65rem;color:var(--c-sub)}
+  .img-ph.wide{height:190px}
+  .img-ph.mid{height:140px}
+  .img-ph.tall{height:220px}
+
+  /* 对话气泡 */
+  .dlg{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
+  .bubble-row{display:flex;gap:.4rem;align-items:flex-end}
+  .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:var(--c-shadow)}
+  .avatar.a{background:var(--c-primary)}
+  .avatar.b{background:var(--c-accent)}
+  .bubble{max-width:75%;padding:.55rem .85rem;border-radius:14px;font-size:.9rem;line-height:1.4;position:relative;box-shadow:var(--c-shadow)}
+  .bubble-row:has(.avatar.a) .bubble{background:#fff;color:var(--c-ink);border-bottom-left-radius:4px}
+  .bubble-row:has(.avatar.b) .bubble{background:var(--c-accent);color:#fff;border-bottom-left-radius:4px}
+  .bubble .who{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.7;margin-bottom:.15rem}
+  .round-tag{display:inline-block;padding:.15rem .6rem;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.05em}
+  .round-tag.l1{background:#dbeafe;color:#1e40af}
+  .round-tag.l2{background:#d1fae5;color:#065f46}
+  .round-tag.l3{background:#fed7aa;color:#9a3412}
+  .round-tag.l4{background:#fecaca;color:#991b1b}
+
+  .concept{border-left:4px solid var(--c-accent);background:linear-gradient(135deg,var(--c-primary-bg),#f8fafc);padding:.6rem .9rem;border-radius:0 12px 12px 0;margin:.5rem 0;box-shadow:var(--c-shadow)}
+  .concept .en{font-size:.95rem;font-weight:700;color:var(--c-primary)}
+  .concept .zh{font-size:.82rem;color:var(--c-sub);margin-top:.15rem}
+
+  .pair{display:grid;grid-template-columns:auto 1fr;gap:.5rem;align-items:start;padding:.45rem .6rem;border-bottom:1px dashed var(--c-line)}
+  .pair:last-child{border-bottom:none}
+  .pair .lang{font-size:.65rem;font-weight:700;color:#fff;border-radius:20px;padding:.15rem .45rem;background:var(--c-primary);white-space:nowrap;align-self:flex-start;margin-top:.15rem}
+  .pair .lang.zh{background:var(--c-accent)}
+  .pair .text .en{font-size:.88rem}
+  .pair .text .zh{font-size:.8rem}
+
+  .scenario-box{background:#fff;border-radius:12px;padding:.6rem .85rem;margin:.4rem 0;box-shadow:var(--c-shadow-md)}
+  .scenario-box .quote{font-size:.88rem;padding:.3rem 0 .3rem .8rem;border-left:3px solid var(--c-accent);margin:.3rem 0}
+
+  /* 基础选择反馈互动 */
+  .choice-q{margin:.5rem 0}
+  .choice-q .q{font-size:1rem;font-weight:700;margin-bottom:.35rem}
+  .choice-opts{display:flex;flex-direction:column;gap:.35rem}
+  .choice-opt{background:#fff;border:2px solid var(--c-line);border-radius:10px;padding:.5rem .75rem;cursor:pointer;font-size:.92rem;transition:all .2s;box-shadow:var(--c-shadow)}
+  .choice-opt:hover{border-color:var(--c-primary-light);transform:translateY(-1px);box-shadow:var(--c-shadow-md)}
+  .choice-opt.chosen{border-color:var(--c-primary);background:var(--c-primary-bg)}
+  .choice-opt.right{border-color:var(--c-right);background:#d1fae5}
+  .choice-opt.wrong{border-color:var(--c-wrong);background:#fee2e2}
+  .choice-fb{margin-top:.4rem;padding:.55rem .75rem;border-radius:10px;font-size:.9rem;display:none;box-shadow:var(--c-shadow)}
+  .drag-card{color:#fff;padding:.7rem 1rem;border-radius:14px;cursor:grab;font-size:.9rem;font-weight:700;text-align:center;min-width:120px;box-shadow:0 6px 16px rgba(0,0,0,.18);transition:transform .2s}
+  .drag-card:active{cursor:grabbing;transform:scale(1.05)}
+  .drag-card small{font-weight:400;font-size:.75rem;opacity:.9}
+  .choice-fb.show{display:block}
+  .choice-fb.good{background:linear-gradient(135deg,#d1fae5,#ecfdf5);color:#065f46;border:none}
+  .choice-fb.try{background:linear-gradient(135deg,var(--c-accent-bg),#fff7ed);color:#9a3412;border:none}
+  .choice-fb.info{background:var(--c-primary-bg);color:var(--c-primary);border:none}
+
+  /* 点击翻牌 */
+  .flip-card{background:#fff;border:2px solid var(--c-line);border-radius:10px;padding:.5rem .75rem;cursor:pointer;font-size:.9rem;transition:all .2s;box-shadow:var(--c-shadow);margin:.3rem 0}
+  .flip-card:hover{border-color:var(--c-primary-light);transform:translateY(-1px)}
+  .flip-card .flip-a{display:block}
+  .flip-card .flip-b{display:none;color:var(--c-primary)}
+  .flip-card.open{border-color:var(--c-primary);background:var(--c-primary-bg)}
+  .flip-card.open .flip-a{display:none}
+  .flip-card.open .flip-b{display:block}
+
+  /* 反思框 */
+  .reflect-box{background:#fff;border-radius:12px;padding:.6rem .85rem;margin:.4rem 0;box-shadow:var(--c-shadow-md)}
+  .reflect-box q{display:block;font-size:.92rem;font-weight:600;margin-bottom:.4rem}
+  .reflect-box textarea{width:100%;min-height:60px;border:1.5px solid var(--c-line);border-radius:10px;padding:.5rem .7rem;font-size:.85rem;font-family:inherit;resize:vertical;transition:border-color .2s}
+  .reflect-box textarea:focus{outline:none;border-color:var(--c-primary)}
+  .reflect-hint{font-size:.72rem;color:var(--c-sub);margin-top:.3rem}
+
+  /* 互动待设计占位 */
+  .interact-ph{border:2px dashed var(--c-accent-light);border-radius:12px;background:var(--c-accent-bg);padding:.7rem .9rem;margin:.5rem 0;color:#9a3412;font-size:.85rem}
+  .interact-ph .ip-title{font-weight:700;margin-bottom:.2rem}
+
+  /* 2x2 矩阵（贝雷模型） */
+  .matrix2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:.5rem;margin:.6rem 0}
+  .m-cell{border-radius:12px;padding:.8rem .9rem;cursor:pointer;transition:all .2s;box-shadow:var(--c-shadow);border:2px solid var(--c-line);background:#fff}
+  .m-cell:hover{transform:translateY(-2px);box-shadow:var(--c-shadow-md)}
+  .m-cell.open{border-color:var(--c-primary);background:var(--c-primary-bg)}
+  .m-cell .m-name{font-size:1rem;font-weight:800;color:var(--c-primary)}
+  .m-cell .m-en{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--c-sub);margin-bottom:.2rem}
+  .m-cell .m-detail{display:none;font-size:.82rem;color:var(--c-sub);margin-top:.3rem}
+  .m-cell.open .m-detail{display:block}
+
+  /* ===== 第3页 · 张雪机车会议诊断互动 ===== */
+  .c3-stage{display:grid;grid-template-columns:1.75fr 1fr;gap:1rem;margin-top:.6rem;align-items:start}
+  .c3-scene{background:#fff;border-radius:14px;padding:.7rem .9rem;box-shadow:var(--c-shadow-md);border:1px solid #eef2f7}
+  .c3-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+  .c3-badge{font-size:.68rem;font-weight:800;letter-spacing:.06em;padding:.18rem .6rem;border-radius:20px;white-space:nowrap}
+  .c3-badge.b1{background:#dbeafe;color:#1e40af}
+  .c3-badge.b2{background:#d1fae5;color:#065f46}
+  .c3-badge.b3{background:#fed7aa;color:#9a3412}
+  .c3-badge.b4{background:#fecaca;color:#991b1b}
+  .c3-progress{font-size:.72rem;color:var(--c-sub);margin-left:auto}
+  .c3-desc{font-size:.8rem;color:var(--c-sub);margin-bottom:.4rem}
+  .c3-question{font-size:.92rem;font-weight:700;margin:.5rem 0 .35rem}
+  .c3-opts{display:flex;flex-direction:column;gap:.35rem}
+  .c3-opt{background:#fff;border:2px solid var(--c-line);border-radius:10px;padding:.5rem .75rem;cursor:pointer;font-size:.88rem;transition:all .2s;box-shadow:var(--c-shadow);text-align:left}
+  .c3-opt:hover{border-color:var(--c-primary-light);transform:translateY(-1px);box-shadow:var(--c-shadow-md)}
+  .c3-opt.c3-ok{border-color:var(--c-right);background:#d1fae5}
+  .c3-opt.c3-no{border-color:var(--c-wrong);background:#fee2e2;opacity:.75}
+  .c3-fb{margin-top:.45rem;padding:.55rem .75rem;border-radius:10px;font-size:.85rem;display:none;box-shadow:var(--c-shadow);line-height:1.5}
+  .c3-fb.show{display:block}
+  .c3-fb.good{background:linear-gradient(135deg,#d1fae5,#ecfdf5);color:#065f46;border:1px solid #a7f3d0}
+  .c3-fb.try{background:linear-gradient(135deg,var(--c-accent-bg),#fff7ed);color:#9a3412;border:1px solid #fed7aa}
+  .c3-next{margin-top:.6rem;display:flex;gap:.5rem;align-items:center}
+  .c3-next button{font-size:.82rem;padding:.4rem 1.1rem;border-radius:20px;border:none;cursor:pointer;transition:all .2s;box-shadow:var(--c-shadow)}
+  .c3-next .go{background:var(--c-primary);color:#fff}
+  .c3-next .go:hover{background:var(--c-primary-light)}
+  .c3-next .again{background:#fff;color:var(--c-sub);border:1px solid var(--c-line)}
+  .c3-next .again:hover{color:var(--c-primary);border-color:var(--c-primary)}
+
+  /* RSCC 四宫格 */
+  .rscc-panel{position:sticky;top:64px;background:#fff;border-radius:14px;padding:.7rem .8rem;box-shadow:var(--c-shadow-md);border:1px solid #eef2f7}
+  .rscc-title{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c-sub);margin-bottom:.5rem;text-align:center}
+  .rscc-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .rscc-cell{border-radius:12px;padding:.65rem .5rem;text-align:center;background:#f1f5f9;border:2px solid #e2e8f0;transition:all .45s cubic-bezier(.2,.8,.3,1.2);opacity:.55;filter:grayscale(.6)}
+  .rscc-cell .rscc-ico{font-size:1.4rem;display:block;margin-bottom:.1rem}
+  .rscc-cell .rscc-zh{font-size:.8rem;font-weight:800;color:#94a3b8;display:block;margin-top:.05rem;transition:color .3s}
+  .rscc-cell .rscc-hint{font-size:.6rem;color:#94a3b8;display:block;margin-top:.1rem;line-height:1.35}
+  .rscc-cell.lit{opacity:1;filter:none;transform:translateY(-3px) scale(1.04);box-shadow:0 8px 20px rgba(15,27,45,0.18)}
+  .rscc-cell.lit .rscc-zh{color:#fff;font-size:.95rem}
+  .rscc-cell.lit .rscc-hint{color:rgba(255,255,255,.9)}
+  .rscc-cell.lit.r{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:#1d4ed8}
+  .rscc-cell.lit.s{background:linear-gradient(135deg,#059669,#047857);border-color:#047857}
+  .rscc-cell.lit.c1{background:linear-gradient(135deg,#d97706,#b45309);border-color:#b45309}
+  .rscc-cell.lit.c2{background:linear-gradient(135deg,#dc2626,#b91c1c);border-color:#b91c1c}
+  .rscc-tip{font-size:.68rem;color:var(--c-sub);text-align:center;margin-top:.5rem;line-height:1.5}
+  .rscc-summary{margin-top:.6rem;padding:.6rem .7rem;border-radius:12px;background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1.5px solid #fbbf24;text-align:center;display:none;animation:rscc-pop .5s ease}
+  .rscc-summary.show{display:block}
+  .rscc-summary .sm-txt{font-size:.95rem;font-weight:800;color:#92400e}
+  .rscc-summary .sm-sub{font-size:.72rem;color:#a16207;margin-top:.15rem}
+  .rscc-summary button{margin-top:.5rem;font-size:.82rem;padding:.4rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;transition:all .2s;box-shadow:var(--c-shadow)}
+  .rscc-summary button:hover{background:var(--c-primary-light)}
+  @keyframes rscc-pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}
+
+  /* ===== 第7页 Think 互动 ===== */
+  .r7-opt{display:flex;align-items:flex-start;gap:.5rem;padding:.5rem .6rem;border:1.5px solid var(--c-line);border-radius:10px;margin-bottom:.35rem;font-size:.82rem;cursor:pointer;transition:all .2s;background:#fff;line-height:1.4}
+  .r7-opt:hover{border-color:var(--c-primary-light);background:#f8fafc}
+  .r7-opt input{margin-top:.15rem;flex-shrink:0;cursor:pointer}
+  .r7-opt:has(input:checked){border-color:var(--c-primary);background:var(--c-primary-bg)}
+  .r7-fb{margin-top:.6rem;padding:.6rem .75rem;border-radius:10px;font-size:.85rem;display:none;box-shadow:var(--c-shadow);line-height:1.5;background:linear-gradient(135deg,#dbeafe,#eff6ff);border:1px solid #bfdbfe;color:#1e40af}
+  .r7-fb.show{display:block;animation:rscc-pop .4s ease}
+
+  /* ===== 可拖拽缩放弹窗 ===== */
+  .dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:none;align-items:center;justify-content:center}
+  .dlg-overlay.show{display:flex}
+  .dlg-win{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;position:absolute;min-width:400px;min-height:300px}
+  .dlg-win.fullscreen{inset:0 !important;width:100vw !important;height:100vh !important;border-radius:0}
+  .dlg-titlebar{height:40px;background:var(--c-primary);color:#fff;display:flex;align-items:center;padding:0 .8rem;cursor:move;user-select:none;flex-shrink:0}
+  .dlg-titlebar .dlg-title{font-size:.82rem;font-weight:600;flex:1;letter-spacing:.03em}
+  .dlg-titlebar button{background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;padding:0 .4rem;line-height:1}
+  .dlg-titlebar button:hover{opacity:.7}
+  .dlg-body{flex:1;position:relative;background:#fff}
+  .dlg-body iframe{width:100%;height:100%;border:none;display:block}
+  .dlg-resize{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#94a3b8 50%)}
+
+  /* ===== 第9页 · 九角色游戏 ===== */
+  .r9-tab.active{background:var(--c-primary)!important;color:#fff!important;border-color:var(--c-primary)!important}
+  .r9-opt{display:block;width:100%;text-align:left;padding:.5rem .7rem;margin-bottom:.35rem;border:1.5px solid var(--c-line);border-radius:10px;background:#fff;cursor:pointer;font-size:.82rem;transition:all .2s;line-height:1.4}
+  .r9-opt:hover{border-color:var(--c-primary-light);background:#f8fafc}
+  .r9-opt.ok{border-color:var(--c-right);background:#d1fae5}
+  .r9-opt.no{border-color:var(--c-wrong);background:#fee2e2;opacity:.75}
+  .r9-card{display:inline-block;padding:.3rem .6rem;border-radius:8px;background:#fff;border:1.5px solid var(--c-line);font-size:.75rem;cursor:grab;box-shadow:var(--c-shadow);user-select:none}
+  .r9-card:active{cursor:grabbing}
+  .r9-card.placed{opacity:.4;pointer-events:none}
+  .r9-bin.over{border-color:var(--c-primary);background:#e0e7ff}
+
+  @media(max-width:760px){
+    .c3-stage{grid-template-columns:1fr}
+    .rscc-panel{position:static;margin-top:.4rem}
+  }
+
+  .page-foot{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--c-line);padding:.35rem 2rem;display:flex;justify-content:space-between;font-size:.65rem;letter-spacing:.1em;color:var(--c-sub)}
+
+  body.lecture .anim{opacity:0;transform:translateY(6px);transition:all .3s}
+  body.lecture .anim.revealed{opacity:1;transform:none}
+
+  /* 章节数字大标 */
+  .ch-num{font-size:.8rem;font-weight:800;letter-spacing:.2em;color:var(--c-accent)}
+
+  @media(max-width:640px){
+    .grid-2,.grid-3,.grid-4,.matrix2x2{grid-template-columns:1fr}
+    .slide{padding:.8rem 1rem 2.5rem}
+  }
+  /* 全局字体放大（除标题外） */
+  .slide:not([data-slide="20"]){zoom:1.15}
+  .slide:not([data-slide="20"]) .slide-title{zoom:0.87}
+</style>
+<style id="ccm-chapter4-integration">
+/* Keep the existing draggable dialog inside narrow screens. */
+#dlgWin{max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span id="navLabel">第四章 · 跨文化团队及其打造</span>
+  <span id="pageNum" style="font-size:.85rem;color:var(--c-sub);margin:0 .5rem">1 / 47</span>
+  <div class="nav-btns">
+    <button id="btnPrev">← 上一页</button>
+    <button id="btnNext">下一页 →</button>
+  </div>
+  <select id="pageJump" style="padding:.25rem .5rem;border:1px solid var(--c-line);border-radius:4px;font-size:.8rem;background:#fff;cursor:pointer;max-width:320px">
+    <option value="-1">跳转页面...</option>
+  </select>
+  <div class="mode-toggle">
+    <button id="btnClass" class="active">课堂</button>
+    <button id="btnSelf">自主</button>
+  </div>
+</div>
+
+<!-- ============ Slide 1: 封面 ============ -->
+<section class="slide active" data-slide="1" data-page-type="章节导入 · Opening">
+  <div style="text-align:center;padding-top:4vh">
+    <div class="section-label" style="display:inline-block;border-left:none;padding-left:0;margin-bottom:.6rem">Chapter 4</div>
+    <h1 class="slide-title" style="font-size:clamp(1.8rem,3vw,2.6rem);text-align:center">
+      <span class="en">Building a Cross-cultural Team</span>
+      <span class="zh" style="font-size:1.2rem">跨文化团队及其打造</span>
+    </h1>
+    <p class="slide-subtitle" style="text-align:center;margin-top:.5rem">
+      <span class="en">RSCC Team Model · Types · Integration · How to Build</span>
+    </p>
+    <div style="max-width:1200px;margin:.8rem auto">
+      <div style="border-radius:14px;overflow:hidden;box-shadow:0 10px 34px rgba(15,27,45,0.18);border:1px solid rgba(203,213,225,0.6)">
+        <video src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/cover.mp4" poster="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/cover-poster.jpg" autoplay muted loop playsinline preload="auto" style="display:block;width:100%;height:auto;aspect-ratio:21/9;object-fit:cover;background:#162d4d"></video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 2: 学习路径 ============ -->
+<section class="slide" data-slide="2" data-page-type="学习路径 · Learning Path">
+  <div class="section-label">学习路径 · Learning Path</div>
+  <h1 class="slide-title">
+    <span class="en">What you will learn</span>
+    <span class="zh">本章学什么</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.6rem">
+    <div class="card primary" style="text-align:center;padding:.9rem .6rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">4.1</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">团队 RSCC 模型</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">Role · Share · Consensus · Cooperation</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.9rem .6rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">4.2</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">跨文化团队类型</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">Token · Bi-cultural · Multicultural</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.9rem .6rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">4.3</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">跨文化整合模式</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">融合 · 同化 · 隔离 · 引进</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.9rem .6rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">4.4</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">打造跨文化团队</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">三类团队的打造策略</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 3: 情境互动·张雪机车会议诊断 ============ -->
+<section class="slide" data-slide="3" data-page-type="情境互动 · 会议诊断">
+  <div class="section-label">情境互动 · 会议观察员 · Scenario: A Meeting in Crisis</div>
+  <h1 class="slide-title">
+    <span class="en">Zhang Xue Motors: The Thailand Launch</span>
+    <span class="zh">张雪机车（KOVE）· 泰国市场推广会</span>
+  </h1>
+
+  <div class="scenario-box" style="margin-top:.4rem">
+    <p class="quote" style="font-size:.88rem">张雪机车国际营销团队正在为泰国市场的 ADV 拉力摩托上市设计推广方案。项目组 8 人：中国总部 4 人（品牌总监、产品经理、财务、总部营销）+ 泰国本地 4 人（本地营销、经销商、KOL 对接、物流/法务）。明天就要给泰国经销商大会出方案——但你发现，会已经开砸了。</p>
+  </div>
+
+  <div class="c3-stage">
+    <!-- 左侧：会议场景 -->
+    <div class="c3-scene" id="c3Scene">
+      <div class="c3-top">
+        <span class="c3-badge b1" id="c3Badge">卡点 ①</span>
+        <span class="c3-progress" id="c3Prog">进度 1 / 4</span>
+      </div>
+      <div class="c3-desc" id="c3Desc"></div>
+      <div class="dlg" id="c3Dlg"></div>
+      <div class="c3-question" id="c3Q"></div>
+      <div class="c3-opts" id="c3Opts"></div>
+      <div class="c3-fb" id="c3Fb"></div>
+      <div class="c3-next" id="c3Next" style="display:none">
+        <button class="go" id="c3Go">下一个卡点 →</button>
+        <button class="again" id="c3Reset">↺ 重开会</button>
+      </div>
+    </div>
+
+    <!-- 右侧：四宫格（引出概念，不出现 RSCC） -->
+    <div class="rscc-panel">
+      <div class="rscc-title">你诊断出的问题 → 团队的关键特征</div>
+      <div class="rscc-grid">
+        <div class="rscc-cell r" id="rsccR">
+          <span class="rscc-ico">👥</span>
+          <span class="rscc-zh">角色</span>
+          <span class="rscc-hint">有人拍板 · 各司其职</span>
+        </div>
+        <div class="rscc-cell s" id="rsccS">
+          <span class="rscc-ico">📤</span>
+          <span class="rscc-zh">分享</span>
+          <span class="rscc-hint">信息互通 · 知识流动</span>
+        </div>
+        <div class="rscc-cell c1" id="rsccC1">
+          <span class="rscc-ico">🎯</span>
+          <span class="rscc-zh">共识</span>
+          <span class="rscc-hint">目标一致 · 标准对齐</span>
+        </div>
+        <div class="rscc-cell c2" id="rsccC2">
+          <span class="rscc-ico">🤝</span>
+          <span class="rscc-zh">协作</span>
+          <span class="rscc-hint">互相补位 · 流程衔接</span>
+        </div>
+      </div>
+      <div class="rscc-tip" id="rsccTip">点击左侧选项，诊断每次"卡壳"出在哪 → 点亮团队的关键特征</div>
+      <div class="rscc-summary" id="rsccSummary">
+        <div class="sm-txt">🎉 四把钥匙集齐！这就是好团队</div>
+        <div class="sm-sub">角色 · 分享 · 共识 · 协作，缺一不可</div>
+        <button id="rsccGoNext">进入 4.1 · 模型讲解 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 4: 4.1 开场 RSCC ============ -->
+<section class="slide" data-slide="4" data-page-type="理论转场 · 4.1">
+  <div class="section-label">4.1 · 团队 RSCC 模型 · RSCC Team Model</div>
+  <h1 class="slide-title">
+    <span class="en">Four Keys to a Real Team</span>
+    <span class="zh">好团队的四个关键特征</span>
+  </h1>
+
+  <div class="grid-4" style="margin-top:.6rem">
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:2rem;font-weight:800;color:var(--c-primary)">R</div>
+      <div style="font-size:.85rem;font-weight:700">角色</div>
+      <div style="font-size:.68rem;color:#555">Role</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:2rem;font-weight:800;color:var(--c-primary)">S</div>
+      <div style="font-size:.85rem;font-weight:700">分享</div>
+      <div style="font-size:.68rem;color:#555">Share</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:2rem;font-weight:800;color:var(--c-primary)">C</div>
+      <div style="font-size:.85rem;font-weight:700">共识</div>
+      <div style="font-size:.68rem;color:#555">Consensus</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:2rem;font-weight:800;color:var(--c-primary)">C</div>
+      <div style="font-size:.85rem;font-weight:700">协作</div>
+      <div style="font-size:.68rem;color:#555">Cooperation</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">A group becomes a team when roles, sharing, consensus and cooperation work together.</span>
+    <span class="zh">角色、分享、共识、协作四者协同，群体才能转化为团队。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 5: R 角色·西游 ============ -->
+<section class="slide" data-slide="5" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l1">R · ROLE 角色</span></div>
+  <h1 class="slide-title">
+    <span class="en">The Pilgrims: A Perfect Team?</span>
+    <span class="zh">西天取经团队：完美的团队？</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem;grid-template-columns:1.35fr 1fr">
+    <div class="card" style="text-align:center;padding:.4rem;overflow:hidden">
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/xiyou.jpg" alt="西游师徒四人" style="width:80%;max-height:280px;object-fit:contain;border-radius:10px;display:block;margin:0 auto;box-shadow:var(--c-shadow)">
+      <div style="font-size:.8rem;margin-top:.4rem">唐僧、悟空、八戒、沙僧——四个人，四种性格</div>
+    </div>
+    <div class="card accent" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:#9a3412">谁负责什么？</div>
+      <div class="pair" style="margin-top:.3rem">
+        <span class="lang">唐僧</span>
+        <span class="text"><span class="en">Vision · 信念坚定、目标明确</span></span>
+      </div>
+      <div class="pair">
+        <span class="lang">悟空</span>
+        <span class="text"><span class="en">Action · 能力超强、冲锋陷阵</span></span>
+      </div>
+      <div class="pair">
+        <span class="lang">八戒</span>
+        <span class="text"><span class="en">Mood · 调节气氛、沟通润滑</span></span>
+      </div>
+      <div class="pair">
+        <span class="lang">沙僧</span>
+        <span class="text"><span class="en">Execution · 踏实执行、后勤保障</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Emphasis: complementarity — skills &amp; personality.</span>
+    <span class="zh">强调：互补——技能互补、个性互补。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 6: R 角色·房谋杜断 ============ -->
+<section class="slide" data-slide="6" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l1">R · ROLE 角色</span></div>
+  <h1 class="slide-title">
+    <span class="en">Fang &amp; Du: Two Halves of One Brain</span>
+    <span class="zh">房谋杜断：一个人的左脑和右脑</span>
+  </h1>
+
+  <div class="grid-2" style="grid-template-columns:1.35fr 1fr">
+    <div class="card" style="text-align:center;padding:.4rem;overflow:hidden">
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/fangmu.jpg" alt="房玄龄与杜如晦" style="width:80%;max-height:260px;object-fit:contain;border-radius:10px;display:block;margin:0 auto;box-shadow:var(--c-shadow)">
+    </div>
+    <div class="card primary" style="padding:.7rem">
+      <div class="pair">
+        <span class="lang">房</span>
+        <span class="text"><span class="en">Strategist · 善谋：点子多、方案全</span></span>
+      </div>
+      <div class="pair">
+        <span class="lang">杜</span>
+        <span class="text"><span class="en">Decider · 善断：拍板快、决策准</span></span>
+      </div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.4rem">"房谋杜断"——一个出主意，一个拿主意，缺一不可。</div>
+    </div>
+  </div>
+
+  <div class="choice-q">
+    <div class="q" style="font-size:.9rem">这个案例说明了团队角色的什么道理？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">领导必须既会谋又会断</div>
+      <div class="choice-opt" data-pick="B">不同角色互补，团队才完整</div>
+      <div class="choice-opt" data-pick="C">聪明人不需要团队</div>
+    </div>
+    <div class="choice-fb" id="fd6fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 7: R 角色·三类角色 ============ -->
+<section class="slide" data-slide="7" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l1">R · ROLE 角色</span></div>
+  <h1 class="slide-title">
+    <span class="en">Three Kinds of Team Roles</span>
+    <span class="zh">团队角色的三个类别</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem;grid-template-columns:1fr 1.15fr;align-items:start">
+    <!-- 左边：Think 互动（先做练习） -->
+    <div class="card" style="padding:.7rem;min-height:280px">
+      <div class="r7-intro" id="r7Intro">
+        <div style="font-size:.88rem;font-weight:800;color:var(--c-primary);letter-spacing:.03em">Think · 想一想</div>
+        <div style="font-size:.85rem;color:var(--c-sub);margin-top:.5rem;line-height:1.7">
+          回想一个你亲身参与过的、<b>三人以上</b>、最终取得了<b>好成果</b>的团队项目或小组任务。
+        </div>
+        <div style="font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5">可以是课程小组作业、实习项目、社团活动、比赛备赛……</div>
+        <button id="r7Start" style="margin-top:.7rem;font-size:.85rem;padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;box-shadow:var(--c-shadow)">准备好了，开始回顾 →</button>
+      </div>
+
+      <div class="r7-survey" id="r7Survey" style="display:none">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:.35rem">① 这个团队里，大家各是什么样的人？<span style="font-weight:400;color:#888;font-size:.72rem">（可多选）</span></div>
+        <div class="r7-opts">
+          <label class="r7-opt"><input type="checkbox" class="r7-cb"> 有人总第一个把任务拆开、催进度、盯交付，把事往前推</label>
+          <label class="r7-opt"><input type="checkbox" class="r7-cb"> 有人擅长出点子、查资料，在大家卡住时给出专业判断</label>
+          <label class="r7-opt"><input type="checkbox" class="r7-cb"> 有人记得谁擅长什么、调解矛盾，负责让大家处得来</label>
+        </div>
+
+        <div style="font-size:.82rem;font-weight:700;margin:.7rem 0 .35rem">② 你自己更像哪种？<span style="font-weight:400;color:#888;font-size:.72rem">（单选）</span></div>
+        <div class="r7-opts">
+          <label class="r7-opt"><input type="radio" name="r7me"> 我是那个"把事做完"的人</label>
+          <label class="r7-opt"><input type="radio" name="r7me"> 我是那个"想明白"的人</label>
+          <label class="r7-opt"><input type="radio" name="r7me"> 我是那个"把人聚起来"的人</label>
+        </div>
+
+        <div class="r7-fb" id="r7Fb"></div>
+      </div>
+    </div>
+
+    <!-- 右边：三个角色类别（互动完后揭晓） -->
+    <div id="r7Reveal" style="display:none">
+      <div style="font-size:.82rem;font-weight:800;color:var(--c-primary);margin-bottom:.5rem;letter-spacing:.03em">揭晓 · 团队角色的三个类别</div>
+      <div class="card" style="padding:.55rem .7rem;margin-bottom:.45rem;display:flex;align-items:center;gap:.6rem">
+        <div style="font-size:1.5rem;flex-shrink:0">🎯</div>
+        <div>
+          <div style="font-size:.88rem;font-weight:700">任务 / 行动型 <span style="font-size:.65rem;color:#888;font-weight:400">Action-oriented</span></div>
+          <div style="font-size:.78rem;color:var(--c-sub);margin-top:.1rem">把事做完：拆任务、盯进度、推进落地</div>
+        </div>
+      </div>
+      <div class="card" style="padding:.55rem .7rem;margin-bottom:.45rem;display:flex;align-items:center;gap:.6rem">
+        <div style="font-size:1.5rem;flex-shrink:0">💡</div>
+        <div>
+          <div style="font-size:.88rem;font-weight:700">思考 / 谋略型 <span style="font-size:.65rem;color:#888;font-weight:400">Thought-oriented</span></div>
+          <div style="font-size:.78rem;color:var(--c-sub);margin-top:.1rem">想明白：出主意、做分析、给专业判断</div>
+        </div>
+      </div>
+      <div class="card" style="padding:.55rem .7rem;display:flex;align-items:center;gap:.6rem">
+        <div style="font-size:1.5rem;flex-shrink:0">🤝</div>
+        <div>
+          <div style="font-size:.88rem;font-weight:700">人际 / 关系型 <span style="font-size:.65rem;color:#888;font-weight:400">People-oriented</span></div>
+          <div style="font-size:.78rem;color:var(--c-sub);margin-top:.1rem">把人聚起来：协调分工、调解矛盾、活跃气氛</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Every successful team needs all three — no one can do it all.</span>
+    <span class="zh">每个成功的团队都需要这三种角色，缺一不可。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 8: R 角色·Belbin 导入 ============ -->
+<section class="slide" data-slide="8" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l1">R · ROLE 角色</span></div>
+  <h1 class="slide-title">
+    <span class="en">Belbin Team Roles</span>
+    <span class="zh">贝尔宾团队角色理论</span>
+  </h1>
+
+  <div class="grid-2">
+    <div class="card" style="padding:.7rem;text-align:center">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">核心观点</div>
+      <div style="font-size:.92rem;margin-top:.3rem;color:var(--c-ink)">"个人岂有完美，团队可臻至善。"</div>
+      <div style="font-size:.8rem;color:var(--c-sub)">No individual is perfect, but a team can be. —— Dr. Meredith Belbin</div>
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/belbin.jpg" alt="贝尔宾：没有完美的个人，但有完美的团队" style="width:75%;max-height:280px;object-fit:contain;border-radius:10px;margin:.5rem auto 0;display:block;box-shadow:var(--c-shadow)">
+    </div>
+    <div class="card accent" style="padding:.8rem">
+      <div style="font-size:.95rem;font-weight:700;color:#9a3412">贝尔宾团队角色（9 种）</div>
+      <div style="font-size:.9rem;color:var(--c-sub);margin-top:.4rem;line-height:1.8">
+        智多星 PL · 审议员 ME · 专业师 SP<br>
+        鞭策者 SH · 执行者 IMP · 完成者 CF<br>
+        外交家 RI · 协调者 CO · 凝聚者 TW
+      </div>
+      <div style="font-size:.85rem;color:var(--c-sub);margin-top:.5rem">每个人都有一两个"自然角色"，团队配齐角色才完整。</div>
+      <button id="btnBelbinSite" style="margin-top:.7rem;font-size:.88rem;padding:.45rem 1rem;border-radius:20px;border:1.5px solid var(--c-primary);background:#fff;color:var(--c-primary);cursor:pointer;transition:all .2s">
+        🌐 贝尔宾中国官网 · Belbin China
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 9: Belbin 九角色卡片（图占位） ============ -->
+<section class="slide" data-slide="9" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l1">R · ROLE 角色 · Belbin Scale</span></div>
+  <h1 class="slide-title">
+    <span class="en">Nine Belbin Roles at a Glance</span>
+    <span class="zh">九种角色速览</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem;grid-template-columns:1.1fr 1fr;align-items:start">
+    <!-- 左边：三组角色卡片（竖排，图标大） -->
+    <div>
+      <div class="card" style="padding:.55rem .6rem;margin-bottom:.4rem;border-left:4px solid #6366f1">
+        <div style="font-size:.72rem;font-weight:800;color:#6366f1;letter-spacing:.05em;margin-bottom:.35rem">💡 思考型 · Thinking</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;text-align:center">
+          <div><div style="font-size:1.3rem">💡</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">智多星</div><div style="font-size:.58rem;color:#888">PL 创意</div></div>
+          <div><div style="font-size:1.3rem">🧐</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">审议员</div><div style="font-size:.58rem;color:#888">ME 分析</div></div>
+          <div><div style="font-size:1.3rem">🎓</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">专业师</div><div style="font-size:.58rem;color:#888">SP 专精</div></div>
+        </div>
+      </div>
+      <div class="card" style="padding:.55rem .6rem;margin-bottom:.4rem;border-left:4px solid #059669">
+        <div style="font-size:.72rem;font-weight:800;color:#059669;letter-spacing:.05em;margin-bottom:.35rem">🤝 人际型 · People</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;text-align:center">
+          <div><div style="font-size:1.3rem">📞</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">外交家</div><div style="font-size:.58rem;color:#888">RI 外联</div></div>
+          <div><div style="font-size:1.3rem">🧑‍⚖️</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">协调者</div><div style="font-size:.58rem;color:#888">CO 统筹</div></div>
+          <div><div style="font-size:1.3rem">🤗</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">凝聚者</div><div style="font-size:.58rem;color:#888">TW 氛围</div></div>
+        </div>
+      </div>
+      <div class="card" style="padding:.55rem .6rem;border-left:4px solid #d97706">
+        <div style="font-size:.72rem;font-weight:800;color:#d97706;letter-spacing:.05em;margin-bottom:.35rem">🎯 行动型 · Action</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;text-align:center">
+          <div><div style="font-size:1.3rem">⚡</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">鞭策者</div><div style="font-size:.58rem;color:#888">SH 推动</div></div>
+          <div><div style="font-size:1.3rem">🔨</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">执行者</div><div style="font-size:.58rem;color:#888">IMP 落地</div></div>
+          <div><div style="font-size:1.3rem">✅</div><div style="font-size:.72rem;font-weight:700;margin-top:.1rem">完成者</div><div style="font-size:.58rem;color:#888">CF 收尾</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右边：互动游戏区（Tab切换） -->
+    <div class="card" style="padding:.7rem;min-height:420px">
+      <div style="text-align:center;font-size:.95rem;font-weight:800;color:var(--c-primary);letter-spacing:.08em;margin-bottom:.5rem">🎮 挑战学习</div>
+      <div style="display:flex;gap:.4rem;margin-bottom:.5rem">
+        <button class="r9-tab active" data-tab="b" style="flex:1;padding:.45rem;border-radius:8px;border:1.5px solid var(--c-primary);background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;font-weight:600">① 行为猜角色</button>
+        <button class="r9-tab" data-tab="a" style="flex:1;padding:.45rem;border-radius:8px;border:1.5px solid var(--c-line);background:#fff;color:var(--c-sub);cursor:pointer;font-size:.85rem;font-weight:600">② 归类挑战</button>
+      </div>
+
+      <!-- 游戏B：行为猜角色 -->
+      <div id="r9GameB">
+        <div style="font-size:.85rem;color:var(--c-sub);margin-bottom:.4rem" id="r9BProg">第 1 / 5 题</div>
+        <div style="font-size:1rem;font-weight:700;line-height:1.5;margin-bottom:.6rem" id="r9BQ"></div>
+        <div id="r9BOpts"></div>
+        <div id="r9BFb" style="display:none;margin-top:.5rem;padding:.5rem .7rem;border-radius:8px;font-size:.9rem;line-height:1.5"></div>
+      </div>
+
+      <!-- 游戏A：拖拽归类 -->
+      <div id="r9GameA" style="display:none">
+        <div style="font-size:.85rem;color:var(--c-sub);margin-bottom:.4rem">把下面 9 张角色卡，拖到对应的桶里</div>
+        <div id="r9Pool" style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem;min-height:40px"></div>
+        <div style="display:grid;grid-template-columns:1fr;gap:.4rem">
+          <div class="r9-bin" data-bin="think" style="border:2px dashed #c7d2fe;border-radius:10px;padding:.4rem;min-height:50px;background:#eef2ff">
+            <div style="font-size:.8rem;font-weight:700;color:#6366f1;margin-bottom:.2rem">💡 思考型</div>
+          </div>
+          <div class="r9-bin" data-bin="people" style="border:2px dashed #a7f3d0;border-radius:10px;padding:.4rem;min-height:50px;background:#ecfdf5">
+            <div style="font-size:.72rem;font-weight:700;color:#059669;margin-bottom:.2rem">🤝 人际型</div>
+          </div>
+          <div class="r9-bin" data-bin="action" style="border:2px dashed #fde68a;border-radius:10px;padding:.4rem;min-height:50px;background:#fffbeb">
+            <div style="font-size:.72rem;font-weight:700;color:#d97706;margin-bottom:.2rem">🎯 行动型</div>
+          </div>
+        </div>
+        <div id="r9AFb" style="display:none;margin-top:.5rem;padding:.5rem .7rem;border-radius:8px;font-size:.82rem;line-height:1.5;background:linear-gradient(135deg,#d1fae5,#ecfdf5);color:#065f46"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 10: 贝尔宾角色讲解视频 ============ -->
+<section class="slide" data-slide="10" data-page-type="4.1 · 角色 Role">
+  <div class="section-label"><span class="round-tag l2">R · ROLE 角色</span></div>
+  <h1 class="slide-title">
+    <span class="en">Belbin Roles Explained</span>
+    <span class="zh">贝尔宾团队角色讲解</span>
+  </h1>
+  <div style="display:flex;gap:1.2rem;align-items:center;margin-top:.8rem">
+    <!-- 左边视频框 16:9 -->
+    <div style="flex:1.6">
+      <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.15);background:#000">
+        <video controls preload="metadata" style="width:100%;height:100%;object-fit:cover" poster="">
+          <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/belbin.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div style="text-align:center;margin-top:.5rem;font-size:.85rem;color:var(--c-sub);font-weight:600">🎬 贝尔宾角色讲解（双语）</div>
+    </div>
+    <!-- 右边测试按钮，上下居中 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem">
+      <div style="text-align:center;font-size:.82rem;color:var(--c-sub);line-height:1.5">
+        看完讲解后，<br>来测一测你的<br>团队角色吧！
+      </div>
+      <button id="r9BelbinTest" style="padding:.7rem 1.2rem;border-radius:12px;border:2px solid #8b5cf6;background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#6d28d9;cursor:pointer;font-size:.9rem;font-weight:700;box-shadow:0 4px 12px rgba(139,92,246,.2)">
+        🧪 贝尔宾团队角色测试<br><span style="font-size:.72rem;font-weight:500">7部分 · 约5分钟</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 11: S 分享 ============ -->
+<section class="slide" data-slide="12" data-page-type="4.1 · 分享 Share">
+  <div class="section-label"><span class="round-tag l2">S · SHARE 分享</span></div>
+  <h1 class="slide-title">
+    <span class="en">What Do We Share?</span>
+    <span class="zh">分享什么？</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem">
+    <div class="card primary" style="text-align:center;padding:.7rem">
+      <div style="font-size:1.2rem">📚</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">知识 Knowledge</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">我会的，教给你</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.7rem">
+      <div style="font-size:1.2rem">🛠️</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">技能 Skill</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">我会做的，带着你做</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.7rem">
+      <div style="font-size:1.2rem">📡</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">信息 Information</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">我知道的，同步给你</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.7rem">
+      <div style="font-size:1.2rem">💗</div>
+      <div style="font-size:.88rem;font-weight:700;margin-top:.2rem">情感 Emotion</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">我的状态，你也懂</div>
+    </div>
+  </div>
+
+  <div class="choice-q">
+    <div class="q" style="font-size:.9rem">团队里最容易被忽略、但最影响凝聚力的"分享"是什么？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">知识技能</div>
+      <div class="choice-opt" data-pick="B">信息同步</div>
+      <div class="choice-opt" data-pick="C">情感（情绪、压力、状态）</div>
+    </div>
+    <div class="choice-fb" id="s10fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 11: S 分享·怎样促使 ============ -->
+<section class="slide" data-slide="12" data-page-type="4.1 · 分享 Share">
+  <div class="section-label"><span class="round-tag l2">S · SHARE 分享</span></div>
+  <h1 class="slide-title">
+    <span class="en">How to Encourage Sharing?</span>
+    <span class="zh">怎样促使大家分享？</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem;grid-template-columns:1.15fr 1fr;align-items:start">
+    <!-- 左边：案例弹窗按钮 + 两道多选题 -->
+    <div class="card" style="padding:.7rem">
+      <button id="r11OpenCase" style="width:100%;padding:.7rem;border-radius:12px;border:2px dashed var(--c-primary-light);background:var(--c-primary-bg);color:var(--c-primary);cursor:pointer;font-size:.88rem;font-weight:700;transition:all .2s">
+        📖 阅读案例 · 从"闷头用"到"主动教"
+      </button>
+      <div style="font-size:.72rem;color:#888;text-align:center;margin-top:.3rem">点击打开案例，读完后回来做题</div>
+
+      <div id="r11Q1" style="margin-top:.8rem">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem">① 小张一开始不愿意分享，真实的顾虑有哪些？<span style="font-weight:400;color:#888;font-size:.72rem">（多选）</span></div>
+        <div id="r11Q1Opts"></div>
+        <div id="r11Q1Fb" style="display:none;margin-top:.4rem;padding:.5rem .7rem;border-radius:8px;font-size:.8rem;line-height:1.5"></div>
+      </div>
+
+      <div id="r11Q2" style="margin-top:.8rem">
+        <div style="font-size:.85rem;font-weight:700;margin-bottom:.4rem">② 后来小张愿意主动分享了，关键变化有哪些？<span style="font-weight:400;color:#888;font-size:.72rem">（多选）</span></div>
+        <div id="r11Q2Opts"></div>
+        <div id="r11Q2Fb" style="display:none;margin-top:.4rem;padding:.5rem .7rem;border-radius:8px;font-size:.8rem;line-height:1.5"></div>
+      </div>
+
+      <button id="r11Next" style="display:none;margin-top:.8rem;padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow)">下一步 · 看看促使分享的三个关键 →</button>
+    </div>
+
+    <!-- 右边：三个卡片（做完左边后揭晓） -->
+    <div id="r11Reveal" style="display:none">
+      <div style="font-size:.82rem;font-weight:800;color:var(--c-primary);margin-bottom:.5rem;letter-spacing:.03em">揭晓 · 促使分享的三个关键</div>
+      <div class="card" style="text-align:center;padding:.7rem .5rem;margin-bottom:.5rem">
+        <div style="font-size:1.3rem">👑</div>
+        <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">领袖的魅力与身体力行</div>
+        <div style="font-size:.72rem;color:#555">Leader's charisma &amp; role model</div>
+        <div style="font-size:.78rem;color:var(--c-sub);margin-top:.3rem">领导先放下身段、先分享，别人才敢分享</div>
+      </div>
+      <div class="card" style="text-align:center;padding:.7rem .5rem;margin-bottom:.5rem">
+        <div style="font-size:1.3rem">🏆</div>
+        <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">恰当的激励措施</div>
+        <div style="font-size:.72rem;color:#555">Proper incentives</div>
+        <div style="font-size:.78rem;color:var(--c-sub);margin-top:.3rem">让分享得到正向反馈，而不只是义务</div>
+      </div>
+      <div class="card" style="text-align:center;padding:.7rem .5rem">
+        <div style="font-size:1.3rem">🔁</div>
+        <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">形成惯例</div>
+        <div style="font-size:.72rem;color:#555">Make it a habit</div>
+        <div style="font-size:.78rem;color:var(--c-sub);margin-top:.3rem">固定节奏：例会上的小分享，不考核、不打分</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Sharing is built by leadership, incentives and habits — not by asking for it once.</span>
+    <span class="zh">分享靠领导带头、激励机制与固定惯例共同养成，不是喊一次口号就能实现。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 12: C 共识·道不同 ============ -->
+<section class="slide" data-slide="13" data-page-type="4.1 · 共识 Consensus">
+  <div class="section-label"><span class="round-tag l3">C · CONSENSUS 共识</span></div>
+  <h1 class="slide-title">
+    <span class="en">"Those with different paths do not plan together"</span>
+    <span class="zh">道不同，不相为谋</span>
+  </h1>
+
+  <div class="scenario-box">
+    <p class="quote" style="font-size:.95rem">为什么我们愿意心甘情愿地做一件事情？<br>
+    <span style="font-size:.82rem;color:var(--c-sub)">Why do we do something wholeheartedly?</span></p>
+  </div>
+
+  <div class="grid-2" style="margin-top:.4rem">
+    <div class="card">
+      <div style="font-size:.82rem;font-weight:700;color:var(--c-primary)">共识不是"服从"</div>
+      <div style="font-size:.82rem;color:var(--c-sub);margin-top:.3rem">不是领导说做什么就做什么，而是大家真的认同"这件事值得做"。</div>
+    </div>
+    <div class="card accent">
+      <div style="font-size:.82rem;font-weight:700;color:#9a3412">共识 = 价值观 + 做事方式</div>
+      <div style="font-size:.82rem;color:var(--c-sub);margin-top:.3rem">对顾客、同事、工作、上下级关系的态度，以及"事情应该怎么做"。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 13: C 共识·各部门 ============ -->
+<section class="slide" data-slide="14" data-page-type="4.1 · 共识 Consensus">
+  <div class="section-label"><span class="round-tag l3">C · CONSENSUS 共识</span></div>
+  <h1 class="slide-title">
+    <span class="en">Consensus Across Departments</span>
+    <span class="zh">每个部门都有自己的"共识"</span>
+  </h1>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem">
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">贵公司的共识</div>
+      <div style="font-size:.75rem;color:#555">The company's consensus</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">市场部门的共识</div>
+      <div style="font-size:.75rem;color:#555">Marketing's consensus</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">财务部门的共识</div>
+      <div style="font-size:.75rem;color:#555">Finance's consensus</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">HR 部门的共识</div>
+      <div style="font-size:.75rem;color:#555">HR's consensus</div>
+    </div>
+  </div>
+
+  <div class="reflect-box">
+    <q>Think · 想一想</q>
+    <span style="font-size:.88rem">跨部门协作为什么难？是不是因为每个部门"觉得对的事"不一样？</span>
+    <textarea placeholder="（课堂口头分享，无需填写）"></textarea>
+    <div class="reflect-hint">课堂讨论 · 不计分</div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Consensus is the foundation of willing effort.</span>
+    <span class="zh">共识的达成，是我们愿意为团队奋斗的基石。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 14: C 协作·矛盾 ============ -->
+<section class="slide" data-slide="15" data-page-type="4.1 · 协作 Cooperation">
+  <div class="section-label"><span class="round-tag l4">C · COOPERATION 协作</span></div>
+  <h1 class="slide-title">
+    <span class="en">When Departments Collide</span>
+    <span class="zh">部门之间的"战争"</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">地产销售 vs 物业管理</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">销售要"卖得出去"，物管要"管得住"。同一个楼盘，两套 KPI。</div>
+    </div>
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">招生部门 vs 教学部门</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">招生要"招得进来"，教学要"教得好"。同一个学生，两种考核。</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Conflict often comes from position, interest and personality.</span>
+    <span class="zh">冲突产生的原因：立场不同、利益不同、性格不同。</span>
+  </div>
+
+  <div class="choice-q">
+    <div class="q" style="font-size:.9rem">两个部门目标都"没错"，为什么还会冲突？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">因为有人素质低</div>
+      <div class="choice-opt" data-pick="B">因为立场和利益不同，缺少共同目标</div>
+      <div class="choice-opt" data-pick="C">因为公司文化不好</div>
+    </div>
+    <div class="choice-fb" id="s14fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 15: C 协作·人字游戏 ============ -->
+<section class="slide" data-slide="16" data-page-type="4.1 · 协作 Cooperation">
+  <div class="section-label"><span class="round-tag l4">C · COOPERATION 协作</span></div>
+  <h1 class="slide-title">
+    <span class="en">The "人" Character Game</span>
+    <span class="zh">"人"字小游戏</span>
+  </h1>
+
+  <div class="scenario-box">
+    <p class="quote" style="font-size:.95rem">两个人各用一根手指，共同写出一个"人"字——<br>
+    <span style="font-size:.82rem;color:var(--c-sub)">不商量、不指挥，试着配合一次。</span></p>
+  </div>
+
+  <div style="text-align:center;margin:.6rem 0">
+    <button id="r15Start" style="padding:.5rem 1.5rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.88rem;box-shadow:var(--c-shadow)">开始体验 →</button>
+  </div>
+
+  <!-- 人字互动游戏（初始隐藏） -->
+  <div id="r15Game" style="display:none;position:relative;width:100%;height:340px;margin-top:.5rem;border-radius:14px;background:#ffffff;overflow:hidden;border:1.5px solid var(--c-line)">
+    <!-- 提示 -->
+    <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:.82rem;color:var(--c-sub);background:#fff;padding:.3rem .9rem;border-radius:18px;box-shadow:var(--c-shadow);white-space:nowrap;z-index:10">👆 拖动两个手掌，用两根食指为对面的人写一个"人"字</div>
+    <!-- 左手（手背视角，握拳，食指朝右上倾斜30度） -->
+    <img id="r15Left" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/hand-left.png" style="position:absolute;left:20px;top:100px;width:180px;cursor:grab;user-select:none;filter:drop-shadow(0 6px 12px rgba(0,0,0,.12))">
+    <!-- 右手（手背视角，握拳，食指朝左上倾斜30度） -->
+    <img id="r15Right" src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/hand-right.png" style="position:absolute;right:20px;top:100px;width:180px;cursor:grab;user-select:none;filter:drop-shadow(0 6px 12px rgba(0,0,0,.12))">
+  </div>
+
+  <div style="text-align:center;margin:.6rem 0;display:none" id="r15NextWrap">
+    <button id="r15Next" style="padding:.45rem 1.3rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow)">下一步 · 写感悟 →</button>
+  </div>
+
+  <div class="reflect-box" id="r15Reflect" style="display:none">
+    <q>Reflect · 感悟</q>
+    <span style="font-size:.88rem">一个人写不出"人"，两个人不配合也写不出。协作的本质是什么？</span>
+    <textarea placeholder="（课堂口头分享，无需填写）"></textarea>
+    <div class="reflect-hint">课堂活动 · 不计分</div>
+  </div>
+</section>
+
+<!-- ============ Slide 17: C 协作·冲突与绩效 ============ -->
+<section class="slide" data-slide="17" data-page-type="4.1 · 协作 Cooperation">
+  <div class="section-label"><span class="round-tag l4">C · COOPERATION 协作</span></div>
+  <h1 class="slide-title">
+    <span class="en">Conflict and Performance</span>
+    <span class="zh">冲突与绩效</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.6rem">
+    <!-- 左边：绩效曲线大图（先显示） -->
+    <div style="flex:1.3">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary);margin-bottom:.4rem">绩效曲线 · Performance Curve（倒 U 形）</div>
+      <svg viewBox="0 0 500 380" style="width:75%;max-width:420px;height:auto;background:#f8fafc;border-radius:12px;border:1px solid var(--c-line)">
+        <!-- 坐标轴 -->
+        <line x1="60" y1="320" x2="460" y2="320" stroke="#334155" stroke-width="2"/>
+        <line x1="60" y1="40" x2="60" y2="320" stroke="#334155" stroke-width="2"/>
+        <!-- 箭头 -->
+        <polygon points="460,320 450,315 450,325" fill="#334155"/>
+        <polygon points="60,40 55,50 65,50" fill="#334155"/>
+        <!-- 轴标签 -->
+        <text x="30" y="55" font-size="20" font-weight="700" fill="#1e293b">绩效</text>
+        <text x="230" y="360" font-size="20" font-weight="700" fill="#1e293b">冲突程度</text>
+        <text x="40" y="335" font-size="18" font-weight="700" fill="#1e293b">0</text>
+        <!-- 红色曲线：倒U形 -->
+        <path d="M 80 310 Q 180 300 250 100 Q 320 30 400 300" stroke="#dc2626" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- A点标注 -->
+        <circle cx="150" cy="240" r="5" fill="#dc2626"/>
+        <text x="110" y="220" font-size="22" font-weight="700" fill="#1e293b">A</text>
+        <!-- B点标注 -->
+        <circle cx="250" cy="100" r="6" fill="#dc2626"/>
+        <text x="240" y="70" font-size="24" font-weight="700" fill="#1e293b">B</text>
+        <!-- C点标注 -->
+        <circle cx="380" cy="270" r="5" fill="#dc2626"/>
+        <text x="400" y="250" font-size="22" font-weight="700" fill="#1e293b">C</text>
+      </svg>
+      <button id="r17Next" style="margin-top:.6rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+    </div>
+    <!-- 右边：翻卡 + 概念（后显示） -->
+    <div id="r17Right" style="flex:1;display:flex;flex-direction:column;gap:.8rem;display:none">
+      <div class="flip-card" data-flip style="margin:0">
+        <span class="flip-a">💡 点击查看：冲突一定是坏事吗？</span>
+        <span class="flip-b"><b>不一定。</b>完全没有冲突（A）缺乏活力；适当冲突（B）激发讨论与创新，绩效最高；冲突过度（C）内耗崩坏。关键在于把冲突控制在"建设性"范围。</span>
+      </div>
+      <div class="concept" style="margin:0">
+        <span class="en">Group vs Team: conflict transforms a group into a team — or tears it apart.</span>
+        <span class="zh">群体到团队的转化：冲突处理得好，群体变团队；处理不好，团队散伙。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 17: 4.1 小结 ============ -->
+<section class="slide" data-slide="18" data-page-type="4.1 · 小结 Summary">
+  <div class="section-label">4.1 · 小结 · Summary</div>
+  <h1 class="slide-title">
+    <span class="en">RSCC: The Four Keys</span>
+    <span class="zh">RSCC 四个关键特征</span>
+  </h1>
+
+  <div class="grid-4" style="margin-top:.6rem">
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">R</div>
+      <div style="font-size:.8rem;font-weight:700">角色互补</div>
+      <div style="font-size:.68rem;color:#555">Role</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">S</div>
+      <div style="font-size:.8rem;font-weight:700">主动分享</div>
+      <div style="font-size:.68rem;color:#555">Share</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">C</div>
+      <div style="font-size:.8rem;font-weight:700">达成共识</div>
+      <div style="font-size:.68rem;color:#555">Consensus</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--c-primary)">C</div>
+      <div style="font-size:.8rem;font-weight:700">高效协作</div>
+      <div style="font-size:.68rem;color:#555">Cooperation</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">A real team is built on four keys: role, sharing, consensus and cooperation.</span>
+    <span class="zh">紧紧围绕团队的四个关键特征：角色、分享、共识、协作。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 18: 4.2 开场 ============ -->
+<section class="slide" data-slide="19" data-page-type="理论转场 · 4.2">
+  <div class="section-label">4.2 · 跨文化团队类型 · Types of Cross-cultural Team</div>
+  <h1 class="slide-title">
+    <span class="en">Three Kinds of Cross-cultural Teams</span>
+    <span class="zh">三种跨文化团队</span>
+  </h1>
+
+  <div class="grid-3" style="margin-top:.6rem">
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:.9rem;font-weight:800;color:var(--c-primary)">象征性文化团队</div>
+      <div style="font-size:.68rem;color:#555">Token Group</div>
+      <div style="font-size:.75rem;color:var(--c-sub);margin-top:.3rem">多数人同文化，极少数"异类"</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:.9rem;font-weight:800;color:var(--c-primary)">双文化团队</div>
+      <div style="font-size:.68rem;color:#555">Bi-cultural Group</div>
+      <div style="font-size:.75rem;color:var(--c-sub);margin-top:.3rem">两种文化，人数相当</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .4rem">
+      <div style="font-size:.9rem;font-weight:800;color:var(--c-primary)">多文化团队</div>
+      <div style="font-size:.68rem;color:#555">Multicultural Group</div>
+      <div style="font-size:.75rem;color:var(--c-sub);margin-top:.3rem">三种及以上文化并存</div>
+    </div>
+  </div>
+
+  <div class="reflect-box">
+    <q>Guess · 猜一猜</q>
+    <span style="font-size:.88rem">猜猜：哪一种团队最容易产生冲突？哪一种创造力最强？</span>
+    <textarea placeholder="（可先记下猜测，后面揭晓）"></textarea>
+    <div class="reflect-hint">先猜再看 · 不计分</div>
+  </div>
+</section>
+
+<!-- ============ Slide 19: 象征性文化团队 ============ -->
+<section class="slide" data-slide="20" data-page-type="4.2 · 类型 Types">
+  <div class="section-label">4.2 · 类型一 · Token Group 象征性文化团队</div>
+  <h1 class="slide-title">
+    <span class="en">The Token Group</span>
+    <span class="zh">象征性文化团队</span>
+  </h1>
+
+  <div style="display:flex;gap:1.5rem;align-items:center;margin-top:.5rem">
+    <!-- 左边：图片 -->
+    <div style="flex:1.2">
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/token-figures.png" alt="象征性成员示意图" style="width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+    </div>
+    <!-- 右边：内容 -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:.8rem">
+      <div class="concept" style="margin:0">
+        <span class="en" style="font-size:1rem">One or two members come from a different culture; all the rest share one culture.</span>
+        <span class="zh" style="font-size:1.05rem">一个团队中，只有一个或两个队员来自不同的文化，其他队员全部来自同一种文化。</span>
+      </div>
+      <div class="card" style="padding:.8rem">
+        <div style="font-size:1rem;font-weight:700;color:var(--c-primary)">例子</div>
+        <div style="font-size:.95rem;color:var(--c-sub);margin-top:.4rem;line-height:1.6">研发部 10 人：8 个美国 + 2 个中国<br>销售部 5 人：4 个中国 + 1 个印度</div>
+      </div>
+      <div class="card accent" style="padding:.8rem">
+        <div style="font-size:1rem;font-weight:700;color:#9a3412">"象征性成员"的处境</div>
+        <div style="font-size:.95rem;color:var(--c-sub);margin-top:.4rem;line-height:1.6">常遭多数成员"打击"、被戴有色眼镜、或干脆被忽视。</div>
+      </div>
+      <div class="concept" style="margin:0">
+        <span class="en" style="font-size:1rem">Building teams, try to avoid token members.</span>
+        <span class="zh" style="font-size:1.05rem">组队时应尽量避免"象征性"成员——孤例容易被边缘化。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 21: 校友案例 · 杨过 PAT ============ -->
+<section class="slide" data-slide="21" data-page-type="4.2 · 校友案例 Alumni">
+  <div class="section-label">4.2 · 校友案例 · CTBU Alumnus</div>
+  <h1 class="slide-title">
+    <span class="en">Alumni Story: First Job</span>
+    <span class="zh">校友故事 · 第一份工作</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <!-- 左边：视频 -->
+    <div style="flex:1.5">
+      <div style="background:#1e293b;color:#fff;padding:.5rem .8rem;border-radius:10px 10px 0 0;font-size:.82rem;line-height:1.5">
+        <b>杨过（PAT）</b> · CTBU Alumnus 校友 · Thailand 泰国<br>
+        Sales Engineer, Kumho-Sunny Plastics (Shanghai) Co., Ltd.<br>
+        上海锦湖日丽塑料公司 · 销售工程师
+      </div>
+      <video controls style="width:100%;display:block;border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,.15)">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/pat.mp4" type="video/mp4">
+      </video>
+    </div>
+    <!-- 右边：思考题 -->
+    <div style="flex:1">
+      <div class="card accent" style="padding:1rem">
+        <div style="font-size:1rem;font-weight:800;color:#9a3412;margin-bottom:.6rem">🤔 Think · 思考题</div>
+        <div style="font-size:.95rem;font-weight:700;color:var(--c-ink)">First Job · 第一份工作</div>
+        <div style="font-size:.9rem;color:var(--c-sub);margin-top:.5rem;line-height:1.7">
+          What happened to Mr. Yang Guo?<br>
+          <b>杨过遭遇了什么？</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 22: 校友案例 · 吕宾 ============ -->
+<section class="slide" data-slide="22" data-page-type="4.2 · 校友案例 Alumni">
+  <div class="section-label">4.2 · 校友案例 · CTBU Alumnus</div>
+  <h1 class="slide-title">
+    <span class="en">Alumni Story: Strategies</span>
+    <span class="zh">校友故事 · 应对策略</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <!-- 左边：视频 -->
+    <div style="flex:1.5">
+      <div style="background:#1e293b;color:#fff;padding:.5rem .8rem;border-radius:10px 10px 0 0;font-size:.82rem;line-height:1.5">
+        <b>吕宾 Lv Bin</b> · CTBU Alumnus 校友 · Benin 贝宁<br>
+        Senior Sales Manager, Chongqing Chang Ming Motocycle<br>
+        重庆昌明摩托车股份有限公司 · 高级销售经理
+      </div>
+      <video controls style="width:100%;display:block;border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,.15)">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/lvbin.mp4" type="video/mp4">
+      </video>
+    </div>
+    <!-- 右边：思考题 -->
+    <div style="flex:1">
+      <div class="card accent" style="padding:1rem">
+        <div style="font-size:1rem;font-weight:800;color:#9a3412;margin-bottom:.6rem">🤔 Think · 思考题</div>
+        <div style="font-size:.95rem;font-weight:700;color:var(--c-ink)">Strategies · 策略</div>
+        <div style="font-size:.9rem;color:var(--c-sub);margin-top:.5rem;line-height:1.8">
+          1. The "weak" culture members<br>
+          <b>"弱势"文化成员</b> 如何应对？<br><br>
+          2. The company<br>
+          <b>公司</b> 层面可以做什么？
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 23: 双文化团队 ============ -->
+<section class="slide" data-slide="23" data-page-type="4.2 · 类型 Types">
+  <div class="section-label">4.2 · 类型二 · Bi-cultural Group 双文化团队</div>
+  <h1 class="slide-title">
+    <span class="en">The Bi-cultural Group</span>
+    <span class="zh">双文化团队</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <!-- 左边：文字 -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:.6rem">
+      <div class="concept" style="margin:0">
+        <span class="en" style="font-size:.9rem">Two cultures, similar numbers. People feel free to speak their minds.</span>
+        <span class="zh" style="font-size:.95rem">两种文化人数相当，双方敢说出观点、不掩饰文化特色，正视差别、坦率讨论。</span>
+      </div>
+      <div class="card" style="padding:.7rem">
+        <div style="font-size:.88rem;font-weight:700;color:var(--c-primary)">但也最容易滑向"我们 vs 他们"</div>
+        <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.7">
+          ① 因长相、语言、生活习惯不同，双方产生明显"鸿沟"；<br>
+          ② 视自己文化成员为"内群体"，对方为"外群体"；<br>
+          ③ 夸大文化差异，用成见看待对方。
+        </div>
+      </div>
+    </div>
+    <!-- 右边：插画 -->
+    <div style="flex:1.3">
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/changan-india.jpg" alt="长安汽车印度公司销售部会议" style="width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+      <div style="text-align:center;margin-top:.4rem;font-size:.82rem;color:var(--c-sub)">长安汽车印度公司销售部：4位中方经理 + 4位印方主管</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 21: 多文化团队 ============ -->
+<section class="slide" data-slide="24" data-page-type="4.2 · 类型 Types">
+  <div class="section-label">4.2 · 类型三 · Multicultural Group 多文化团队</div>
+  <h1 class="slide-title">
+    <span class="en">The Multicultural Group</span>
+    <span class="zh">多文化团队</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <!-- 左边：文字内容 -->
+    <div style="flex:1.2;display:flex;flex-direction:column;gap:.5rem">
+      <div class="concept" style="margin:0">
+        <span class="en" style="font-size:.88rem">At least three cultures, with similar numbers of members.</span>
+        <span class="zh" style="font-size:.92rem">至少有三个或以上文化背景的成员，且人数相当。</span>
+      </div>
+
+      <div class="card" style="padding:.7rem">
+        <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">例子：地区营销主管团队</div>
+        <div style="font-size:.82rem;color:var(--c-sub);margin-top:.3rem;line-height:1.7">1 名澳洲人 + 1 名美国人 + 1 名越南人 + 1 名马来西亚人 + 1 名印尼人 + 2 名泰国人</div>
+      </div>
+
+      <button id="r22Next1" style="margin-top:.3rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+
+      <div id="r22ProsCons" style="display:none;margin-top:.3rem">
+        <div class="grid-2" style="margin-top:.3rem;gap:.5rem">
+          <div class="card" style="text-align:center;padding:.6rem;border-left:4px solid var(--c-right)">
+            <div style="font-size:.85rem;font-weight:700;color:var(--c-right)">优点 Pros</div>
+            <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">背景、经验多元 → <b>创造性</b></div>
+          </div>
+          <div class="card" style="text-align:center;padding:.6rem;border-left:4px solid var(--c-wrong)">
+            <div style="font-size:.85rem;font-weight:700;color:var(--c-wrong)">缺点 Cons</div>
+            <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">冲突成本高 → <b>内耗风险</b></div>
+          </div>
+        </div>
+
+        <button id="r22Next2" style="margin-top:.4rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+      </div>
+
+      <div id="r22Quiz" style="display:none;margin-top:.3rem">
+        <div class="choice-q">
+          <div class="q" style="font-size:.9rem">三类团队中，最容易产生冲突的是？</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A">象征性文化团队</div>
+            <div class="choice-opt" data-pick="B">双文化团队</div>
+            <div class="choice-opt" data-pick="C">多文化团队</div>
+          </div>
+          <div class="choice-fb" id="s20fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右边：插画 -->
+    <div style="flex:1;margin-top:-1rem">
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/multicultural.jpg" alt="多文化团队：地区营销主管团队" style="width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+      <div style="text-align:center;margin-top:.4rem;font-size:.82rem;color:var(--c-sub)">7 人来自 6 个国家，围坐圆桌共商营销策略</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 25: 校友案例 · 杨过 PAT 第二份工作 ============ -->
+<section class="slide" data-slide="25" data-page-type="4.2 · 校友案例 Alumni">
+  <div class="section-label">4.2 · 校友案例 · CTBU Alumnus</div>
+  <h1 class="slide-title">
+    <span class="en">Alumni Story: Second Job</span>
+    <span class="zh">校友故事 · 第二份工作</span>
+  </h1>
+
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <!-- 左边：视频 -->
+    <div style="flex:1.5">
+      <div style="background:#1e293b;color:#fff;padding:.5rem .8rem;border-radius:10px 10px 0 0;font-size:.82rem;line-height:1.5">
+        <b>杨过（PAT）</b> · CTBU Alumnus 校友 · Thailand 泰国<br>
+        Sales Engineer, Kumho-Sunny Plastics (Shanghai) Co., Ltd.<br>
+        上海锦湖日丽塑料公司 · 销售工程师
+      </div>
+      <video controls style="width:100%;display:block;border-radius:0 0 10px 10px;box-shadow:0 6px 20px rgba(0,0,0,.15)">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/PAT2.mp4" type="video/mp4">
+      </video>
+    </div>
+    <!-- 右边：思考题 -->
+    <div style="flex:1">
+      <div class="card accent" style="padding:1rem">
+        <div style="font-size:1rem;font-weight:800;color:#9a3412;margin-bottom:.6rem">🤔 Think · 思考题</div>
+        <div style="font-size:.95rem;font-weight:700;color:var(--c-ink)">Second Job · 第二份工作</div>
+        <div style="font-size:.9rem;color:var(--c-sub);margin-top:.5rem;line-height:1.7">
+          What are the challenges and advantages of Yang Guo's cross-cultural team?<br><br>
+          <b>杨过所在跨文化团队面临哪些挑战和优势？</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 22: 类型与绩效 ============ -->
+<section class="slide" data-slide="26" data-page-type="4.2 · 绩效 Performance">
+  <div class="section-label">4.2 · 跨文化团队与绩效 · Performance</div>
+  <h1 class="slide-title">
+    <span class="en">Performance Goes to the Extremes</span>
+    <span class="zh">绩效走向两极</span>
+  </h1>
+
+  <!-- 拖拽互动：绩效分布图 -->
+  <div class="card" style="padding:.7rem">
+    <div style="text-align:center;font-size:.88rem;font-weight:700;color:var(--c-primary);margin-bottom:.5rem">📊 拖一拖：把卡片放到曲线对应位置</div>
+    <div style="position:relative;width:100%;max-width:720px;margin:0 auto">
+      <svg viewBox="0 0 700 340" style="width:100%;height:auto;display:block">
+        <!-- 横轴 -->
+        <line x1="30" y1="260" x2="680" y2="260" stroke="#334155" stroke-width="2"/>
+        <polygon points="680,260 670,255 670,265" fill="#334155"/>
+        <!-- 倒U形曲线：左端从横轴附近升起，中间顶点，右端落回横轴 -->
+        <path d="M 90 260 Q 180 250 280 80 Q 350 30 420 80 Q 520 250 610 260" stroke="#dc2626" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- 中间虚线 -->
+        <line x1="350" y1="30" x2="350" y2="260" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4"/>
+        <!-- 轴标签 -->
+        <text x="180" y="290" font-size="17" font-weight="700" fill="#1e293b" text-anchor="middle">非常低效</text>
+        <text x="350" y="290" font-size="17" font-weight="700" fill="#1e293b" text-anchor="middle">平均绩效</text>
+        <text x="550" y="290" font-size="17" font-weight="700" fill="#1e293b" text-anchor="middle">非常高效</text>
+      </svg>
+      <!-- 三个drop区域（做大） -->
+      <div id="dropLeft" data-region="left" style="position:absolute;left:12%;top:55%;width:16%;height:30%;border:2px dashed #dc2626;border-radius:10px;background:rgba(220,38,38,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;transition:background .2s"></div>
+      <div id="dropMid" data-region="mid" style="position:absolute;left:40%;top:40%;width:20%;height:45%;border:2px dashed #3b82f6;border-radius:10px;background:rgba(59,130,246,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:6px;transition:background .2s"></div>
+      <div id="dropRight" data-region="right" style="position:absolute;left:72%;top:55%;width:16%;height:30%;border:2px dashed #22c55e;border-radius:10px;background:rgba(34,197,94,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;transition:background .2s"></div>
+    </div>
+    <!-- 拖拽卡片池 -->
+    <div id="r23Pool" style="display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:.6rem">
+      <div class="r23-card" draggable="true" data-correct="mid" style="padding:.4rem .8rem;background:#fff;border:2px solid #3b82f6;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#3b82f6">单文化团队</div>
+      <div class="r23-card" draggable="true" data-correct="both" style="padding:.4rem .8rem;background:#fff;border:2px solid #dc2626;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#dc2626">跨文化团队</div>
+      <div class="r23-card" draggable="true" data-correct="both" style="padding:.4rem .8rem;background:#fff;border:2px solid #dc2626;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#dc2626">跨文化团队</div>
+      <div class="r23-card" draggable="true" data-correct="mid" style="padding:.4rem .8rem;background:#fff;border:2px solid #059669;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#059669">沟通顺畅</div>
+      <div class="r23-card" draggable="true" data-correct="both" style="padding:.4rem .8rem;background:#fff;border:2px solid #d97706;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#d97706">冲突内耗</div>
+      <div class="r23-card" draggable="true" data-correct="right" style="padding:.4rem .8rem;background:#fff;border:2px solid #7c3aed;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#7c3aed">多元创造</div>
+      <div class="r23-card" draggable="true" data-correct="mid" style="padding:.4rem .8rem;background:#fff;border:2px solid #64748b;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#64748b">同质保守</div>
+    </div>
+    <div id="r23Fb" style="text-align:center;margin-top:.5rem;font-size:.85rem;min-height:1.5rem"></div>
+    <div style="text-align:right;font-size:.65rem;color:#94a3b8;margin-top:.3rem">Earley &amp; Mosakowski, 2000; Kovach, 1980; Watson, Kumar, &amp; Michaelson</div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Compared with monocultural teams, cross-cultural teams perform either significantly lower or significantly higher — rarely in the middle.</span>
+    <span class="zh">研究表明：与单文化团队相比，跨文化团队绩效要么显著更低，要么显著更高，倾向两极而非居中。</span>
+  </div>
+
+  <div class="reflect-box">
+    <q>Think · 为什么？</q>
+    <span style="font-size:.88rem">同样的文化差异，为什么有的团队"1+1&gt;2"，有的团队"1+1&lt;1"？差异在哪？</span>
+    <textarea placeholder="（先思考，下一页看微软案例）"></textarea>
+    <div class="reflect-hint">先思考 · 不计分</div>
+  </div>
+</section>
+
+<!-- ============ Slide 23: 微软案例 ============ -->
+<section class="slide" data-slide="27" data-page-type="4.2 · 案例 Case">
+  <div class="section-label">4.2 · 优势案例 · When Diversity Wins</div>
+  <h1 class="slide-title">
+    <span class="en">When Diversity Wins</span>
+    <span class="zh">多样性如何赢：两个商业故事</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.88rem;font-weight:700;color:var(--c-primary)">案例 1：游戏手柄</div>
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/xbox.jpg" alt="大小手柄对比" style="width:80%;max-height:200px;object-fit:contain;border-radius:8px;margin:.4rem auto;display:block">
+      <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.6">设计手柄时针对美国男性的大手；团队里的日本成员提出：亚洲人手小，应该做小一号。结果大受市场欢迎。</div>
+    </div>
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.88rem;font-weight:700;color:var(--c-primary)">案例 2：iPhone 双卡双待</div>
+      <img src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/img/iphone.jpg" alt="iPhone双卡双待" style="width:80%;max-height:200px;object-fit:contain;border-radius:8px;margin:.4rem auto;display:block">
+      <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.6">早期iPhone一直单卡，中国团队发现国人习惯两部手机（工作号+生活号），苹果随后推出双卡双待版，中国市场销量暴涨——本土视角发现全球需求。</div>
+    </div>
+  </div>
+
+  <div class="flip-card" data-flip>
+    <span class="flip-a">点击查看：两个案例的共同点</span>
+    <span class="flip-b"><b>文化盲点 = 商业风险；文化视角 = 商业机会。</b>本土团队看不见的问题，多元视角一眼发现——多样性是"风险雷达"和"机会探测器"。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 24: 跨文化团队劣势 ============ -->
+<section class="slide" data-slide="28" data-page-type="4.2 · 劣势 Cons">
+  <div class="section-label">4.2 · 劣势 · Disadvantages</div>
+  <h1 class="slide-title">
+    <span class="en">The Costs of Diversity</span>
+    <span class="zh">跨文化团队的四项劣势</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.8rem;font-weight:700;color:var(--c-wrong)">沟通误会</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">个体/集体 · 高/低语境 · 权力距离大/小</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.8rem;font-weight:700;color:var(--c-wrong)">步调不一致</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">时间观念 · 对合同的认知 · 期望的指导方式</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.8rem;font-weight:700;color:var(--c-wrong)">潜在歧视</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">种族、国别层面的隐性偏见</div>
+    </div>
+    <div class="card" style="padding:.6rem">
+      <div style="font-size:.8rem;font-weight:700;color:var(--c-wrong)">缺乏默契</div>
+      <div style="font-size:.78rem;color:var(--c-sub);margin-top:.2rem">难以形成单一文化下的那种"不用说的默契"</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Diversity is a double-edged sword: the same difference can create value or cost.</span>
+    <span class="zh">多样性是把双刃剑：同样的差异，既能创造价值，也能制造成本——关键在管理。</span>
+  </div>
+</section>
+<!-- ============ Slide 25: 4.3 开场 ============ -->
+<section class="slide" data-slide="29" data-page-type="理论转场 · 4.3">
+  <div class="section-label">4.3 · 跨文化团队整合模式 · Cross-cultural Integration Model</div>
+  <h1 class="slide-title">
+    <span class="en">How Do Cultures Integrate?</span>
+    <span class="zh">并购 / 合资之后，文化怎么"过到一起"？</span>
+  </h1>
+
+  <div class="scenario-box">
+    <p class="quote" style="font-size:.95rem">两家公司走到一起（并购或合资），两种企业文化相遇。<br>
+    <span style="font-size:.82rem;color:var(--c-sub)">是"你听我的"？还是"各过各的"？还是"变成新的"？</span></p>
+  </div>
+
+  <div class="concept">
+    <span class="en">Berry (1980) acculturation model answers two questions.</span>
+    <span class="zh">贝雷（1980）的文化适应模型，用两个问题回答：</span>
+  </div>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <div class="card" style="text-align:center;padding:.8rem .5rem">
+      <div style="font-size:1.2rem">🌸</div>
+      <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">是否保持自己的文化特色？</div>
+      <div style="font-size:.7rem;color:#555">Keep one's own cultural identity?</div>
+    </div>
+    <div class="card" style="text-align:center;padding:.8rem .5rem">
+      <div style="font-size:1.2rem">🤝</div>
+      <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">是否接触异族文化？</div>
+      <div style="font-size:.7rem;color:#555">Contact the other culture?</div>
+    </div>
+  </div>
+
+  <div style="font-size:.8rem;color:var(--c-sub);text-align:center;margin-top:.3rem">两个"是/否" → 四种模式：融合 · 同化 · 隔离 · 边缘化/引进</div>
+</section>
+
+<!-- ============ Slide 26: 贝雷模型 2x2 矩阵 ============ -->
+<section class="slide" data-slide="30" data-page-type="4.3 · 模型 Model">
+  <div class="section-label">4.3 · 贝雷文化适应模型 · Berry's Acculturation Model</div>
+  <h1 class="slide-title">
+    <span class="en">Four Ways to Integrate</span>
+    <span class="zh">四种整合模式</span>
+  </h1>
+
+  <div style="text-align:center;font-size:.72rem;color:var(--c-sub);margin-bottom:.3rem">
+    横轴：是否接触异族文化？→　纵轴：是否保持自己的文化特色？→
+  </div>
+  <div class="matrix2x2">
+    <div class="m-cell" data-m="assimilation" style="grid-column:2;grid-row:1">
+      <div class="m-en">接触：是 · 保持：否</div>
+      <div class="m-name">同化 Assimilation</div>
+      <div class="m-detail">一方放弃自己的文化，被另一方文化取代。例如沃尔玛收购阿斯达。</div>
+    </div>
+    <div class="m-cell" data-m="fusion" style="grid-column:1;grid-row:1">
+      <div class="m-en">接触：是 · 保持：是</div>
+      <div class="m-name">融合 Fusion</div>
+      <div class="m-detail">剔除两种文化中的不合理部分，整合精华，培育全新企业文化。例如雷诺-日产联盟。</div>
+    </div>
+    <div class="m-cell" data-m="separation" style="grid-column:1;grid-row:2">
+      <div class="m-en">接触：否 · 保持：是</div>
+      <div class="m-name">隔离 Separation</div>
+      <div class="m-detail">"一企两制"：A 国文化、B 国文化各过各的，互不接触。</div>
+    </div>
+    <div class="m-cell" data-m="marginal" style="grid-column:2;grid-row:2">
+      <div class="m-en">接触：否 · 保持：否</div>
+      <div class="m-name">边缘化 / 引进 Marginalization</div>
+      <div class="m-detail">既不想保持自己，又不接触对方；另一种解读：保持原有文化的同时，接纳对方文化中的合理部分（引进）。</div>
+    </div>
+  </div>
+
+  <div style="font-size:.72rem;color:var(--c-sub)">💡 点击四个象限查看解释。</div>
+</section>
+
+<!-- ============ Slide 27: 四种模式详解 ============ -->
+<section class="slide" data-slide="31" data-page-type="4.3 · 模式 Modes">
+  <div class="section-label">4.3 · 四种模式 · Four Modes</div>
+  <h1 class="slide-title">
+    <span class="en">Assimilation · Separation · Marginalization · Fusion</span>
+    <span class="zh">四种文化互动模式</span>
+  </h1>
+
+  <div style="text-align:center;font-size:.88rem;font-weight:700;color:var(--c-primary);margin:.3rem 0">📊 把下面四张卡片拖到对应图形下方</div>
+
+  <!-- 上部：四种模式示意图 -->
+  <svg viewBox="0 0 900 260" style="width:100%;max-width:880px;height:auto;margin:0 auto;display:block">
+    <!-- 顶部A国B国 -->
+    <circle cx="220" cy="40" r="32" fill="#fb923c" stroke="#fde68a" stroke-width="3"/>
+    <text x="220" y="46" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">A国文化</text>
+    <circle cx="680" cy="40" r="32" fill="#1e1e1e" stroke="#fde68a" stroke-width="3"/>
+    <text x="680" y="46" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">B国文化</text>
+    <!-- 箭头 -->
+    <path d="M 250 60 L 380 100" stroke="#94a3b8" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+    <path d="M 650 60 L 520 100" stroke="#94a3b8" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#94a3b8"/></marker></defs>
+    <!-- 中间并购框 -->
+    <rect x="250" y="100" width="400" height="40" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="450" y="125" font-size="15" font-weight="700" fill="#334155" text-anchor="middle">并购或合资（团队）</text>
+    <!-- 四个结果图 -->
+    <!-- 图1：黑包橙（同化） -->
+    <circle cx="90" cy="200" r="38" fill="#1e1e1e"/>
+    <circle cx="90" cy="200" r="14" fill="#fb923c" stroke="#fde68a" stroke-width="2"/>
+    <!-- 图2：分开竖线（隔离） -->
+    <ellipse cx="290" cy="200" rx="28" ry="32" fill="#1e1e1e"/>
+    <ellipse cx="360" cy="200" rx="28" ry="32" fill="#fb923c" stroke="#fde68a" stroke-width="2"/>
+    <line x1="325" y1="168" x2="325" y2="232" stroke="#334155" stroke-width="2"/>
+    <!-- 图3：重叠红色（融合） -->
+    <circle cx="530" cy="200" r="34" fill="#fb923c" stroke="#fde68a" stroke-width="2"/>
+    <circle cx="570" cy="200" r="34" fill="#1e1e1e"/>
+    <circle cx="550" cy="200" r="18" fill="#dc2626"/>
+    <!-- 图4：大黑旁小橙（引进） -->
+    <circle cx="750" cy="200" r="38" fill="#1e1e1e"/>
+    <circle cx="790" cy="215" r="20" fill="#fb923c" stroke="#fde68a" stroke-width="2"/>
+  </svg>
+
+  <!-- 四个投放框 -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;max-width:880px;margin:0 auto">
+    <div class="r31-drop" data-region="assimilation" style="min-height:60px;border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;padding:4px"></div>
+    <div class="r31-drop" data-region="separation" style="min-height:60px;border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;padding:4px"></div>
+    <div class="r31-drop" data-region="fusion" style="min-height:60px;border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;padding:4px"></div>
+    <div class="r31-drop" data-region="introduction" style="min-height:60px;border:2px dashed #cbd5e1;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;padding:4px"></div>
+  </div>
+
+  <!-- 下部：打乱的卡片池 -->
+  <div id="r31Pool" style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:.8rem">
+    <div class="r31-card" draggable="true" data-correct="introduction" style="padding:.45rem .9rem;background:#fff;border:2px solid #d97706;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#d97706">引进 Introduction<br><span style="font-size:.7rem;font-weight:400;color:#888">"我还是我，但吸收你的好"</span></div>
+    <div class="r31-card" draggable="true" data-correct="fusion" style="padding:.45rem .9rem;background:#fff;border:2px solid #dc2626;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#dc2626">融合 Fusion<br><span style="font-size:.7rem;font-weight:400;color:#888">"我们变成新的我们"</span></div>
+    <div class="r31-card" draggable="true" data-correct="assimilation" style="padding:.45rem .9rem;background:#fff;border:2px solid #1e1e1e;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#1e1e1e">同化 Assimilation<br><span style="font-size:.7rem;font-weight:400;color:#888">"你完全变成我"</span></div>
+    <div class="r31-card" draggable="true" data-correct="separation" style="padding:.45rem .9rem;background:#fff;border:2px solid #6366f1;border-radius:20px;cursor:grab;font-size:.82rem;font-weight:600;color:#6366f1">隔离 Separation<br><span style="font-size:.7rem;font-weight:400;color:#888">"我们各过各的"</span></div>
+  </div>
+  <div id="r31Fb" style="text-align:center;margin-top:.5rem;font-size:.85rem;min-height:1.5rem"></div>
+</section>
+
+<!-- ============ Slide 32: 雷诺-日产两阶段 ============ -->
+<section class="slide" data-slide="32" data-page-type="4.3 · 案例 Case">
+  <div class="section-label"><span class="round-tag l1">CASE · 雷诺-日产联盟</span></div>
+  <h1 class="slide-title">
+    <span class="en">Renault-Nissan: Two Phases</span>
+    <span class="zh">雷诺-日产联盟：两个阶段</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <!-- 左：第一阶段 1999-2018 -->
+    <div class="card" style="padding:.8rem">
+      <div style="font-size:.9rem;font-weight:800;color:var(--c-primary)">第一阶段：1999–2018</div>
+      <div style="font-size:.82rem;color:var(--c-sub);margin-top:.4rem;line-height:1.6">
+        雷诺注资日产，戈恩出任CEO。双方设联合管理委员会，共享平台技术，既保留各自优势（日产精益生产、雷诺设计），又剔除官僚主义，培育"联盟文化"。
+      </div>
+      <div style="margin-top:.6rem;padding:.5rem;background:#f1f5f9;border-radius:8px">
+        <div style="font-size:.8rem;font-weight:700;margin-bottom:.3rem">这一阶段最接近哪种模式？（单选）</div>
+        <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32a" value="assimilation"> 同化：日产变成雷诺的样子</label>
+        <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32a" value="separation"> 隔离：各干各的，互不干涉</label>
+        <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32a" value="introduction"> 引进：一方保持自己，吸收对方好的</label>
+        <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32a" value="fusion"> 融合：剔除糟粕、整合精华、培育新文化</label>
+      </div>
+    </div>
+    <!-- 右：第二阶段 2019-至今（先隐藏） -->
+    <div id="r32Right" style="display:none">
+      <div class="card accent" style="padding:.8rem">
+        <div style="font-size:.9rem;font-weight:800;color:#9a3412">第二阶段：2019–至今</div>
+        <div style="font-size:.82rem;color:var(--c-sub);margin-top:.4rem;line-height:1.6">
+          戈恩事件后信任崩塌。2025年双方重新签约：雷诺持股从43%降至15%，取消交叉控股，停止部分零部件采购，各自独立运营，仅保留少量合作项目。
+        </div>
+        <div style="margin-top:.6rem;padding:.5rem;background:#fff7ed;border-radius:8px">
+          <div style="font-size:.8rem;font-weight:700;margin-bottom:.3rem">退潮后，联盟退回哪种模式？（单选）</div>
+          <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32b" value="assimilation"> 同化：一方被另一方吞并</label>
+          <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32b" value="separation"> 隔离：各干各的，互不干涉</label>
+          <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32b" value="introduction"> 引进：一方保持自己，吸收对方好的</label>
+          <label style="display:block;font-size:.82rem;margin:.25rem 0;cursor:pointer"><input type="radio" name="r32b" value="fusion"> 融合：剔除糟粕、整合精华、培育新文化</label>
+        </div>
+      </div>
+      <div class="concept" style="margin-top:.5rem">
+        <span style="font-size:.82rem">真实情况：第一阶段是理想中的"融合"，但2025年实际退回"隔离"——资本话语权之争让深度合作难以为继。</span>
+      </div>
+      <div id="r32Btn" style="display:none;text-align:center;margin-top:.5rem">
+        <button onclick="window.open('https://m.thepaper.cn/newsDetail_forward_31023971','_blank')" style="font-size:.85rem;padding:.45rem 1.1rem;border-radius:20px;border:1.5px solid #9a3412;background:#fff7ed;color:#9a3412;cursor:pointer;box-shadow:var(--c-shadow)">📰 阅读原文："貌合神离"搞不好联盟</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="r32Next" style="margin-top:.6rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+</section>
+
+<!-- ============ Slide 33: 联想-IBM ============ -->
+<section class="slide" data-slide="33" data-page-type="4.3 · 案例 Case">
+  <div class="section-label"><span class="round-tag l1">CASE 2 · 联想-IBM</span></div>
+  <h1 class="slide-title">
+    <span class="en">Lenovo-IBM</span>
+  </h1>
+
+  <!-- 第一步：左边文字 -->
+  <div style="display:flex;gap:1.2rem;align-items:flex-start;margin-top:.5rem">
+    <div style="flex:1">
+      <div class="card" style="padding:.8rem">
+        <div style="font-size:.88rem;font-weight:700;color:var(--c-primary)">2005年：收购初期</div>
+        <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.7">
+          联想收购IBM PC业务后，<b>先保持</b>IBM原有品牌、管理团队和企业文化独立运作——ThinkPad保持高端形象，联想专注中国市场。初期这种"放任"策略减少了文化冲突。
+        </div>
+      </div>
+      <div class="choice-q" style="margin-top:.6rem">
+        <div class="q" style="font-size:.9rem">联想初期的策略属于哪种模式？</div>
+        <div class="choice-opts">
+          <div class="choice-opt" data-pick="A">同化：IBM完全变成联想</div>
+          <div class="choice-opt" data-pick="B">隔离：两套文化各过各的</div>
+          <div class="choice-opt" data-pick="C">引进：联想保持自己，同时吸收IBM的好</div>
+        </div>
+        <div class="choice-fb" id="s29fb"></div>
+      </div>
+      <button id="r33Next" style="margin-top:.6rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+    </div>
+    <!-- 右边：视频（先显示） -->
+    <div style="flex:1.2">
+      <video controls style="width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.12);display:block;max-height:300px;object-fit:cover">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/ibm.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- 第二步：视频下方选择题（先隐藏） -->
+  <div id="r33Quiz" style="display:none;margin-top:.5rem">
+    <div class="choice-q">
+      <div class="q" style="font-size:.9rem">看视频：联想收购IBM后期，柳传志回归后采用的是哪种策略？</div>
+      <div class="choice-opts">
+        <div class="choice-opt" data-pick="A">同化：IBM完全变成联想</div>
+        <div class="choice-opt" data-pick="B">隔离：两套文化各过各的</div>
+        <div class="choice-opt" data-pick="C">引进：联想吸收IBM的好，但保持自己</div>
+        <div class="choice-opt" data-pick="D">融合：整合双方精华，形成新文化</div>
+      </div>
+      <div class="choice-fb" id="r33Fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 30: 案例 沃尔玛-阿斯达 ============ -->
+<section class="slide" data-slide="34" data-page-type="4.3 · 案例 Case">
+  <div class="section-label"><span class="round-tag l1">CASE 3 · 沃尔玛-阿斯达</span></div>
+  <h1 class="slide-title">
+    <span class="en">Walmart-Asda</span>
+  </h1>
+
+  <div class="card" style="padding:.7rem">
+    <div style="font-size:.82rem;color:var(--c-sub);line-height:1.7">
+      1999 年，美国零售巨头沃尔玛收购英国连锁超市阿斯达。收购后，阿斯达<b>完全放弃</b>原有企业文化和管理模式，<b>全面采用</b>沃尔玛的文化、运营系统和标准流程——引入"天天低价"策略、供应链管理方法和员工培训体系。阿斯达迅速整合进沃尔玛全球网络，但部分本地员工对文化变革产生抵触。
+    </div>
+  </div>
+  <button class="r-next-btn" data-target="r34Quiz" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+
+  <div id="r34Quiz" class="choice-q" style="display:none">
+    <div class="q" style="font-size:.9rem">这个案例属于哪种整合模式？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">同化（阿斯达完全变成沃尔玛）</div>
+      <div class="choice-opt" data-pick="B">融合（两种文化合成新文化）</div>
+      <div class="choice-opt" data-pick="C">隔离（两套体系并存）</div>
+    </div>
+    <div class="choice-fb" id="s30fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 31: 案例 苹果-NeXT ============ -->
+<section class="slide" data-slide="35" data-page-type="4.3 · 案例 Case">
+  <div class="section-label"><span class="round-tag l1">CASE 4 · 苹果-NeXT</span></div>
+  <h1 class="slide-title">
+    <span class="en">Apple-NeXT</span>
+  </h1>
+
+  <div class="card" style="padding:.7rem">
+    <div style="font-size:.82rem;color:var(--c-sub);line-height:1.7">
+      1996 年，苹果收购 NeXT。苹果在<b>保持自身</b>创新和设计导向文化的同时，<b>主动接纳</b> NeXT 文化中的合理部分——NeXTSTEP 操作系统技术和乔布斯的领导哲学。这次收购帮助苹果复兴 Mac OS X，引进 NeXT 的软件开发理念，最终推动 iOS 和 iPhone 的诞生。苹果没有完全改变自己的文化，而是选择性引进 NeXT 的优点，实现技术与文化互补。
+    </div>
+  </div>
+  <button class="r-next-btn" data-target="r35Quiz" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+
+  <div id="r35Quiz" class="choice-q" style="display:none">
+    <div class="q" style="font-size:.9rem">这个案例属于哪种整合模式？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">同化（苹果被 NeXT 取代）</div>
+      <div class="choice-opt" data-pick="B">隔离（两个团队互不接触）</div>
+      <div class="choice-opt" data-pick="C">引进（保持苹果文化，吸收 NeXT 精华）</div>
+    </div>
+    <div class="choice-fb" id="s31fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 36: 吉利-沃尔沃 ============ -->
+<section class="slide" data-slide="36" data-page-type="4.3 · 判断 Judge">
+  <div class="section-label"><span class="round-tag l2">JUDGE · 判断</span></div>
+  <h1 class="slide-title">
+    <span class="en">Geely-Volvo: Which Mode?</span>
+  </h1>
+
+  <!-- 第一步：左边文字 -->
+  <div style="display:flex;gap:1rem;align-items:flex-start;margin-top:.5rem">
+    <div style="flex:1">
+      <div class="card" style="padding:.7rem">
+        <div style="font-size:.85rem;color:var(--c-sub);line-height:1.7">
+          2010 年，吉利控股收购瑞典沃尔沃汽车。吉利提出"放虎归山"：保留沃尔沃独立运营、独立董事会、欧洲研发与品牌定位；同时在中国设立吉利-沃尔沃合资公司共享技术平台。
+        </div>
+      </div>
+      <button id="r36Next1" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.8rem;box-shadow:var(--c-shadow)">下一步 →</button>
+      <button id="r36Next2" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.8rem;box-shadow:var(--c-shadow);display:none">下一步 →</button>
+      <!-- 第三步：题目（在左边文字下面） -->
+      <div id="r36Quiz" style="display:none;margin-top:.5rem">
+        <div class="choice-q">
+          <div class="q" style="font-size:.85rem">看完视频，你认为吉利-沃尔沃属于哪种模式？</div>
+          <div class="choice-opts" style="gap:.3rem">
+            <div class="choice-opt" data-pick="A" style="padding:.35rem .6rem;font-size:.8rem">同化：沃尔沃变成吉利</div>
+            <div class="choice-opt" data-pick="B" style="padding:.35rem .6rem;font-size:.8rem">隔离：保持独立运营</div>
+            <div class="choice-opt" data-pick="C" style="padding:.35rem .6rem;font-size:.8rem">融合：协同开发，形成新合作模式</div>
+          </div>
+          <div class="choice-fb" id="s32fb"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 右边：视频（第二步显示） -->
+    <div id="r36Video" style="flex:1.2;display:none">
+      <video controls style="width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.12);display:block">
+        <source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/volvo.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 33: 判断 福耀玻璃 ============ -->
+<section class="slide" data-slide="37" data-page-type="4.3 · 判断 Judge">
+  <div class="section-label"><span class="round-tag l2">JUDGE · 判断</span></div>
+  <h1 class="slide-title">
+    <span class="en">Fuyao in America: Which Mode?</span>
+    <span class="zh">美国工厂 · 福耀玻璃：属于哪种模式？</span>
+  </h1>
+
+  <div class="card" style="padding:.7rem">
+    <div style="font-size:.82rem;color:var(--c-sub);line-height:1.7">
+      福耀玻璃在美国俄亥俄州建厂，从中国派驻管理人员，同时雇佣大量美国本地工人。双方在工会、工作节奏、管理风格上发生激烈碰撞——纪录片《美国工厂》记录了这一过程。福耀既要保持中国式的效率管理，又不得不适应美国的劳工法律与工作文化。
+    </div>
+  </div>
+  <button class="r-next-btn" data-target="r37Quiz" style="margin-top:.5rem;padding:.4rem 1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+
+  <div id="r37Quiz" class="choice-q" style="display:none">
+    <div class="q" style="font-size:.9rem">这一案例体现的整合模式更接近？</div>
+    <div class="choice-opts">
+      <div class="choice-opt" data-pick="A">同化（美方完全接受中方管理）</div>
+      <div class="choice-opt" data-pick="B">隔离（中美国团队完全分开）</div>
+      <div class="choice-opt" data-pick="C">引进/融合（中方保持管理特色，同时适应美国法律与工作文化）</div>
+    </div>
+    <div class="choice-fb" id="s33fb"></div>
+  </div>
+</section>
+
+<!-- ============ Slide 34: 4.4 开场 ============ -->
+<section class="slide" data-slide="38" data-page-type="理论转场 · 4.4">
+  <div class="section-label">4.4 · 打造跨文化团队 · Building a Cross-cultural Team</div>
+  <h1 class="slide-title">
+    <span class="en">From "A Team" to "A Great Team"</span>
+    <span class="zh">从"有团队"到"好团队"</span>
+  </h1>
+
+  <div class="grid-3" style="margin-top:.6rem">
+    <div class="card primary" style="text-align:center;padding:.8rem .5rem">
+      <div style="font-size:1.1rem">1️⃣</div>
+      <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">象征性文化团队</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">让"少数派"不被边缘化</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .5rem">
+      <div style="font-size:1.1rem">2️⃣</div>
+      <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">双文化团队</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">打破"我们 vs 他们"</div>
+    </div>
+    <div class="card primary" style="text-align:center;padding:.8rem .5rem">
+      <div style="font-size:1.1rem">3️⃣</div>
+      <div style="font-size:.85rem;font-weight:700;margin-top:.2rem">多文化团队</div>
+      <div style="font-size:.75rem;color:#555;margin-top:.2rem">把差异变成创造力</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <span class="en">Different team structures need different building strategies.</span>
+    <span class="zh">不同类型的跨文化团队，需要不同的打造策略。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 35: 打造象征性团队·成员 ============ -->
+<section class="slide" data-slide="39" data-page-type="4.4 · 打造 Build">
+  <div class="section-label">4.4 · 打造象征性文化团队 · Token Group</div>
+  <h1 class="slide-title">
+    <span class="en">If You Are the Token Member</span>
+    <span class="zh">作为"象征性"成员，应该：</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.5rem">
+    <div class="card" style="padding:.8rem">
+      <div style="font-size:.95rem;color:var(--c-sub);line-height:1.8">
+        ① 认识到自己要承受压力，想办法让自己放松；<br>
+        ② 与其他象征性成员沟通，分享感受、互相支持；<br>
+        ③ 发展技术专长并展示能力，而不是突出文化差异；<br>
+        ④ 让大家知道你是来帮忙解决问题的，抓住机会表现；<br>
+        ⑤ 主动与多数成员沟通请教，把他们当专家和学习资源。
+      </div>
+    </div>
+    <div class="card" style="padding:.8rem">
+      <div style="font-size:.95rem;color:var(--c-sub);line-height:1.8">
+        ⑥ 学会外交手段，处理尴尬的交往情境；<br>
+        ⑦ 培养幽默感，别把每件事都看得过于严重；<br>
+        ⑧ 寻找机会与多数成员建立个人联系，避免每次都面对"一个群体"；<br>
+        ⑨ 强调与多数人的共同之处，避免总是充当少数人群的代表。
+      </div>
+    </div>
+  </div>
+
+  <div class="flip-card" data-flip>
+    <span class="flip-a">点击查看：这些建议的共同点</span>
+    <span class="flip-b"><b>变"象征"为"实力"。</b>用能力、关系与幽默感，把自己从"代表某文化的人"变成"解决问题的伙伴"。</span>
+  </div>
+</section>
+
+<!-- ============ Slide 36: 打造象征性团队·多数派 ============ -->
+<section class="slide" data-slide="40" data-page-type="4.4 · 打造 Build">
+  <div class="section-label">4.4 · 打造象征性文化团队 · Token Group</div>
+  <h1 class="slide-title">
+    <span class="en">If You Are in the Majority</span>
+    <span class="zh">作为"多数文化"成员，应该：</span>
+  </h1>
+
+  <div class="grid-2" style="margin-top:.4rem;grid-template-columns:1fr 1fr;align-items:start">
+    <!-- 左边：场景 + 渐进揭晓 -->
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:800;color:var(--c-primary)">🎬 场景</div>
+      <div style="font-size:.82rem;line-height:1.7;margin-top:.4rem;color:var(--c-ink)">
+        你们组 5 个人，4 个都是本地人，只有 1 位从外地/外国来的同事。开会时他总是安静地坐着，很少主动发言。
+      </div>
+
+      <div id="r36Steps" style="margin-top:.6rem">
+        <div class="r36-step" data-step="1" style="display:none">
+          <div style="display:flex;gap:.5rem;align-items:flex-start;padding:.5rem;border-radius:8px;background:#eff6ff;margin-bottom:.4rem">
+            <div style="font-size:1.1rem">🗣️</div>
+            <div style="font-size:.8rem;line-height:1.55"><b>主动邀请发言</b><br>不要假设"他没意见"，而是直接问"你怎么看？"——给他开口的机会。</div>
+          </div>
+        </div>
+        <div class="r36-step" data-step="2" style="display:none">
+          <div style="display:flex;gap:.5rem;align-items:flex-start;padding:.5rem;border-radius:8px;background:#f0fdf4;margin-bottom:.4rem">
+            <div style="font-size:1.1rem">👤</div>
+            <div style="font-size:.8rem;line-height:1.55"><b>把他当"个人"，不是"代表"</b><br>不要说"你们国家的人都……"——他不是整个文化的代言人。</div>
+          </div>
+        </div>
+        <div class="r36-step" data-step="3" style="display:none">
+          <div style="display:flex;gap:.5rem;align-items:flex-start;padding:.5rem;border-radius:8px;background:#fffbeb;margin-bottom:.4rem">
+            <div style="font-size:1.1rem">🤝</div>
+            <div style="font-size:.8rem;line-height:1.55"><b>私下建立个人关系</b><br>一对一聊聊家常，而不是只在大会上公开问——让他觉得被当作朋友，而不是"观察对象"。</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="r36Next" style="margin-top:.5rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">下一步 →</button>
+    </div>
+
+    <!-- 右边：反思（全部揭晓后显示） -->
+    <div id="r36Reflect" style="display:none">
+      <div class="reflect-box">
+        <q>Think · 想一想</q>
+        <span style="font-size:.88rem">如果你是团队里占多数的成员，你会主动做什么，让唯一的"少数派"感觉自在？</span>
+        <textarea placeholder="（课堂讨论，无需填写）"></textarea>
+        <div class="reflect-hint">课堂讨论 · 不计分</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 41: 打造双文化团队 ============ -->
+<section class="slide" data-slide="41" data-page-type="4.4 · 打造 Build">
+  <div class="section-label">4.4 · 打造双文化团队 · Bi-cultural Group</div>
+  <h1 class="slide-title">
+    <span class="en">Two Cultures, One Team</span>
+    <span class="zh">如何打造优秀的双文化团队</span>
+  </h1>
+
+  <!-- 第一步：提示+卡片池 -->
+  <div style="text-align:center;margin-top:.3rem">
+    <div style="font-size:.95rem;color:var(--c-primary);font-weight:700">🎮 拖动卡片，按你认为的重要性排序（从最重要到最不重要）</div>
+  </div>
+
+  <div id="r41Cards" style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem">
+    <div class="drag-card" draggable="true" data-card="A" style="background:linear-gradient(135deg,#667eea,#764ba2)">共同目标<br><small>我们是一队的</small></div>
+    <div class="drag-card" draggable="true" data-card="B" style="background:linear-gradient(135deg,#f093fb,#f5576c)">轮值主持<br><small>轮流当队长</small></div>
+    <div class="drag-card" draggable="true" data-card="C" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">第三文化规则<br><small>定一套新规矩</small></div>
+    <div class="drag-card" draggable="true" data-card="D" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">跨文化培训<br><small>互相了解差异</small></div>
+    <div class="drag-card" draggable="true" data-card="E" style="background:linear-gradient(135deg,#fa709a,#fee140)">角色互补<br><small>你擅长的我缺</small></div>
+  </div>
+
+  <!-- 排序区 -->
+  <div id="r41Drop" style="margin-top:.8rem;min-height:60px;border:2px dashed #cbd5e1;border-radius:12px;padding:.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;justify-content:center">
+    <span style="color:#94a3b8;font-size:.85rem">把卡片拖到这里排序 ↓</span>
+  </div>
+
+  <div style="text-align:center;margin-top:.5rem">
+    <button id="r41Next" style="padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow)">提交我的排序 →</button>
+  </div>
+
+  <!-- 第二步：讨论提示 -->
+  <div id="r41Discuss" style="display:none;margin-top:.6rem">
+    <div class="concept" style="text-align:center">
+      <span style="font-size:.9rem">💬 你的排序是什么？请和旁边同学对比一下，说说为什么。<br><small style="color:#64748b">研究表明："共同目标"和"角色互补"通常被排在前面——但没有唯一正确答案。</small></span>
+    </div>
+  </div>
+
+  <!-- 第三步：关键难点回顾 -->
+  <div id="r41Key" style="display:none;margin-top:.5rem">
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">关键难点回顾</div>
+      <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.7">
+        双文化团队人数相当 → 谁也不服谁 → 容易形成"内群体/外群体"。打造重点：<b>建立共同目标</b>（我们是一队的），<b>承认并利用差异</b>（你擅长的正好是我缺的）。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 38: 打造多文化团队 ============ -->
+<section class="slide" data-slide="42" data-page-type="4.4 · 打造 Build">
+  <div class="section-label">4.4 · 打造多文化团队 · Multicultural Group</div>
+  <h1 class="slide-title">
+    <span class="en">Many Cultures, One Direction</span>
+    <span class="zh">如何打造优秀的多文化团队</span>
+  </h1>
+
+  <!-- 第一步：卡片池（点击看解释） -->
+  <div style="text-align:center;margin-top:.3rem">
+    <div style="font-size:.95rem;color:var(--c-primary);font-weight:700">🎮 先点击卡片了解每条策略，再拖动按重要性排序</div>
+  </div>
+
+  <div id="r42Cards" style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem">
+    <div class="drag-card" draggable="true" data-card="A" data-desc="画一张团队文化地图：每个人写下自己的文化背景、沟通偏好、禁忌点，大家互相了解。" style="background:linear-gradient(135deg,#667eea,#764ba2)">文化地图<br><small>点击看解释</small></div>
+    <div class="drag-card" draggable="true" data-card="B" data-desc="定一套所有文化都接受的新规则：比如会议用英语、邮件书面确认、决策投票制。" style="background:linear-gradient(135deg,#f093fb,#f5576c)">共同规则<br><small>点击看解释</small></div>
+    <div class="drag-card" draggable="true" data-card="C" data-desc="约定沟通协议：比如有不同意见直接说、不当面拒绝第三方、重要决定书面化。" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">沟通协议<br><small>点击看解释</small></div>
+    <div class="drag-card" draggable="true" data-card="D" data-desc="提前约定冲突怎么处理：比如先冷静24小时、找第三方调解、不上升到人身攻击。" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">冲突预防机制<br><small>点击看解释</small></div>
+  </div>
+
+  <!-- 解释显示区 -->
+  <div id="r42Desc" style="margin-top:.5rem;padding:.6rem;background:#f8fafc;border-radius:10px;display:none;font-size:.88rem;color:var(--c-sub);line-height:1.6">
+  </div>
+
+  <!-- 排序区 -->
+  <div id="r42Drop" style="margin-top:.6rem;min-height:60px;border:2px dashed #cbd5e1;border-radius:12px;padding:.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;justify-content:center">
+    <span style="color:#94a3b8;font-size:.85rem">把卡片拖到这里排序 ↓</span>
+  </div>
+
+  <div style="text-align:center;margin-top:.5rem">
+    <button id="r42Next" style="padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow)">提交我的排序 →</button>
+  </div>
+
+  <!-- 第二步：讨论提示 -->
+  <div id="r42Discuss" style="display:none;margin-top:.6rem">
+    <div class="concept" style="text-align:center">
+      <span style="font-size:.9rem">💬 你的排序是什么？请和旁边同学对比一下，说说为什么。<br><small style="color:#64748b">多样性是创意之源，也是冲突之源——关键是让多种视角产生创意，而不是变成多场争吵。</small></span>
+    </div>
+  </div>
+
+  <!-- 第三步：关键难点回顾 -->
+  <div id="r42Key" style="display:none;margin-top:.5rem">
+    <div class="card" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">关键难点回顾</div>
+      <div style="font-size:.85rem;color:var(--c-sub);margin-top:.3rem;line-height:1.7">
+        多文化团队：<b>优点</b>——背景、经验、经历多元带来创造性；<b>缺点</b>——跨文化冲突成本高。打造重点：让"多种视角"产生创意，同时建立规则防止"多种声音"变成"多场争吵"。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 43: Q公司案例 ============ -->
+<section class="slide" data-slide="43" data-page-type="案例 · Case Study">
+  <div class="section-label">小组案例分析 · Group Case Study</div>
+  <h1 class="slide-title">
+    <span class="en">Q Company: Conflict and Integration</span>
+    <span class="zh">Q 公司的跨文化冲突与融合</span>
+  </h1>
+
+  <div style="display:flex;gap:.8rem;margin-top:.3rem;height:calc(100vh - 220px)">
+    <!-- 左边：案例文本框 2/3 -->
+    <div style="flex:2;display:flex;flex-direction:column">
+      <!-- 阶段按钮 -->
+      <div style="display:flex;gap:.4rem;margin-bottom:.4rem">
+        <button class="r43-stage-btn" data-stage="1" style="flex:1;padding:.5rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);box-shadow:0 4px 12px rgba(102,126,234,.4)">📖 阶段一：成立与涨工资风波</button>
+        <button class="r43-stage-btn" data-stage="2" style="flex:1;padding:.5rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#f093fb,#f5576c);box-shadow:0 4px 12px rgba(245,87,108,.4)">⚡ 阶段二：经营会与销售危机</button>
+        <button class="r43-stage-btn" data-stage="3" style="flex:1;padding:.5rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#43e97b,#38f9d7);box-shadow:0 4px 12px rgba(67,233,123,.4)">🌟 阶段三：融合与大家庭</button>
+        <button id="r43NightBtn" title="切换夜读模式" style="padding:.5rem .8rem;border-radius:12px;border:2px solid var(--c-line);background:#fff;cursor:pointer;font-size:.9rem">🌙</button>
+      </div>
+      <!-- 文本框 -->
+      <div id="r43Text" style="flex:1;border:2px solid var(--c-line);border-radius:12px;padding:.7rem;overflow-y:auto;background:#fafbfc;line-height:1.6;font-size:.88rem;color:var(--c-text)">
+        <div id="r43Text1">
+          <b>1. 公司成立背景</b><br>
+          日本Q公司始建于1975年，主营塑料模具部品，在日本国内有三个工场、14个营业所，员工810人。<br>
+          1990年，日本Q公司希望在中国建立生产基地提供廉价半成品，于是在大连开发区成立独资子公司——中国Q公司。日方没打算战略投入，最初派来的都是现场技术人员，任务是教中国员工加工方法，这为后来管理者本土化埋下伏笔。<br>
+          经过8次增资，到2006年投资总额4000万美元，员工从37人发展到2300多人，年销售额从180万增长到5亿元。<br><br>
+          <b>2. 涨工资风波</b><br>
+          成立之初完全是日方"一言堂"，课长以上全是日方现场技术人员，缺乏管理能力但全面掌控业务。由于文化差异、语言障碍，日方态度粗暴，冬天上班早的中方员工只能在寒风中等日方开门。<br>
+          日本Q公司文化是"服从"，员工有素养和忍耐力。但中国员工不同——成立三个月后第一次调薪，日方没征求中方意见，给部分人加薪但没给真正有能力的人，导致有人辞职。中方总务担当（现任总经理）向日方总经理质疑，日方回答"这是日方高层集体决定的"。<br>
+          这件事震撼了日方管理者，开始反思，中国员工逐渐有机会担任主任、课长——这是中方首次参与管理的关键事件。
+        </div>
+        <div id="r43Text2" style="display:none">
+          <b>3. 经营会的故事</b><br>
+          1995年建立经营会集体决策，结束一言堂。中方占多数，决策时"不是职位高的人对，而是谁对听谁的"，下级可以对上司说NO。第二任日方总经理想花70万买高尔夫会员卡，提交经营会说"有一票反对我就放弃"。<br><br>
+          <b>4. 销售公司事件</b><br>
+          1999年，日方派来的销售主管L先生主张以个人名义注册销售公司（当时法律禁止外资进入流通），中方高管反对（法律风险、回到加工车间定位），但日方出于对本国人的信任采纳了。L先生持股90%，2002年败露，反咬一口说销售公司是他个人的，还起诉Q公司。<br>
+          危难之际，中方总经理临危不乱：一方面打官司追讨货款，另一方面派没有销售经验但忠诚的员工到上海深圳重建直销网络。3个月恢复业绩，当年销售额翻番，之后年增长40%以上。<br>
+          这件事彻底转变了日方对中国人的看法："中国人并不是不可信任！"<br><br>
+          <b>5. 年度会议上的冲突</b><br>
+          此后中方全面主导管理，日方只做技术支持。2005年新日方总经理到任，恰逢质量危机，几名日方管理人员在年度会议上公开指责中方。中方总经理严肃反驳：Q公司是"Q人"的公司，不是日方也不是中方；最大威胁在内部不在外部；大家要多说"我们"，少说"你们/我们"。新总经理立即支持，冲突化解。
+        </div>
+        <div id="r43Text3" style="display:none">
+          <b>6. 团结、激情、快乐的大家庭</b><br>
+          中国Q公司秉承日本母公司"于社会要奉献，于顾客要感谢，于工作有创意，于同僚要融洽，于自己有责任"的社训，在此基础上发展了自己的企业理念。日本的TQM、QC、PDCA、5S、朝礼、忘年会都保留下来，但变成了"Q公司语言"的一部分。<br>
+          中日通过业务指导、技术研修互相交流：日本员工拄拐站在机床旁工作的敬业精神感染了中国员工；中国也派研修生到日本学习。<br>
+          1998年亚洲金融危机，Q公司不裁员，反而脱产培训员工，员工自发休日义务献工患难与共。<br>
+          福利待遇高于同行20%，有图书室、健身房、卡拉OK、全员运动会。建立了"能力主义"人才机制，日本母公司董事长甚至说"希望中国Q公司未来能向日本输送人才"。
+        </div>
+      </div>
+      <!-- 已阅读按钮 -->
+      <button id="r43ReadBtn" style="margin-top:.4rem;padding:.45rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow)">我已阅读完此段，我想做题了 📝</button>
+    </div>
+    <!-- 右边：题目框 1/3 -->
+    <div style="flex:1;border:2px solid var(--c-line);border-radius:12px;padding:.7rem;background:#fff;overflow-y:auto">
+      <div id="r43Quiz1" style="display:none">
+        <div style="font-size:.9rem;font-weight:700;color:var(--c-primary);margin-bottom:.5rem">📝 阶段一题目</div>
+        <div class="choice-q">
+          <div class="q" style="font-size:.85rem">Q公司成立之初，日方采取哪种整合模式？</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A" style="font-size:.82rem">同化：中方完全变成日方</div>
+            <div class="choice-opt" data-pick="B" style="font-size:.82rem">隔离：各干各的</div>
+            <div class="choice-opt" data-pick="C" style="font-size:.82rem">引进：日方保持自己，教中方技术</div>
+          </div>
+          <div class="choice-fb"></div>
+        </div>
+        <div class="choice-q" style="margin-top:.6rem">
+          <div class="q" style="font-size:.85rem">这种管理模式在日本成功，为什么在中国碰壁？</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A" style="font-size:.82rem">中国员工素质差，不服从管理</div>
+            <div class="choice-opt" data-pick="B" style="font-size:.82rem">日本"服从文化"在中国行不通，中国员工敢于质疑</div>
+            <div class="choice-opt" data-pick="C" style="font-size:.82rem">中日语言不通，无法沟通</div>
+          </div>
+          <div class="choice-fb"></div>
+        </div>
+      </div>
+      <div id="r43Quiz2" style="display:none">
+        <div style="font-size:.9rem;font-weight:700;color:var(--c-primary);margin-bottom:.5rem">📝 阶段二题目</div>
+        <div class="choice-q">
+          <div class="q" style="font-size:.85rem">哪些事件促使Q公司管理变革？（多选）</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A" style="font-size:.82rem">涨工资风波</div>
+            <div class="choice-opt" data-pick="B" style="font-size:.82rem">销售公司事件</div>
+            <div class="choice-opt" data-pick="C" style="font-size:.82rem">年度会议冲突</div>
+            <div class="choice-opt" data-pick="D" style="font-size:.82rem">亚洲金融危机</div>
+          </div>
+          <div class="choice-fb"></div>
+        </div>
+        <div class="choice-q" style="margin-top:.6rem">
+          <div class="q" style="font-size:.85rem">变革后，Q公司团队类型变成？</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A" style="font-size:.82rem">象征性团队（中方是少数）</div>
+            <div class="choice-opt" data-pick="B" style="font-size:.82rem">双文化团队（中日各占一半）</div>
+            <div class="choice-opt" data-pick="C" style="font-size:.82rem">以中方为主、日方辅助的融合型</div>
+          </div>
+          <div class="choice-fb"></div>
+        </div>
+      </div>
+      <div id="r43Quiz3" style="display:none">
+        <div style="font-size:.9rem;font-weight:700;color:var(--c-primary);margin-bottom:.5rem">📝 阶段三题目</div>
+        <div class="choice-q">
+          <div class="q" style="font-size:.85rem">Q公司最终形成了哪种模式？</div>
+          <div class="choice-opts">
+            <div class="choice-opt" data-pick="A" style="font-size:.82rem">日本模式照搬</div>
+            <div class="choice-opt" data-pick="B" style="font-size:.82rem">中国模式取代</div>
+            <div class="choice-opt" data-pick="C" style="font-size:.82rem">融合：保留日本精华+中国特色，形成新Q文化</div>
+          </div>
+          <div class="choice-fb"></div>
+        </div>
+      </div>
+      <div id="r43Hint" style="color:#94a3b8;font-size:.85rem;text-align:center;margin-top:2rem">读完一段后点"我已阅读完此段"<br>右侧将显示对应题目</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Slide 40: 本章小结 ============ -->
+<section class="slide" data-slide="44" data-page-type="章节小结 · Summary">
+  <div class="section-label">本章小结 · Chapter Summary</div>
+  <h1 class="slide-title">
+    <span class="en">What We Learned</span>
+    <span class="zh">本章回顾</span>
+  </h1>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem">
+    <div class="card primary" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">4.1 团队 RSCC 模型</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">角色 Role · 分享 Share · 共识 Consensus · 协作 Cooperation</div>
+    </div>
+    <div class="card primary" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">4.2 跨文化团队类型</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">象征性 Token · 双文化 Bi-cultural · 多文化 Multicultural</div>
+    </div>
+    <div class="card primary" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">4.3 跨文化整合模式</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">融合 · 同化 · 隔离 · 引进（贝雷 1980）</div>
+    </div>
+    <div class="card primary" style="padding:.7rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--c-primary)">4.4 打造策略</div>
+      <div style="font-size:.8rem;color:var(--c-sub);margin-top:.3rem">三类团队各有打造重点：防边缘化 · 破内外群体 · 化差异为创造</div>
+    </div>
+  </div>
+
+  <div class="reflect-box" style="margin-top:.6rem">
+    <q>Final Reflection · 总体反思</q>
+    <span style="font-size:.88rem">1. 用 RSCC 模型分析你所在的一个小组/团队，哪个环节最弱？<br>2. 如果让你为一个"象征性成员"设计一条"生存锦囊"，你会放哪三条？<br>3. 融合是四种整合模式中最好的吗？为什么很多公司仍选同化或隔离？</span>
+    <textarea placeholder="（写下你的思考，课堂上分享）"></textarea>
+    <div class="reflect-hint">反思题 · 不计分 · 课堂分享</div>
+  </div>
+</section>
+
+<!-- ===== 可拖拽缩放弹窗 ===== -->
+<div class="dlg-overlay" id="dlgOverlay">
+  <div class="dlg-win" id="dlgWin" style="width:860px;height:600px;left:50%;top:50%;transform:translate(-50%,-50%)">
+    <div class="dlg-titlebar" id="dlgTitlebar">
+      <span class="dlg-title" id="dlgTitle">贝尔宾中国官网 · Belbin China</span>
+      <button id="dlgFull" title="全屏">⛶</button>
+      <button id="dlgClose" title="关闭">✕</button>
+    </div>
+    <div class="dlg-body">
+      <iframe id="dlgFrame" src="about:blank" style="display:none"></iframe>
+      <div id="dlgFallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:2rem;text-align:center">
+        <div style="font-size:3rem;margin-bottom:1rem">🌐</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--c-ink);margin-bottom:.5rem">贝尔宾中国官网</div>
+        <div style="font-size:.82rem;color:var(--c-sub);line-height:1.6;max-width:360px;margin-bottom:1.2rem">
+          由于网站安全设置（X-Frame-Options），官网无法在弹窗内直接浏览。<br>请点击下方按钮在新标签页打开。
+        </div>
+        <a href="https://www.belbin.cn" target="_blank" rel="noopener" style="display:inline-block;padding:.55rem 1.4rem;border-radius:24px;background:var(--c-primary);color:#fff;text-decoration:none;font-size:.88rem;box-shadow:var(--c-shadow)">
+          在新标签页打开 belbin.cn →
+        </a>
+      </div>
+    </div>
+    <div class="dlg-resize"></div>
+  </div>
+</div>
+
+<script>
+  // ===== 第3页 · 张雪机车会议诊断 =====
+  const c3Scenes = [
+    {
+      badge: 'b1', tag: '卡点 ①', key: 'R',
+      desc: '会议开始，方案主线就吵起来了——',
+      dlg: [
+        { who: '产品经理 · 中国总部', cls: 'a', text: '这台 ADV 就该主打硬核越野，达喀尔基因，全球统一调性！' },
+        { who: '本地营销 · 泰国', cls: 'b', text: '可泰国人买 ADV，多数是通勤加周末进山。硬核越野，谁买单？' }
+      ],
+      q: '方案主线吵了两小时没定。你觉得卡在哪？',
+      opts: [
+        { t: '产品经理不了解泰国市场', ok: false, fb: '再想想：不了解市场确实有问题，但"没人拍板"才是这场争吵停不下来的原因。' },
+        { t: '没人负责拍板决策', ok: true, fb: '诊断正确！问题出在【角色】：该谁拍板、按什么标准拍板，从一开始就没说清。→ 点亮"角色"' },
+        { t: '会议时间太短了', ok: false, fb: '再想想：时间长短不是主因——吵得再久，没有决策者照样定不下来。' }
+      ]
+    },
+    {
+      badge: 'b2', tag: '卡点 ②', key: 'S',
+      desc: '方案要数据支撑时，场面一度安静——',
+      dlg: [
+        { who: '品牌总监 · 中国总部', cls: 'a', text: '去年雨季促销的转化数据呢？拿来对比一下。' },
+        { who: '本地团队 · 泰国', cls: 'b', text: '在渠道那边……没同步过来。对了，总部的预算表我们也还没收到。' }
+      ],
+      q: '关键信息卡在各自手里。问题出在？',
+      opts: [
+        { t: '数据系统太落后', ok: false, fb: '再想想：系统只是工具——没有"主动共享"的机制和习惯，再好的系统也是空转。' },
+        { t: '信息没有共享机制', ok: true, fb: '诊断正确！问题出在【分享】：知识、信息、数据没有流动起来，团队各自为战。→ 点亮"分享"' },
+        { t: '本地团队不够积极', ok: false, fb: '再想想：不是谁"不积极"，而是没人把信息同步当成必须做的事。' }
+      ]
+    },
+    {
+      badge: 'b3', tag: '卡点 ③', key: 'C1',
+      desc: '两边都对"什么叫做好方案"有不同理解——',
+      dlg: [
+        { who: '总部营销 · 中国', cls: 'a', text: '必须保持全球统一的品牌调性，一个字都不能改。' },
+        { who: '本地营销 · 泰国', cls: 'b', text: '泼水节骑行季就是泰国最大的爆点，不本地化根本打不动。' }
+      ],
+      q: '两边都觉得自己没错。缺的是什么？',
+      opts: [
+        { t: '领导再强势一点', ok: false, fb: '再想想：强压只能一时，大家心里不认同，方案执行照样打折。' },
+        { t: '对"成功"的共同定义', ok: true, fb: '诊断正确！问题出在【共识】：目标、价值观、评价标准没有对齐，团队劲使不到一处。→ 点亮"共识"' },
+        { t: '再多开几次会', ok: false, fb: '再想想：开会解决不了"标准不同"——需要的是先谈拢目标，而不是增加会议。' }
+      ]
+    },
+    {
+      badge: 'b4', tag: '卡点 ④', key: 'C2',
+      desc: '会议快结束时，所有人都开始等别人——',
+      dlg: [
+        { who: '总部设计', cls: 'a', text: '预算还没批，主视觉我出不了。' },
+        { who: 'KOL 对接 · 泰国', cls: 'b', text: '素材没出来，KOL 档期约不上。' },
+        { who: '物流法务 · 泰国', cls: 'b', text: '物料清关要时间……都在等前面的人。' }
+      ],
+      q: '每个人都在等别人。核心问题是？',
+      opts: [
+        { t: '大家工作态度不积极', ok: false, fb: '再想想：都在等，不是懒——是流程上没人把"衔接"当成分内事。' },
+        { t: '协作流程与职责衔接失灵', ok: true, fb: '诊断正确！问题出在【协作】：节点之间互相依赖却没有串联机制，团队卡在等待中。→ 点亮"协作"' },
+        { t: '泰国那边节奏太慢', ok: false, fb: '再想想：不是哪边慢，而是跨角色协作的接口断了，谁都推进不了。' }
+      ]
+    }
+  ];
+  let c3Cur = 0;
+  let c3Lit = { R: false, S: false, C1: false, C2: false };
+  const c3CellMap = { R: 'rsccR', S: 'rsccS', C1: 'rsccC1', C2: 'rsccC2' };
+
+  function c3Render() {
+    const sc = c3Scenes[c3Cur];
+    document.getElementById('c3Badge').className = 'c3-badge ' + sc.badge;
+    document.getElementById('c3Badge').textContent = sc.tag;
+    document.getElementById('c3Prog').textContent = '进度 ' + (c3Cur + 1) + ' / 4';
+    document.getElementById('c3Desc').textContent = sc.desc;
+    document.getElementById('c3Q').textContent = sc.q;
+
+    // 对话气泡
+    const dlg = document.getElementById('c3Dlg');
+    dlg.innerHTML = '';
+    sc.dlg.forEach(b => {
+      const row = document.createElement('div');
+      row.className = 'bubble-row';
+      const av = document.createElement('div');
+      av.className = 'avatar ' + b.cls;
+      av.textContent = b.cls === 'a' ? '中' : '泰';
+      const bub = document.createElement('div');
+      bub.className = 'bubble';
+      bub.innerHTML = '<div class="who">' + b.who + '</div>' + b.text;
+      row.appendChild(av); row.appendChild(bub);
+      dlg.appendChild(row);
+    });
+
+    // 选项
+    const optsBox = document.getElementById('c3Opts');
+    optsBox.innerHTML = '';
+    sc.opts.forEach((o, i) => {
+      const d = document.createElement('div');
+      d.className = 'c3-opt';
+      d.textContent = (['A', 'B', 'C'][i]) + '. ' + o.t;
+      d.dataset.idx = i;
+      d.addEventListener('click', () => c3Pick(d, o));
+      optsBox.appendChild(d);
+    });
+
+    const fb = document.getElementById('c3Fb');
+    fb.className = 'c3-fb';
+    fb.innerHTML = '';
+    document.getElementById('c3Next').style.display = 'none';
+    const tip = document.getElementById('rsccTip');
+    if (!tip.dataset.done) tip.textContent = '点击左侧选项，诊断每次"卡壳"出在哪 → 点亮对应的团队钥匙';
+  }
+
+  function c3Pick(el, o) {
+    if (el.classList.contains('c3-ok') || el.classList.contains('c3-no')) return; // 已作答
+    const fb = document.getElementById('c3Fb');
+    const opts = el.parentElement.querySelectorAll('.c3-opt');
+    if (o.ok) {
+      opts.forEach(x => x.style.pointerEvents = 'none');
+      el.classList.add('c3-ok');
+      fb.className = 'c3-fb show good';
+      fb.innerHTML = o.fb;
+      // 点亮格子
+      const key = c3Scenes[c3Cur].key;
+      c3Lit[key] = true;
+      document.getElementById(c3CellMap[key]).classList.add('lit');
+      document.getElementById('c3Next').style.display = 'flex';
+      // 更新提示
+      const tip = document.getElementById('rsccTip');
+      const litNames = { R: '角色', S: '分享', C1: '共识', C2: '协作' };
+      const litList = ['R', 'S', 'C1', 'C2'].filter(k => c3Lit[k]).map(k => litNames[k]);
+      tip.textContent = '已点亮：' + litList.join(' · ') + '（' + Object.values(c3Lit).filter(Boolean).length + '/4）';
+      tip.dataset.done = '1';
+      // 全部点亮 → 总结
+      if (Object.values(c3Lit).every(v => v)) {
+        document.getElementById('rsccSummary').classList.add('show');
+        tip.textContent = '恭喜！你已经亲手发现了好团队的四把钥匙。';
+      }
+    } else {
+      el.classList.add('c3-no');
+      fb.className = 'c3-fb show try';
+      fb.innerHTML = o.fb;
+      setTimeout(() => { el.classList.remove('c3-no'); fb.className = 'c3-fb'; }, 1400);
+    }
+  }
+
+  document.getElementById('c3Go').addEventListener('click', () => {
+    if (c3Cur < 3) { c3Cur++; c3Render(); }
+  });
+  document.getElementById('c3Reset').addEventListener('click', () => {
+    c3Cur = 0;
+    Object.keys(c3Lit).forEach(k => c3Lit[k] = false);
+    ['rsccR', 'rsccS', 'rsccC1', 'rsccC2'].forEach(id => document.getElementById(id).classList.remove('lit'));
+    document.getElementById('rsccSummary').classList.remove('show');
+    const tip = document.getElementById('rsccTip');
+    tip.textContent = '点击左侧选项，诊断每次"卡壳"出在哪 → 点亮对应的团队钥匙';
+    delete tip.dataset.done;
+    c3Render();
+  });
+  document.getElementById('rsccGoNext').addEventListener('click', () => show(3)); // 跳第4页
+
+  // 随机打乱四宫格格子位置，防止学生按"题目顺序=格子顺序"蒙答案
+  (function shuffleRsccCells() {
+    const grid = document.querySelector('.rscc-grid');
+    const cells = Array.from(grid.children);
+    for (let i = cells.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cells[i], cells[j]] = [cells[j], cells[i]];
+    }
+    cells.forEach(c => grid.appendChild(c));
+  })();
+
+  c3Render();
+
+  // ===== 第7页 · Think 回顾互动 =====
+  document.getElementById('r7Start').addEventListener('click', () => {
+    document.getElementById('r7Intro').style.display = 'none';
+    const s = document.getElementById('r7Survey');
+    s.style.display = 'block';
+    s.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+  function r7Check() {
+    const anyCb = document.querySelectorAll('.r7-cb:checked').length > 0;
+    const anyRadio = document.querySelector('input[name="r7me"]:checked') !== null;
+    const fb = document.getElementById('r7Fb');
+    const reveal = document.getElementById('r7Reveal');
+    if (anyCb && anyRadio) {
+      fb.classList.add('show');
+      fb.innerHTML = '✅ 很好——你选的这些角色，正是一个成功团队的标配。没有谁能一个人把"想明白、把事做完、把人聚起来"全扛了。';
+      // 揭晓右边三个类别
+      reveal.style.display = 'block';
+      reveal.style.animation = 'rscc-pop .5s ease';
+    }
+  }
+  document.querySelectorAll('.r7-cb, input[name="r7me"]').forEach(el => {
+    el.addEventListener('change', r7Check);
+  });
+
+  // ===== 页面导航 =====
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  const TOTAL = slides.length;
+
+  // 导航标签：根据slide索引范围显示当前模块
+  const navLabels = [];
+  const labelMap = [
+    [0, '第四章 · 封面'],
+    [1, '第四章 · 学习路径'],
+    [2, '第四章 · 情境导入'],
+    [3, '4.1 · RSCC 模型'],
+    [4, '4.1 · R 角色'],
+    [5, '4.1 · R 角色'],
+    [6, '4.1 · R 角色'],
+    [7, '4.1 · R 角色'],
+    [8, '4.1 · R 角色 · Belbin'],
+    [9, '4.1 · S 分享'],
+    [10, '4.1 · S 分享'],
+    [11, '4.1 · C 共识'],
+    [12, '4.1 · C 共识'],
+    [13, '4.1 · C 协作'],
+    [14, '4.1 · C 协作'],
+    [15, '4.1 · C 协作'],
+    [16, '4.1 · 小结'],
+    [17, '4.2 · 团队类型'],
+    [18, '4.2 · 象征性文化团队'],
+    [19, '4.2 · 双文化团队'],
+    [20, '4.2 · 多文化团队'],
+    [21, '4.2 · 类型与绩效'],
+    [22, '4.2 · 微软案例'],
+    [23, '4.2 · 劣势'],
+    [24, '4.3 · 整合模式'],
+    [25, '4.3 · 贝雷模型'],
+    [26, '4.3 · 四种模式'],
+    [27, '4.3 · 雷诺-日产'],
+    [28, '4.3 · 联想-IBM'],
+    [29, '4.3 · 沃尔玛-阿斯达'],
+    [30, '4.3 · 苹果-NeXT'],
+    [31, '4.3 · 吉利-沃尔沃'],
+    [32, '4.3 · 福耀玻璃'],
+    [33, '4.4 · 打造跨文化团队'],
+    [34, '4.4 · 象征性团队'],
+    [35, '4.4 · 象征性团队'],
+    [36, '4.4 · 双文化团队'],
+    [37, '4.4 · 多文化团队'],
+    [38, 'Q公司案例'],
+    [39, '第四章 · 小结']
+  ];
+  for (let i = 0; i < TOTAL; i++) {
+    let label = '第四章';
+    for (const [idx, lab] of labelMap) {
+      if (i >= idx) label = lab;
+    }
+    navLabels.push([i, label]);
+  }
+
+  const pageNumEl = document.getElementById('pageNum');
+  const navLabelEl = document.getElementById('navLabel');
+  const pageJumpSel = document.getElementById('pageJump');
+
+  // 填充跳转下拉框
+  slides.forEach((s, i) => {
+    const zh = s.querySelector('.slide-title .zh');
+    const en = s.querySelector('.slide-title .en');
+    const zhText = zh ? zh.textContent.trim() : '';
+    const enText = en ? en.textContent.trim() : '';
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${i + 1}. ${zhText || enText || '页面'}`;
+    pageJumpSel.appendChild(opt);
+  });
+
+  function show(i) {
+    if (i < 0 || i >= TOTAL) return;
+    slides[cur].classList.remove('active');
+    cur = i;
+    slides[cur].classList.add('active');
+    pageNumEl.textContent = `${cur + 1} / ${TOTAL}`;
+    const nav = navLabels[cur] ? navLabels[cur][1] : '第四章';
+    navLabelEl.textContent = nav;
+    pageJumpSel.value = String(cur);
+    // 课堂模式：重新按顺序展示动画元素
+    if (document.body.classList.contains('lecture')) {
+      const anims = slides[cur].querySelectorAll('.anim');
+      anims.forEach(a => a.classList.remove('revealed'));
+      revealInOrder();
+    }
+    window.scrollTo(0, 0);
+  }
+
+  let animTimer = null;
+  function revealInOrder() {
+    clearTimeout(animTimer);
+    const anims = [...slides[cur].querySelectorAll('.anim')].sort((a, b) => (+a.dataset.order || 0) - (+b.dataset.order || 0));
+    if (!anims.length) return;
+    let next = 0;
+    function step() {
+      if (next < anims.length) {
+        anims[next].classList.add('revealed');
+        next++;
+        animTimer = setTimeout(step, 350);
+      }
+    }
+    step();
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', () => show(cur - 1));
+  document.getElementById('btnNext').addEventListener('click', () => show(cur + 1));
+  pageJumpSel.addEventListener('change', () => { if (pageJumpSel.value !== '-1') show(+pageJumpSel.value); });
+
+  // 键盘翻页
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') show(cur + 1);
+    if (e.key === 'ArrowLeft') show(cur - 1);
+  });
+
+  // ===== 课堂/自主模式 =====
+  const btnClass = document.getElementById('btnClass');
+  const btnSelf = document.getElementById('btnSelf');
+  function setMode(lecture) {
+    document.body.classList.toggle('lecture', lecture);
+    btnClass.classList.toggle('active', lecture);
+    btnSelf.classList.toggle('active', !lecture);
+    if (lecture) {
+      const anims = slides[cur].querySelectorAll('.anim');
+      anims.forEach(a => a.classList.remove('revealed'));
+      revealInOrder();
+    } else {
+      clearTimeout(animTimer);
+      document.querySelectorAll('.anim').forEach(a => a.classList.add('revealed'));
+    }
+  }
+  btnClass.addEventListener('click', () => setMode(true));
+  btnSelf.addEventListener('click', () => setMode(false));
+
+  // ===== 选择反馈（选择题：点击选项→判对错→显示反馈）=====
+  const choiceFbAnswers = {
+    s10fb: { right: 'C', good: '对！情感分享最容易被忽略——情绪和压力不说出来，团队表面和谐，实则疏远。', try: '再想想：知识技能和信息都有明确的"载体"，只有情绪没有。' },
+    s14fb: { right: 'B', good: '对！立场、利益不同，缺共同目标，两个部门都"没错"却冲突。', try: '再想想：问题不在个人素质，而在结构与立场。' },
+    s20fb: { right: 'B', good: '对！双文化团队人数相当、谁也不服谁，最容易形成内外群体冲突。', try: '再想想：象征性团队是"少数被边缘化"，多文化团队是"多元但分散"，双文化是"两强相争"。' },
+    s28fb: { right: 'B', good: '对！剔除糟粕、整合精华、培育"联盟文化"——典型的融合。', try: '再想想：双方都没有放弃自己的文化，而是合成了新文化。' },
+    s29fb: { right: 'C', good: '对！联想保持 IBM 品牌文化独立运作（保持自我），同时吸收其合理部分——引进。', try: '再想想：初期两套体系都在运作，不是谁取代谁。' },
+    s30fb: { right: 'A', good: '对！阿斯达完全放弃原有文化，全面采用沃尔玛体系——同化。', try: '再想想：阿斯达没有保留自己的文化，是"完全变成沃尔玛"。' },
+    s31fb: { right: 'C', good: '对！苹果保持自身文化，选择性引进 NeXT 的技术与理念——引进。', try: '再想想：苹果还是苹果，只是吸收了 NeXT 的精华。' },
+    s32fb: { right: 'B', good: '对！"放虎归山"= 沃尔沃独立运营、互不干涉——隔离（后期向融合演进）。', try: '再想想：初期吉利没有让沃尔沃"变成吉利"，而是放手独立。' },
+    s33fb: { right: 'C', good: '对！福耀保持中式效率管理，同时被迫适应美国法律与工作文化——引进/融合的磨合过程。', try: '再想想：不是单方接受，而是双方都在调整。' }
+  };
+
+  document.querySelectorAll('.choice-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = opt.closest('.choice-q');
+      const fb = q.querySelector('.choice-fb');
+      const qId = fb ? fb.id : '';
+      q.querySelectorAll('.choice-opt').forEach(o => o.classList.remove('chosen', 'right', 'wrong'));
+      opt.classList.add('chosen');
+      const ans = choiceFbAnswers[qId];
+      if (ans) {
+        if (opt.dataset.pick === ans.right) {
+          opt.classList.add('right');
+          fb.className = 'choice-fb show good';
+          fb.innerHTML = ans.good;
+        } else {
+          opt.classList.add('wrong');
+          fb.className = 'choice-fb show try';
+          fb.innerHTML = ans.try;
+        }
+      } else {
+        fb.className = 'choice-fb show info';
+        fb.innerHTML = '已记录你的选择（课堂讨论题，无标准答案）。';
+      }
+    });
+  });
+
+  // ===== 翻牌卡片 =====
+  document.querySelectorAll('[data-flip]').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('open'));
+  });
+
+  // ===== 贝雷模型矩阵 =====
+  document.querySelectorAll('.m-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const wasOpen = cell.classList.contains('open');
+      // 同一页内互斥展开
+      cell.closest('.matrix2x2').querySelectorAll('.m-cell').forEach(c => c.classList.remove('open'));
+      if (!wasOpen) cell.classList.add('open');
+    });
+  });
+
+  // ===== 第9页 · 九角色游戏 =====
+  (function(){
+    // Tab 切换
+    document.querySelectorAll('.r9-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.r9-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('r9GameB').style.display = tab.dataset.tab === 'b' ? 'block' : 'none';
+        document.getElementById('r9GameA').style.display = tab.dataset.tab === 'a' ? 'block' : 'none';
+      });
+    });
+
+    // 游戏B：行为猜角色
+    const r9BQuestions = [
+      { q: '团队项目要赶进度了，他总是第一个把任务拆成几步，催大家按时交活。这是？', opts: ['执行者 IMP', '智多星 PL', '凝聚者 TW'], ans: 0, explain: '执行者 IMP —— 把想法变成实际步骤并推进落地。' },
+      { q: '大家 brainstorm 卡住了，他总能提出别人没想到的全新思路。这是？', opts: ['完成者 CF', '智多星 PL', '外交家 RI'], ans: 1, explain: '智多星 PL —— 原创性强，擅长打破常规想出新方案。' },
+      { q: '他记得每个人的生日和喜好，有人闹矛盾他主动去调解，团队气氛总是很融洽。这是？', opts: ['凝聚者 TW', '审议员 ME', '鞭策者 SH'], ans: 0, explain: '凝聚者 TW —— 维护团队和谐，促进协作与归属感。' },
+      { q: '他特别擅长对外联络，总能找到新的资源、合作方和信息渠道。这是？', opts: ['专业师 SP', '协调者 CO', '外交家 RI'], ans: 2, explain: '外交家 RI —— 外向好奇，善于探索外部资源和人脉。' },
+      { q: '快交付了，他总不放心，反复检查每个细节和数据，确保不出错。这是？', opts: ['完成者 CF', '执行者 IMP', '凝聚者 TW'], ans: 0, explain: '完成者 CF —— 一丝不苟，确保最终成果没有疏漏。' }
+    ];
+    let r9BCur = 0, r9BScore = 0;
+    function r9BRender() {
+      const q = r9BQuestions[r9BCur];
+      document.getElementById('r9BProg').textContent = `第 ${r9BCur + 1} / ${r9BQuestions.length} 题`;
+      document.getElementById('r9BQ').textContent = q.q;
+      const optsBox = document.getElementById('r9BOpts');
+      optsBox.innerHTML = '';
+      q.opts.forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'r9-opt';
+        btn.textContent = String.fromCharCode(65 + i) + '. ' + o;
+        btn.addEventListener('click', () => {
+          if (i === q.ans) {
+            btn.classList.add('ok');
+            optsBox.querySelectorAll('.r9-opt').forEach(b => b.style.pointerEvents = 'none');
+            const fb = document.getElementById('r9BFb');
+            fb.style.display = 'block';
+            fb.style.background = 'linear-gradient(135deg,#d1fae5,#ecfdf5)';
+            fb.style.color = '#065f46';
+            fb.innerHTML = '✅ ' + q.explain;
+            r9BScore++;
+            setTimeout(() => {
+              r9BCur++;
+              if (r9BCur < r9BQuestions.length) {
+                r9BRender();
+                fb.style.display = 'none';
+              } else {
+                document.getElementById('r9BQ').innerHTML = `🎉 完成！你答对了 ${r9BScore} / ${r9BQuestions.length} 题。<br><button id="r9BReplay" style="margin-top:.6rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">↺ 再玩一次</button>`;
+                document.getElementById('r9BOpts').innerHTML = '';
+                fb.style.display = 'block';
+                fb.innerHTML = '试试下面的「② 归类挑战」，把 9 种角色分到三大类里！';
+                document.getElementById('r9BReplay').addEventListener('click', () => {
+                  r9BCur = 0; r9BScore = 0;
+                  // 洗牌题目顺序
+                  const shuffled = [...r9BQuestions].sort(() => Math.random() - 0.5);
+                  r9BQuestions.length = 0;
+                  r9BQuestions.push(...shuffled);
+                  r9BRender();
+                });
+              }
+            }, 1500);
+          } else {
+            btn.classList.add('no');
+            const fb = document.getElementById('r9BFb');
+            fb.style.display = 'block';
+            fb.style.background = 'linear-gradient(135deg,#fef3c7,#fffbeb)';
+            fb.style.color = '#92400e';
+            fb.innerHTML = '再想想——不是这个角色哦。';
+            setTimeout(() => btn.classList.remove('no'), 1200);
+          }
+        });
+        optsBox.appendChild(btn);
+      });
+      document.getElementById('r9BFb').style.display = 'none';
+    }
+    r9BRender();
+
+    // 游戏A：拖拽归类
+    const r9AllRoles = [
+      { name: '智多星', abbr: 'PL', bin: 'think' },
+      { name: '审议员', abbr: 'ME', bin: 'think' },
+      { name: '专业师', abbr: 'SP', bin: 'think' },
+      { name: '外交家', abbr: 'RI', bin: 'people' },
+      { name: '协调者', abbr: 'CO', bin: 'people' },
+      { name: '凝聚者', abbr: 'TW', bin: 'people' },
+      { name: '鞭策者', abbr: 'SH', bin: 'action' },
+      { name: '执行者', abbr: 'IMP', bin: 'action' },
+      { name: '完成者', abbr: 'CF', bin: 'action' }
+    ];
+    let placedCount = 0;
+    function r9AInit() {
+      placedCount = 0;
+      const pool = document.getElementById('r9Pool');
+      pool.innerHTML = '';
+      document.querySelectorAll('.r9-bin').forEach(bin => {
+        // 保留标题，清空卡片
+        const title = bin.querySelector('div');
+        bin.innerHTML = '';
+        bin.appendChild(title);
+      });
+      document.getElementById('r9AFb').style.display = 'none';
+      // 洗牌
+      const shuffled = [...r9AllRoles].sort(() => Math.random() - 0.5);
+      shuffled.forEach(role => {
+        const card = document.createElement('div');
+        card.className = 'r9-card';
+        card.draggable = true;
+        card.textContent = `${role.name} ${role.abbr}`;
+        card.dataset.bin = role.bin;
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', card.dataset.bin);
+          e.dataTransfer.effectAllowed = 'move';
+          card.style.opacity = '0.5';
+        });
+        card.addEventListener('dragend', () => { card.style.opacity = '1'; });
+        pool.appendChild(card);
+      });
+    }
+    r9AInit();
+    document.querySelectorAll('.r9-bin').forEach(bin => {
+      bin.addEventListener('dragover', e => { e.preventDefault(); bin.classList.add('over'); });
+      bin.addEventListener('dragleave', () => bin.classList.remove('over'));
+      bin.addEventListener('drop', e => {
+        e.preventDefault();
+        bin.classList.remove('over');
+        const cards = document.querySelectorAll('.r9-card');
+        const dragged = Array.from(cards).find(c => c.style.opacity === '0.5');
+        if (!dragged) return;
+        if (dragged.dataset.bin === bin.dataset.bin) {
+          bin.appendChild(dragged);
+          dragged.classList.add('placed');
+          placedCount++;
+          if (placedCount === 9) {
+            const fb = document.getElementById('r9AFb');
+            fb.style.display = 'block';
+            fb.innerHTML = '🎉 全部归位！9 种角色分属三大类——思考型想明白、人际型把人聚起来、行动型把事做完。<br><button id="r9AReplay" style="margin-top:.5rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)">↺ 再玩一次</button>';
+            document.getElementById('r9AReplay').addEventListener('click', r9AInit);
+          }
+        } else {
+          alert('这个角色不属于这一类，再想想！');
+        }
+      });
+    });
+  })();
+
+  // ===== 第11页 · 案例反思 =====
+  (function(){
+    // 案例文字（放在弹窗里）
+    const caseText = `
+      <div style="font-size:.95rem;line-height:1.9;color:var(--c-primary);padding:1.2rem 1.5rem;text-align:left">
+        <p style="text-indent:2em;margin:0 0 .8rem 0">小张是组里最早摸透 AI 编程的人，手里攒了不少提示词和工具链。同事来问，他总含糊两句就岔开话题——倒不是对人有意见，只是这些东西是他熬了好几个周末、踩了一堆坑换回来的，他总觉得"说出去就不值钱了"。</p>
+        <p style="text-indent:2em;margin:0">直到有一次部门例会上，总监自己先开口，把上个月用 AI 做砸的三个项目摊开讲，连截图都放出来了，满屋子笑成一片。后来小张实在被问得没办法，随手写了篇教程丢群里，没想到好几个同事真用它解决了卡了一周的问题，在群里追着谢他，总监还在大群里提了他一句。再后来，组里每周五下午多了个"十五分钟随便聊"的环节，不考核、不打分，谁有新鲜玩意就上来唠两句。小张发现自己讲一遍之后，对那些技术的理解反而比闷头用的时候更透了。慢慢地，不用人问，他自己就会主动往群里丢东西。</p>
+      </div>`;
+
+    // 打开案例弹窗（复用弹窗组件）
+    document.getElementById('r11OpenCase').addEventListener('click', () => {
+      const overlay = document.getElementById('dlgOverlay');
+      const win = document.getElementById('dlgWin');
+      document.getElementById('dlgTitle').textContent = '案例 · 从"闷头用"到"主动教"';
+      document.getElementById('dlgFrame').style.display = 'none';
+      const fb = document.getElementById('dlgFallback');
+      fb.style.display = 'block';
+      fb.innerHTML = caseText;
+      overlay.classList.add('show');
+      win.classList.remove('fullscreen');
+      win.style.left = '50%';
+      win.style.top = '50%';
+      win.style.transform = 'translate(-50%,-50%)';
+      win.style.width = '720px';
+      win.style.height = '520px';
+    });
+
+    // 多选题渲染
+    function renderMultiQ(containerId, optsId, fbId, opts, correctCount, onDone) {
+      const box = document.getElementById(optsId);
+      const fb = document.getElementById(fbId);
+      box.innerHTML = '';
+      opts.forEach((o, i) => {
+        const d = document.createElement('label');
+        d.className = 'r7-opt';
+        d.style.fontSize = '.82rem';
+        d.innerHTML = `<input type="checkbox" class="r11-cb" data-correct="${o.correct}"> ${String.fromCharCode(65+i)}. ${o.t}`;
+        box.appendChild(d);
+      });
+      // 提交按钮
+      const submitBtn = document.createElement('button');
+      submitBtn.textContent = '提交答案';
+      submitBtn.style.cssText = 'margin-top:.5rem;padding:.35rem 1rem;border-radius:18px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.8rem;box-shadow:var(--c-shadow)';
+      box.appendChild(submitBtn);
+
+      submitBtn.addEventListener('click', () => {
+        const checked = box.querySelectorAll('.r11-cb:checked');
+        const allCbs = box.querySelectorAll('.r11-cb');
+        // 判断：选对了所有正确项，且没选错
+        let right = true;
+        allCbs.forEach(cb => {
+          const shouldBeChecked = cb.dataset.correct === 'true';
+          const isChecked = cb.checked;
+          if (shouldBeChecked !== isChecked) right = false;
+        });
+        if (right) {
+          allCbs.forEach(cb => {
+            const parent = cb.parentElement;
+            if (cb.dataset.correct === 'true') parent.style.borderColor = 'var(--c-right)';
+            else parent.style.borderColor = 'var(--c-wrong)';
+          });
+          box.querySelectorAll('label').forEach(l => l.style.pointerEvents = 'none');
+          submitBtn.style.display = 'none';
+          fb.style.display = 'block';
+          fb.style.background = 'linear-gradient(135deg,#d1fae5,#ecfdf5)';
+          fb.style.color = '#065f46';
+          fb.innerHTML = '✅ 回答正确！';
+          setTimeout(onDone, 1200);
+        } else {
+          fb.style.display = 'block';
+          fb.style.background = 'linear-gradient(135deg,#fef3c7,#fffbeb)';
+          fb.style.color = '#92400e';
+          fb.innerHTML = '再想想——有漏选或多选哦。';
+        }
+      });
+    }
+
+    // 第1题：3个正确，1个错误（错误在第2位B）
+    renderMultiQ('r11Q1', 'r11Q1Opts', 'r11Q1Fb', [
+      { t: '怕自己熬出来的东西"说出去就不值钱了"', correct: true },
+      { t: '觉得同事都不如自己，不屑于分享', correct: false },
+      { t: '怕开了头就被人追着问，变成免费培训机', correct: true },
+      { t: '怕自己讲得不够好，被人看轻"也就这水平"', correct: true }
+    ], 3, () => {
+      document.getElementById('r11Q2').scrollIntoView({behavior:'smooth', block:'center'});
+    });
+
+    // 第2题：3个正确，1个错误（错误在第3位C）
+    renderMultiQ('r11Q2', 'r11Q2Opts', 'r11Q2Fb', [
+      { t: '领导自己先把"翻车案例"摊开了，他觉得安全了', correct: true },
+      { t: '第一次分享后得到同事感谢和领导点名，尝到了"甜头"', correct: true },
+      { t: '领导专门给他发了一笔分享奖金，物质刺激到位', correct: false },
+      { t: '每周五的固定小分享让分享变成了习惯，不再有压力', correct: true }
+    ], 3, () => {
+      document.getElementById('r11Next').style.display = 'inline-block';
+    });
+
+    document.getElementById('r11Next').addEventListener('click', () => {
+      const reveal = document.getElementById('r11Reveal');
+      reveal.style.display = 'block';
+      reveal.style.animation = 'rscc-pop .5s ease';
+      reveal.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  })();
+
+  // ===== 第15页 · 人字游戏渐进显示 =====
+  (function(){
+    document.getElementById('r15Start').addEventListener('click', () => {
+      document.getElementById('r15Game').style.display = 'block';
+      document.getElementById('r15NextWrap').style.display = 'block';
+      document.getElementById('r15Start').style.display = 'none';
+    });
+    document.getElementById('r15Next').addEventListener('click', () => {
+      document.getElementById('r15Reflect').style.display = 'block';
+      document.getElementById('r15NextWrap').style.display = 'none';
+    });
+  })();
+
+  // ===== 第15页 · 人字游戏（双手拖拽） =====
+  (function(){
+    ['r15Left','r15Right'].forEach(id => {
+      const el = document.getElementById(id);
+      let dragging = false, offsetX = 0, offsetY = 0;
+      el.addEventListener('mousedown', e => {
+        dragging = true;
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.parentElement.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        el.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+      document.addEventListener('mousemove', e => {
+        if (!dragging) return;
+        const parentRect = el.parentElement.getBoundingClientRect();
+        let x = e.clientX - parentRect.left - offsetX;
+        let y = e.clientY - parentRect.top - offsetY;
+        // 限制在容器内
+        x = Math.max(0, Math.min(x, parentRect.width - el.offsetWidth));
+        y = Math.max(40, Math.min(y, parentRect.height - el.offsetHeight));
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+      });
+      document.addEventListener('mouseup', () => {
+        dragging = false;
+        el.style.cursor = 'grab';
+      });
+      // 触屏支持
+      el.addEventListener('touchstart', e => {
+        const t = e.touches[0];
+        dragging = true;
+        const rect = el.getBoundingClientRect();
+        offsetX = t.clientX - rect.left;
+        offsetY = t.clientY - rect.top;
+        e.preventDefault();
+      }, {passive:false});
+      document.addEventListener('touchmove', e => {
+        if (!dragging) return;
+        const t = e.touches[0];
+        const parentRect = el.parentElement.getBoundingClientRect();
+        let x = t.clientX - parentRect.left - offsetX;
+        let y = t.clientY - parentRect.top - offsetY;
+        x = Math.max(0, Math.min(x, parentRect.width - el.offsetWidth));
+        y = Math.max(40, Math.min(y, parentRect.height - el.offsetHeight));
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        e.preventDefault();
+      }, {passive:false});
+      document.addEventListener('touchend', () => { dragging = false; });
+    });
+  })();
+
+  // ===== 第9页 · 贝尔宾测试弹窗 =====
+  (function(){
+    document.getElementById('r9BelbinTest').addEventListener('click', () => {
+      const overlay = document.getElementById('dlgOverlay');
+      const win = document.getElementById('dlgWin');
+      document.getElementById('dlgTitle').textContent = '贝尔宾团队角色测试';
+      const fb = document.getElementById('dlgFallback');
+      fb.style.display = 'none';
+      const frame = document.getElementById('dlgFrame');
+      frame.style.display = 'block';
+      frame.src = 'belbin-test.html?v=20261024-2&name=同学';
+      overlay.classList.add('show');
+      win.classList.remove('fullscreen');
+      win.style.left = '50%';
+      win.style.top = '50%';
+      win.style.transform = 'translate(-50%,-50%)';
+      win.style.width = '900px';
+      win.style.height = '600px';
+    });
+  })();
+
+  // ===== 通用分步按钮 =====
+  document.querySelectorAll('.r-next-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t=document.getElementById(btn.dataset.target);
+      if(t){t.style.display='block';btn.style.display='none';}
+    });
+  });
+
+  // ===== 第43页 · Q公司案例阶段切换 =====
+  (function(){
+    let currentStage=1;
+    const btns=document.querySelectorAll('.r43-stage-btn');
+    function showStage(n){
+      currentStage=n;
+      btns.forEach(b=>{
+        if(b.dataset.stage==n){
+          b.style.background='var(--c-primary)';b.style.color='#fff';b.style.borderColor='var(--c-primary)';
+        }else{
+          b.style.background='#fff';b.style.color='var(--c-sub)';b.style.borderColor='var(--c-line)';
+        }
+      });
+      for(let i=1;i<=3;i++){
+        document.getElementById('r43Text'+i).style.display=i==n?'block':'none';
+      }
+    }
+    btns.forEach(b=>b.addEventListener('click',()=>showStage(parseInt(b.dataset.stage))));
+    // 已阅读按钮
+    document.getElementById('r43ReadBtn').addEventListener('click',()=>{
+      document.getElementById('r43Quiz'+currentStage).style.display='block';
+      document.getElementById('r43Hint').style.display='none';
+    });
+    // 夜读模式切换
+    const nightBtn=document.getElementById('r43NightBtn');
+    const textBox=document.getElementById('r43Text');
+    let night=false;
+    nightBtn.addEventListener('click',()=>{
+      night=!night;
+      if(night){
+        textBox.style.background='#2d3748';
+        textBox.style.color='#e2e8f0';
+        nightBtn.textContent='☀️';
+      }else{
+        textBox.style.background='#fafbfc';
+        textBox.style.color='var(--c-text)';
+        nightBtn.textContent='🌙';
+      }
+    });
+  })();
+
+  // ===== 第42页 · 多文化团队拖拽排序 =====
+  (function(){
+    const cards=document.querySelectorAll('#r42Cards .drag-card');
+    const drop=document.getElementById('r42Drop');
+    const desc=document.getElementById('r42Desc');
+    if(!drop) return;
+    cards.forEach(c=>{
+      // 点击显示解释
+      c.addEventListener('click',()=>{
+        desc.style.display='block';
+        desc.textContent=c.dataset.desc;
+      });
+      c.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('text/plain',c.dataset.card);
+        e.dataTransfer.effectAllowed='move';
+      });
+    });
+    drop.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';});
+    drop.addEventListener('drop',e=>{
+      e.preventDefault();
+      const id=e.dataTransfer.getData('text/plain');
+      const card=document.querySelector(`#r42Cards .drag-card[data-card="${id}"]`);
+      if(card){
+        const hint=drop.querySelector('span');
+        if(hint) hint.remove();
+        drop.appendChild(card);
+      }
+    });
+    const btn=document.getElementById('r42Next');
+    if(btn) btn.addEventListener('click',()=>{
+      document.getElementById('r42Discuss').style.display='block';
+      btn.style.display='none';
+      const btn2=document.createElement('button');
+      btn2.textContent='下一步 →';
+      btn2.style.cssText='padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow);margin-top:.5rem';
+      btn2.onclick=()=>{
+        document.getElementById('r42Key').style.display='block';
+        btn2.style.display='none';
+      };
+      document.getElementById('r42Discuss').appendChild(btn2);
+    });
+  })();
+
+  // ===== 第41页 · 双文化团队拖拽排序 =====
+  (function(){
+    const cards=document.querySelectorAll('#r41Cards .drag-card');
+    const drop=document.getElementById('r41Drop');
+    if(!drop) return;
+    cards.forEach(c=>{
+      c.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('text/plain',c.dataset.card);
+        e.dataTransfer.effectAllowed='move';
+      });
+    });
+    drop.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';});
+    drop.addEventListener('drop',e=>{
+      e.preventDefault();
+      const id=e.dataTransfer.getData('text/plain');
+      const card=document.querySelector(`#r41Cards .drag-card[data-card="${id}"]`);
+      if(card){
+        // 去掉提示文字
+        const hint=drop.querySelector('span');
+        if(hint) hint.remove();
+        drop.appendChild(card);
+      }
+    });
+    // 提交按钮
+    const btn=document.getElementById('r41Next');
+    if(btn) btn.addEventListener('click',()=>{
+      document.getElementById('r41Discuss').style.display='block';
+      btn.style.display='none';
+      // 再点一次显示关键难点
+      btn2=document.createElement('button');
+      btn2.textContent='下一步 →';
+      btn2.style.cssText='padding:.45rem 1.2rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem;box-shadow:var(--c-shadow);margin-top:.5rem';
+      btn2.onclick=()=>{
+        document.getElementById('r41Key').style.display='block';
+        btn2.style.display='none';
+      };
+      document.getElementById('r41Discuss').appendChild(btn2);
+    });
+  })();
+
+  // ===== 第36页 · 吉利沃尔沃分步显示 =====
+  (function(){
+    const b1=document.getElementById('r36Next1');
+    if(b1) b1.addEventListener('click',()=>{
+      document.getElementById('r36Video').style.display='block';
+      b1.style.display='none';
+      // 视频播放结束后显示第二个下一步按钮
+      const v=document.querySelector('#r36Video video');
+      if(v) v.addEventListener('ended',()=>{
+        document.getElementById('r36Next2').style.display='block';
+      });
+    });
+    const b2=document.getElementById('r36Next2');
+    if(b2) b2.addEventListener('click',()=>{
+      document.getElementById('r36Quiz').style.display='block';
+      b2.style.display='none';
+    });
+  })();
+
+  // ===== 第33页 · 联想IBM分步显示 =====
+  (function(){
+    const btn=document.getElementById('r33Next');
+    if(btn) btn.addEventListener('click',()=>{
+      document.getElementById('r33Quiz').style.display='block';
+      btn.style.display='none';
+    });
+  })();
+
+  // ===== 第32页 · 雷诺日产分步显示 =====
+  (function(){
+    const btn=document.getElementById('r32Next');
+    if(btn) btn.addEventListener('click',()=>{
+      document.getElementById('r32Right').style.display='block';
+      btn.style.display='none';
+      // 第二个下一步按钮
+      const btn2=document.createElement('button');
+      btn2.textContent='下一步 →';
+      btn2.style.cssText='margin-top:.6rem;padding:.4rem 1.1rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.82rem;box-shadow:var(--c-shadow)';
+      btn2.onclick=()=>{
+        document.getElementById('r32Btn').style.display='block';
+        btn2.style.display='none';
+      };
+      document.querySelector('#r32Right').appendChild(btn2);
+    });
+  })();
+
+  // ===== 第31页 · 四种模式拖拽 =====
+  (function(){
+    const cards = document.querySelectorAll('.r31-card');
+    const drops = document.querySelectorAll('.r31-drop');
+    if(!cards.length) return;
+    cards.forEach((c,i)=>c.dataset.idx=i);
+    cards.forEach(card=>{
+      card.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('text/plain',JSON.stringify({correct:card.dataset.correct,text:card.textContent,idx:card.dataset.idx}));
+        card.style.opacity='.5';
+      });
+      card.addEventListener('dragend',()=>card.style.opacity='1');
+    });
+    drops.forEach(drop=>{
+      drop.addEventListener('dragover',e=>e.preventDefault());
+      drop.addEventListener('drop',e=>{
+        e.preventDefault();
+        const data=JSON.parse(e.dataTransfer.getData('text/plain'));
+        const fb=document.getElementById('r31Fb');
+        if(data.correct===drop.dataset.region){
+          if(!drop.querySelector('.placed-label')){
+            const card=document.querySelector(`.r31-card[data-idx="${data.idx}"]`);
+            if(card){card.style.display='none';}
+            const label=document.createElement('div');
+            label.className='placed-label';
+            label.textContent=card?card.textContent.split('\n')[0]:data.text;
+            label.style.cssText='font-size:.82rem;font-weight:700;padding:.2rem .6rem;border-radius:14px;background:rgba(34,197,94,.12);color:#059669';
+            drop.appendChild(label);
+            drop.style.borderColor='#22c55e';
+          }
+          fb.innerHTML=`<span style="color:#059669;font-weight:700">✓ 正确！</span>`;
+        } else {
+          fb.innerHTML=`<span style="color:#dc2626;font-weight:700">✗ 再想想？</span>`;
+        }
+      });
+    });
+  })();
+
+  // ===== 第23页 · 绩效曲线拖拽互动 =====
+  (function(){
+    const cards = document.querySelectorAll('.r23-card');
+    const drops = {
+      left: document.getElementById('dropLeft'),
+      mid: document.getElementById('dropMid'),
+      right: document.getElementById('dropRight')
+    };
+    if(!cards.length || !drops.left) return;
+
+    cards.forEach(card => {
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          correct: card.dataset.correct,
+          text: card.textContent,
+          idx: card.dataset.idx
+        }));
+        card.style.opacity = '.5';
+      });
+      card.addEventListener('dragend', () => { card.style.opacity = '1'; });
+    });
+    cards.forEach((c,i) => c.dataset.idx = i);
+
+    Object.entries(drops).forEach(([key, el]) => {
+      el.addEventListener('dragover', e => e.preventDefault());
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const fb = document.getElementById('r23Fb');
+        let correct = false;
+        if(data.correct === 'both'){
+          correct = (key === 'left' || key === 'right');
+        } else {
+          correct = (data.correct === key);
+        }
+        if(correct){
+          // 检查是否已放过
+          const existing = el.querySelector(`.placed-label[data-text="${data.text}"]`);
+          if(!existing){
+            const label = document.createElement('div');
+            label.className = 'placed-label';
+            label.dataset.text = data.text;
+            label.textContent = data.text;
+            label.style.cssText = 'font-size:.85rem;font-weight:700;color:inherit;padding:.15rem .5rem;border-radius:14px;background:rgba(255,255,255,.8);box-shadow:0 1px 3px rgba(0,0,0,.1)';
+            el.appendChild(label);
+            el.style.background = 'rgba(34,197,94,.12)';
+            // 隐藏原卡片
+            const card = document.querySelector(`.r23-card[data-idx="${data.idx}"]`);
+            if(card) card.style.display = 'none';
+          }
+          fb.innerHTML = `<span style="color:#059669;font-weight:700">✓ "${data.text}" 放对了！</span>`;
+        } else {
+          fb.innerHTML = `<span style="color:#dc2626;font-weight:700">✗ "${data.text}" 再想想？</span>`;
+        }
+      });
+    });
+  })();
+
+  // ===== 第22页 · 多文化团队分步显示 =====
+  (function(){
+    const btn1 = document.getElementById('r22Next1');
+    if(btn1){
+      btn1.addEventListener('click', () => {
+        document.getElementById('r22ProsCons').style.display = 'block';
+        btn1.style.display = 'none';
+      });
+    }
+    const btn2 = document.getElementById('r22Next2');
+    if(btn2){
+      btn2.addEventListener('click', () => {
+        document.getElementById('r22Quiz').style.display = 'block';
+        btn2.style.display = 'none';
+      });
+    }
+  })();
+
+  // ===== 第17页 · 冲突与绩效渐进显示 =====
+  (function(){
+    const btn = document.getElementById('r17Next');
+    if(btn){
+      btn.addEventListener('click', () => {
+        document.getElementById('r17Right').style.display = 'flex';
+        btn.style.display = 'none';
+      });
+    }
+  })();
+
+  // ===== 第36页 · 多数派渐进显示 =====
+  (function(){
+    let cur = 0;
+    const btn = document.getElementById('r36Next');
+    btn.addEventListener('click', () => {
+      cur++;
+      const step = document.querySelector(`.r36-step[data-step="${cur}"]`);
+      if (step) {
+        step.style.display = 'block';
+        step.style.animation = 'rscc-pop .4s ease';
+      }
+      if (cur >= 3) {
+        btn.style.display = 'none';
+        document.getElementById('r36Reflect').style.display = 'block';
+      }
+    });
+  })();
+
+  // ===== 可拖拽缩放弹窗 =====
+  (function(){
+    const overlay = document.getElementById('dlgOverlay');
+    const win = document.getElementById('dlgWin');
+    const titlebar = document.getElementById('dlgTitlebar');
+    const closeBtn = document.getElementById('dlgClose');
+    const fullBtn = document.getElementById('dlgFull');
+    const frame = document.getElementById('dlgFrame');
+    const resizeHandle = win.querySelector('.dlg-resize');
+
+    // 打开弹窗
+    function openDlg(url, title){
+      frame.src = url;
+      document.getElementById('dlgTitle').textContent = title;
+      overlay.classList.add('show');
+      win.classList.remove('fullscreen');
+      // 重置位置大小
+      win.style.left = '50%';
+      win.style.top = '50%';
+      win.style.transform = 'translate(-50%,-50%)';
+      win.style.width = '860px';
+      win.style.height = '600px';
+    }
+    function closeDlg(){
+      overlay.classList.remove('show');
+      win.classList.remove('fullscreen');
+      frame.src = 'about:blank';
+    }
+    closeBtn.addEventListener('click', closeDlg);
+    overlay.addEventListener('click', e => { if(e.target === overlay) closeDlg(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape' && overlay.classList.contains('show')) closeDlg(); });
+
+    // 全屏切换
+    fullBtn.addEventListener('click', () => {
+      win.classList.toggle('fullscreen');
+      if(win.classList.contains('fullscreen')){
+        win.style.left = ''; win.style.top = ''; win.style.transform = '';
+      } else {
+        win.style.left = '50%'; win.style.top = '50%'; win.style.transform = 'translate(-50%,-50%)';
+        win.style.width = '860px'; win.style.height = '600px';
+      }
+    });
+
+    // 拖拽移动
+    let dragging = false, dx = 0, dy = 0;
+    titlebar.addEventListener('mousedown', e => {
+      if(e.target.tagName === 'BUTTON') return;
+      if(win.classList.contains('fullscreen')) return;
+      dragging = true;
+      const rect = win.getBoundingClientRect();
+      win.style.transform = '';
+      win.style.left = rect.left + 'px';
+      win.style.top = rect.top + 'px';
+      dx = e.clientX - rect.left;
+      dy = e.clientY - rect.top;
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if(!dragging) return;
+      win.style.left = (e.clientX - dx) + 'px';
+      win.style.top = (e.clientY - dy) + 'px';
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    // 右下角缩放
+    let resizing = false, startW = 0, startH = 0, startX = 0, startY = 0;
+    resizeHandle.addEventListener('mousedown', e => {
+      if(win.classList.contains('fullscreen')) return;
+      resizing = true;
+      const rect = win.getBoundingClientRect();
+      startW = rect.width; startH = rect.height;
+      startX = e.clientX; startY = e.clientY;
+      e.preventDefault(); e.stopPropagation();
+    });
+    document.addEventListener('mousemove', e => {
+      if(!resizing) return;
+      win.style.width = (startW + e.clientX - startX) + 'px';
+      win.style.height = (startH + e.clientY - startY) + 'px';
+    });
+    document.addEventListener('mouseup', () => { resizing = false; });
+
+    // 绑定贝尔宾按钮
+    document.getElementById('btnBelbinSite').addEventListener('click', () => {
+      openDlg('https://www.belbin.cn', '贝尔宾中国官网 · Belbin China');
+    });
+  })();
+
+  // ===== 初始化 =====
+  setMode(true);
+  show(0);
+</script>
+</body>
+</html>
+

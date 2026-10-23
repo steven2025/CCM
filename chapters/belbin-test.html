@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>大学生团队角色测评</title>
+<script src="../assets/vendor/chart-3.9.1.min.js?v=3.9.1"></script>
+<style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --highlight: #f39c12;
+            --highlight2: #2ecc71;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --tech-bg: linear-gradient(135deg, #1a2a6c, #2c3e50, #3498db);
+            --tech-glow: 0 0 15px rgba(52, 152, 219, 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+        }
+        
+        body {
+            background: var(--tech-bg);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(231, 76, 60, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(243, 156, 18, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .screen {
+            display: none;
+            background: rgba(44, 62, 80, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--tech-glow);
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--highlight));
+            z-index: 1;
+        }
+        
+        .active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--light);
+            font-size: 2.2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            color: var(--light);
+            font-size: 1.8rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--light);
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+        
+        .btn {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), var(--tech-glow);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+        }
+        
+        .btn-back {
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            margin-bottom: 15px;
+        }
+        
+        .question-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            padding: 14px;
+            background: rgba(52, 73, 94, 0.6);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 3px solid var(--primary);
+            transition: all 0.2s;
+        }
+        .question p {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            min-height: 55px;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 12px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+            transition: all 0.3s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .slider-value {
+            width: 50px;
+            text-align: center;
+            margin-left: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        /* 固定显示的剩余分数 */
+        .points-remaining-fixed {
+            text-align: center;
+            font-size: .85rem;
+            font-weight: bold;
+            color: #f39c12;
+            padding: .3rem .8rem;
+            background: rgba(243,156,18,.15);
+            border-radius: 8px;
+        }
+        
+        /* 滚动跟随的剩余分数 */
+        .points-remaining-sticky {
+            position: sticky;
+            top: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--highlight);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), var(--tech-glow);
+            margin-bottom: 15px;
+            z-index: 999;
+            display: none; /* 默认隐藏，在移动端显示 */
+        }
+        
+        /* 移动端显示滚动跟随的剩余分数 */
+        @media (max-width: 768px) {
+            .points-remaining-sticky {
+                display: block;
+            }
+            
+            .points-remaining-fixed {
+                top: 10px;
+                right: 10px;
+                left: auto;
+                font-size: 16px;
+                padding: 10px 15px;
+            }
+        }
+        
+        /* 超小屏幕优化 */
+        @media (max-width: 480px) {
+            .points-remaining-sticky {
+                font-size: 16px;
+                padding: 10px 15px;
+                top: 5px;
+            }
+            
+            .points-remaining-fixed {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin: 25px 0;
+        }
+        
+        .role-interpretation {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .role-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s;
+        }
+        
+        .role-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role-name {
+            font-weight: bold;
+            color: var(--light);
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .role-score {
+            color: var(--highlight);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        .nav-buttons .btn {
+            width: 48%;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        
+        .user-info {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .chart-type-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .chart-type-btn {
+            margin: 0 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chart-type-btn.active {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chart-type-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-instructions {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .motto {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .motto-line1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--light);
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .motto-line2 {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .interpretation-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .interpretation-content p {
+            text-indent: 2em;
+            margin-bottom: 15px;
+        }
+        
+        .interpretation-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .interpretation-section h3 {
+            text-indent: 0;
+            margin-bottom: 15px;
+            color: var(--highlight);
+        }
+        
+        .signature {
+            text-align: right;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .footer-note {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .screen {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-buttons .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .chart-type-selector {
+                flex-wrap: wrap;
+            }
+            
+            .chart-type-btn {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<!-- 欢迎界面 -->
+<div class="screen active" id="welcome-screen">
+<h1>团队角色测评（学生版）</h1>
+<div class="motto">
+<div class="motto-line1">个人岂有完美 团队可臻至善</div>
+<div class="motto-line2">测试程序开发：重庆工商大学 鄢清华</div>
+</div>
+<div class="user-info" id="user-info">
+<!-- 用户信息将在这里显示 -->
+</div>
+<div class="welcome-message">
+<p>欢迎参加大学生团队角色测评！</p>
+<p>本测试将帮助您了解自己在团队中的角色倾向。</p>
+<p>测试共有7个部分，每个部分有9个陈述。</p>
+<p>每个部分您有10分可以分配给这些陈述，请根据您的实际情况分配分数。</p>
+</div>
+<button class="btn" id="start-test-btn">开始测评</button>
+</div>
+<!-- 测试界面 -->
+<div class="screen" id="test-screen">
+<button class="btn btn-back" id="back-to-welcome-from-test" style="font-size:.75rem;padding:.25rem .6rem">← 返回</button>
+<h2 id="test-part-title" style="font-size:1rem;margin-bottom:.5rem">第一部分</h2>
+<!-- 顶部一行：剩余分数 + 翻页按钮 -->
+<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem">
+  <div id="points-remaining-fixed" style="flex:1;text-align:center;padding:.3rem;border-radius:8px;background:rgba(243,156,18,.15);color:#f39c12;font-weight:700;font-size:.85rem;position:static !important;box-shadow:none !important">剩余分数: 10</div>
+  <button class="btn btn-secondary" id="prev-part-btn" style="display:none;padding:.3rem .8rem;font-size:.75rem">← 上一部分</button>
+  <button class="btn" id="next-part-btn" style="padding:.3rem .8rem;font-size:.75rem">下一部分 →</button>
+</div>
+<div class="question-container" id="questions-container">
+<!-- 问题将在这里动态生成 -->
+</div>
+</div>
+<!-- 测评完成界面 -->
+<div class="screen" id="test-complete-screen">
+<button class="btn btn-back" id="back-to-test-from-complete">← 返回测试</button>
+<h1>测评完成</h1>
+<p>恭喜你已完成所有部分！</p>
+<p>现在可以查看你的成长解读。</p>
+<button class="btn" id="view-report-btn">查看报告</button>
+</div>
+<!-- 报告界面 -->
+<div class="screen" id="report-screen">
+<button class="btn btn-back" id="back-to-complete-from-report">← 返回上一页</button>
+<div class="user-info" id="report-user-info">
+<!-- 用户信息将在这里显示 -->
+</div>
+<h2>您的大学生团队角色测评结果</h2>
+<div class="chart-type-selector">
+<button class="chart-type-btn active" data-type="radar">蛛网图</button>
+<button class="chart-type-btn" data-type="bar">柱状图</button>
+<button class="chart-type-btn" data-type="polarArea">极地区域图</button>
+</div>
+<div class="chart-container">
+<canvas id="results-chart"></canvas>
+</div>
+<div class="role-interpretation">
+<h3>你当前更突出的团队角色</h3>
+<div id="top-roles">
+<!-- 最高分角色将在这里显示 -->
+</div>
+<button class="btn" id="view-interpretation-btn">查看详细成长解读</button>
+</div>
+<div class="nav-buttons">
+<button class="btn btn-secondary" id="back-to-welcome-from-report">返回首页</button>
+<button class="btn" id="restart-test-btn">重新测评</button>
+</div>
+</div>
+<!-- 角色解读界面 -->
+<div class="screen" id="interpretation-screen">
+<button class="btn btn-back" id="back-to-report-from-interpretation">← 返回报告</button>
+<div class="user-info" id="interpretation-user-info">
+<!-- 用户信息将在这里显示 -->
+</div>
+<h2>成长解读</h2>
+<div class="interpretation-content" id="role-details">
+<!-- 角色解读将在这里显示 -->
+</div>
+<div class="footer-note">
+                大学生团队角色测评
+            </div>
+</div>
+<div class="lang-fab" style="position:fixed;top:12px;right:12px;z-index:2147483647;">
+<button id="lang-toggle" style="border:none;border-radius:999px;padding:12px 14px;background:linear-gradient(145deg,#222f3e,#34495e);color:#fff;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35);display:flex;align-items:center;gap:8px;font-weight:bold">
+<span>🌐</span><span id="lang-current">中文</span>
+</button>
+<div id="lang-panel" style="position:absolute;top:52px;right:0;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:8px;display:none">
+<div class="lang-item" data-lang="zh" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">中文 (ZH)</div>
+<div class="lang-item" data-lang="en" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">English (EN)</div>
+<div class="lang-item" data-lang="fr" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">Français (FR)</div>
+<div class="lang-item" data-lang="th" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">ไทย (TH)</div>
+<div class="lang-item" data-lang="ru" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">Русский (RU)</div>
+<div class="lang-item" data-lang="id" style="padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap">Bahasa Indonesia (ID)</div>
+</div>
+</div>
+</div>
+<script>
+        // 测试数据 - 基于您提供的Excel文件
+        const testData = {
+            
+            parts: [
+                {
+                    title: "第一部分：在团队合作中，我通常能带来的优势是",
+                    questions: [
+                        "我通常能比较快地发现新的机会或新的做法",
+                        "在课堂小组、社团或项目合作中，我通常都能和不同类型的同学顺利配合",
+                        "我通常能较清楚地判断哪些想法更实际、哪些想法更值得尝试",
+                        "当任务需要推进时，我往往能够把关键事情真正落实下来",
+                        "如果我发现某位同学很适合某项任务，我会主动建议让他或她加入进来",
+                        "我的专业知识、学习能力或某方面特长，常常能为团队提供帮助",
+                        "在大家讨论方案时，我通常能比较客观地提出另一种可行思路",
+                        "我经常会冒出一些新点子或新想法",
+                        "只要最后能推动事情变好，我愿意面对一开始不被理解的情况"
+                    ]
+                },
+                {
+                    title: "第二部分：在团队合作中，我可能会遇到的困难是",
+                    questions: [
+                        "如果小组讨论比较混乱、没有重点，或者迟迟定不下分工，我会感到不太舒服",
+                        "有时候因为我太理性、太客观，反而不太容易一下子和大家熟络起来",
+                        "因为我比较在意团队气氛，有时不太愿意让自己显得太突出",
+                        "我有时会沉浸在突然冒出来的想法里，而忽略眼前正在推进的事情",
+                        "我比较容易关注细节，也会担心哪里没有做好",
+                        "当我很想把事情推进下去时，可能会让别人觉得我有点强势",
+                        "对于那些有想法但表达得不够清楚的人，我有时会显得过于包容",
+                        "如果一个任务和我的兴趣关联不大，我的投入度可能会下降",
+                        "当大家在讨论新想法时，我有时会说得比较多"
+                    ]
+                },
+                {
+                    title: "第三部分：当我和别人一起完成一项任务时",
+                    questions: [
+                        "在提出新观点或新思路方面，我通常比较有优势",
+                        "我会主动留意团队中容易被忽视的小问题和小失误",
+                        "我往往能在不过度施压的情况下影响他人",
+                        "我对新的信息、新的做法和新的发展变化通常比较敏感",
+                        "在合作中，我会尽量保持认真、负责和有分寸",
+                        "当团队需要做判断时，我的分析和判断通常比较稳",
+                        "只要是对团队整体有帮助的建议，我通常愿意支持",
+                        "当讨论拖延太久或偏离重点时，我会希望把大家拉回正题",
+                        "对于基础性的安排和执行工作，我通常能处理得比较有条理"
+                    ]
+                },
+                {
+                    title: "第四部分：在团队中的我，通常更像是这样的人",
+                    questions: [
+                        "合作开始后，我愿意先了解组员的特点和擅长方向",
+                        "即使我愿意听取不同意见，但到了该做决定的时候，我通常也能做出判断",
+                        "当我觉得某个想法不够合理时，我会提出质疑或坚持自己的看法",
+                        "一旦方向确定下来，我往往愿意推动事情真正开始",
+                        "在团队中，我通常不会刻意让自己成为最显眼的人",
+                        "为了推进任务，我愿意主动联系老师、学长学姐或其他同学寻找资源",
+                        "只要是我负责的事情，我通常都会尽量做到认真、完整",
+                        "在讨论中，我常常能发现某些观点站不住脚的地方",
+                        "当我对任务背景了解得比较清楚时，我的参与感会更强"
+                    ]
+                },
+                {
+                    title: "第五部分：在课程任务或校园合作中，我更容易因为这些而有成就感",
+                    questions: [
+                        "我喜欢分析情况，并比较不同方案的利弊",
+                        "我会因为自己学到的知识或擅长的能力真正帮到团队而感到满足",
+                        "我会因为自己提出了有创意、有启发性的想法而感到开心",
+                        "当我能全身心投入一项任务并持续推进时，我会很有成就感",
+                        "我会因为找到一个真正可行的解决办法而感到满足",
+                        "我会因为促进了团队之间的理解与合作而感到有价值",
+                        "我喜欢和有新想法、有活力的人一起合作，也愿意适应他们的节奏",
+                        "我会因为帮助团队达成一致、顺利往前走而感到满足",
+                        "当我的观点能够明显影响最后的决定时，我会很有参与感"
+                    ]
+                },
+                {
+                    title: "第六部分：如果突然要和不太熟悉的同学一起完成一项时间紧张的任务",
+                    questions: [
+                        "我会先尽快查找相关资料，帮助自己进入状态",
+                        "即使事情不容易，我也会尽量让团队始终朝着目标前进",
+                        "我愿意先打开讨论，让大家把不同想法都说出来",
+                        "在这种情况下，我通常还能尽量保持冷静、有条理地思考",
+                        "我会考虑怎么根据每个人的特点来分工，让事情更高效",
+                        "在局面还比较混乱时，我可能会先自己理清思路，再提出方案",
+                        "如果团队明显推进不动，我通常会主动做点什么来推动进展",
+                        "我的紧迫感通常会提醒团队不要一再拖延",
+                        "我会更愿意与态度积极、愿意配合的人一起推进任务"
+                    ]
+                },
+                {
+                    title: "第七部分：在团队合作中遇到问题时",
+                    questions: [
+                        "如果有人明显拖慢进度或阻碍推进，我比较容易着急",
+                        "当我和立场差异很大的人沟通时，有时不太容易让对方真正理解我",
+                        "如果我感觉讨论效率太低，我会更想自己把事情先做起来",
+                        "对于我自己不擅长的部分，我愿意主动向别人寻求帮助",
+                        "当团队氛围比较沉闷、大家动力不足时，我也可能会受到影响",
+                        "因为我希望把事情做好，有时会在细节上花费太多精力",
+                        "别人有时会觉得我分析得很多，但不一定足够果断",
+                        "如果目标不够明确，我会比较难马上进入状态",
+                        "面对复杂问题时，我有时心里明白，但不一定能一下子表达得很清楚"
+                    ]
+                }
+            ],
+            
+            roles: [
+                { 
+                    name: "执行者", 
+                    code: "IMP", 
+                    description: "你比较务实，也愿意把想法一步步变成实际行动。",
+                    strengths: "你通常做事有条理、讲落实、重执行。对已经确定下来的任务，你往往能比较稳定地推进。在小组作业中，你适合负责拆分任务、安排顺序、跟进进度，让讨论结果真正落地。",
+                    weaknesses: "当方案还比较开放、变化很多时，你可能会更偏向稳妥做法，对太新的尝试先保持观察。",
+                    contributions: "在保持执行力的同时，也可以尝试给新想法多一点试错空间。这样会让你既稳，又更有弹性。"
+                },
+                { 
+                    name: "协调者", 
+                    code: "CO", 
+                    description: "你比较擅长看清目标，也能帮助团队找到更合适的分工方式。",
+                    strengths: "你通常能从整体出发，判断团队现在最需要做什么、谁更适合做什么。在合作中，你适合担任统筹、梳理方向、协调分工的角色，让大家更容易形成共识。",
+                    weaknesses: "有时你更擅长组织别人，而不是亲自处理细节任务，所以别人可能会希望你也多承担一些具体执行。",
+                    contributions: "在发挥统筹优势的同时，适当参与部分关键执行，会让你的带动作用更有说服力。"
+                },
+                { 
+                    name: "塑造者", 
+                    code: "SH", 
+                    description: "你通常很有推进力，遇到任务压力时反而更容易进入状态。",
+                    strengths: "你行动快、目标感强，面对拖延、犹豫或效率不高的情况时，往往会主动站出来推动团队前进。在时间紧、要求高的项目中，你的存在能明显提升节奏感。",
+                    weaknesses: "当你太想把事情做好、做快时，别人有时会觉得你太急、太直接，甚至有一点压迫感。",
+                    contributions: "如果能在推进效率的同时，多留意别人的接受方式和情绪感受，你会更容易成为既有力量又受欢迎的推动者。"
+                },
+                { 
+                    name: "智多星", 
+                    code: "PL", 
+                    description: "你通常想法多、视角新，擅长从不同角度理解和解决问题。",
+                    strengths: "在选题、策划、方案设计、创意表达这些环节中，你往往很有价值。你能为团队带来新鲜的思路，也常常能在别人卡住的时候想到不同的可能性。",
+                    weaknesses: "有时你会更享受“想出来”的过程，而不一定同样喜欢把细节一步步落实。别人也可能听不懂你脑子里已经想明白的东西。",
+                    contributions: "试着把想法说得更清楚、更具体，并和执行安排结合起来。这样你的创意会更容易真正落地。"
+                },
+                { 
+                    name: "资源调查者", 
+                    code: "RI", 
+                    description: "你通常外向、开放，愿意主动接触新信息、新人和新机会。",
+                    strengths: "你擅长找资源、问信息、拓展联系，也比较容易把团队带到更广的外部支持中。在需要搜集资料、联系老师、争取帮助、寻找合作机会时，你会很有优势。",
+                    weaknesses: "你可能在开始阶段很有热情，但等新鲜感下降后，持续跟进的耐心会稍弱一些。",
+                    contributions: "如果你能把“发现机会”的能力和“持续推进”的习惯结合起来，你对团队的帮助会更稳定、更完整。"
+                },
+                { 
+                    name: "监督评价者", 
+                    code: "ME", 
+                    description: "你比较理性、冷静，擅长分析利弊并做出较稳的判断。",
+                    strengths: "在团队容易冲动、容易被表面热情带偏时，你常常能把大家拉回更清晰的判断。你适合参与方案比较、逻辑审核、风险判断这些环节，帮助团队少走弯路。",
+                    weaknesses: "有时你会显得过于理智，别人可能感受不到你的热情；你的谨慎也可能被误解成不够积极。",
+                    contributions: "在表达判断时，如果能同时说明你的支持点和建设性建议，别人会更容易理解你的价值。"
+                },
+                { 
+                    name: "凝聚者", 
+                    code: "TW", 
+                    description: "你重视合作氛围，也比较能感受到别人的情绪和需要。",
+                    strengths: "你通常愿意倾听、愿意配合，也能帮助团队缓和摩擦、照顾感受、维持关系。在合作过程中，你常常是让大家愿意继续坐下来沟通的重要力量。",
+                    weaknesses: "因为你比较在意关系和气氛，有时会不太愿意直接表达不同意见，尤其在需要做艰难决定的时候。",
+                    contributions: "你可以在保持温和的同时，练习更明确地表达自己的看法。真正稳定的合作，也需要清晰而真诚的沟通。"
+                },
+                { 
+                    name: "完成者", 
+                    code: "CF", 
+                    description: "你认真细致，也常常对结果质量有较高要求。",
+                    strengths: "你善于检查细节、发现遗漏、完善表达，让最终成果更完整、更可靠。在汇报材料、文稿校对、数据检查、任务收尾这些环节中，你通常很值得信赖。",
+                    weaknesses: "你有时会因为太想做好而不断修改，或者在小问题上花费过多精力，让自己变得紧张和疲惫。",
+                    contributions: "你可以继续保持高标准，但也要练习判断“什么时候已经足够好”。这样既能保证质量，也能保护自己的节奏。"
+                },
+                { 
+                    name: "专家", 
+                    code: "SP", 
+                    description: "你往往会在某一类知识、技能或领域上投入得比较深。",
+                    strengths: "当团队任务需要某种专业能力或扎实知识时，你常常能提供关键支持。在你擅长的领域里，你的投入、专注和深度会非常有价值。",
+                    weaknesses: "你有时会更关注自己熟悉的部分，而对整体分工或非专业内容关注较少。别人也可能听不懂你过于专业的表达。",
+                    contributions: "如果你能在保持专业深度的同时，多和团队解释“你的能力能帮大家解决什么问题”，你的优势会更容易被看见和使用。"
+                }
+            ],
+            // 每个部分中每个问题对应的角色索引
+            questionRoleMapping: [
+                [4, 6, 0, 2, 1, 8, 5, 3, 7], // 第一部分
+                [1, 5, 6, 3, 7, 2, 6, 8, 3], // 第二部分
+                [3, 7, 1, 4, 0, 5, 6, 2, 0], // 第三部分
+                [6, 5, 2, 0, 6, 4, 7, 5, 8], // 第四部分
+                [5, 8, 3, 2, 0, 6, 4, 1, 2], // 第五部分
+                [8, 0, 3, 5, 1, 3, 2, 7, 6], // 第六部分
+                [2, 6, 8, 4, 4, 7, 5, 0, 5]  // 第七部分
+            ]
+        };
+
+        // 应用状态
+        let appState = {
+            currentUser: null,
+            currentPart: 0,
+            userAnswers: Array(7).fill().map(() => Array(9).fill(0)),
+            chart: null
+        };
+
+        // DOM 元素
+        const screens = {
+            welcome: document.getElementById('welcome-screen'),
+            test: document.getElementById('test-screen'),
+            testComplete: document.getElementById('test-complete-screen'),
+            report: document.getElementById('report-screen'),
+            interpretation: document.getElementById('interpretation-screen')
+        };
+
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 返回按钮
+            document.getElementById('back-to-welcome-from-test').addEventListener('click', showWelcomeScreen);
+            document.getElementById('back-to-test-from-complete').addEventListener('click', showTestScreen);
+            document.getElementById('back-to-complete-from-report').addEventListener('click', showTestCompleteScreen);
+            document.getElementById('back-to-report-from-interpretation').addEventListener('click', showReportScreen);
+            document.getElementById('back-to-welcome-from-report').addEventListener('click', showWelcomeScreen);
+            
+            // 测试流程相关
+            document.getElementById('start-test-btn').addEventListener('click', startTest);
+            document.getElementById('prev-part-btn').addEventListener('click', goToPreviousPart);
+            document.getElementById('next-part-btn').addEventListener('click', goToNextPart);
+            document.getElementById('view-report-btn').addEventListener('click', showReportScreen);
+            
+            // 报告相关
+            document.getElementById('view-interpretation-btn').addEventListener('click', showInterpretationScreen);
+            document.getElementById('restart-test-btn').addEventListener('click', restartTest);
+            
+            // 图表类型选择
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateChart(this.getAttribute('data-type'));
+                });
+            });
+        }
+
+        // 显示特定屏幕
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => {
+                screen.classList.remove('active');
+                // 隐藏剩余分数显示，除非是测试界面
+                if (screenName !== 'test') {
+                    document.getElementById('points-remaining-fixed').style.display = 'none';
+                }
+            });
+            screens[screenName].classList.add('active');
+            
+            // 如果是测试界面，显示剩余分数
+            if (screenName === 'test') {
+                document.getElementById('points-remaining-fixed').style.display = 'block';
+            }
+        }
+
+        // 显示登录屏幕
+        function showLoginScreen() {
+            showScreen('login');
+        }
+
+        // 显示注册屏幕
+        function showRegisterScreen() {
+            showScreen('register');
+        }
+
+        // 显示欢迎屏幕
+        function showWelcomeScreen() {
+            document.getElementById('user-info').textContent = `欢迎，${appState.currentUser.name}`;
+            showScreen('welcome');
+        }
+
+        // 显示测试屏幕
+        function showTestScreen() {
+            showScreen('test');
+        }
+
+        // 显示测评完成屏幕
+        function showTestCompleteScreen() {
+            showScreen('testComplete');
+        }
+
+        // 登录处理
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+            
+            // 简单的本地存储验证（实际应用中应有更安全的方法）
+            const users = JSON.parse(localStorage.getItem('belbinUsers') || '{}');
+            
+            if (users[username] && users[username].password === password) {
+                appState.currentUser = {
+                    username: username,
+                    name: users[username].name || username
+                };
+                // 保存当前用户到localStorage
+                localStorage.setItem('belbinCurrentUser', JSON.stringify(appState.currentUser));
+                showWelcomeScreen();
+            } else {
+                alert('用户名或密码错误');
+            }
+        }
+
+        // 注册处理
+        function handleRegister() {
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+            
+            // 保存用户信息（实际应用中应有更安全的方法）
+            const users = JSON.parse(localStorage.getItem('belbinUsers') || '{}');
+            
+            if (users[username]) {
+                alert('用户名已存在');
+                return;
+            }
+            
+            users[username] = {
+                password: password,
+                name: username,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('belbinUsers', JSON.stringify(users));
+            alert('注册成功，请登录');
+            showLoginScreen();
+        }
+
+        // 开始测评
+        function startTest() {
+            appState.currentPart = 0;
+            loadTestPart(0);
+            showScreen('test');
+        }
+
+        // 加载测试部分
+        function loadTestPart(partIndex) {
+            const part = testData.parts[partIndex];
+            document.getElementById('test-part-title').textContent = part.title;
+            
+            // 更新导航按钮
+            document.getElementById('prev-part-btn').style.display = partIndex > 0 ? 'block' : 'none';
+            document.getElementById('next-part-btn').textContent = partIndex < 6 ? '下一部分' : '完成测试';
+            
+            // 生成问题
+            const questionsContainer = document.getElementById('questions-container');
+            questionsContainer.innerHTML = '';
+            
+            part.questions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.innerHTML = `
+                    <p>${question}</p>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="10" value="${appState.userAnswers[partIndex][index]}" 
+                               class="slider" data-part="${partIndex}" data-question="${index}">
+                        <span class="slider-value">${appState.userAnswers[partIndex][index]}</span>
+                    </div>
+                `;
+                questionsContainer.appendChild(questionElement);
+            });
+            
+            // 添加滑块事件监听
+            document.querySelectorAll('.slider').forEach(slider => {
+                slider.addEventListener('input', handleSliderChange);
+            });
+            
+            // 更新剩余分数显示
+            updateRemainingPoints(partIndex);
+        }
+
+        // 处理滑块变化
+        function handleSliderChange(event) {
+            const slider = event.target;
+            const partIndex = parseInt(slider.getAttribute('data-part'));
+            const questionIndex = parseInt(slider.getAttribute('data-question'));
+            const value = parseInt(slider.value);
+            
+            // 更新显示的值
+            slider.nextElementSibling.textContent = value;
+            
+            // 更新答案状态
+            appState.userAnswers[partIndex][questionIndex] = value;
+            
+            // 更新剩余分数显示
+            updateRemainingPoints(partIndex);
+        }
+
+        // 更新剩余分数显示
+        function updateRemainingPoints(partIndex) {
+            const total = appState.userAnswers[partIndex].reduce((sum, value) => sum + value, 0);
+            const remaining = 10 - total;
+            
+            const fixedElement = document.getElementById('points-remaining-fixed');
+            fixedElement.textContent = `剩余分数: ${remaining}`;
+            
+            if (remaining < 0) {
+                fixedElement.style.color = '#e74c3c';
+                fixedElement.style.background = 'rgba(231,76,60,.15)';
+            } else if (remaining === 0) {
+                fixedElement.style.color = '#27ae60';
+                fixedElement.style.background = 'rgba(39,174,96,.15)';
+            } else {
+                fixedElement.style.color = '#f39c12';
+                fixedElement.style.background = 'rgba(243,156,18,.15)';
+            }
+        }
+
+        // 转到下一部分
+        function goToNextPart() {
+            const currentPart = appState.currentPart;
+            const total = appState.userAnswers[currentPart].reduce((sum, value) => sum + value, 0);
+            
+            if (total !== 10) {
+                alert(`本部分您已分配了${total}分，请确保总分恰好为10分`);
+                return;
+            }
+            
+            if (currentPart < 6) {
+                appState.currentPart++;
+                loadTestPart(appState.currentPart);
+            } else {
+                // 保存测试结果
+                saveTestResults();
+                showScreen('testComplete');
+            }
+        }
+
+        // 保存测试结果
+        function saveTestResults() {
+            if (!appState.currentUser) return;
+            
+            const users = JSON.parse(localStorage.getItem('belbinUsers') || '{}');
+            if (users[appState.currentUser.username]) {
+                users[appState.currentUser.username].lastTestResults = {
+                    answers: appState.userAnswers,
+                    completedAt: new Date().toISOString()
+                };
+                localStorage.setItem('belbinUsers', JSON.stringify(users));
+            }
+        }
+
+        // 转到上一部分
+        function goToPreviousPart() {
+            if (appState.currentPart > 0) {
+                appState.currentPart--;
+                loadTestPart(appState.currentPart);
+            }
+        }
+
+        // 显示报告屏幕
+        function showReportScreen() {
+            document.getElementById('report-user-info').textContent = `用户: ${appState.currentUser.name}`;
+            calculateResults();
+            showScreen('report');
+        }
+
+        // 计算测试结果
+        function calculateResults() {
+            const roleScores = Array(9).fill(0);
+            
+            // 根据用户答案和问题-角色映射计算每个角色的得分
+            for (let partIndex = 0; partIndex < 7; partIndex++) {
+                for (let questionIndex = 0; questionIndex < 9; questionIndex++) {
+                    const roleIndex = testData.questionRoleMapping[partIndex][questionIndex];
+                    roleScores[roleIndex] += appState.userAnswers[partIndex][questionIndex];
+                }
+            }
+            
+            // 保存结果到应用状态
+            appState.roleScores = roleScores;
+            
+            // 显示最高分角色
+            displayTopRoles(roleScores);
+            
+            // 更新图表
+            updateChart('radar');
+        }
+
+        // 显示最高分角色
+        function displayTopRoles(roleScores) {
+            const topRolesContainer = document.getElementById('top-roles');
+            topRolesContainer.innerHTML = '';
+            
+            // 创建角色得分数组并排序
+            const roleScoreArray = roleScores.map((score, index) => ({
+                role: testData.roles[index],
+                score: score
+            }));
+            
+            // 按得分排序
+            roleScoreArray.sort((a, b) => b.score - a.score);
+            
+            // 显示前3个角色
+            for (let i = 0; i < 3 && i < roleScoreArray.length; i++) {
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-item';
+                roleItem.innerHTML = `
+                    <div class="role-name">${roleScoreArray[i].role.name}</div>
+                    <div class="role-score">得分: ${roleScoreArray[i].score}</div>
+                    <p>${roleScoreArray[i].role.description}</p>
+                `;
+                topRolesContainer.appendChild(roleItem);
+            }
+        }
+
+        // 更新图表
+        function updateChart(chartType) {
+            const ctx = document.getElementById('results-chart').getContext('2d');
+            
+            // 如果已有图表，销毁它
+            if (appState.chart) {
+                appState.chart.destroy();
+            }
+            
+            // 创建角色得分数组并排序
+            const roleScoreArray = appState.roleScores.map((score, index) => ({
+                role: testData.roles[index],
+                score: score,
+                index: index
+            }));
+            
+            // 按得分排序
+            roleScoreArray.sort((a, b) => b.score - a.score);
+            
+            // 提取排序后的角色名称和得分
+            const sortedRoleNames = roleScoreArray.map(item => item.role.name);
+            const sortedRoleScores = roleScoreArray.map(item => item.score);
+            const maxScore = Math.max(...sortedRoleScores);
+            const secondMaxScore = sortedRoleScores.length > 1 ? sortedRoleScores[1] : 0;
+            
+            // 根据选择的图表类型创建图表
+            switch(chartType) {
+                case 'radar':
+                    // 对于雷达图，我们需要原始顺序的数据
+                    const roleNames = testData.roles.map(role => role.name);
+                    const roleScores = appState.roleScores;
+                    
+                    appState.chart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: roleNames,
+                            datasets: [{
+                                label: '角色得分',
+                                data: roleScores,
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                                borderColor: 'rgba(52, 152, 219, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: roleScores.map(score => 
+                                    score === maxScore ? 'rgba(243, 156, 18, 1)' : 'rgba(52, 152, 219, 1)'
+                                ),
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: roleScores.map(score => 
+                                    score === maxScore ? 8 : 5
+                                ),
+                                pointHoverRadius: roleScores.map(score => 
+                                    score === maxScore ? 10 : 7
+                                )
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        display: true,
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    pointLabels: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        font: {
+                                            size: 12
+                                        }
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        backdropColor: 'transparent'
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: Math.max(...roleScores) + 5
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    break;
+                    
+                case 'bar':
+                    // 为柱状图准备背景颜色数组（最高值用橙色，第二高用绿色）
+                    const backgroundColors = sortedRoleScores.map(score => {
+                        if (score === maxScore) return 'rgba(243, 156, 18, 0.7)';
+                        if (score === secondMaxScore) return 'rgba(46, 204, 113, 0.7)';
+                        return 'rgba(52, 152, 219, 0.7)';
+                    });
+                    
+                    const borderColors = sortedRoleScores.map(score => {
+                        if (score === maxScore) return 'rgba(243, 156, 18, 1)';
+                        if (score === secondMaxScore) return 'rgba(46, 204, 113, 1)';
+                        return 'rgba(52, 152, 219, 1)';
+                    });
+                    
+                    appState.chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedRoleNames,
+                            datasets: [{
+                                label: '角色得分',
+                                data: sortedRoleScores,
+                                backgroundColor: backgroundColors,
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: Math.max(...sortedRoleScores) + 5,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                    break;
+                    
+                case 'polarArea':
+                    appState.chart = new Chart(ctx, {
+                        type: 'polarArea',
+                        data: {
+                            labels: sortedRoleNames,
+                            datasets: [{
+                                label: '角色得分',
+                                data: sortedRoleScores,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.7)',
+                                    'rgba(54, 162, 235, 0.7)',
+                                    'rgba(255, 206, 86, 0.7)',
+                                    'rgba(75, 192, 192, 0.7)',
+                                    'rgba(153, 102, 255, 0.7)',
+                                    'rgba(255, 159, 64, 0.7)',
+                                    'rgba(199, 199, 199, 0.7)',
+                                    'rgba(83, 102, 255, 0.7)',
+                                    'rgba(40, 159, 64, 0.7)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                r: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        backdropColor: 'transparent'
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: Math.max(...sortedRoleScores) + 5
+                                }
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+
+        // 显示角色解读屏幕
+        function showInterpretationScreen() {
+            document.getElementById('interpretation-user-info').textContent = `用户: ${appState.currentUser.name}`;
+            
+            const roleDetailsContainer = document.getElementById('role-details');
+            
+            // 创建角色得分数组并排序
+            const roleScoreArray = appState.roleScores.map((score, index) => ({
+                role: testData.roles[index],
+                score: score
+            }));
+            
+            // 按得分排序
+            roleScoreArray.sort((a, b) => b.score - a.score);
+            
+            // 获取当前日期
+            const currentDate = new Date();
+            const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth()+1}月${currentDate.getDate()}日`;
+            
+            // 生成个性化解读报告
+            let interpretationHTML = '';
+            
+            // 主要角色解读
+            if (roleScoreArray.length > 0) {
+                const primaryRole = roleScoreArray[0];
+                interpretationHTML += `
+                    <div class="interpretation-section">
+                        <h3>${appState.currentUser.name}，根据测试结果，您在团队中的主要角色是：${primaryRole.role.name}</h3>
+                        <p><strong>主要描述：</strong>${primaryRole.role.description}</p>
+                        <p><strong>优势：</strong>${primaryRole.role.strengths}</p>
+                        <p><strong>可接受的弱点：</strong>${primaryRole.role.weaknesses}</p>
+                        <p><strong>对团队的贡献：</strong>${primaryRole.role.contributions}</p>
+                    </div>
+                `;
+            }
+            
+            // 次要角色解读
+            if (roleScoreArray.length > 1) {
+                const secondaryRole = roleScoreArray[1];
+                interpretationHTML += `
+                    <div class="interpretation-section">
+                        <h3>${appState.currentUser.name}，您在团队中的第二种角色可能是：${secondaryRole.role.name}</h3>
+                        <p>如果您所在的团队和您本人有需要，也可以开发和提升您的这个角色。</p>
+                        <p><strong>主要描述：</strong>${secondaryRole.role.description}</p>
+                        <p><strong>优势：</strong>${secondaryRole.role.strengths}</p>
+                        <p><strong>可接受的弱点：</strong>${secondaryRole.role.weaknesses}</p>
+                        <p><strong>对团队的贡献：</strong>${secondaryRole.role.contributions}</p>
+                    </div>
+                `;
+            }
+            
+            // 结尾祝福和落款
+            interpretationHTML += `
+                <div class="interpretation-section">
+                    <p>感谢你完成这次大学生团队角色测评。了解自己的团队角色，并不是为了给自己贴上固定标签，而是为了更清楚地认识自己在合作中的自然表现。</p>
+                    <p>没有哪一种角色是“最好的”。更重要的是，在不同的学习任务和合作情境中，逐渐找到适合自己的位置，也尝试练习那些能帮助你继续成长的能力。</p>
+                </div>
+                <div class="signature">
+                    <p>大学生团队角色测评</p>
+                    <p>${formattedDate}</p>
+                </div>
+            `;
+            
+            roleDetailsContainer.innerHTML = interpretationHTML;
+            
+            showScreen('interpretation');
+        }
+
+        // 重新开始测评
+        function restartTest() {
+            if (confirm('确定要重新开始测评吗？当前测试结果将被清除。')) {
+                appState.userAnswers = Array(7).fill().map(() => Array(9).fill(0));
+                appState.currentPart = 0;
+                startTest();
+            }
+        }
+
+        // 初始化应用
+        function initApp() {
+            initEventListeners();
+            
+            // 从URL参数获取学生姓名，跳过登录
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const studentName = urlParams.get('name') || '同学';
+                appState.currentUser = {
+                    username: studentName,
+                    name: studentName
+                };
+                showWelcomeScreen();
+            } catch (e) {
+                console.error('初始化应用时出错:', e);
+                appState.currentUser = { username: '同学', name: '同学' };
+                showWelcomeScreen();
+            }
+        }
+
+        // 启动应用
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+<script>
+(function(){
+  // Build i18n object
+  const i18n = {
+    zh: { name: "中文", ui: {
+      app_title:"大学生团队角色测评",
+      label_username:"用户名", label_password:"密码", label_confirm_pwd:"确认密码",
+      ph_username:"请输入用户名", ph_password:"请输入密码", ph_confirm_password:"请再次输入密码",
+      btn_login:"登录", btn_register:"注册新账号", btn_confirm_register:"确认注册",
+      btn_back_login:"← 返回登录",
+      welcome_title:"大学生团队角色测评",
+      motto_1:"了解自己在合作中的自然位置，也看见自己可以继续成长的方向",
+      motto_2:"适用于课堂合作、课程项目、社团活动与校园团队实践",
+      welcome_p1:"欢迎参加大学生团队角色测评！",
+      welcome_p2:"这份测评将帮助你了解自己在课堂合作、项目分工与校园团队中的表现特点。",
+      welcome_p3:"测评共分为7个部分，每个部分有9个描述。",
+      welcome_p4:"在每个部分中，你有10分可以分配给这些描述，请根据与你实际情况的符合程度进行分配。",
+      btn_start_test:"开始测评",
+      btn_back_home:"← 返回首页",
+      btn_prev:"上一部分",
+      btn_next:"下一部分",
+      btn_finish:"完成测评",
+      test_instruction:"请将10分分配给下面的9个描述，某些描述可以不给分，但总分必须恰好为10分。",
+      title_complete:"测评完成",
+      complete_p1:"恭喜你已完成所有部分！",
+      complete_p2:"现在可以查看你的成长解读。",
+      btn_view_report:"查看报告",
+      btn_back_prev:"← 返回上一页",
+      report_title:"你的团队角色测评结果",
+      chart_radar:"蛛网图", chart_bar:"柱状图", chart_polar:"极地区域图",
+      top_roles_title:"你当前更突出的团队角色",
+      btn_view_interpretation:"查看详细成长解读",
+      btn_restart:"重新测评", btn_back_report:"← 返回报告",
+      interp_title:"成长解读",
+      points_remaining:"剩余分数",
+      alert_need_creds:"请输入用户名和密码",
+      alert_wrong_creds:"用户名或密码错误",
+      alert_pwd_mismatch:"两次输入的密码不一致",
+      alert_user_exists:"用户名已存在",
+      alert_register_ok:"注册成功，请登录",
+      alert_group_total: (n)=>`本部分你已分配了${n}分，请确保总分恰好为10分`,
+      user_welcome: (name)=>`欢迎你，${name}`,
+      user_label: (name)=>`用户：${name}`,
+      role_primary_title: (name, role)=>`根据这次测评结果，在课程合作、项目分工和校园团队活动中，${name}更容易表现出“${role}”的特点。`,
+      role_secondary_title: (name, role)=>`除了主要角色外，${name}也展现出一定的“${role}”倾向。`,
+      role_secondary_hint:"这说明在不同任务情境下，你不仅有自己比较稳定的一面，也有一些可以被进一步激发和发展的潜力。",
+      section_desc:"角色特点", section_strengths:"在校园合作中的优势",
+      section_weaknesses:"可能遇到的挑战", section_contrib:"给你的成长建议",
+      section_thanks_1:"感谢你完成这次测评。了解自己的团队角色，并不是为了给自己贴上固定标签，而是为了更清楚地认识自己在合作中的自然表现。",
+      section_thanks_2:"没有哪一种角色是“最好的”。更重要的是，在不同的学习任务和合作情境中，逐渐找到适合自己的位置，也尝试练习那些能帮助你继续成长的能力。",
+      sign_org:"大学生团队角色测评",
+      chart_role_label:"角色得分"
+    }},
+    
+    en: { name:"English", ui:{
+      app_title:"Belbin Team Roles Test",
+      label_username:"Username", label_password:"Password", label_confirm_pwd:"Confirm Password",
+      ph_username:"Enter username", ph_password:"Enter password", ph_confirm_password:"Re-enter password",
+      btn_login:"Log in", btn_register:"Register", btn_confirm_register:"Confirm Registration",
+      btn_back_login:"← Back to Login",
+      welcome_title:"Belbin Team Roles Test",
+      motto_1:"No one is perfect; together a team can be.",
+      motto_2:"Program by: Chongqing Technology and Business University · Yan Qinghua",
+      welcome_p1:"Welcome to the Belbin Team Roles assessment!",
+      welcome_p2:"This test helps you understand your preferred roles in a team.",
+      welcome_p3:"There are 7 parts, each with 9 statements.",
+      welcome_p4:"In each part you have 10 points to allocate across the statements.",
+      btn_start_test:"Start Test",
+      btn_back_home:"← Back to Home",
+      btn_prev:"Previous Part",
+      btn_next:"Next Part",
+      btn_finish:"Finish Test",
+      test_instruction:"Allocate a total of 10 points across the 9 statements below. Some may be zero, but the total must equal exactly 10.",
+      title_complete:"Test Completed",
+      complete_p1:"Great! You've finished all parts.",
+      complete_p2:"Would you like to view your report?",
+      btn_view_report:"View Report",
+      btn_back_prev:"← Back",
+      report_title:"Your Belbin Team Roles Results",
+      chart_radar:"Radar", chart_bar:"Bar", chart_polar:"Polar Area",
+      top_roles_title:"Your Core Roles",
+      btn_view_interpretation:"View Detailed Interpretation",
+      btn_restart:"Restart", btn_back_report:"← Back to Report",
+      interp_title:"Detailed Role Interpretation",
+      points_remaining:"Points Left",
+      alert_need_creds:"Please enter username and password",
+      alert_wrong_creds:"Incorrect username or password",
+      alert_pwd_mismatch:"Passwords do not match",
+      alert_user_exists:"Username already exists",
+      alert_register_ok:"Registered! Please log in.",
+      alert_group_total:(n)=>`You have allocated ${n} points. The total must be exactly 10.`,
+      user_welcome:(name)=>`Welcome, ${name}`,
+      user_label:(name)=>`User: ${name}`,
+      role_primary_title:(name, role)=>`${name}, your primary team role is: ${role}`,
+      role_secondary_title:(name, role)=>`${name}, your secondary role may be: ${role}`,
+      role_secondary_hint:"You may develop and strengthen this role if needed by you or your team.",
+      section_desc:"Description", section_strengths:"Strengths", section_weaknesses:"Allowable Weaknesses", section_contrib:"Contributions",
+      section_thanks_1:"Thanks for taking the Belbin assessment! Understanding your roles is a key step to better collaboration.",
+      section_thanks_2:"We hope this report helps you leverage your strengths at work and in your career. Wishing you every success!",
+      sign_org:"Chongqing Technology and Business University · Yan Qinghua",
+      chart_role_label:"Role Score"
+    }},
+    fr:{ name:"Français", ui:{
+      app_title:"Test des rôles d’équipe Belbin",
+      label_username:"Nom d’utilisateur", label_password:"Mot de passe", label_confirm_pwd:"Confirmer le mot de passe",
+      ph_username:"Saisir le nom d’utilisateur", ph_password:"Saisir le mot de passe", ph_confirm_password:"Resaisir le mot de passe",
+      btn_login:"Se connecter", btn_register:"Créer un compte", btn_confirm_register:"Valider l’inscription",
+      btn_back_login:"← Retour à la connexion",
+      welcome_title:"Test des rôles d’équipe Belbin",
+      motto_1:"Aucun individu n’est parfait ; ensemble, une équipe peut l’être.",
+      motto_2:"Programme : CTBU · Yan Qinghua",
+      welcome_p1:"Bienvenue au questionnaire Belbin !",
+      welcome_p2:"Ce test vous aide à comprendre vos rôles préférés en équipe.",
+      welcome_p3:"Il y a 7 parties, chacune avec 9 affirmations.",
+      welcome_p4:"Dans chaque partie, vous disposez de 10 points à répartir.",
+      btn_start_test:"Commencer",
+      btn_back_home:"← Accueil",
+      btn_prev:"Partie précédente",
+      btn_next:"Partie suivante",
+      btn_finish:"Terminer le test",
+      test_instruction:"Répartissez exactement 10 points entre les 9 affirmations ci-dessous. Certaines peuvent recevoir 0.",
+      title_complete:"Test terminé",
+      complete_p1:"Bravo ! Vous avez terminé toutes les parties.",
+      complete_p2:"Voulez-vous consulter votre rapport ?",
+      btn_view_report:"Voir le rapport",
+      btn_back_prev:"← Retour",
+      report_title:"Vos résultats Belbin",
+      chart_radar:"Radar", chart_bar:"Histogramme", chart_polar:"Zone polaire",
+      top_roles_title:"Vos rôles clés",
+      btn_view_interpretation:"Voir l’interprétation détaillée",
+      btn_restart:"Recommencer", btn_back_report:"← Retour au rapport",
+      interp_title:"Interprétation détaillée",
+      points_remaining:"Points restants",
+      alert_need_creds:"Veuillez saisir le nom d’utilisateur et le mot de passe",
+      alert_wrong_creds:"Identifiant ou mot de passe incorrect",
+      alert_pwd_mismatch:"Les mots de passe ne correspondent pas",
+      alert_user_exists:"Ce nom d’utilisateur existe déjà",
+      alert_register_ok:"Inscription réussie ! Connectez-vous.",
+      alert_group_total:(n)=>`Vous avez attribué ${n} points. Le total doit être 10.`,
+      user_welcome:(name)=>`Bienvenue, ${name}`,
+      user_label:(name)=>`Utilisateur : ${name}`,
+      role_primary_title:(name, role)=>`${name}, votre rôle principal est : ${role}`,
+      role_secondary_title:(name, role)=>`${name}, votre rôle secondaire pourrait être : ${role}`,
+      role_secondary_hint:"Vous pouvez développer ce rôle selon les besoins.",
+      section_desc:"Description", section_strengths:"Forces", section_weaknesses:"Faiblesses tolérables", section_contrib:"Contributions",
+      section_thanks_1:"Merci d’avoir passé le test Belbin !", section_thanks_2:"Plein succès !",
+      sign_org:"Université CTBU · Yan Qinghua", chart_role_label:"Score par rôle"
+    }},
+    th:{ name:"ไทย", ui:{
+      app_title:"แบบทดสอบบทบาททีม Belbin",
+      label_username:"ชื่อผู้ใช้", label_password:"รหัสผ่าน", label_confirm_pwd:"ยืนยันรหัสผ่าน",
+      ph_username:"กรอกชื่อผู้ใช้", ph_password:"กรอกรหัสผ่าน", ph_confirm_password:"กรอกรหัสผ่านอีกครั้ง",
+      btn_login:"เข้าสู่ระบบ", btn_register:"สมัครสมาชิก", btn_confirm_register:"ยืนยันการสมัคร",
+      btn_back_login:"← กลับสู่หน้าเข้าสู่ระบบ",
+      welcome_title:"แบบทดสอบบทบาททีม Belbin",
+      motto_1:"ไม่มีใครสมบูรณ์แบบ แต่ทีมสามารถสมบูรณ์ได้",
+      motto_2:"พัฒนาโดย: CTBU · Yan Qinghua",
+      welcome_p1:"ยินดีต้อนรับสู่แบบทดสอบ Belbin",
+      welcome_p2:"แบบทดสอบนี้ช่วยให้เข้าใจบทบาทที่คุณถนัดในทีม",
+      welcome_p3:"ทั้งหมด 7 ส่วน ส่วนละ 9 ข้อความ",
+      welcome_p4:"แต่ละส่วนมี 10 คะแนนให้จัดสรร",
+      btn_start_test:"เริ่มทำแบบทดสอบ",
+      btn_back_home:"← กลับหน้าหลัก",
+      btn_prev:"ส่วนก่อนหน้า",
+      btn_next:"ส่วนถัดไป",
+      btn_finish:"จบแบบทดสอบ",
+      test_instruction:"กระจาย 10 คะแนนให้ครบกับข้อความ 9 ข้อด้านล่าง",
+      title_complete:"ทำแบบทดสอบเสร็จ",
+      complete_p1:"เยี่ยม! คุณทำครบทุกส่วนแล้ว",
+      complete_p2:"ต้องการดูรายงานหรือไม่?",
+      btn_view_report:"ดูรายงาน",
+      btn_back_prev:"← กลับ",
+      report_title:"ผลลัพธ์บทบาททีม Belbin ของคุณ",
+      chart_radar:"เรดาร์", chart_bar:"แท่ง", chart_polar:"โพลาร์",
+      top_roles_title:"บทบาทเด่นของคุณ",
+      btn_view_interpretation:"ดูการอธิบายเชิงลึก",
+      btn_restart:"เริ่มใหม่", btn_back_report:"← กลับสู่รายงาน",
+      interp_title:"การตีความบทบาทโดยละเอียด",
+      points_remaining:"คะแนนคงเหลือ",
+      alert_need_creds:"กรอกชื่อผู้ใช้และรหัสผ่าน",
+      alert_wrong_creds:"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+      alert_pwd_mismatch:"รหัสผ่านไม่ตรงกัน",
+      alert_user_exists:"มีชื่อผู้ใช้นี้แล้ว",
+      alert_register_ok:"สมัครเสร็จแล้ว กรุณาเข้าสู่ระบบ",
+      alert_group_total:(n)=>`คุณให้ไปแล้ว ${n} คะแนน ต้องรวมกันเป็น 10 คะแนน`,
+      user_welcome:(name)=>`ยินดีต้อนรับ, ${name}`,
+      user_label:(name)=>`ผู้ใช้: ${name}`,
+      role_primary_title:(name, role)=>`${name} บทบาทหลักของคุณคือ: ${role}`,
+      role_secondary_title:(name, role)=>`${name} บทบาทรองของคุณอาจเป็น: ${role}`,
+      role_secondary_hint:"สามารถพัฒนาบทบาทนี้ได้หากจำเป็น",
+      section_desc:"คำอธิบาย", section_strengths:"จุดแข็ง", section_weaknesses:"จุดอ่อนที่ยอมรับได้", section_contrib:"สิ่งที่มอบให้ทีม",
+      section_thanks_1:"ขอบคุณที่ทำแบบทดสอบ Belbin!", section_thanks_2:"ขอให้โชคดี!",
+      sign_org:"มหาวิทยาลัย CTBU · Yan Qinghua", chart_role_label:"คะแนนบทบาท"
+    }},
+    ru:{ name:"Русский", ui:{
+      app_title:"Тест ролей Белбина",
+      label_username:"Имя пользователя", label_password:"Пароль", label_confirm_pwd:"Подтверждение пароля",
+      ph_username:"Введите имя пользователя", ph_password:"Введите пароль", ph_confirm_password:"Повторите пароль",
+      btn_login:"Войти", btn_register:"Регистрация", btn_confirm_register:"Подтвердить",
+      btn_back_login:"← Назад к входу",
+      welcome_title:"Тест Белбина",
+      motto_1:"Один не совершенен; команда может быть.", motto_2:"Программа: CTBU · Ян Цинхуа",
+      welcome_p1:"Добро пожаловать в тест Белбина!", welcome_p2:"Он помогает понять ваши роли в команде.",
+      welcome_p3:"7 разделов по 9 утверждений.", welcome_p4:"В каждом разделе распределите 10 баллов.",
+      btn_start_test:"Начать", btn_back_home:"← На главную", btn_prev:"Предыдущий раздел", btn_next:"Следующий раздел", btn_finish:"Завершить тест",
+      test_instruction:"Распределите ровно 10 баллов между 9 утверждениями ниже.",
+      title_complete:"Тест завершён", complete_p1:"Отлично! Все разделы пройдены.", complete_p2:"Открыть отчёт?",
+      btn_view_report:"Показать отчёт", btn_back_prev:"← Назад", report_title:"Ваши результаты Белбина",
+      chart_radar:"Радар", chart_bar:"Столбцы", chart_polar:"Полярная",
+      top_roles_title:"Ваши ключевые роли",
+      btn_view_interpretation:"Детальная интерпретация", btn_restart:"Сбросить", btn_back_report:"← Назад к отчёту",
+      interp_title:"Подробная интерпретация", points_remaining:"Осталось баллов",
+      alert_need_creds:"Введите имя пользователя и пароль", alert_wrong_creds:"Неверные имя пользователя или пароль",
+      alert_pwd_mismatch:"Пароли не совпадают", alert_user_exists:"Имя пользователя уже занято", alert_register_ok:"Регистрация прошла успешно. Войдите.",
+      alert_group_total:(n)=>`Вы распределили ${n} баллов. Нужно ровно 10.`,
+      user_welcome:(name)=>`Добро пожаловать, ${name}`, user_label:(name)=>`Пользователь: ${name}`,
+      role_primary_title:(name, role)=>`${name}, ваша основная роль: ${role}`,
+      role_secondary_title:(name, role)=>`${name}, потенциальная вторичная роль: ${role}`,
+      role_secondary_hint:"Эту роль можно развивать при необходимости.",
+      section_desc:"Описание", section_strengths:"Сильные стороны", section_weaknesses:"Допустимые слабости", section_contrib:"Вклад",
+      section_thanks_1:"Спасибо за прохождение теста Белбина!", section_thanks_2:"Успехов!",
+      sign_org:"CTBU · Ян Цинхуа", chart_role_label:"Баллы роли"
+    }},
+    id:{ name:"Bahasa Indonesia", ui:{
+      app_title:"Tes Peran Tim Belbin",
+      label_username:"Nama pengguna", label_password:"Kata sandi", label_confirm_pwd:"Konfirmasi kata sandi",
+      ph_username:"Masukkan nama pengguna", ph_password:"Masukkan kata sandi", ph_confirm_password:"Masukkan ulang kata sandi",
+      btn_login:"Masuk", btn_register:"Daftar", btn_confirm_register:"Konfirmasi pendaftaran",
+      btn_back_login:"← Kembali ke Login",
+      welcome_title:"Tes Peran Tim Belbin",
+      motto_1:"Tak ada yang sempurna sendirian; tim bisa jadi sempurna.", motto_2:"Program: CTBU · Yan Qinghua",
+      welcome_p1:"Selamat datang di tes Belbin!", welcome_p2:"Tes ini membantu memahami peran Anda di dalam tim.",
+      welcome_p3:"Terdapat 7 bagian, masing-masing 9 pernyataan.", welcome_p4:"Setiap bagian memiliki 10 poin untuk dibagikan.",
+      btn_start_test:"Mulai Tes", btn_back_home:"← Beranda", btn_prev:"Bagian Sebelumnya", btn_next:"Bagian Berikutnya", btn_finish:"Selesai",
+      test_instruction:"Bagikan tepat 10 poin ke 9 pernyataan di bawah.",
+      title_complete:"Tes Selesai", complete_p1:"Bagus! Anda telah menyelesaikan semua bagian.", complete_p2:"Ingin melihat laporan?",
+      btn_view_report:"Lihat Laporan", btn_back_prev:"← Kembali", report_title:"Hasil Peran Tim Belbin Anda",
+      chart_radar:"Radar", chart_bar:"Batang", chart_polar:"Polar Area",
+      top_roles_title:"Peran Utama Anda",
+      btn_view_interpretation:"Lihat Interpretasi Detail", btn_restart:"Mulai Ulang", btn_back_report:"← Kembali ke Laporan",
+      interp_title:"Interpretasi Peran Terperinci", points_remaining:"Sisa Poin",
+      alert_need_creds:"Masukkan nama pengguna dan kata sandi", alert_wrong_creds:"Nama pengguna atau kata sandi salah",
+      alert_pwd_mismatch:"Kata sandi tidak cocok", alert_user_exists:"Nama pengguna sudah ada", alert_register_ok:"Pendaftaran berhasil. Silakan masuk.",
+      alert_group_total:(n)=>`Anda telah membagikan ${n} poin. Total harus tepat 10.`,
+      user_welcome:(name)=>`Selamat datang, ${name}`, user_label:(name)=>`Pengguna: ${name}`,
+      role_primary_title:(name, role)=>`${name}, peran utama Anda: ${role}`,
+      role_secondary_title:(name, role)=>`${name}, peran sekunder Anda mungkin: ${role}`,
+      role_secondary_hint:"Peran ini dapat dikembangkan sesuai kebutuhan.",
+      section_desc:"Deskripsi", section_strengths:"Kekuatan", section_weaknesses:"Kelemahan yang Dapat Diterima", section_contrib:"Kontribusi",
+      section_thanks_1:"Terima kasih telah mengikuti tes Belbin!", section_thanks_2:"Sukses selalu!",
+      sign_org:"CTBU · Yan Qinghua", chart_role_label:"Skor Peran"
+    }}
+  };
+
+  // Build parts and roles for each language
+  const enParts = [
+    { title:"Part 1: How I believe I contribute to a team", questions:[
+      "I can quickly spot and seize new opportunities.","I work well with people of different types.","I usually sense what is realistic and what is possible.",
+      "I get things done mainly through my own effort.","When I notice someone valuable to the team goal, I promptly bring them in.",
+      "My professional knowledge and skills are my main asset.","When choosing a course of action, I can propose a reasonable alternative without bias.","I am a natural idea-generator.",
+      "If the outcome is beneficial, I can tolerate initial indifference or pushback."
+    ]},
+    { title:"Part 2: My possible weaknesses in a team", questions:[
+      "If a meeting is poorly organized or chaired, I feel uncomfortable.","My objectivity sometimes makes it hard to fit in socially with colleagues.",
+      "Because I value group climate, I sometimes struggle to stand out.","I can get lost in sudden flights of imagination and forget ongoing work.",
+      "Colleagues think I over-focus on details and worry unnecessarily about mistakes.","When something must be done, I can come across as forceful or even overbearing.",
+      "I may be too tolerant of people who have good ideas but do not present them properly.","I’m reluctant to contribute unless the topic is highly relevant to me.","When new ideas are discussed, I tend to talk too much."
+    ]},
+    { title:"Part 3: When working with others", questions:[
+      "I am among the first to present original insights.","I constantly guard against carelessness and oversight.","I can influence others without exerting pressure.",
+      "I eagerly seek new thinking and developments.","I strive to uphold professional ethics.","I trust my judgment to help make the right decisions.",
+      "I am willing to back positive suggestions for the common good.","I will press for action to ensure meetings aren't time-wasting or off-topic.","I reassure others by organizing the basics meticulously."
+    ]},
+    { title:"Part 4: My characteristics in a work team", questions:[
+      "I am keen to learn more about my colleagues.","Though I consider all views, I still decide firmly when needed.","I often challenge others’ views or stand by my own.",
+      "Once a plan must start, I can drive execution.","I deliberately avoid standing out or being unpredictable.","I enjoy connecting with people outside the team.",
+      "Whatever task I take on, I pursue excellence.","In debates I usually find arguments to refute weak claims.","I contribute most when I am clear about the topic."
+    ]},
+    { title:"Part 5: Why I feel satisfied at work", questions:[
+      "I like analyzing situations and weighing all options.","I feel I help the team by using my expertise.","I enjoy a space where imagination can flourish.",
+      "I have a temperament that lets me devote myself wholeheartedly to work.","I’m interested in finding feasible solutions to problems.","I feel I promote good working relationships.",
+      "I can adapt to people with novel ideas.","I help build consensus for necessary actions.","I can strongly influence decisions."
+    ]},
+    { title:"Part 6: If I’m suddenly given a tough task with limited time and unfamiliar people", questions:[
+      "I will read as much as possible to seek guidance.","Despite difficulties, I keep the goal consistent.","I’ll open wide discussion to spark ideas and drive work forward.",
+      "I can keep cool and think in an orderly way.","I’ll reduce workload by deploying people to their strengths.","Before a new plan emerges, I prefer to step aside and draft a way out.",
+      "If the team stalls, I take active measures to push progress.","My natural sense of urgency helps us stay on schedule.","I prefer to work with those who show a positive attitude."
+    ]},
+    { title:"Part 7: Regarding problems encountered in team work", questions:[
+      "I easily become impatient with those who block progress.","When I clash with true opposites, I can’t always get my point across.","I dislike feeling my time is wasted and would rather work alone.",
+      "For things I cannot do, I consciously seek help from others.","I may become bored and need one or two passionate people to lift me.","My strong desire for perfection can slow continuous progress.",
+      "Others may say I over-analyze and lack intuition.","If the goal is unclear, it’s hard for me to get started.","I sometimes struggle to explain or clarify complex issues I face."
+    ]}
+  ];
+
+  // Roles translations for non-zh languages
+  const roleKeys = ["IMP","CO","SH","PL","RI","ME","TW","CF","SP"];
+  const zhRoles = (testData.roles || []).map((r,i)=>({code:roleKeys[i], name:r.name, description:r.description, strengths:r.strengths, weaknesses:r.weaknesses, contributions:r.contributions }));
+  const enRoles = [
+    {code:"IMP",name:"Implementer",description:"Pragmatic and reliable; turns ideas into actions.",strengths:"Disciplined, efficient, well-organized; converts concepts into practical tasks.",weaknesses:"May be inflexible and slow to respond to new possibilities; sometimes conservative.",contributions:"Translates decisions and concepts into manageable tasks and executes plans systematically."},
+    {code:"CO",name:"Coordinator",description:"Mature and confident; clarifies goals and facilitates decisions.",strengths:"Clarifies objectives, delegates appropriately, identifies talent and resources.",weaknesses:"May be seen as manipulative or delegating own work; sometimes lacks hands-on input.",contributions:"Keeps the team focused on goals, facilitates decision-making, and unlocks members’ potential."},
+    {code:"SH",name:"Shaper",description:"Challenging and dynamic; thrives under pressure and overcomes obstacles.",strengths:"Drives pace, challenges inertia and complacency, pushes the team forward.",weaknesses:"Can be provocative, impatient, and hurt others’ feelings; may trigger conflict.",contributions:"Provides energy and drive; raises performance standards especially under pressure."},
+    {code:"PL",name:"Plant",description:"Creative and imaginative; solves difficult problems.",strengths:"Generates original ideas and strategies; solves complex issues.",weaknesses:"May ignore detail and get absorbed in ideas; sometimes poor at follow-through.",contributions:"Offers novel approaches and focuses on big issues to create innovative solutions."},
+    {code:"RI",name:"Resource Investigator",description:"Outgoing and enthusiastic; explores opportunities and builds contacts.",strengths:"Communicative networker; spots opportunities and develops external links.",weaknesses:"May be over-optimistic and lose interest once initial enthusiasm fades.",contributions:"Explores external resources, develops useful contacts, and negotiates for team benefit."},
+    {code:"ME",name:"Monitor Evaluator",description:"Sober and strategic; makes accurate judgments.",strengths:"Objective analysis, critical thinking, sound judgment.",weaknesses:"May lack drive to inspire others; can appear detached and critical.",contributions:"Weighs options carefully and steers the team away from poor decisions."},
+    {code:"TW",name:"Teamworker",description:"Cooperative and perceptive; averts friction and supports others.",strengths:"Diplomatic, attentive, fosters harmony and cohesion in the team.",weaknesses:"May avoid confrontation and be indecisive at critical moments.",contributions:"Supports colleagues and helps maintain harmony, especially under pressure."},
+    {code:"CF",name:"Completer Finisher",description:"Conscientious and detail-oriented; searches out errors and meets deadlines.",strengths:"Painstaking, quality-focused, detects omissions and ensures high standards.",weaknesses:"Reluctant to delegate, over-worries about small details, may lose sight of the big picture.",contributions:"Prevents careless mistakes, monitors critical tasks, and keeps a healthy sense of urgency."},
+    {code:"SP",name:"Specialist",description:"Single-minded and self-motivated; provides rare skills and knowledge.",strengths:"Deep expertise and focus in a key domain; valuable technical contribution.",weaknesses:"Contribution may be narrow; may overlook the bigger picture and struggle to communicate with non-specialists.",contributions:"Provides specialist knowledge and solves technical problems in critical areas."}
+  ];
+
+  i18n.zh.parts = testData.parts;
+  i18n.zh.roles = zhRoles;
+
+  // For non-zh languages, reuse English parts; you can later replace with full translations
+  ["en","fr","th","ru","id"].forEach(l=>{
+    i18n[l].parts = enParts;
+  });
+  i18n.en.roles = enRoles;
+  // For other languages, temporarily map roles to English names (can translate later)
+  ["fr","th","ru","id"].forEach(l=>{ i18n[l].roles = enRoles; });
+
+  // Expose i18n
+  window._i18n = i18n;
+
+  // Language state + helpers
+  const state = { lang: localStorage.getItem('belbinLang') || 'zh' };
+  function setLang(lang){
+    state.lang = lang;
+    localStorage.setItem('belbinLang', lang);
+    document.getElementById('lang-current').textContent = i18n[lang].name;
+    applyI18n();
+    // re-render current screens if needed
+    if(document.getElementById('welcome-screen')?.classList.contains('active')){ updateWelcomeTexts(); }
+    if(document.getElementById('test-screen')?.classList.contains('active')){ loadTestPart(appState.currentPart); }
+    if(document.getElementById('report-screen')?.classList.contains('active')){ showReportScreen(); }
+    if(document.getElementById('interpretation-screen')?.classList.contains('active')){ showInterpretationScreen(); }
+  }
+  window.setLang = setLang;
+
+  function t(key){ const v = i18n[state.lang].ui[key]; return (typeof v==='function')?v: (v ?? _i18n.en.ui[key] ?? key); }
+  function tn(key, ...args){ const v = i18n[state.lang].ui[key]; return (typeof v==='function')?v(...args): (v ?? key); }
+  window._t = t; window._tn = tn;
+
+  function getParts(){ return i18n[state.lang].parts; }
+  function getRoles(){ return i18n[state.lang].roles; }
+  window._getParts = getParts; window._getRoles = getRoles;
+
+  function updateWelcomeTexts(){
+    const ws = document.getElementById('welcome-screen');
+    if(!ws) return;
+    ws.querySelector('h1').textContent = t('welcome_title');
+    const motto = ws.querySelector('.motto');
+    if(motto){
+      motto.querySelector('.motto-line1').textContent = t('motto_1');
+      motto.querySelector('.motto-line2').textContent = t('motto_2');
+    }
+    const msgs = ws.querySelectorAll('.welcome-message p');
+    if(msgs.length>=4){
+      msgs[0].textContent = t('welcome_p1');
+      msgs[1].textContent = t('welcome_p2');
+      msgs[2].textContent = t('welcome_p3');
+      msgs[3].textContent = t('welcome_p4');
+    }
+    const startBtn = document.getElementById('start-test-btn');
+    if(startBtn) startBtn.textContent = t('btn_start_test');
+  }
+
+  function applyI18n(){
+    // Login
+    const ls = document.getElementById('login-screen');
+    if(ls){
+      ls.querySelector('h1').textContent = t('app_title');
+      const labels = ls.querySelectorAll('label');
+      if(labels[0]) labels[0].textContent = t('label_username');
+      if(labels[1]) labels[1].textContent = t('label_password');
+      const u = document.getElementById('username'); if(u) u.placeholder = t('ph_username');
+      const p = document.getElementById('password'); if(p) p.placeholder = t('ph_password');
+      const lb = document.getElementById('login-btn'); if(lb) lb.textContent = t('btn_login');
+      const rb = document.getElementById('register-btn'); if(rb) rb.textContent = t('btn_register');
+    }
+    // Register
+    const rs = document.getElementById('register-screen');
+    if(rs){
+      rs.querySelector('h1') && (rs.querySelector('h1').textContent = t('btn_register'));
+      const labels = rs.querySelectorAll('label');
+      if(labels[0]) labels[0].textContent = t('label_username');
+      if(labels[1]) labels[1].textContent = t('label_password');
+      if(labels[2]) labels[2].textContent = t('label_confirm_pwd');
+      const nu = document.getElementById('new-username'); if(nu) nu.placeholder = t('ph_username');
+      const np = document.getElementById('new-password'); if(np) np.placeholder = t('ph_password');
+      const cp = document.getElementById('confirm-password'); if(cp) cp.placeholder = t('ph_confirm_password');
+      const cb = document.getElementById('confirm-register-btn'); if(cb) cb.textContent = t('btn_confirm_register');
+      const back = document.getElementById('back-to-login-from-register'); if(back) back.textContent = t('btn_back_login');
+    }
+    // Welcome
+    const backWel = document.getElementById('back-to-login-from-welcome'); if(backWel) backWel.textContent = t('btn_back_login');
+    updateWelcomeTexts();
+
+    // Test screen
+    const bth = document.getElementById('back-to-welcome-from-test'); if(bth) bth.textContent = t('btn_back_home');
+    const instr = document.querySelector('#test-screen .test-instructions p'); if(instr){ instr.innerHTML = `<strong>${t('test_instruction').split('：')[0]}：</strong>${t('test_instruction')}`; }
+    const prev = document.getElementById('prev-part-btn'); if(prev) prev.textContent = t('btn_prev');
+    const next = document.getElementById('next-part-btn'); if(next) next.textContent = t('btn_next');
+    const prf = document.getElementById('points-remaining-fixed'); if(prf) prf.textContent = `${t('points_remaining')}: 10`;
+    const prs = document.getElementById('points-remaining-sticky'); if(prs) prs.textContent = `${t('points_remaining')}: 10`;
+
+    // Complete screen
+    const btt = document.getElementById('back-to-test-from-complete'); if(btt) btt.textContent = t('btn_back_home');
+    const tcs = document.getElementById('test-complete-screen'); 
+    if(tcs){
+      const h1 = tcs.querySelector('h1'); if(h1) h1.textContent = t('title_complete');
+      const ps = tcs.querySelectorAll('p');
+      if(ps[0]) ps[0].textContent = t('complete_p1');
+      if(ps[1]) ps[1].textContent = t('complete_p2');
+      const v = document.getElementById('view-report-btn'); if(v) v.textContent = t('btn_view_report');
+    }
+
+    // Report screen
+    const br = document.getElementById('back-to-complete-from-report'); if(br) br.textContent = t('btn_back_prev');
+    const rscr = document.getElementById('report-screen');
+    if(rscr){
+      const h2 = rscr.querySelector('h2'); if(h2) h2.textContent = t('report_title');
+      const btns = rscr.querySelectorAll('.chart-type-btn');
+      if(btns[0]) btns[0].textContent = t('chart_radar');
+      if(btns[1]) btns[1].textContent = t('chart_bar');
+      if(btns[2]) btns[2].textContent = t('chart_polar');
+      const interBtn = document.getElementById('view-interpretation-btn'); if(interBtn) interBtn.textContent = t('btn_view_interpretation');
+      const homeBtn = document.getElementById('back-to-welcome-from-report'); if(homeBtn) homeBtn.textContent = t('btn_back_home');
+      const restartBtn = document.getElementById('restart-test-btn'); if(restartBtn) restartBtn.textContent = t('btn_restart');
+      const topTitle = rscr.querySelector('.role-interpretation h3'); if(topTitle) topTitle.textContent = t('top_roles_title');
+    }
+
+    // Interpretation screen
+    const bir = document.getElementById('back-to-report-from-interpretation'); if(bir) bir.textContent = t('btn_back_report');
+    const ih2 = document.querySelector('#interpretation-screen h2'); if(ih2) ih2.textContent = t('interp_title');
+  }
+
+  // Override loadTestPart to use language parts + labels
+  const _orig_load = window.loadTestPart;
+  window.loadTestPart = function(partIndex){
+    const parts = getParts();
+    const part = parts[partIndex];
+    document.getElementById('test-part-title').textContent = part.title;
+    document.getElementById('prev-part-btn').style.display = partIndex > 0 ? 'block' : 'none';
+    const nextBtn = document.getElementById('next-part-btn');
+    if(nextBtn) nextBtn.textContent = partIndex < 6 ? t('btn_next') : t('btn_finish');
+
+    const questionsContainer = document.getElementById('questions-container');
+    questionsContainer.innerHTML = '';
+
+    part.questions.forEach((q, idx)=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'question';
+      wrap.innerHTML = `<p>${q}</p>
+      <div class="slider-container">
+        <input type="range" min="0" max="10" value="${appState.userAnswers[partIndex][idx]}" class="slider" data-part="${partIndex}" data-question="${idx}">
+        <span class="slider-value">${appState.userAnswers[partIndex][idx]}</span>
+      </div>`;
+      questionsContainer.appendChild(wrap);
+    });
+    document.querySelectorAll('.slider').forEach(s=>s.addEventListener('input', function(e){
+      const sld = e.target;
+      const pi = +sld.getAttribute('data-part');
+      const qi = +sld.getAttribute('data-question');
+      const val = +sld.value;
+      sld.nextElementSibling.textContent = val;
+      appState.userAnswers[pi][qi] = val;
+      updateRemainingPoints(pi);
+    }));
+    updateRemainingPoints(partIndex);
+    const prf = document.getElementById('points-remaining-fixed');
+    if(prf) prf.textContent = `${t('points_remaining')}: ${10 - (appState.userAnswers[partIndex]||[]).reduce((a,b)=>a+b,0)}`;
+  };
+
+  // Override displayTopRoles and showInterpretationScreen to use translated roles
+  window.displayTopRoles = function(roleScores){
+    const topRolesContainer = document.getElementById('top-roles');
+    topRolesContainer.innerHTML = '';
+    const roles = getRoles();
+    const roleScoreArray = roleScores.map((score, index)=>({ role: roles[index], score, index }));
+    roleScoreArray.sort((a,b)=>b.score-a.score);
+    roleScoreArray.slice(0,3).forEach(item=>{
+      const div = document.createElement('div');
+      div.className = 'role-item';
+      div.innerHTML = `<div class="role-name">${item.role.name}</div>
+                       <div class="role-score">${t('chart_role_label')}: ${item.score}</div>
+                       <p>${item.role.description}</p>`;
+      topRolesContainer.appendChild(div);
+    });
+  };
+
+  window.showInterpretationScreen = function(){
+    const label = tn('user_label', appState.currentUser?.name || appState.currentUser?.username || '');
+    document.getElementById('interpretation-user-info').textContent = label;
+    const roles = getRoles();
+    const arr = appState.roleScores.map((s,i)=>({s,i})).sort((a,b)=>b.s-a.s);
+    let html = '';
+    if(arr.length>0){
+      const r1 = roles[arr[0].i];
+      html += `<div class="interpretation-section">
+        <h3>${tn('role_primary_title', appState.currentUser?.name || '', r1.name)}</h3>
+        <p><strong>${t('section_desc')}：</strong>${r1.description}</p>
+        <p><strong>${t('section_strengths')}：</strong>${r1.strengths}</p>
+        <p><strong>${t('section_weaknesses')}：</strong>${r1.weaknesses}</p>
+        <p><strong>${t('section_contrib')}：</strong>${r1.contributions}</p>
+      </div>`;
+    }
+    if(arr.length>1){
+      const r2 = roles[arr[1].i];
+      html += `<div class="interpretation-section">
+        <h3>${tn('role_secondary_title', appState.currentUser?.name || '', r2.name)}</h3>
+        <p>${t('role_secondary_hint')}</p>
+        <p><strong>${t('section_desc')}：</strong>${r2.description}</p>
+        <p><strong>${t('section_strengths')}：</strong>${r2.strengths}</p>
+        <p><strong>${t('section_weaknesses')}：</strong>${r2.weaknesses}</p>
+        <p><strong>${t('section_contrib')}：</strong>${r2.contributions}</p>
+      </div>`;
+    }
+    html += `<div class="interpretation-section"><p>${t('section_thanks_1')}</p><p>${t('section_thanks_2')}</p></div>
+             <div class="signature"><p>${t('sign_org')}</p><p>${new Date().toLocaleDateString(state.lang==='zh'?'zh-CN':state.lang,{year:'numeric',month:'long',day:'numeric'})}</p></div>`;
+    document.getElementById('role-details').innerHTML = html;
+    document.getElementById('interpretation-screen').classList.add('active');
+    document.getElementById('report-screen').classList.remove('active');
+  };
+
+  // Override updateChart to use translated labels and roles
+  window.updateChart = function(chartType){
+    const ctx = document.getElementById('results-chart').getContext('2d');
+    if(appState.chart){ appState.chart.destroy(); }
+    const roles = getRoles();
+    const names = roles.map(r=>r.name);
+    const scores = appState.roleScores;
+    const pairs = scores.map((s,i)=>({s,i})).sort((a,b)=>b.s-a.s);
+    const namesSorted = pairs.map(o=>names[o.i]);
+    const scoresSorted = pairs.map(o=>o.s);
+    const maxScore = Math.max(...scoresSorted);
+    const second = scoresSorted.length>1 ? scoresSorted[1] : 0;
+
+    switch(chartType){
+      case 'radar':
+        appState.chart = new Chart(ctx, {
+          type: 'radar',
+          data: { labels: names, datasets:[{ label: t('chart_role_label'), data: scores,
+            backgroundColor:'rgba(52,152,219,.2)', borderColor:'rgba(52,152,219,1)', borderWidth:2,
+            pointBackgroundColor: scores.map(v=> v===maxScore ? 'rgba(243,156,18,1)' : 'rgba(52,152,219,1)'),
+            pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:scores.map(v=> v===maxScore?8:5), pointHoverRadius:scores.map(v=> v===maxScore?10:7) }]},
+          options:{ scales:{ r:{ angleLines:{display:true,color:'rgba(255,255,255,.1)'}, grid:{color:'rgba(255,255,255,.1)'},
+            pointLabels:{color:'rgba(255,255,255,.85)',font:{size:12}}, ticks:{color:'rgba(255,255,255,.6)',backdropColor:'transparent'},
+            suggestedMin:0, suggestedMax: Math.max(...scores)+5 }}, plugins:{ legend:{display:false} } }
+        });
+        break;
+      case 'bar':
+        appState.chart = new Chart(ctx, {
+          type:'bar',
+          data:{ labels:namesSorted, datasets:[{ label:t('chart_role_label'), data:scoresSorted, backgroundColor:scoresSorted.map(v=> v===maxScore?'rgba(243,156,18,.75)':(v===second?'rgba(46,204,113,.75)':'rgba(52,152,219,.75)')), borderColor:scoresSorted.map(v=> v===maxScore?'rgba(243,156,18,1)':(v===second?'rgba(46,204,113,1)':'rgba(52,152,219,1)')), borderWidth:1 }]},
+          options:{ scales:{ y:{ beginAtZero:true, grid:{color:'rgba(255,255,255,.1)'}, ticks:{color:'rgba(255,255,255,.85)'} }, x:{ grid:{color:'rgba(255,255,255,.1)'}, ticks:{color:'rgba(255,255,255,.85)',maxRotation:45,minRotation:45} } }, plugins:{ legend:{display:false} } }
+        });
+        break;
+      default:
+        appState.chart = new Chart(ctx, {
+          type:'polarArea',
+          data:{ labels:namesSorted, datasets:[{ label:t('chart_role_label'), data:scoresSorted, backgroundColor:[ 'rgba(255,99,132,.7)','rgba(54,162,235,.7)','rgba(255,206,86,.7)','rgba(75,192,192,.7)','rgba(153,102,255,.7)','rgba(255,159,64,.7)','rgba(199,199,199,.7)','rgba(83,102,255,.7)','rgba(40,159,64,.7)'], borderWidth:1 }]},
+          options:{ scales:{ r:{ grid:{color:'rgba(255,255,255,.1)'}, ticks:{ color:'rgba(255,255,255,.6)', backdropColor:'transparent' }, suggestedMin:0, suggestedMax: Math.max(...scoresSorted)+5 } } }
+        });
+    }
+  };
+
+  // Language toggle events
+  document.addEventListener('DOMContentLoaded', function(){
+    // Apply language immediately
+    setLang(state.lang);
+    // FAB
+    const panel = document.getElementById('lang-panel');
+    const toggle = document.getElementById('lang-toggle');
+    if(toggle){
+      toggle.addEventListener('click', ()=>{ panel.style.display = panel.style.display==='block'?'none':'block'; });
+    }
+    if(panel){
+      panel.querySelectorAll('.lang-item').forEach(it=>{
+        it.addEventListener('click', ()=>{ setLang(it.getAttribute('data-lang')); panel.style.display='none'; });
+      });
+    }
+    document.addEventListener('click', (e)=>{
+      const fab = document.querySelector('.lang-fab');
+      if(fab && !fab.contains(e.target)) { if(panel) panel.style.display='none'; }
+    });
+  });
+})();
+</script>
+<style id="remaining-points-hud-style">
+.points-remaining-fixed{
+  position: static;
+  background: rgba(243,156,18,.15);
+  color: #f39c12; padding: .3rem .8rem; border-radius: 8px;
+  font-weight: 700; font-size: .85rem;
+  user-select: none; pointer-events: auto;
+}
+.points-remaining-fixed.flash{
+  animation: rpFlash .3s ease-in-out 1;
+}
+@keyframes rpFlash{
+  0%{ background:#7f1d1d; }
+  100%{ background: rgba(243,156,18,.15); }
+}
+.points-remaining-sticky{
+  position: sticky; top: 8px; align-self: flex-start;
+  background: rgba(0,0,0,.6); color: #fff; padding: 6px 10px;
+  border-radius: 999px; display: inline-block; margin-bottom: 8px;
+  font-weight: 600;
+}
+</style>
+<script id="remaining-points-hud-logic">
+(function(){
+  function ensureFixedHUD(){
+    let hud = document.getElementById('points-remaining-fixed');
+    if(!hud){
+      hud = document.createElement('div');
+      hud.id = 'points-remaining-fixed';
+      hud.className = 'points-remaining-fixed';
+      hud.textContent = (window._t ? _t('points_remaining') : 'Points Left') + ': 10';
+      document.body.appendChild(hud);
+    }
+    return hud;
+  }
+
+  // 包装提示效果
+  function flashHUD(){
+    const hud = ensureFixedHUD();
+    hud.classList.remove('flash');
+    void hud.offsetWidth; // reflow to restart animation
+    hud.classList.add('flash');
+  }
+
+  // 重写 updateRemainingPoints，统一刷新 HUD 与粘性提示
+  const _origUpdate = window.updateRemainingPoints;
+  window.updateRemainingPoints = function(partIndex){
+    const arr = (window.appState && appState.userAnswers && appState.userAnswers[partIndex]) ? appState.userAnswers[partIndex] : [];
+    const total = arr.reduce((a,b)=>a + (Number(b)||0), 0);
+    let left = 10 - total;
+    if(left < 0) left = 0; // 双保险，正常不会触发
+    const fixed = ensureFixedHUD();
+    const label = (window._t ? _t('points_remaining') : 'Points Left');
+    fixed.textContent = label + ': ' + left;
+
+    const sticky = document.getElementById('points-remaining-sticky');
+    if(sticky){ sticky.textContent = label + ': ' + left; }
+    const fixed2 = document.getElementById('points-remaining-fixed'); // 另一个引用
+    if(fixed2 && fixed2 !== fixed){ fixed2.textContent = label + ': ' + left; }
+  };
+
+  // 注入对 slider 的“硬限额”逻辑（在 i18n 覆写的 loadTestPart 之后再绑定）
+  function bindClamp(){
+    document.querySelectorAll('.slider').forEach(function(sld){
+      // 避免重复绑定
+      if(sld.dataset._clamped) return;
+      sld.dataset._clamped = "1";
+
+      sld.addEventListener('input', function(e){
+        const el = e.target;
+        const pi = +el.getAttribute('data-part');
+        const qi = +el.getAttribute('data-question');
+        let val = +el.value;
+        if(!window.appState || !appState.userAnswers || !appState.userAnswers[pi]) return;
+
+        const before = appState.userAnswers[pi][qi] || 0;
+        // 先写入，再检测超出
+        appState.userAnswers[pi][qi] = val;
+        let sum = appState.userAnswers[pi].reduce((a,b)=>a + (Number(b)||0), 0);
+
+        if(sum > 10){
+          const excess = sum - 10;
+          val = Math.max(0, val - excess);
+          appState.userAnswers[pi][qi] = val;
+          el.value = val;
+          const disp = el.nextElementSibling;
+          if(disp) disp.textContent = val;
+          flashHUD();
+          // 轻微蜂鸣（可选）：某些浏览器无效，安全忽略
+          try{ if(window.navigator && navigator.vibrate){ navigator.vibrate(30); } }catch(_){}
+        }
+
+        // 刷新剩余分
+        if(window.updateRemainingPoints) updateRemainingPoints(pi);
+      });
+    });
+  }
+
+  // 监听每次 loadTestPart 完成后绑定
+  const _origLoad = window.loadTestPart;
+  if(_origLoad){
+    window.loadTestPart = function(partIndex){
+      const ret = _origLoad.apply(this, arguments);
+      ensureFixedHUD();
+      bindClamp();
+      // 初次进入时同步一次
+      if(window.updateRemainingPoints) updateRemainingPoints(partIndex);
+      return ret;
+    };
+  }else{
+    // 异常fallback：DOMContentLoaded后尝试绑定（不太可能走到）
+    document.addEventListener('DOMContentLoaded', function(){
+      ensureFixedHUD();
+      bindClamp();
+      if(window.updateRemainingPoints) updateRemainingPoints(0);
+    });
+  }
+
+  // 初始就放一个HUD，避免白屏时无提示
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureFixedHUD();
+  });
+})();
+</script>
+<script id="remaining-points-hud-logic-v2">
+(function(){
+  // stronger ensure
+  function ensureFixedHUDVisible(){
+    const hud = document.getElementById('points-remaining-fixed');
+    if(hud){
+      hud.style.display = 'block';
+      return hud;
+    }
+    const n = document.createElement('div');
+    n.id = 'points-remaining-fixed';
+    n.className = 'points-remaining-fixed';
+    n.textContent = (window._t ? _t('points_remaining') : 'Points Left') + ': 10';
+    document.body.appendChild(n);
+    return n;
+  }
+
+  function computeGroupTotal(partIndex){
+    // primary: use DOM sliders to avoid any state-sync issue
+    const sliders = document.querySelectorAll('.slider[data-part="'+partIndex+'"]');
+    if(sliders && sliders.length){
+      let sum = 0;
+      sliders.forEach(s => { const v = Number(s.value)||0; sum += v; });
+      return sum;
+    }
+    // fallback to appState
+    if(window.appState && appState.userAnswers && appState.userAnswers[partIndex]){
+      return appState.userAnswers[partIndex].reduce((a,b)=> a + (Number(b)||0), 0);
+    }
+    return 0;
+  }
+
+  // Hard clamp with DOM-based recompute
+  function clampCurrentSlider(el, partIndex){
+    let sum = computeGroupTotal(partIndex);
+    if(sum > 10){
+      const excess = sum - 10;
+      let v = Number(el.value)||0;
+      v = Math.max(0, v - excess);
+      el.value = v;
+      const disp = el.nextElementSibling; if(disp) disp.textContent = v;
+      try{ if(navigator && navigator.vibrate){ navigator.vibrate(25); } }catch(_){}
+      const hud = document.getElementById('points-remaining-fixed');
+      if(hud){ hud.classList.remove('flash'); void hud.offsetWidth; hud.classList.add('flash'); }
+      // keep state in sync if appState exists
+      const pi = +el.getAttribute('data-part'); const qi = +el.getAttribute('data-question');
+      if(window.appState && appState.userAnswers && appState.userAnswers[pi]){
+        appState.userAnswers[pi][qi] = v;
+      }
+    }
+  }
+
+  function refreshRemaining(partIndex){
+    const total = computeGroupTotal(partIndex);
+    const left = Math.max(0, 10 - total);
+    const label = (window._t ? _t('points_remaining') : 'Points Left');
+    const fixed = ensureFixedHUDVisible();
+    fixed.textContent = `${label}: ${left}`;
+    const sticky = document.getElementById('points-remaining-sticky'); if(sticky){ sticky.textContent = `${label}: ${left}`; }
+  }
+
+  function bindAll(){
+    ensureFixedHUDVisible();
+    document.querySelectorAll('.slider').forEach(function(sld){
+      if(sld.dataset._hud2) return; sld.dataset._hud2="1";
+      sld.addEventListener('input', function(e){
+        const el = e.target;
+        const pi = +el.getAttribute('data-part') || (window.appState?appState.currentPart:0);
+        // Update value mirror
+        const v = Number(el.value)||0;
+        const span = el.nextElementSibling; if(span){ span.textContent = v; }
+        // Clamp if needed
+        clampCurrentSlider(el, pi);
+        // Refresh numbers
+        refreshRemaining(pi);
+      });
+    });
+  }
+
+  // Intercept both loadTestPart and updateRemainingPoints (final overwrite)
+  const _origLoad = window.loadTestPart;
+  window.loadTestPart = function(partIndex){
+    const ret = _origLoad ? _origLoad.apply(this, arguments) : undefined;
+    bindAll();
+    refreshRemaining(partIndex);
+    return ret;
+  };
+
+  window.updateRemainingPoints = function(partIndex){
+    refreshRemaining(partIndex);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureFixedHUDVisible();
+    bindAll();
+    // if already in test screen, refresh
+    if(document.getElementById('test-screen')?.classList.contains('active')){
+      const pi = (window.appState?appState.currentPart:0);
+      refreshRemaining(pi);
+    }
+  });
+})();
+</script>
+
+<script id="goToNextPart-domtotal-fix">
+(function(){
+  function computeGroupTotalDom(partIndex){
+    const sliders = document.querySelectorAll('.slider[data-part="'+partIndex+'"]');
+    let sum = 0;
+    sliders.forEach(s => { sum += Number(s.value) || 0; });
+    return sum;
+  }
+  function syncDomToState(partIndex){
+    if(!window.appState || !appState.userAnswers || !appState.userAnswers[partIndex]) return;
+    const sliders = document.querySelectorAll('.slider[data-part="'+partIndex+'"]');
+    sliders.forEach((s, i) => {
+      appState.userAnswers[partIndex][i] = Number(s.value) || 0;
+    });
+  }
+  // override
+  window.goToNextPart = function(){
+    const currentPart = appState.currentPart;
+    // Always sync DOM -> state then compute
+    syncDomToState(currentPart);
+    const total = computeGroupTotalDom(currentPart);
+    if (total !== 10) {
+      const n = total; // already integer by slider steps
+      const msg = (window._tn ? _tn('alert_group_total', n) : `本部分您已分配了${n}分，请确保总分恰好为10分`);
+      alert(msg);
+      return;
+    }
+    if (currentPart < 6) {
+      appState.currentPart++;
+      // Reset HUD/sticky to 10 for new part
+      if(window.updateRemainingPoints) updateRemainingPoints(appState.currentPart);
+      loadTestPart(appState.currentPart);
+    } else {
+      // 完成最后一部分
+      saveTestResults();
+      document.getElementById('test-screen').classList.remove('active');
+      document.getElementById('test-complete-screen').classList.add('active');
+    }
+  };
+})();
+</script>
+
+<script id="student-all-languages-overrides">
+(function(){
+  if (!window._i18n) return;
+
+  const studentOverrides = {
+    en: {
+      ui: {
+        app_title:"Student Team Roles Assessment",
+        btn_register:"Create Account",
+        welcome_title:"Student Team Roles Assessment",
+        motto_1:"Understand your natural place in collaboration and notice how you can keep growing.",
+        motto_2:"Designed for class projects, group assignments, clubs, competitions, and campus teamwork.",
+        welcome_p1:"Welcome to the Student Team Roles Assessment!",
+        welcome_p2:"This assessment helps you understand how you usually show up in class collaboration, project work, and campus teams.",
+        welcome_p3:"There are 7 sections, each with 9 descriptions.",
+        welcome_p4:"In each section, you have 10 points to distribute based on how well each description matches you.",
+        btn_start_test:"Start Assessment",
+        btn_finish:"Finish Assessment",
+        test_instruction:"Distribute 10 points across the 9 descriptions below. Some descriptions may receive 0 points, but the total must be exactly 10.",
+        title_complete:"Assessment Complete",
+        complete_p1:"Great job — you have completed all sections!",
+        complete_p2:"You can now view your growth-focused interpretation.",
+        report_title:"Your Team Role Assessment Results",
+        top_roles_title:"Your More Prominent Team Roles",
+        btn_view_interpretation:"View Detailed Growth Interpretation",
+        btn_restart:"Retake Assessment",
+        interp_title:"Growth Interpretation",
+        role_primary_title:(name, role)=>`Based on this assessment, in class collaboration, project work, and campus team activities, ${name} is more likely to show the characteristics of “${role}.”`,
+        role_secondary_title:(name, role)=>`Beyond the primary role, ${name} also shows some tendency toward “${role}.”`,
+        role_secondary_hint:"This suggests that across different tasks and team settings, you have both a stable style and further strengths that can be developed.",
+        section_desc:"Role characteristics",
+        section_strengths:"Strengths in campus collaboration",
+        section_weaknesses:"Possible challenges",
+        section_contrib:"Growth suggestions",
+        section_thanks_1:"Thank you for completing this assessment. The goal is not to put a fixed label on you, but to help you better understand how you naturally show up in collaboration.",
+        section_thanks_2:"No single role is the ‘best’ one. What matters is finding a place that suits you in different learning tasks and team settings, while also practicing the abilities that help you keep growing.",
+        sign_org:"Student Team Roles Assessment"
+      },
+      parts: [
+        { title:"Part 1: The strengths I usually bring to a team", questions:[
+          "I usually spot new opportunities or new ways of doing things quite quickly.",
+          "In class groups, clubs, or project teams, I usually work smoothly with different kinds of people.",
+          "I am often able to judge which ideas are realistic and which are worth trying.",
+          "When a task needs to move forward, I can usually help turn key things into action.",
+          "If I notice that someone would be a good fit for a task, I tend to suggest involving them.",
+          "My academic knowledge, learning ability, or a specific skill often helps the team.",
+          "When people are discussing options, I can usually offer an objective alternative.",
+          "I often come up with new ideas or fresh approaches.",
+          "As long as it helps the team in the end, I am willing to face some initial misunderstanding."
+        ]},
+        { title:"Part 2: The difficulties I may experience in teamwork", questions:[
+          "If a group discussion feels messy, unfocused, or slow to decide on roles, I feel uncomfortable.",
+          "Sometimes I am so rational or objective that it is not easy for me to warm up socially right away.",
+          "Because I care about the atmosphere of the group, I may hesitate to stand out too much.",
+          "I sometimes get absorbed in sudden ideas and lose track of what is already being done.",
+          "I tend to notice details easily and can worry that something has not been done well enough.",
+          "When I really want the task to move forward, other people may see me as a little strong or forceful.",
+          "I can sometimes be too tolerant of people who have ideas but do not express them clearly.",
+          "If a task is not connected to my interests, my level of engagement may drop.",
+          "When the group is discussing new ideas, I sometimes talk more than I need to."
+        ]},
+        { title:"Part 3: When I work with other people on a task", questions:[
+          "I am usually strong at offering new viewpoints or fresh ways of thinking.",
+          "I naturally notice small mistakes or details that the group may overlook.",
+          "I can often influence others without putting too much pressure on them.",
+          "I am usually sensitive to new information, new methods, and new developments.",
+          "In collaboration, I try to stay responsible, reliable, and considerate.",
+          "When the team needs to make a judgment, my analysis is often quite steady.",
+          "If a suggestion helps the whole team, I am usually willing to support it.",
+          "When a discussion drifts or takes too long, I want to bring people back to the point.",
+          "I am usually able to handle basic planning and execution in an organized way."
+        ]},
+        { title:"Part 4: In a team, I am usually someone who...", questions:[
+          "Once collaboration begins, I am willing to learn about what each teammate is like and what they do well.",
+          "Even though I listen to different views, I can still make a decision when needed.",
+          "If I think an idea is not reasonable enough, I will question it or stand by my own view.",
+          "Once the direction is clear, I am often willing to help get things started.",
+          "I do not usually try to become the most noticeable person in the group.",
+          "To move a task forward, I am willing to reach out to teachers, senior students, or others for resources.",
+          "If I am responsible for something, I usually try to do it carefully and completely.",
+          "In discussions, I often notice when a viewpoint is not well supported.",
+          "When I understand the background of the task clearly, I tend to participate more actively."
+        ]},
+        { title:"Part 5: In class tasks or campus teamwork, I feel the most satisfied when...", questions:[
+          "I get to analyze a situation and compare the pros and cons of different options.",
+          "What I know or what I am good at genuinely helps the team.",
+          "I put forward an idea that feels creative or inspiring.",
+          "I can devote myself fully to a task and keep it moving.",
+          "I help the team find a solution that is truly workable.",
+          "I help improve understanding and cooperation among teammates.",
+          "I get to work with people who bring fresh energy and new ideas, and I can adapt to them.",
+          "I help the group reach agreement and keep moving forward.",
+          "My perspective has a visible influence on the final decision."
+        ]},
+        { title:"Part 6: If I suddenly have to complete a time-pressured task with unfamiliar teammates...", questions:[
+          "I will first look for useful information and materials so I can get up to speed quickly.",
+          "Even when things are difficult, I try to keep the team moving toward the goal.",
+          "I am willing to open up the discussion so everyone can share their ideas.",
+          "In that situation, I can usually stay calm and think in an orderly way.",
+          "I think about how to divide the work based on each person’s strengths.",
+          "When the situation is still unclear, I may first organize my own thoughts before proposing a plan.",
+          "If the team is clearly stuck, I will usually do something to push progress forward.",
+          "My sense of urgency often helps remind the group not to keep delaying.",
+          "I prefer to work with people who show a positive and cooperative attitude."
+        ]},
+        { title:"Part 7: When problems arise in teamwork...", questions:[
+          "If someone is clearly slowing down progress, I can become impatient.",
+          "When I communicate with someone whose position is very different from mine, I may struggle to make them truly understand me.",
+          "If discussion feels very inefficient, I may want to stop talking and simply get the task moving myself.",
+          "For things I am not good at, I am willing to ask others for help.",
+          "When the team atmosphere is low and motivation is weak, I can be affected too.",
+          "Because I want things done well, I sometimes spend too much energy on details.",
+          "Other people may think I analyze a lot but am not always decisive enough.",
+          "If the goal is unclear, it is harder for me to get started right away.",
+          "With complex issues, I sometimes understand them internally but do not explain them clearly at first."
+        ]}
+      ],
+      roles: [
+        {name:"Implementer", description:"You are practical and usually willing to turn ideas into real action.", strengths:"You are often organized, dependable, and good at following through. In group assignments, you can help break work down, keep things moving, and make sure plans actually happen.", weaknesses:"When ideas are still very open or changing quickly, you may prefer safer options and take more time before embracing new approaches.", contributions:"Keep your strong execution, and also give new ideas a little room to be tested. That can make you both steady and flexible."},
+        {name:"Coordinator", description:"You are good at seeing the overall goal and helping people find the right roles.", strengths:"You often notice what the team needs most and who may be best suited for each part. You fit well in roles that involve organizing, clarifying direction, and coordinating work.", weaknesses:"At times, you may be better at organizing others than at handling small details yourself, so teammates may hope you also take on more direct execution.", contributions:"While using your coordination strengths, stay involved in a few key tasks yourself. That often makes your leadership feel even more convincing."},
+        {name:"Shaper", description:"You often bring drive and momentum, especially when the task is challenging.", strengths:"You move quickly, care about the goal, and are likely to push the team forward when progress is slow. In high-pressure projects, your energy can lift the pace noticeably.", weaknesses:"When you care a lot about speed and results, others may experience you as too direct or intense.", contributions:"If you pair your drive with more awareness of how others receive your message, you can become a strong motivator whom people also feel comfortable with."},
+        {name:"Plant", description:"You often think in fresh ways and enjoy exploring different angles of a problem.", strengths:"You can be especially valuable in brainstorming, planning, topic selection, and creative design. You often help the team see possibilities that others may miss.", weaknesses:"You may enjoy generating ideas more than carrying every detail through, and sometimes other people cannot immediately follow what already feels clear in your mind.", contributions:"Try explaining your ideas in a clearer and more concrete way, and connect them to practical next steps so your creativity can land more easily."},
+        {name:"Resource Investigator", description:"You are open, curious, and willing to explore people, information, and opportunities.", strengths:"You are good at finding resources, asking around, and building useful connections. In tasks that involve gathering information or reaching out for help, you are often a strong asset.", weaknesses:"You may be highly enthusiastic at the beginning, but once the novelty fades, keeping up the follow-through can be harder.", contributions:"If you combine your strength in discovering opportunities with steadier follow-up, your contribution becomes even more complete and reliable."},
+        {name:"Monitor Evaluator", description:"You are thoughtful, calm, and good at weighing options carefully.", strengths:"When a team feels rushed, overly excited, or easily distracted, you can help bring it back to clearer judgment. You are well suited to comparing options, checking logic, and thinking through risks.", weaknesses:"At times you may come across as too detached or cautious, and others may not immediately see your engagement.", contributions:"When sharing your judgment, include both your concerns and your constructive suggestions. That often helps others recognize your value more easily."},
+        {name:"Teamworker", description:"You care about the atmosphere of collaboration and are sensitive to other people’s feelings and needs.", strengths:"You are usually willing to listen, cooperate, and reduce tension. In teams, you are often one of the people who help others stay willing to communicate and work together.", weaknesses:"Because you care about harmony, you may hesitate to voice disagreement directly, especially when a difficult decision needs to be made.", contributions:"You can keep your warmth while practicing more direct expression of your own view. Stable collaboration also needs clear and honest communication."},
+        {name:"Completer Finisher", description:"You are careful, detail-oriented, and often hold yourself to a high standard.", strengths:"You are good at checking details, catching omissions, and improving the final quality of the team’s output. In editing, proofreading, data checking, and final polishing, you are often very dependable.", weaknesses:"Because you want things done well, you may keep revising or spend too much energy on small points, which can make you tense or tired.", contributions:"Keep your standards, but also practice noticing when the work is already good enough. That helps you protect both quality and your own pace."},
+        {name:"Specialist", description:"You often invest deeply in a particular area of knowledge or skill.", strengths:"When a team task needs specific expertise, you can provide important depth and focused support. In the area you know well, your contribution can be especially valuable.", weaknesses:"You may focus more on the part you know best and less on the overall process, and sometimes others may find highly technical explanations hard to follow.", contributions:"Keep your depth, and also explain more clearly how your expertise helps the team solve its problem. That makes your value easier for others to recognize and use."}
+      ]
+    },
+
+    fr: {
+      ui: {
+        app_title:"Évaluation des rôles d’équipe pour étudiants",
+        btn_register:"Créer un compte",
+        welcome_title:"Évaluation des rôles d’équipe pour étudiants",
+        motto_1:"Mieux comprendre sa place naturelle dans la coopération et voir comment continuer à grandir.",
+        motto_2:"Conçue pour les travaux de groupe, les projets de cours, les associations, les concours et la collaboration sur le campus.",
+        welcome_p1:"Bienvenue dans l’évaluation des rôles d’équipe pour étudiants !",
+        welcome_p2:"Cette évaluation vous aide à comprendre comment vous agissez habituellement dans les travaux de groupe, les projets de cours et les équipes étudiantes.",
+        welcome_p3:"L’évaluation comprend 7 parties, chacune avec 9 descriptions.",
+        welcome_p4:"Dans chaque partie, vous disposez de 10 points à répartir selon le degré de correspondance avec votre manière d’être réelle.",
+        btn_start_test:"Commencer l’évaluation",
+        btn_finish:"Terminer l’évaluation",
+        test_instruction:"Répartissez 10 points entre les 9 descriptions ci-dessous. Certaines peuvent recevoir 0 point, mais le total doit être exactement de 10.",
+        title_complete:"Évaluation terminée",
+        complete_p1:"Bravo, vous avez terminé toutes les parties !",
+        complete_p2:"Vous pouvez maintenant consulter votre interprétation orientée développement.",
+        report_title:"Vos résultats de l’évaluation des rôles d’équipe",
+        top_roles_title:"Vos rôles d’équipe les plus marqués",
+        btn_view_interpretation:"Voir l’interprétation détaillée",
+        btn_restart:"Repasser l’évaluation",
+        interp_title:"Interprétation de développement",
+        role_primary_title:(name, role)=>`D’après cette évaluation, dans la coopération en cours, les projets et les activités d’équipe sur le campus, ${name} manifeste plus facilement les caractéristiques du rôle « ${role} ».`,
+        role_secondary_title:(name, role)=>`Au-delà du rôle principal, ${name} montre aussi une certaine tendance vers le rôle « ${role} ».`,
+        role_secondary_hint:"Cela suggère que, selon les tâches et les contextes de coopération, vous avez à la fois un style assez stable et d’autres points forts qui peuvent encore se développer.",
+        section_desc:"Caractéristiques du rôle",
+        section_strengths:"Atouts dans la collaboration sur le campus",
+        section_weaknesses:"Défis possibles",
+        section_contrib:"Pistes de progression",
+        section_thanks_1:"Merci d’avoir complété cette évaluation. Le but n’est pas de vous coller une étiquette définitive, mais de vous aider à mieux comprendre votre manière naturelle d’agir en coopération.",
+        section_thanks_2:"Aucun rôle n’est le “meilleur”. L’important est de trouver une place qui vous convient dans différents contextes d’apprentissage et de coopération, tout en développant peu à peu les capacités qui vous feront progresser.",
+        sign_org:"Évaluation des rôles d’équipe pour étudiants"
+      },
+      parts: [
+        { title:"Partie 1 : Les atouts que j’apporte généralement à une équipe", questions:[
+          "Je repère assez vite de nouvelles opportunités ou de nouvelles façons de faire.",
+          "Dans les groupes de cours, les associations ou les projets, je coopère généralement facilement avec des personnes très différentes.",
+          "J’arrive souvent à voir quelles idées sont réalistes et lesquelles valent la peine d’être essayées.",
+          "Quand une tâche doit avancer, j’arrive souvent à faire passer les choses importantes à l’action.",
+          "Si je vois qu’une personne serait très adaptée à une mission, je propose volontiers de l’impliquer.",
+          "Mes connaissances, ma capacité d’apprentissage ou une compétence particulière apportent souvent quelque chose à l’équipe.",
+          "Quand on discute de plusieurs options, je peux souvent proposer une autre piste de manière objective.",
+          "J’ai souvent de nouvelles idées ou des approches originales.",
+          "Tant que cela aide vraiment l’équipe au final, je peux accepter d’être un peu mal compris au début."
+        ]},
+        { title:"Partie 2 : Les difficultés que je peux rencontrer dans le travail d’équipe", questions:[
+          "Si une discussion de groupe est confuse, manque de direction ou tarde à répartir les rôles, cela me met mal à l’aise.",
+          "Parfois, parce que je suis très rationnel ou très objectif, il ne m’est pas si facile de créer tout de suite du lien avec les autres.",
+          "Comme je tiens à l’ambiance du groupe, il m’arrive de ne pas vouloir trop me mettre en avant.",
+          "Il m’arrive de me laisser emporter par une idée soudaine et d’oublier ce qui est déjà en train d’être fait.",
+          "Je remarque facilement les détails et je peux m’inquiéter de ce qui n’est pas encore assez bien fait.",
+          "Quand je veux vraiment que la tâche avance, les autres peuvent me trouver un peu trop direct ou insistant.",
+          "Je peux parfois être trop indulgent envers ceux qui ont de bonnes idées mais les expriment mal.",
+          "Si une tâche n’a pas beaucoup de lien avec mes centres d’intérêt, mon implication peut baisser.",
+          "Quand le groupe discute de nouvelles idées, il m’arrive de parler plus que nécessaire."
+        ]},
+        { title:"Partie 3 : Lorsque je travaille avec d’autres sur une tâche", questions:[
+          "Je suis généralement à l’aise pour proposer de nouveaux points de vue ou de nouvelles idées.",
+          "Je remarque naturellement les petites erreurs ou les détails que le groupe pourrait laisser passer.",
+          "J’arrive souvent à influencer les autres sans trop leur mettre de pression.",
+          "Je suis assez sensible aux nouvelles informations, aux nouvelles méthodes et aux évolutions récentes.",
+          "Dans la coopération, j’essaie d’être responsable, fiable et respectueux.",
+          "Quand l’équipe doit prendre une décision, mon analyse est souvent assez stable.",
+          "Si une proposition est utile pour l’ensemble du groupe, je suis généralement prêt à la soutenir.",
+          "Quand une discussion s’éloigne du sujet ou dure trop longtemps, j’ai envie de la ramener à l’essentiel.",
+          "Je suis généralement capable de gérer les bases de l’organisation et de l’exécution de façon structurée."
+        ]},
+        { title:"Partie 4 : Dans une équipe, je ressemble souvent à quelqu’un qui...", questions:[
+          "Au début d’une collaboration, j’aime comprendre le profil de chaque membre et ce qu’il sait bien faire.",
+          "Même si j’écoute différents avis, je peux quand même prendre une décision quand c’est nécessaire.",
+          "Si je trouve qu’une idée n’est pas assez solide, je vais la questionner ou défendre mon point de vue.",
+          "Une fois la direction clarifiée, je suis souvent prêt à aider le groupe à se mettre en mouvement.",
+          "Je ne cherche pas spécialement à être la personne la plus visible du groupe.",
+          "Pour faire avancer une tâche, je suis prêt à contacter des enseignants, des étudiants plus avancés ou d’autres personnes pour trouver des ressources.",
+          "Quand quelque chose est sous ma responsabilité, j’essaie de le faire sérieusement et jusqu’au bout.",
+          "Dans les échanges, je repère souvent quand un argument n’est pas assez fondé.",
+          "Quand je comprends bien le contexte de la tâche, je participe en général plus activement."
+        ]},
+        { title:"Partie 5 : Dans les travaux de cours ou les projets du campus, je me sens le plus satisfait quand...", questions:[
+          "Je peux analyser une situation et comparer les avantages et les limites de plusieurs options.",
+          "Ce que je sais ou ce que je sais bien faire aide réellement l’équipe.",
+          "Je propose une idée qui paraît créative ou inspirante.",
+          "Je peux m’investir pleinement dans une tâche et la faire avancer dans la durée.",
+          "J’aide l’équipe à trouver une solution vraiment applicable.",
+          "J’aide à améliorer la compréhension mutuelle et la coopération entre les membres.",
+          "Je travaille avec des personnes qui apportent de l’énergie nouvelle et des idées fraîches, et je sais m’adapter à elles.",
+          "J’aide le groupe à se mettre d’accord et à continuer d’avancer.",
+          "Mon point de vue influence de façon visible la décision finale."
+        ]},
+        { title:"Partie 6 : Si je dois soudain accomplir une tâche urgente avec des coéquipiers que je connais peu...", questions:[
+          "Je vais d’abord chercher des informations et des ressources utiles pour me mettre rapidement à niveau.",
+          "Même quand la situation est difficile, j’essaie de garder l’équipe orientée vers l’objectif.",
+          "Je suis prêt à ouvrir la discussion pour que chacun puisse exprimer ses idées.",
+          "Dans ce type de situation, j’arrive généralement à rester calme et à penser de façon structurée.",
+          "Je réfléchis à la manière de répartir le travail selon les points forts de chacun.",
+          "Quand la situation est encore floue, il m’arrive d’abord d’organiser mes propres idées avant de proposer un plan.",
+          "Si l’équipe est clairement bloquée, je fais souvent quelque chose pour relancer l’avancement.",
+          "Mon sens de l’urgence aide souvent le groupe à éviter de repousser encore les choses.",
+          "Je préfère travailler avec des personnes qui montrent une attitude positive et coopérative."
+        ]},
+        { title:"Partie 7 : Quand des problèmes apparaissent dans le travail d’équipe...", questions:[
+          "Si quelqu’un ralentit clairement l’avancement, je peux vite devenir impatient.",
+          "Quand je parle avec quelqu’un dont la position est très différente de la mienne, j’ai parfois du mal à me faire vraiment comprendre.",
+          "Si les discussions me semblent très inefficaces, j’ai envie d’arrêter de parler et de faire avancer la tâche moi-même.",
+          "Pour ce que je maîtrise moins, je suis prêt à demander de l’aide aux autres.",
+          "Quand l’ambiance du groupe est basse et que la motivation manque, cela peut aussi m’affecter.",
+          "Parce que je veux que les choses soient bien faites, je peux parfois consacrer trop d’énergie aux détails.",
+          "Les autres peuvent penser que j’analyse beaucoup mais que je ne tranche pas toujours assez vite.",
+          "Quand l’objectif n’est pas clair, il est plus difficile pour moi de me mettre tout de suite en route.",
+          "Face à des questions complexes, il m’arrive de comprendre intérieurement sans réussir à l’expliquer clairement au premier abord."
+        ]}
+      ],
+      roles: [
+        {name:"Réalisateur", description:"Vous êtes plutôt concret et prêt à transformer les idées en actions réelles.", strengths:"Vous êtes souvent organisé, fiable et orienté vers la mise en œuvre. Dans les travaux de groupe, vous pouvez aider à découper les tâches, suivre l’avancement et faire en sorte que les décisions deviennent réalité.", weaknesses:"Quand les idées sont encore très ouvertes ou changent vite, vous pouvez préférer des options plus sûres et prendre un peu plus de temps avant d’adopter une approche nouvelle.", contributions:"Conservez votre vraie force d’exécution, mais laissez aussi un peu de place à l’expérimentation. Cela peut vous rendre à la fois stable et plus souple."},
+        {name:"Coordinateur", description:"Vous savez voir l’objectif d’ensemble et aider les autres à trouver la bonne place.", strengths:"Vous remarquez souvent ce dont l’équipe a le plus besoin et qui serait bien placé pour chaque mission. Vous êtes à l’aise pour clarifier la direction, organiser le travail et coordonner les contributions.", weaknesses:"Il arrive que vous soyez plus à l’aise pour organiser les autres que pour gérer vous-même les petits détails, ce qui peut donner envie à vos coéquipiers de vous voir aussi davantage dans l’exécution.", contributions:"Tout en utilisant vos talents de coordination, impliquez-vous aussi dans quelques tâches-clés. Cela rend souvent votre rôle encore plus crédible et rassurant."},
+        {name:"Propulseur", description:"Vous apportez souvent de l’énergie et du rythme, surtout quand la tâche est exigeante.", strengths:"Vous avancez vite, gardez l’objectif en vue et poussez souvent le groupe à progresser quand tout ralentit. Dans les projets sous pression, votre énergie peut faire monter nettement le niveau de mobilisation.", weaknesses:"Quand vous tenez beaucoup à l’efficacité et à la vitesse, les autres peuvent parfois vous trouver trop direct ou trop intense.", contributions:"Si vous associez votre force de propulsion à une meilleure attention à la manière dont les autres reçoivent vos messages, vous pouvez devenir un moteur puissant et apprécié."},
+        {name:"Concepteur", description:"Vous aimez chercher des idées neuves et regarder les problèmes sous des angles différents.", strengths:"Vous pouvez être particulièrement précieux dans le brainstorming, la conception, le choix d’un sujet ou l’élaboration d’une solution originale. Vous aidez souvent le groupe à voir des possibilités que d’autres n’avaient pas remarquées.", weaknesses:"Vous pouvez aimer davantage la phase d’idée que la mise en œuvre détaillée, et il arrive que les autres ne saisissent pas immédiatement ce qui vous paraît déjà évident.", contributions:"Essayez d’expliquer vos idées de façon plus concrète et plus structurée, puis reliez-les à des étapes pratiques. Votre créativité aura ainsi plus de chances de prendre forme."},
+        {name:"Investigateur de ressources", description:"Vous êtes ouvert, curieux et prêt à explorer des personnes, des informations et des opportunités.", strengths:"Vous savez chercher des ressources, demander autour de vous et créer des liens utiles. Dans les tâches qui demandent de collecter des informations ou de solliciter de l’aide, vous êtes souvent un vrai atout.", weaknesses:"Vous pouvez être très enthousiaste au début, puis avoir plus de mal à maintenir le même niveau de suivi quand l’effet de nouveauté diminue.", contributions:"Si vous combinez votre capacité à découvrir des opportunités avec un suivi plus régulier, votre apport deviendra encore plus complet et plus stable."},
+        {name:"Évaluateur", description:"Vous êtes réfléchi, calme et capable de peser les options avec discernement.", strengths:"Quand une équipe se laisse emporter par l’enthousiasme, la précipitation ou la confusion, vous pouvez aider à revenir à un jugement plus clair. Vous êtes bien placé pour comparer des options, vérifier la logique et anticiper les risques.", weaknesses:"Vous pouvez parfois paraître trop distant ou trop prudent, et les autres ne voient pas toujours tout de suite votre engagement.", contributions:"Lorsque vous exprimez votre analyse, ajoutez non seulement vos réserves mais aussi des pistes constructives. Les autres reconnaîtront alors plus facilement votre valeur."},
+        {name:"Soutien d’équipe", description:"Vous accordez de l’importance à l’ambiance de coopération et vous percevez assez bien les besoins des autres.", strengths:"Vous êtes souvent prêt à écouter, à coopérer et à apaiser les tensions. Dans une équipe, vous faites souvent partie de ceux qui permettent aux autres de continuer à dialoguer et à travailler ensemble.", weaknesses:"Comme vous tenez à l’harmonie, vous pouvez hésiter à exprimer directement votre désaccord, surtout lorsqu’une décision difficile doit être prise.", contributions:"Vous pouvez garder votre douceur tout en apprenant à dire plus clairement ce que vous pensez. Une coopération solide a aussi besoin d’une parole honnête et précise."},
+        {name:"Finaliseur", description:"Vous êtes soigneux, attentif aux détails et exigeant sur la qualité.", strengths:"Vous savez repérer les oublis, vérifier les détails et améliorer la qualité finale du rendu. Pour la relecture, la vérification, les finitions et le contrôle final, on peut souvent compter sur vous.", weaknesses:"Parce que vous voulez bien faire, vous pouvez continuer à corriger longtemps ou consacrer trop d’énergie à de petits points, ce qui risque de vous fatiguer.", contributions:"Gardez votre niveau d’exigence, mais apprenez aussi à reconnaître quand le travail est déjà suffisamment bon. Cela protège à la fois la qualité et votre propre rythme."},
+        {name:"Spécialiste", description:"Vous investissez souvent beaucoup d’énergie dans un domaine de connaissance ou de compétence précis.", strengths:"Quand une équipe a besoin d’une expertise particulière, vous pouvez apporter une profondeur et un soutien très précieux. Dans votre domaine, votre contribution peut être déterminante.", weaknesses:"Vous pouvez concentrer votre attention surtout sur la partie que vous maîtrisez le mieux et moins sur l’ensemble du processus, et vos explications très techniques peuvent parfois être difficiles à suivre pour les autres.", contributions:"Conservez votre profondeur, mais prenez aussi le temps d’expliquer plus simplement comment votre expertise aide réellement le groupe. Cela rendra votre apport plus visible et plus facile à mobiliser."}
+      ]
+    },
+
+    th: {
+      ui: {
+        app_title:"แบบประเมินบทบาททีมสำหรับนักศึกษา",
+        btn_register:"สร้างบัญชี",
+        welcome_title:"แบบประเมินบทบาททีมสำหรับนักศึกษา",
+        motto_1:"เข้าใจตำแหน่งตามธรรมชาติของตนในการทำงานร่วมกัน และมองเห็นทิศทางที่ตนยังเติบโตต่อได้",
+        motto_2:"ออกแบบมาสำหรับงานกลุ่มในชั้นเรียน โครงการรายวิชา ชมรม การแข่งขัน และการทำงานร่วมกันในมหาวิทยาลัย",
+        welcome_p1:"ยินดีต้อนรับสู่แบบประเมินบทบาททีมสำหรับนักศึกษา",
+        welcome_p2:"แบบประเมินนี้จะช่วยให้คุณเข้าใจว่าปกติแล้วคุณแสดงบทบาทอย่างไรในการทำงานกลุ่ม งานโครงการ และกิจกรรมทีมในมหาวิทยาลัย",
+        welcome_p3:"แบบประเมินมี 7 ส่วน แต่ละส่วนมี 9 ข้อความอธิบาย",
+        welcome_p4:"ในแต่ละส่วน คุณมี 10 คะแนนเพื่อกระจายตามระดับที่ข้อความนั้นตรงกับตัวคุณจริง ๆ",
+        btn_start_test:"เริ่มประเมิน",
+        btn_finish:"เสร็จสิ้นการประเมิน",
+        test_instruction:"กระจาย 10 คะแนนให้กับข้อความอธิบาย 9 ข้อด้านล่าง บางข้ออาจให้ 0 คะแนนได้ แต่คะแนนรวมต้องเท่ากับ 10 พอดี",
+        title_complete:"ประเมินเสร็จแล้ว",
+        complete_p1:"ยอดเยี่ยม คุณทำครบทุกส่วนแล้ว",
+        complete_p2:"ตอนนี้คุณสามารถดูคำอธิบายเชิงพัฒนาได้แล้ว",
+        report_title:"ผลการประเมินบทบาททีมของคุณ",
+        top_roles_title:"บทบาททีมที่เด่นชัดของคุณ",
+        btn_view_interpretation:"ดูคำอธิบายเชิงพัฒนาแบบละเอียด",
+        btn_restart:"ทำแบบประเมินอีกครั้ง",
+        interp_title:"คำอธิบายเชิงพัฒนา",
+        role_primary_title:(name, role)=>`จากผลการประเมินครั้งนี้ ในการทำงานร่วมกันในชั้นเรียน งานโครงการ และกิจกรรมทีมในมหาวิทยาลัย ${name} มีแนวโน้มจะแสดงลักษณะของบทบาท “${role}” ได้เด่นกว่า`,
+        role_secondary_title:(name, role)=>`นอกจากบทบาทหลักแล้ว ${name} ยังแสดงแนวโน้มของบทบาท “${role}” อยู่พอสมควร`,
+        role_secondary_hint:"สิ่งนี้สะท้อนว่าในงานและบริบทที่ต่างกัน คุณมีทั้งสไตล์ที่ค่อนข้างมั่นคง และจุดแข็งอื่น ๆ ที่ยังพัฒนาได้ต่อไป",
+        section_desc:"ลักษณะของบทบาท",
+        section_strengths:"จุดแข็งในการทำงานร่วมกันในมหาวิทยาลัย",
+        section_weaknesses:"ความท้าทายที่อาจพบ",
+        section_contrib:"ข้อเสนอแนะเพื่อการเติบโต",
+        section_thanks_1:"ขอบคุณที่ทำแบบประเมินนี้ เป้าหมายไม่ใช่การติดป้ายให้ตัวคุณแบบตายตัว แต่เพื่อช่วยให้คุณเข้าใจวิธีที่คุณแสดงออกตามธรรมชาติเมื่อทำงานร่วมกับผู้อื่นมากขึ้น",
+        section_thanks_2:"ไม่มีบทบาทใดเป็น “ดีที่สุด” เสมอไป สิ่งสำคัญคือการค่อย ๆ หาตำแหน่งที่เหมาะกับตัวเองในบริบทการเรียนรู้และการทำงานร่วมกันที่แตกต่างกัน พร้อมทั้งฝึกทักษะที่จะช่วยให้คุณเติบโตต่อไป",
+        sign_org:"แบบประเมินบทบาททีมสำหรับนักศึกษา"
+      },
+      parts: [
+        { title:"ส่วนที่ 1: จุดแข็งที่ฉันมักนำมาให้ทีม", questions:[
+          "ฉันมักมองเห็นโอกาสใหม่ ๆ หรือวิธีทำงานใหม่ ๆ ได้ค่อนข้างเร็ว",
+          "ในการทำงานกลุ่ม ชมรม หรือโครงการ ฉันมักทำงานร่วมกับคนหลากหลายแบบได้ค่อนข้างราบรื่น",
+          "ฉันมักพอมองออกว่าแนวคิดไหนเป็นไปได้จริง และแนวคิดไหนน่าลอง",
+          "เมื่อภารกิจต้องเดินหน้า ฉันมักช่วยผลักให้เรื่องสำคัญเกิดขึ้นจริงได้",
+          "ถ้าฉันเห็นว่าใครเหมาะกับงานบางอย่าง ฉันมักจะเสนอให้ชวนคนนั้นเข้ามามีส่วนร่วม",
+          "ความรู้ ความสามารถในการเรียนรู้ หรือทักษะเฉพาะของฉันมักช่วยทีมได้",
+          "เมื่อทุกคนกำลังคุยกันเรื่องทางเลือกต่าง ๆ ฉันมักเสนออีกแนวทางหนึ่งอย่างเป็นกลางได้",
+          "ฉันมักมีไอเดียใหม่ ๆ หรือวิธีคิดที่สดใหม่เกิดขึ้นเสมอ",
+          "ตราบใดที่ท้ายที่สุดแล้วช่วยทีมได้ ฉันยอมรับได้หากช่วงแรกจะมีคนยังไม่เข้าใจฉันมากนัก"
+        ]},
+        { title:"ส่วนที่ 2: ความยากลำบากที่ฉันอาจพบในการทำงานเป็นทีม", questions:[
+          "ถ้าการคุยงานของกลุ่มดูสับสน ไม่ชัดเจน หรือแบ่งหน้าที่กันไม่ได้เสียที ฉันจะรู้สึกไม่ค่อยสบายใจ",
+          "บางครั้งเพราะฉันคิดอย่างมีเหตุผลหรือเป็นกลางมาก จึงอาจยังไม่สนิทกับคนอื่นได้ทันที",
+          "เพราะฉันใส่ใจบรรยากาศของกลุ่ม ฉันจึงอาจไม่อยากทำให้ตัวเองเด่นเกินไป",
+          "บางครั้งฉันอาจจมอยู่กับความคิดใหม่ที่ผุดขึ้นมา จนลืมสิ่งที่กำลังดำเนินอยู่",
+          "ฉันมักสังเกตรายละเอียดได้ง่าย และกังวลว่างานบางส่วนอาจยังทำได้ไม่ดีพอ",
+          "เมื่อฉันอยากให้งานเดินหน้าเร็ว ๆ คนอื่นอาจมองว่าฉันค่อนข้างแรงหรือกดดันเกินไป",
+          "บางครั้งฉันอาจใจดีกับคนที่มีความคิดดี แต่ยังอธิบายออกมาได้ไม่ชัดเจนเกินไป",
+          "ถ้างานนั้นไม่เกี่ยวกับความสนใจของฉันมากนัก ระดับการมีส่วนร่วมของฉันอาจลดลง",
+          "เวลาที่กลุ่มกำลังคุยไอเดียใหม่ ๆ ฉันอาจพูดมากเกินความจำเป็นบ้าง"
+        ]},
+        { title:"ส่วนที่ 3: เมื่อฉันทำงานร่วมกับคนอื่นในภารกิจหนึ่ง", questions:[
+          "ฉันมักมีจุดแข็งในการเสนอแนวคิดหรือมุมมองใหม่ ๆ",
+          "ฉันมักสังเกตเห็นข้อผิดพลาดเล็ก ๆ หรือรายละเอียดที่กลุ่มอาจมองข้าม",
+          "ฉันมักมีอิทธิพลต่อคนอื่นได้โดยไม่ต้องกดดันมากเกินไป",
+          "ฉันค่อนข้างไวต่อข้อมูลใหม่ วิธีการใหม่ และความเปลี่ยนแปลงใหม่ ๆ",
+          "เวลาอยู่ในทีม ฉันพยายามรักษาความรับผิดชอบ ความน่าเชื่อถือ และความเหมาะสม",
+          "เมื่อทีมต้องตัดสินใจ การวิเคราะห์ของฉันมักค่อนข้างมั่นคง",
+          "ถ้าข้อเสนอใดเป็นประโยชน์ต่อทีมโดยรวม ฉันก็มักยินดีสนับสนุน",
+          "ถ้าการคุยเริ่มออกนอกประเด็นหรือนานเกินไป ฉันอยากช่วยดึงทุกคนกลับมาอยู่กับเรื่องหลัก",
+          "ฉันมักจัดการงานพื้นฐานด้านการวางแผนและการลงมือทำได้เป็นระบบ"
+        ]},
+        { title:"ส่วนที่ 4: ในทีม ฉันมักเป็นคนที่...", questions:[
+          "เมื่อเริ่มทำงานร่วมกัน ฉันอยากรู้ว่าเพื่อนร่วมทีมแต่ละคนมีลักษณะอย่างไรและถนัดอะไร",
+          "ถึงแม้ฉันจะรับฟังความคิดเห็นที่หลากหลาย แต่เมื่อถึงเวลาจำเป็น ฉันก็สามารถตัดสินใจได้",
+          "ถ้าฉันคิดว่าไอเดียหนึ่งยังไม่สมเหตุสมผลพอ ฉันจะตั้งคำถามหรือยืนหยัดกับมุมมองของตัวเอง",
+          "เมื่อทิศทางชัดเจนแล้ว ฉันมักพร้อมช่วยให้ทุกอย่างเริ่มต้นจริง",
+          "ฉันไม่ได้พยายามทำให้ตัวเองเป็นคนที่เด่นที่สุดในกลุ่มเสมอไป",
+          "เพื่อให้งานเดินหน้า ฉันยินดีติดต่ออาจารย์ รุ่นพี่ หรือคนอื่น ๆ เพื่อขอข้อมูลและทรัพยากร",
+          "ถ้างานใดอยู่ในความรับผิดชอบของฉัน ฉันมักพยายามทำให้ครบและรอบคอบ",
+          "เวลาอภิปรายกัน ฉันมักสังเกตได้ว่าเมื่อไรเหตุผลของบางมุมมองยังไม่แน่นพอ",
+          "เมื่อฉันเข้าใจบริบทของงานชัดเจน ฉันก็มักมีส่วนร่วมมากขึ้น"
+        ]},
+        { title:"ส่วนที่ 5: ในงานเรียนหรืองานทีมในมหาวิทยาลัย ฉันรู้สึกพอใจมากที่สุดเมื่อ...", questions:[
+          "ฉันได้วิเคราะห์สถานการณ์และเปรียบเทียบข้อดีข้อเสียของทางเลือกต่าง ๆ",
+          "สิ่งที่ฉันรู้หรือทักษะที่ฉันถนัดช่วยทีมได้จริง",
+          "ฉันได้เสนอความคิดที่สร้างสรรค์หรือน่าสนใจ",
+          "ฉันทุ่มเทให้กับงานอย่างเต็มที่และช่วยให้งานเดินต่อไปได้",
+          "ฉันช่วยให้ทีมพบวิธีแก้ปัญหาที่ใช้ได้จริง",
+          "ฉันช่วยให้สมาชิกในทีมเข้าใจกันและร่วมมือกันดีขึ้น",
+          "ฉันได้ทำงานกับคนที่มีพลังใหม่ ๆ และไอเดียสดใหม่ และฉันก็ปรับตัวเข้ากับพวกเขาได้",
+          "ฉันช่วยให้กลุ่มตกลงกันได้และเดินหน้าต่อไป",
+          "มุมมองของฉันมีอิทธิพลต่อการตัดสินใจสุดท้ายอย่างชัดเจน"
+        ]},
+        { title:"ส่วนที่ 6: ถ้าฉันต้องทำงานเร่งด่วนร่วมกับเพื่อนร่วมทีมที่ยังไม่ค่อยคุ้นเคย...", questions:[
+          "ฉันจะเริ่มจากหาข้อมูลและทรัพยากรที่ช่วยให้เข้าใจงานได้เร็วขึ้น",
+          "ถึงแม้สถานการณ์จะยาก ฉันก็พยายามทำให้ทีมยังคงมุ่งไปสู่เป้าหมาย",
+          "ฉันยินดีเปิดพื้นที่ให้ทุกคนได้พูดความคิดของตัวเองออกมา",
+          "ในสถานการณ์แบบนี้ ฉันมักยังคงใจเย็นและคิดอย่างเป็นระบบได้",
+          "ฉันจะคิดว่าควรแบ่งงานอย่างไรตามจุดแข็งของแต่ละคน",
+          "เมื่อสถานการณ์ยังไม่ชัดเจน ฉันอาจจัดระเบียบความคิดของตัวเองก่อน แล้วจึงเสนอแผน",
+          "ถ้าทีมดูติดขัดอย่างชัดเจน ฉันมักทำอะไรบางอย่างเพื่อช่วยให้งานเดินหน้า",
+          "ความรู้สึกเร่งด่วนของฉันมักช่วยเตือนทีมไม่ให้ผัดวันไปเรื่อย ๆ",
+          "ฉันชอบทำงานกับคนที่มีท่าทีเชิงบวกและพร้อมร่วมมือ"
+        ]},
+        { title:"ส่วนที่ 7: เมื่อเกิดปัญหาในการทำงานเป็นทีม...", questions:[
+          "ถ้ามีคนทำให้งานช้าลงอย่างเห็นได้ชัด ฉันอาจเริ่มใจร้อนได้",
+          "เมื่อฉันสื่อสารกับคนที่มีจุดยืนต่างจากฉันมาก ฉันอาจทำให้เขาเข้าใจฉันได้ไม่ง่ายนัก",
+          "ถ้าการคุยงานดูไม่มีประสิทธิภาพมาก ฉันอาจอยากหยุดคุยแล้วลงมือผลักงานด้วยตัวเอง",
+          "สำหรับเรื่องที่ฉันไม่ถนัด ฉันยินดีขอความช่วยเหลือจากคนอื่น",
+          "เมื่อบรรยากาศในทีมเงียบและแรงจูงใจต่ำ ฉันเองก็อาจได้รับผลกระทบเช่นกัน",
+          "เพราะฉันอยากให้งานออกมาดี ฉันจึงอาจใช้พลังงานกับรายละเอียดมากเกินไป",
+          "คนอื่นอาจมองว่าฉันวิเคราะห์เยอะ แต่ตัดสินใจไม่เร็วพอเสมอไป",
+          "ถ้าเป้าหมายยังไม่ชัดเจน ฉันจะเริ่มต้นได้ยากขึ้น",
+          "เมื่อเจอปัญหาซับซ้อน บางครั้งฉันเข้าใจอยู่ในใจแล้ว แต่ยังอธิบายออกมาได้ไม่ชัดนักในตอนแรก"
+        ]}
+      ],
+      roles: [
+        {name:"ผู้ลงมือทำ", description:"คุณค่อนข้างเป็นคนปฏิบัติจริง และพร้อมเปลี่ยนความคิดให้กลายเป็นการลงมือทำ", strengths:"คุณมักเป็นคนมีระบบ น่าเชื่อถือ และลงมือทำต่อเนื่องได้ดี ในงานกลุ่ม คุณมักช่วยแตกงาน ติดตามความคืบหน้า และทำให้สิ่งที่ตกลงกันไว้เกิดขึ้นจริง", weaknesses:"เมื่อไอเดียยังเปิดกว้างหรือเปลี่ยนเร็ว คุณอาจเอนเอียงไปหาทางเลือกที่ปลอดภัยกว่า และใช้เวลานานขึ้นในการเปิดรับวิธีใหม่", contributions:"รักษาพลังในการลงมือทำของคุณไว้ และลองเปิดพื้นที่ให้แนวคิดใหม่ได้ถูกทดลองบ้าง สิ่งนี้จะทำให้คุณทั้งมั่นคงและยืดหยุ่นมากขึ้น"},
+        {name:"ผู้ประสานงาน", description:"คุณมองเห็นเป้าหมายภาพรวมได้ดี และช่วยให้คนอื่นหาตำแหน่งที่เหมาะสมของตนได้", strengths:"คุณมักสังเกตได้ว่าทีมต้องการอะไรที่สุด และใครเหมาะกับงานส่วนไหน คุณเหมาะกับบทบาทที่ต้องจัดระบบ ชี้ทิศทาง และประสานการทำงานของคนหลายคน", weaknesses:"บางครั้งคุณอาจถนัดจัดการภาพรวมมากกว่าลงมือทำรายละเอียดเอง ทำให้เพื่อนร่วมทีมอยากเห็นคุณรับผิดชอบงานสำคัญบางส่วนด้วยเช่นกัน", contributions:"ขณะใช้จุดแข็งด้านการประสานงาน ลองมีส่วนร่วมกับงานสำคัญบางชิ้นด้วยตนเอง สิ่งนี้มักทำให้บทบาทของคุณดูน่าเชื่อถือและมั่นคงยิ่งขึ้น"},
+        {name:"ผู้ผลักดัน", description:"คุณมักนำพลังและแรงขับเคลื่อนมาให้ทีม โดยเฉพาะเมื่องานท้าทาย", strengths:"คุณเคลื่อนไหวเร็ว มองเป้าหมายชัด และมักเป็นคนผลักให้ทีมเดินหน้าต่อเมื่อทุกอย่างชะลอ ในโครงการที่กดดัน พลังของคุณมักช่วยยกระดับจังหวะการทำงานได้อย่างชัดเจน", weaknesses:"เมื่อคุณให้ความสำคัญกับความเร็วและผลลัพธ์มาก คนอื่นอาจรู้สึกว่าคุณตรงหรือเข้มเกินไป", contributions:"ถ้าคุณจับคู่พลังในการผลักดันกับความใส่ใจต่อวิธีที่คนอื่นรับสารจากคุณมากขึ้น คุณจะเป็นแรงขับสำคัญที่ทั้งมีพลังและทำให้คนอื่นสบายใจได้"},
+        {name:"นักคิดสร้างสรรค์", description:"คุณชอบมองปัญหาจากหลายมุมและคิดแนวทางใหม่ ๆ", strengths:"คุณมีคุณค่าอย่างมากในช่วงระดมสมอง การวางแผน การเลือกหัวข้อ หรือการออกแบบแนวทางใหม่ คุณมักช่วยให้ทีมเห็นความเป็นไปได้ที่คนอื่นยังไม่ทันสังเกต", weaknesses:"คุณอาจชอบช่วงคิดไอเดียมากกว่าการตามรายละเอียดให้ครบทุกขั้น และบางครั้งสิ่งที่ชัดในหัวคุณอาจยังไม่ชัดสำหรับคนอื่น", contributions:"ลองอธิบายความคิดของคุณให้เป็นรูปธรรมและเป็นขั้นตอนมากขึ้น พร้อมเชื่อมโยงกับสิ่งที่ควรทำต่อไป ความคิดสร้างสรรค์ของคุณจะยิ่งนำไปใช้ได้จริง"},
+        {name:"ผู้สำรวจทรัพยากร", description:"คุณเปิดกว้าง อยากรู้อยากเห็น และพร้อมออกไปค้นหาคน ข้อมูล และโอกาสใหม่ ๆ", strengths:"คุณเก่งในการหาทรัพยากร สอบถามข้อมูล และสร้างความเชื่อมโยงที่เป็นประโยชน์ ในงานที่ต้องเก็บข้อมูลหรือขอความช่วยเหลือจากภายนอก คุณมักเป็นทรัพยากรสำคัญของทีม", weaknesses:"คุณอาจกระตือรือร้นมากในช่วงเริ่มต้น แต่เมื่อความใหม่ลดลง การติดตามต่อเนื่องอาจยากขึ้น", contributions:"ถ้าคุณผสานความสามารถในการมองเห็นโอกาสเข้ากับการติดตามงานที่สม่ำเสมอขึ้น บทบาทของคุณจะยิ่งครบถ้วนและมั่นคงขึ้น"},
+        {name:"ผู้ประเมินอย่างรอบคอบ", description:"คุณสุขุม มีเหตุผล และชั่งน้ำหนักทางเลือกได้ดี", strengths:"เมื่อทีมรีบร้อน ตื่นเต้นเกินไป หรือหลุดจากประเด็น คุณมักช่วยพากลับมาสู่การตัดสินใจที่ชัดเจนขึ้นได้ คุณเหมาะกับการเปรียบเทียบทางเลือก ตรวจสอบเหตุผล และมองความเสี่ยง", weaknesses:"บางครั้งคุณอาจดูห่างหรือระมัดระวังเกินไป ทำให้คนอื่นยังไม่เห็นความตั้งใจของคุณทันที", contributions:"เวลาคุณแสดงความคิดเห็น ลองบอกทั้งข้อกังวลและข้อเสนอเชิงสร้างสรรค์ไปพร้อมกัน คนอื่นจะมองเห็นคุณค่าของคุณได้ง่ายขึ้น"},
+        {name:"ผู้สนับสนุนทีม", description:"คุณใส่ใจบรรยากาศของการร่วมมือ และรับรู้ความรู้สึกกับความต้องการของคนอื่นได้ดี", strengths:"คุณมักพร้อมรับฟัง ร่วมมือ และช่วยลดความตึงเครียด ในทีม คุณมักเป็นคนที่ช่วยให้ทุกคนยังอยากคุยและทำงานร่วมกันต่อ", weaknesses:"เพราะคุณให้ความสำคัญกับความกลมกลืน คุณอาจลังเลที่จะพูดความเห็นต่างตรง ๆ โดยเฉพาะเมื่อทีมต้องตัดสินใจเรื่องยาก", contributions:"คุณยังคงอ่อนโยนได้ ขณะเดียวกันก็ฝึกพูดมุมมองของตนเองให้ชัดขึ้น ความร่วมมือที่มั่นคงต้องมีการสื่อสารที่ตรงไปตรงมาและจริงใจด้วย"},
+        {name:"ผู้เก็บงานละเอียด", description:"คุณรอบคอบ ใส่ใจรายละเอียด และมักตั้งมาตรฐานงานของตัวเองไว้สูง", strengths:"คุณเก่งในการตรวจรายละเอียด จับสิ่งตกหล่น และยกระดับคุณภาพผลงานสุดท้าย ในงานแก้ไข ตรวจทาน ตรวจข้อมูล และเก็บรายละเอียดขั้นสุดท้าย คุณมักเป็นคนที่ไว้ใจได้มาก", weaknesses:"เพราะอยากให้งานออกมาดี คุณอาจแก้ซ้ำหรือใช้พลังกับเรื่องเล็กมากเกินไป จนทำให้ตัวเองตึงเครียดหรือเหนื่อย", contributions:"รักษามาตรฐานของคุณไว้ แต่ลองฝึกสังเกตด้วยว่างานถึงจุดที่ “ดีพอแล้ว” เมื่อไร สิ่งนี้จะช่วยดูแลทั้งคุณภาพงานและจังหวะของตัวคุณเอง"},
+        {name:"ผู้เชี่ยวชาญเฉพาะด้าน", description:"คุณมักทุ่มเทกับความรู้หรือทักษะบางด้านอย่างลึกซึ้ง", strengths:"เมื่องานของทีมต้องใช้ความรู้เฉพาะทาง คุณมักนำความลึกและการสนับสนุนที่มีคุณค่ามากมาให้ ในด้านที่คุณถนัดจริง บทบาทของคุณอาจสำคัญอย่างมาก", weaknesses:"คุณอาจโฟกัสกับส่วนที่ตนถนัดมากกว่าภาพรวม และคำอธิบายที่เป็นเชิงเทคนิคมากเกินไปอาจทำให้คนอื่นตามได้ยาก", contributions:"รักษาความลึกของคุณไว้ พร้อมทั้งอธิบายให้ชัดขึ้นว่าความเชี่ยวชาญของคุณช่วยทีมแก้ปัญหาอย่างไร สิ่งนี้จะทำให้คนอื่นเห็นและใช้คุณค่าของคุณได้มากขึ้น"}
+      ]
+    },
+
+    ru: {
+      ui: {
+        app_title:"Студенческая оценка командных ролей",
+        btn_register:"Создать аккаунт",
+        welcome_title:"Студенческая оценка командных ролей",
+        motto_1:"Понять своё естественное место в сотрудничестве и увидеть, в каком направлении можно расти дальше.",
+        motto_2:"Подходит для групповых заданий, учебных проектов, студенческих клубов, конкурсов и командной работы в университете.",
+        welcome_p1:"Добро пожаловать в студенческую оценку командных ролей!",
+        welcome_p2:"Эта оценка поможет вам понять, как вы обычно проявляете себя в учебном сотрудничестве, проектной работе и студенческих командах.",
+        welcome_p3:"Оценка состоит из 7 разделов, в каждом по 9 описаний.",
+        welcome_p4:"В каждом разделе у вас есть 10 баллов, которые нужно распределить в зависимости от того, насколько описание вам подходит.",
+        btn_start_test:"Начать оценку",
+        btn_finish:"Завершить оценку",
+        test_instruction:"Распределите 10 баллов между 9 описаниями ниже. Некоторым описаниям можно дать 0 баллов, но сумма должна быть ровно 10.",
+        title_complete:"Оценка завершена",
+        complete_p1:"Отлично, вы завершили все разделы!",
+        complete_p2:"Теперь вы можете посмотреть интерпретацию, ориентированную на развитие.",
+        report_title:"Ваши результаты оценки командных ролей",
+        top_roles_title:"Ваши более выраженные командные роли",
+        btn_view_interpretation:"Посмотреть подробную интерпретацию развития",
+        btn_restart:"Пройти оценку заново",
+        interp_title:"Интерпретация развития",
+        role_primary_title:(name, role)=>`По результатам этой оценки в учебном сотрудничестве, проектной работе и командной деятельности на кампусе ${name} чаще проявляет черты роли «${role}».`,
+        role_secondary_title:(name, role)=>`Помимо основной роли, у ${name} также заметна склонность к роли «${role}».`,
+        role_secondary_hint:"Это говорит о том, что в разных задачах и форматах взаимодействия у вас есть не только довольно устойчивый стиль, но и дополнительные стороны, которые можно развивать дальше.",
+        section_desc:"Особенности роли",
+        section_strengths:"Сильные стороны в учебном сотрудничестве",
+        section_weaknesses:"Возможные трудности",
+        section_contrib:"Рекомендации для роста",
+        section_thanks_1:"Спасибо, что прошли эту оценку. Её цель — не приклеить к вам постоянный ярлык, а помочь лучше понять, как вы естественно проявляете себя в совместной работе.",
+        section_thanks_2:"Не существует одной “лучшей” роли. Гораздо важнее постепенно находить подходящее для себя место в разных учебных задачах и форматах сотрудничества, а также развивать навыки, которые помогут вам двигаться дальше.",
+        sign_org:"Студенческая оценка командных ролей"
+      },
+      parts: [
+        { title:"Раздел 1: Сильные стороны, которые я обычно приношу в команду", questions:[
+          "Я обычно довольно быстро замечаю новые возможности или новые способы что-то делать.",
+          "В учебных группах, клубах или проектных командах я обычно легко нахожу общий язык с очень разными людьми.",
+          "Я часто могу понять, какие идеи реалистичны, а какие действительно стоит попробовать.",
+          "Когда задаче нужно двигаться вперёд, я обычно могу помочь превратить важные вещи в реальные действия.",
+          "Если я вижу, что кто-то хорошо подходит для определённой задачи, я обычно предлагаю подключить этого человека.",
+          "Мои знания, способность учиться или конкретный навык часто оказываются полезными для команды.",
+          "Когда обсуждаются разные варианты, я обычно могу предложить ещё один объективный путь.",
+          "Мне часто приходят в голову новые идеи или свежие подходы.",
+          "Если в итоге это поможет команде, я готов спокойно отнестись к тому, что сначала меня могут не совсем понять."
+        ]},
+        { title:"Раздел 2: Трудности, которые я могу испытывать в командной работе", questions:[
+          "Если групповое обсуждение выглядит хаотичным, расплывчатым или роли долго не распределяются, мне становится некомфортно.",
+          "Иногда из-за того, что я слишком рационален или объективен, мне непросто сразу стать ближе к другим людям.",
+          "Поскольку мне важна атмосфера в группе, я иногда не хочу слишком сильно выделяться.",
+          "Иногда я могу увлечься внезапной идеей и потерять из виду то, что уже делается.",
+          "Я легко замечаю детали и могу переживать, что что-то сделано недостаточно хорошо.",
+          "Когда мне очень хочется, чтобы задача продвигалась вперёд, другим я могу казаться слишком напористым.",
+          "Иногда я бываю слишком терпим к людям, у которых есть идеи, но которые не умеют ясно их выражать.",
+          "Если задача мало связана с моими интересами, мой уровень вовлечённости может снижаться.",
+          "Когда группа обсуждает новые идеи, я иногда говорю больше, чем нужно."
+        ]},
+        { title:"Раздел 3: Когда я работаю с другими над задачей", questions:[
+          "Я обычно хорошо умею предлагать новые точки зрения или свежие идеи.",
+          "Я естественно замечаю мелкие ошибки и детали, которые группа может пропустить.",
+          "Мне часто удаётся влиять на других, не оказывая чрезмерного давления.",
+          "Я довольно чувствителен к новой информации, новым методам и изменениям.",
+          "В совместной работе я стараюсь быть ответственным, надёжным и уважительным.",
+          "Когда команде нужно принять решение, мой анализ часто оказывается довольно устойчивым.",
+          "Если какое-то предложение полезно для всей команды, я обычно готов его поддержать.",
+          "Если обсуждение затягивается или уходит в сторону, мне хочется вернуть всех к сути.",
+          "Я обычно могу организованно справляться с базовым планированием и выполнением."
+        ]},
+        { title:"Раздел 4: В команде я обычно похож на человека, который...", questions:[
+          "Когда сотрудничество только начинается, мне интересно понять особенности каждого участника и то, в чём он силён.",
+          "Даже если я выслушиваю разные мнения, при необходимости я всё равно способен принять решение.",
+          "Если мне кажется, что идея недостаточно разумна, я задаю вопросы или отстаиваю свою точку зрения.",
+          "Когда направление уже ясно, я обычно готов помочь команде действительно начать двигаться.",
+          "Я обычно не стараюсь быть самым заметным человеком в группе.",
+          "Чтобы продвинуть задачу вперёд, я готов обращаться к преподавателям, старшекурсникам или другим людям за ресурсами.",
+          "Если что-то находится в моей зоне ответственности, я стараюсь сделать это аккуратно и до конца.",
+          "В обсуждениях я часто замечаю, когда чья-то позиция недостаточно обоснована.",
+          "Когда я хорошо понимаю контекст задачи, я обычно включаюсь активнее."
+        ]},
+        { title:"Раздел 5: В учебных заданиях или командной работе на кампусе я особенно доволен, когда...", questions:[
+          "Я могу проанализировать ситуацию и сравнить плюсы и минусы разных вариантов.",
+          "То, что я знаю или умею, действительно помогает команде.",
+          "Я предлагаю идею, которая выглядит творческой или вдохновляющей.",
+          "Я могу полностью включиться в задачу и поддерживать её движение вперёд.",
+          "Я помогаю команде найти решение, которое действительно можно реализовать.",
+          "Я помогаю участникам лучше понимать друг друга и эффективнее сотрудничать.",
+          "Я работаю с людьми, которые приносят новую энергию и свежие идеи, и могу подстроиться к ним.",
+          "Я помогаю группе прийти к согласию и продолжать движение.",
+          "Моя точка зрения заметно влияет на итоговое решение."
+        ]},
+        { title:"Раздел 6: Если мне внезапно нужно выполнить срочную задачу с малознакомыми участниками команды...", questions:[
+          "Сначала я постараюсь найти полезную информацию и материалы, чтобы быстрее войти в курс дела.",
+          "Даже если ситуация сложная, я стараюсь удерживать команду в направлении общей цели.",
+          "Я готов открыть обсуждение, чтобы каждый мог высказать свои идеи.",
+          "В такой ситуации я обычно способен сохранять спокойствие и мыслить структурированно.",
+          "Я думаю о том, как лучше распределить работу, исходя из сильных сторон каждого.",
+          "Когда ситуация ещё неясна, я могу сначала упорядочить собственные мысли, а потом предлагать план.",
+          "Если команда явно застряла, я обычно делаю что-то, чтобы сдвинуть дело с места.",
+          "Моё чувство срочности часто помогает напомнить группе, что не стоит снова всё откладывать.",
+          "Мне комфортнее работать с людьми, которые проявляют позитивный и кооперативный настрой."
+        ]},
+        { title:"Раздел 7: Когда в командной работе возникают проблемы...", questions:[
+          "Если кто-то явно тормозит продвижение, я могу быстро начать раздражаться.",
+          "Когда я общаюсь с человеком, чья позиция сильно отличается от моей, мне бывает трудно добиться настоящего понимания.",
+          "Если обсуждение кажется мне очень неэффективным, у меня появляется желание перестать говорить и самому сдвинуть задачу с места.",
+          "В том, что у меня получается хуже, я готов обращаться за помощью к другим.",
+          "Когда в команде низкий настрой и слабая мотивация, это тоже может на меня влиять.",
+          "Поскольку мне важно сделать работу хорошо, я иногда трачу слишком много сил на детали.",
+          "Другие могут считать, что я много анализирую, но не всегда достаточно быстро решаюсь.",
+          "Если цель неясна, мне труднее сразу включиться в работу.",
+          "В сложных вопросах я иногда понимаю суть внутри, но не сразу умею ясно её объяснить."
+        ]}
+      ],
+      roles: [
+        {name:"Исполнитель", description:"Вы довольно практичны и готовы превращать идеи в реальные действия.", strengths:"Обычно вы организованны, надёжны и хорошо доводите дело до конца. В групповых заданиях вы можете помогать разбивать работу на шаги, следить за продвижением и превращать обсуждения в реальные результаты.", weaknesses:"Когда идеи ещё очень открытые или быстро меняются, вам может быть комфортнее держаться более безопасных вариантов и дольше привыкать к новым подходам.", contributions:"Сохраняйте свою сильную сторону — умение доводить до результата, но при этом оставляйте немного пространства для проверки новых идей. Это сделает вас одновременно устойчивым и гибким."},
+        {name:"Координатор", description:"Вы хорошо видите общую цель и помогаете людям найти подходящую для себя роль.", strengths:"Вы часто замечаете, что именно сейчас важнее всего для команды и кто лучше справится с той или иной задачей. Вам подходят роли, связанные с организацией, прояснением направления и координацией совместной работы.", weaknesses:"Иногда вам легче распределять и направлять других, чем самим заниматься мелкими деталями, поэтому товарищам по команде может хотеться, чтобы вы тоже брали на себя часть ключевого выполнения.", contributions:"Используя свои сильные стороны в координации, оставайтесь вовлечёнными и в некоторые важные задачи напрямую. Это часто делает ваш вклад ещё более убедительным."},
+        {name:"Формирователь", description:"Вы часто приносите в команду энергию и импульс к движению, особенно в сложных задачах.", strengths:"Вы быстро действуете, держите цель в фокусе и часто подталкиваете команду вперёд, когда темп падает. В напряжённых проектах ваша энергия способна заметно ускорить работу.", weaknesses:"Когда для вас особенно важны скорость и результат, другие могут воспринимать вас как слишком прямолинейного или слишком жёсткого человека.", contributions:"Если соединить вашу силу продвижения с большим вниманием к тому, как другие воспринимают ваши слова, вы сможете стать мощным двигателем команды, рядом с которым людям тоже комфортно."},
+        {name:"Генератор идей", description:"Вы любите смотреть на задачи под разными углами и находить новые ходы.", strengths:"Вы особенно полезны в мозговых штурмах, выборе тем, проектировании решений и творческой части работы. Вы часто помогаете команде увидеть возможности, которых другие ещё не заметили.", weaknesses:"Вам может больше нравиться этап появления идеи, чем детальная реализация, и иногда то, что уже ясно вам, ещё неочевидно другим.", contributions:"Пробуйте объяснять свои идеи более конкретно и пошагово, а также связывать их с практическими следующими действиями. Так вашей креативности будет легче превратиться в реальный результат."},
+        {name:"Исследователь ресурсов", description:"Вы открыты, любознательны и готовы искать людей, информацию и новые возможности.", strengths:"Вы умеете находить ресурсы, узнавать нужную информацию и налаживать полезные связи. В задачах, где нужно собрать данные или обратиться за помощью, вы часто становитесь большим плюсом для команды.", weaknesses:"Вы можете быть очень воодушевлены в начале, но когда новизна спадает, поддерживать тот же уровень доведения до конца становится труднее.", contributions:"Если вы соедините способность замечать возможности с более устойчивым сопровождением дел, ваш вклад станет ещё более полным и надёжным."},
+        {name:"Оценщик", description:"Вы рассудительны, спокойны и хорошо взвешиваете разные варианты.", strengths:"Когда команда спешит, слишком увлекается или сбивается с курса, вы можете вернуть её к более ясному и трезвому взгляду. Вам особенно подходят сравнение вариантов, проверка логики и оценка рисков.", weaknesses:"Иногда вы можете казаться слишком отстранённым или осторожным, и другим не всегда сразу заметна ваша вовлечённость.", contributions:"Когда вы высказываете своё мнение, полезно добавлять не только сомнения и ограничения, но и конструктивные предложения. Так другим будет легче увидеть ценность вашего взгляда."},
+        {name:"Командный игрок", description:"Вам важна атмосфера сотрудничества, и вы хорошо чувствуете эмоции и потребности других.", strengths:"Обычно вы готовы слушать, сотрудничать и снижать напряжение. В команде вы часто становитесь одним из тех, кто помогает людям оставаться в диалоге и продолжать работать вместе.", weaknesses:"Поскольку вы цените гармонию, вам может быть трудно прямо озвучивать несогласие, особенно когда группе нужно принять непростое решение.", contributions:"Вы можете сохранить свою мягкость, но при этом тренироваться говорить о собственной позиции яснее. Для устойчивого сотрудничества важны не только доброжелательность, но и честная, чёткая коммуникация."},
+        {name:"Доводящий до конца", description:"Вы внимательны к деталям, аккуратны и часто предъявляете к себе высокий стандарт качества.", strengths:"Вы хорошо замечаете недочёты, проверяете мелочи и помогаете улучшать итоговый результат команды. В редактировании, вычитке, проверке данных и финальной доработке на вас часто можно положиться.", weaknesses:"Поскольку вам важно сделать работу хорошо, вы можете слишком долго дорабатывать или тратить слишком много сил на небольшие элементы, из-за чего накапливается напряжение и усталость.", contributions:"Сохраняйте свои стандарты, но учитесь также замечать момент, когда работа уже достаточно хороша. Это помогает беречь и качество, и собственный ритм."},
+        {name:"Специалист", description:"Вы часто глубоко вкладываетесь в какую-то конкретную область знаний или навыков.", strengths:"Когда задаче команды требуется специальная экспертиза, вы можете принести важную глубину и точечную поддержку. В том, что вы знаете действительно хорошо, ваш вклад может быть особенно ценным.", weaknesses:"Вы можете сильнее сосредотачиваться на той части работы, в которой особенно компетентны, и меньше — на общем процессе, а слишком технические объяснения иногда затрудняют понимание для других.", contributions:"Сохраняйте свою глубину, но старайтесь яснее объяснять, как именно ваша экспертиза помогает команде решать задачу. Тогда окружающим будет легче увидеть и использовать вашу сильную сторону."}
+      ]
+    },
+
+    id: {
+      ui: {
+        app_title:"Asesmen Peran Tim Mahasiswa",
+        btn_register:"Buat Akun",
+        welcome_title:"Asesmen Peran Tim Mahasiswa",
+        motto_1:"Memahami posisi alami diri saat berkolaborasi dan melihat arah pertumbuhan yang masih bisa dikembangkan.",
+        motto_2:"Dirancang untuk tugas kelompok, proyek perkuliahan, organisasi kampus, kompetisi, dan kerja tim di lingkungan kampus.",
+        welcome_p1:"Selamat datang di Asesmen Peran Tim Mahasiswa!",
+        welcome_p2:"Asesmen ini membantu Anda memahami bagaimana Anda biasanya berperan dalam kerja sama kelas, proyek, dan tim di kampus.",
+        welcome_p3:"Asesmen terdiri dari 7 bagian, masing-masing berisi 9 deskripsi.",
+        welcome_p4:"Di setiap bagian, Anda memiliki 10 poin untuk dibagikan sesuai seberapa cocok tiap deskripsi dengan diri Anda.",
+        btn_start_test:"Mulai Asesmen",
+        btn_finish:"Selesaikan Asesmen",
+        test_instruction:"Bagikan 10 poin ke 9 deskripsi di bawah ini. Beberapa deskripsi boleh diberi 0 poin, tetapi totalnya harus tepat 10.",
+        title_complete:"Asesmen Selesai",
+        complete_p1:"Bagus sekali, Anda telah menyelesaikan semua bagian!",
+        complete_p2:"Sekarang Anda dapat melihat interpretasi yang berfokus pada pertumbuhan.",
+        report_title:"Hasil Asesmen Peran Tim Anda",
+        top_roles_title:"Peran Tim yang Paling Menonjol pada Diri Anda",
+        btn_view_interpretation:"Lihat Interpretasi Pertumbuhan Secara Detail",
+        btn_restart:"Ulangi Asesmen",
+        interp_title:"Interpretasi Pertumbuhan",
+        role_primary_title:(name, role)=>`Berdasarkan hasil asesmen ini, dalam kerja sama kelas, proyek, dan aktivitas tim di kampus, ${name} cenderung lebih sering menampilkan karakteristik peran “${role}”.`,
+        role_secondary_title:(name, role)=>`Selain peran utama, ${name} juga menunjukkan kecenderungan tertentu terhadap peran “${role}”.`,
+        role_secondary_hint:"Ini menunjukkan bahwa dalam tugas dan situasi kolaborasi yang berbeda, Anda memiliki gaya yang cukup stabil sekaligus potensi lain yang masih bisa dikembangkan.",
+        section_desc:"Karakteristik peran",
+        section_strengths:"Kekuatan dalam kolaborasi kampus",
+        section_weaknesses:"Tantangan yang mungkin muncul",
+        section_contrib:"Saran pengembangan",
+        section_thanks_1:"Terima kasih telah menyelesaikan asesmen ini. Tujuannya bukan untuk memberi label tetap pada diri Anda, melainkan membantu Anda memahami bagaimana Anda secara alami hadir dalam kerja sama.",
+        section_thanks_2:"Tidak ada satu peran pun yang selalu menjadi “yang terbaik”. Yang lebih penting adalah menemukan posisi yang cocok untuk diri Anda dalam berbagai situasi belajar dan kerja sama, sambil terus melatih kemampuan yang membantu Anda bertumbuh.",
+        sign_org:"Asesmen Peran Tim Mahasiswa"
+      },
+      parts: [
+        { title:"Bagian 1: Kekuatan yang biasanya saya bawa ke dalam tim", questions:[
+          "Saya biasanya cukup cepat melihat peluang baru atau cara baru untuk mengerjakan sesuatu.",
+          "Dalam kelompok kelas, organisasi, atau tim proyek, saya biasanya dapat bekerja sama dengan lancar bersama orang yang sangat beragam.",
+          "Saya sering dapat menilai ide mana yang realistis dan ide mana yang layak dicoba.",
+          "Ketika sebuah tugas perlu bergerak maju, saya biasanya bisa membantu mengubah hal-hal penting menjadi tindakan nyata.",
+          "Jika saya melihat seseorang cocok untuk suatu tugas, saya cenderung mengusulkan agar orang itu dilibatkan.",
+          "Pengetahuan, kemampuan belajar, atau keterampilan tertentu yang saya miliki sering membantu tim.",
+          "Saat berbagai pilihan sedang dibahas, saya biasanya dapat mengusulkan alternatif lain secara objektif.",
+          "Saya cukup sering memunculkan ide baru atau pendekatan yang segar.",
+          "Selama pada akhirnya hal itu membantu tim, saya bersedia menghadapi kesalahpahaman di awal."
+        ]},
+        { title:"Bagian 2: Kesulitan yang mungkin saya alami dalam kerja tim", questions:[
+          "Jika diskusi kelompok terasa kacau, tidak terarah, atau pembagian tugas tidak kunjung jelas, saya merasa kurang nyaman.",
+          "Kadang-kadang karena saya terlalu rasional atau objektif, saya tidak langsung mudah akrab secara sosial dengan orang lain.",
+          "Karena saya peduli pada suasana kelompok, saya kadang tidak ingin terlalu menonjol.",
+          "Saya kadang terlalu tenggelam dalam ide yang tiba-tiba muncul sampai lupa pada pekerjaan yang sedang berjalan.",
+          "Saya mudah memperhatikan detail dan bisa khawatir bila ada bagian yang belum dikerjakan dengan cukup baik.",
+          "Ketika saya sangat ingin tugas segera maju, orang lain bisa melihat saya sebagai orang yang agak terlalu kuat atau menekan.",
+          "Kadang saya terlalu toleran terhadap orang yang punya ide bagus tetapi belum bisa menjelaskannya dengan jelas.",
+          "Jika sebuah tugas tidak terlalu terkait dengan minat saya, tingkat keterlibatan saya bisa menurun.",
+          "Ketika kelompok sedang membahas ide-ide baru, saya terkadang berbicara lebih banyak dari yang diperlukan."
+        ]},
+        { title:"Bagian 3: Saat saya bekerja bersama orang lain dalam suatu tugas", questions:[
+          "Saya biasanya cukup kuat dalam mengemukakan sudut pandang atau gagasan baru.",
+          "Saya secara alami memperhatikan kesalahan kecil atau detail yang mungkin terlewat oleh kelompok.",
+          "Saya sering dapat memengaruhi orang lain tanpa memberi tekanan berlebihan.",
+          "Saya cukup peka terhadap informasi baru, cara baru, dan perkembangan terbaru.",
+          "Dalam kerja sama, saya berusaha tetap bertanggung jawab, dapat diandalkan, dan menjaga sikap.",
+          "Ketika tim perlu membuat penilaian, analisis saya sering cukup stabil.",
+          "Jika sebuah usulan bermanfaat bagi seluruh tim, saya biasanya bersedia mendukungnya.",
+          "Ketika diskusi mulai melebar atau terlalu lama, saya ingin membantu membawa semua orang kembali ke inti persoalan.",
+          "Saya biasanya dapat menangani dasar-dasar perencanaan dan pelaksanaan dengan rapi."
+        ]},
+        { title:"Bagian 4: Dalam tim, saya biasanya seperti seseorang yang...", questions:[
+          "Ketika kerja sama dimulai, saya ingin memahami seperti apa tiap anggota tim dan apa yang mereka kuasai.",
+          "Walaupun saya mendengarkan berbagai pandangan, saat diperlukan saya tetap dapat mengambil keputusan.",
+          "Jika saya merasa sebuah ide belum cukup masuk akal, saya akan mempertanyakannya atau mempertahankan pandangan saya sendiri.",
+          "Setelah arahnya jelas, saya biasanya siap membantu agar pekerjaan benar-benar mulai berjalan.",
+          "Saya biasanya tidak berusaha menjadi orang yang paling menonjol dalam kelompok.",
+          "Untuk mendorong tugas agar maju, saya bersedia menghubungi dosen, kakak tingkat, atau orang lain untuk mencari sumber daya.",
+          "Jika sesuatu menjadi tanggung jawab saya, saya biasanya berusaha mengerjakannya dengan teliti dan sampai tuntas.",
+          "Dalam diskusi, saya sering menyadari ketika suatu pandangan belum didukung alasan yang cukup kuat.",
+          "Ketika saya memahami latar belakang tugas dengan jelas, saya cenderung lebih aktif berpartisipasi."
+        ]},
+        { title:"Bagian 5: Dalam tugas kuliah atau kerja sama di kampus, saya merasa paling puas ketika...", questions:[
+          "Saya dapat menganalisis situasi dan membandingkan kelebihan serta kekurangan dari beberapa pilihan.",
+          "Apa yang saya ketahui atau apa yang saya kuasai benar-benar membantu tim.",
+          "Saya berhasil mengusulkan ide yang terasa kreatif atau menginspirasi.",
+          "Saya bisa mencurahkan diri sepenuhnya pada sebuah tugas dan membantu menjaganya tetap berjalan.",
+          "Saya membantu tim menemukan solusi yang benar-benar bisa diterapkan.",
+          "Saya membantu anggota tim saling memahami dan bekerja sama dengan lebih baik.",
+          "Saya bekerja bersama orang-orang yang membawa energi baru dan ide segar, dan saya dapat menyesuaikan diri dengan mereka.",
+          "Saya membantu kelompok mencapai kesepakatan dan terus bergerak maju.",
+          "Sudut pandang saya memberi pengaruh yang terlihat pada keputusan akhir."
+        ]},
+        { title:"Bagian 6: Jika saya tiba-tiba harus menyelesaikan tugas yang mendesak bersama rekan tim yang belum akrab...", questions:[
+          "Saya akan lebih dulu mencari informasi dan bahan yang berguna agar cepat memahami situasinya.",
+          "Meskipun situasinya sulit, saya berusaha menjaga tim tetap mengarah ke tujuan.",
+          "Saya bersedia membuka ruang diskusi agar semua orang bisa menyampaikan idenya.",
+          "Dalam situasi seperti itu, saya biasanya masih bisa tetap tenang dan berpikir secara teratur.",
+          "Saya akan memikirkan cara membagi pekerjaan berdasarkan kekuatan masing-masing orang.",
+          "Ketika situasinya masih belum jelas, saya mungkin akan lebih dulu merapikan pikiran sendiri sebelum mengusulkan rencana.",
+          "Jika tim benar-benar macet, saya biasanya akan melakukan sesuatu untuk mendorong kemajuan.",
+          "Rasa urgensi yang saya miliki sering membantu mengingatkan kelompok agar tidak terus menunda.",
+          "Saya lebih suka bekerja dengan orang yang menunjukkan sikap positif dan mau bekerja sama."
+        ]},
+        { title:"Bagian 7: Ketika muncul masalah dalam kerja tim...", questions:[
+          "Jika ada orang yang jelas-jelas memperlambat kemajuan, saya bisa cepat merasa tidak sabar.",
+          "Ketika saya berkomunikasi dengan orang yang posisinya sangat berbeda dari saya, saya kadang sulit membuat mereka benar-benar memahami saya.",
+          "Jika diskusi terasa sangat tidak efisien, saya bisa ingin berhenti berbicara dan langsung mendorong tugas berjalan sendiri.",
+          "Untuk hal-hal yang tidak terlalu saya kuasai, saya bersedia meminta bantuan orang lain.",
+          "Ketika suasana tim rendah dan motivasi melemah, saya juga bisa ikut terpengaruh.",
+          "Karena saya ingin pekerjaan selesai dengan baik, saya kadang menghabiskan terlalu banyak energi pada detail-detail kecil.",
+          "Orang lain mungkin melihat saya banyak menganalisis tetapi tidak selalu cukup cepat mengambil keputusan.",
+          "Jika tujuannya belum jelas, saya lebih sulit untuk langsung mulai bergerak.",
+          "Dalam persoalan yang rumit, kadang saya sebenarnya sudah paham di dalam pikiran, tetapi belum langsung bisa menjelaskannya dengan jelas."
+        ]}
+      ],
+      roles: [
+        {name:"Pelaksana", description:"Anda cenderung praktis dan siap mengubah gagasan menjadi tindakan nyata.", strengths:"Anda biasanya teratur, dapat diandalkan, dan mampu menindaklanjuti dengan baik. Dalam tugas kelompok, Anda bisa membantu memecah pekerjaan, memantau kemajuan, dan memastikan rencana benar-benar terlaksana.", weaknesses:"Ketika ide masih sangat terbuka atau berubah cepat, Anda mungkin lebih nyaman dengan pilihan yang aman dan membutuhkan waktu lebih lama untuk menerima pendekatan baru.", contributions:"Pertahankan kekuatan Anda dalam eksekusi, tetapi beri juga sedikit ruang bagi ide-ide baru untuk diuji. Hal itu dapat membuat Anda tetap stabil sekaligus lebih lentur."},
+        {name:"Koordinator", description:"Anda pandai melihat tujuan besar dan membantu orang lain menemukan peran yang tepat.", strengths:"Anda sering menangkap apa yang paling dibutuhkan tim saat itu dan siapa yang cocok untuk tiap bagian pekerjaan. Anda cocok dalam peran yang melibatkan pengorganisasian, penjernihan arah, dan koordinasi kerja bersama.", weaknesses:"Kadang Anda lebih nyaman mengatur orang lain daripada turun langsung ke detail-detail kecil, sehingga rekan satu tim mungkin berharap Anda juga mengambil bagian lebih nyata dalam pelaksanaan.", contributions:"Sambil memanfaatkan kekuatan koordinasi Anda, tetaplah terlibat langsung dalam beberapa tugas penting. Hal itu sering membuat peran Anda terasa lebih meyakinkan."},
+        {name:"Pendorong", description:"Anda sering membawa energi dan dorongan maju ke dalam tim, terutama saat tugas terasa menantang.", strengths:"Anda bergerak cepat, fokus pada tujuan, dan sering mendorong tim tetap maju saat ritme mulai melambat. Dalam proyek yang penuh tekanan, energi Anda dapat menaikkan tempo kerja dengan jelas.", weaknesses:"Ketika Anda sangat peduli pada kecepatan dan hasil, orang lain bisa merasakan Anda terlalu langsung atau terlalu kuat.", contributions:"Jika Anda memadukan dorongan kuat Anda dengan perhatian lebih pada cara orang lain menerima pesan Anda, Anda bisa menjadi penggerak yang kuat sekaligus nyaman diajak bekerja sama."},
+        {name:"Penggagas Ide", description:"Anda senang memandang persoalan dari banyak sudut dan menemukan jalan baru.", strengths:"Anda sangat berharga dalam brainstorming, perencanaan, pemilihan topik, dan perancangan solusi kreatif. Anda sering membantu tim melihat kemungkinan yang belum diperhatikan orang lain.", weaknesses:"Anda mungkin lebih menikmati tahap memunculkan ide dibanding menuntaskan detail pelaksanaannya, dan kadang apa yang sudah jelas bagi Anda belum tentu langsung jelas bagi orang lain.", contributions:"Cobalah menjelaskan ide Anda dengan lebih konkret dan bertahap, lalu hubungkan dengan langkah praktis berikutnya. Dengan begitu, kreativitas Anda akan lebih mudah diwujudkan."},
+        {name:"Pencari Sumber Daya", description:"Anda terbuka, ingin tahu, dan siap menjelajahi orang, informasi, serta peluang baru.", strengths:"Anda pandai mencari sumber daya, bertanya, dan membangun koneksi yang berguna. Dalam tugas yang membutuhkan pengumpulan informasi atau meminta bantuan, Anda sering menjadi aset penting bagi tim.", weaknesses:"Anda bisa sangat antusias di awal, tetapi ketika rasa baru mulai berkurang, menjaga tindak lanjut yang konsisten bisa menjadi lebih sulit.", contributions:"Jika Anda menggabungkan kemampuan melihat peluang dengan kebiasaan menindaklanjuti yang lebih stabil, kontribusi Anda akan menjadi lebih utuh dan dapat diandalkan."},
+        {name:"Penilai", description:"Anda cenderung tenang, rasional, dan mampu menimbang pilihan dengan hati-hati.", strengths:"Ketika tim sedang terburu-buru, terlalu bersemangat, atau mudah teralihkan, Anda bisa membantu mengembalikannya pada penilaian yang lebih jernih. Anda cocok dalam membandingkan pilihan, memeriksa logika, dan memikirkan risiko.", weaknesses:"Kadang Anda bisa terlihat terlalu menjaga jarak atau terlalu berhati-hati, sehingga keterlibatan Anda tidak langsung terlihat oleh orang lain.", contributions:"Saat menyampaikan penilaian Anda, sertakan bukan hanya kekhawatiran, tetapi juga saran yang membangun. Dengan begitu, orang lain akan lebih mudah melihat nilai dari sudut pandang Anda."},
+        {name:"Pendukung Tim", description:"Anda peduli pada suasana kerja sama dan cukup peka terhadap perasaan serta kebutuhan orang lain.", strengths:"Anda biasanya siap mendengarkan, bekerja sama, dan meredakan ketegangan. Dalam tim, Anda sering menjadi salah satu orang yang membantu anggota lain tetap mau berkomunikasi dan bekerja bersama.", weaknesses:"Karena Anda menghargai keharmonisan, Anda mungkin ragu untuk menyampaikan ketidaksetujuan secara langsung, terutama saat tim harus mengambil keputusan yang sulit.", contributions:"Anda bisa tetap hangat sambil melatih keberanian untuk menyampaikan pandangan sendiri dengan lebih jelas. Kerja sama yang kuat juga membutuhkan komunikasi yang jujur dan tegas."},
+        {name:"Penyelesai Akhir", description:"Anda teliti, berorientasi pada detail, dan sering menetapkan standar kualitas yang tinggi bagi diri sendiri.", strengths:"Anda pandai mengecek detail, menemukan hal yang terlewat, dan meningkatkan kualitas akhir hasil tim. Dalam pengeditan, pemeriksaan, pengecekan data, dan penyempurnaan akhir, Anda sering sangat dapat diandalkan.", weaknesses:"Karena Anda ingin hasilnya benar-benar baik, Anda bisa terus merevisi atau menghabiskan terlalu banyak energi pada hal-hal kecil, sehingga diri Anda menjadi tegang atau lelah.", contributions:"Pertahankan standar Anda, tetapi latih juga kemampuan untuk mengenali kapan sebuah pekerjaan sudah cukup baik. Hal itu membantu menjaga kualitas sekaligus ritme Anda sendiri."},
+        {name:"Spesialis", description:"Anda sering menaruh perhatian mendalam pada bidang pengetahuan atau keterampilan tertentu.", strengths:"Ketika tugas tim membutuhkan keahlian khusus, Anda bisa memberikan kedalaman dan dukungan yang sangat bernilai. Dalam bidang yang benar-benar Anda kuasai, kontribusi Anda bisa sangat penting.", weaknesses:"Anda mungkin lebih fokus pada bagian yang paling Anda kuasai daripada keseluruhan proses, dan penjelasan yang terlalu teknis kadang sulit diikuti orang lain.", contributions:"Pertahankan kedalaman Anda, tetapi jelaskan dengan lebih jelas bagaimana keahlian Anda membantu tim menyelesaikan masalahnya. Dengan begitu, nilai Anda akan lebih mudah terlihat dan dimanfaatkan."}
+      ]
+    }
+  };
+
+  const applyLangOverride = (lang, data) => {
+    if (!window._i18n[lang]) return;
+    window._i18n[lang].ui = Object.assign({}, window._i18n[lang].ui || {}, data.ui || {});
+    if (data.parts) window._i18n[lang].parts = data.parts;
+    if (data.roles) window._i18n[lang].roles = data.roles;
+  };
+
+  Object.keys(studentOverrides).forEach(lang => applyLangOverride(lang, studentOverrides[lang]));
+
+  if (typeof window.setLang === 'function') {
+    const current = (localStorage.getItem('belbinLang') || 'zh');
+    try { window.setLang(current); } catch (e) {}
+  }
+})();
+</script>
+
+</body>
+</html>
