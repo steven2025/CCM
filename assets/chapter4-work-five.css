@@ -1,0 +1,28 @@
+/* Chapter 4: assigning-work practice, isolated from existing slides. */
+.slide[data-slide="work-five-steps"]{padding:12px 24px 24px}
+.work5-title{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;margin-bottom:12px}
+.work5-title .en{font-size:clamp(1.2rem,1.7vw,1.65rem)}
+.work5-title .zh{font-size:clamp(1.3rem,1.8vw,1.7rem);font-weight:800;color:var(--c-ink);margin:0}
+.work5-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:22px;align-items:stretch}
+.work5-left{min-width:0}.work5-video{width:100%;max-width:440px;margin:0 auto 10px;aspect-ratio:16/9;background:#101c2b;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px #152e4d20}
+.work5-video video{display:block;width:100%;height:100%;object-fit:contain}
+.work5-method{background:#eef4fa;border:1px solid #ccdae7;border-radius:12px;padding:10px 12px}
+.work5-method h2{font-size:.9rem;color:#163b58;margin-bottom:6px}
+.work5-method ol{list-style:none;display:grid;gap:5px;counter-reset:worksteps}
+.work5-method li{display:flex;gap:8px;font-size:.88rem;line-height:1.4;align-items:baseline}
+.work5-method li::before{counter-increment:worksteps;content:counter(worksteps);font-weight:800;color:#fff;background:#205773;border-radius:5px;min-width:23px;text-align:center}
+.work5-practice{min-width:0;background:#f8fbff;border:1px solid #d3dfeb;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.work5-audience{display:flex;gap:8px}.work5-audience button,.work5-tasks button{font:inherit;cursor:pointer;border:1px solid #c5d5e5;background:#fff;color:#214763;border-radius:8px;padding:6px 12px;font-size:.85rem}
+.work5-audience button[aria-pressed=true]{background:#184d6d;color:white;border-color:#184d6d;box-shadow:0 3px 7px #184d6d24}
+.work5-practice h2{font-size:1.12rem;line-height:1.4;color:#153d59}
+.work5-roles{font-size:.88rem;line-height:1.5;color:#36536a}.work5-roles strong{color:#9a4921}
+.work5-tasks{display:flex;flex-wrap:wrap;gap:6px}.work5-tasks button{font-size:.8rem;padding:5px 10px}.work5-tasks button[aria-pressed=true]{background:#fff0c6;border-color:#b47b22;color:#65400b;font-weight:700}
+.work5-task-card{--task-accent:#216889;--task-bg:#e1f2fc;position:relative;isolation:isolate;flex:1;min-height:210px;border:1px solid color-mix(in srgb,var(--task-accent) 35%,white);border-top:5px solid var(--task-accent);border-radius:14px;padding:18px 20px;background:linear-gradient(125deg,#fff 0%,var(--task-bg) 95%);box-shadow:0 6px 0 #c6d3df,0 13px 22px #163b5620;margin-bottom:8px;overflow:auto;max-height:430px}
+.work5-task-card h3{font-size:1rem;color:var(--task-accent);margin-bottom:14px}
+.work5-task-card p{font-size:clamp(1rem,1.25vw,1.18rem);line-height:1.85;color:#19364b;overflow-wrap:anywhere}
+.work5-task-card strong{color:#a13630;font-weight:800}.work5-task-card em{font-style:normal;color:#06679b;font-weight:800}
+.work5-task-meta{display:block;font-size:.74rem;color:#527082;margin-bottom:8px;letter-spacing:.03em}
+@media(max-width:760px){.slide[data-slide="work-five-steps"]{padding:12px 16px 26px}.work5-layout{grid-template-columns:1fr;gap:14px}.work5-task-card{min-height:220px;max-height:none}.work5-practice{padding:12px}.work5-video{max-width:440px}}
+
+.slide[data-slide="work-five-steps"]{zoom:1;min-height:calc(100dvh - 44px)}
+.slide[data-slide="work-five-steps"] .slide-title{zoom:1}
