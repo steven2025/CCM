@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/pwa/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
   <link rel="stylesheet" href="./assets/pwa.css">
-  <script src="./assets/pwa.js?v=20261024-15" defer></script>
+  <script src="./assets/pwa.js?v=20261024-16" defer></script>
   <link rel="stylesheet" href="./assets/student-manager.css?v=29">
   <script src="./assets/student-manager.js?v=29" defer></script>
   <script src="./assets/subtitle-json.js?v=30"></script>
@@ -1636,12 +1636,12 @@
   </style>
 <script id="observer-mode-runtime">
 (()=>{'use strict';
-const reads=new Set(['observer-settings-get','login','get-materials-admin','get-analytics','students-list','assignments-list','assignments-admin-list','assignment-download-url','assignment-gallery','assignment-my-submission','teacher-showcase-list','topic-choice-list','topic-choice-mine','topic-choice-admin-list','chapter-images-list','chapter-notes-list','get-quiz-progress','opc-list','opc-record','opc-gallery','opc-download','submit-quiz-answer']);
+const reads=new Set(['track-event','observer-settings-get','login','get-materials-admin','get-analytics','students-list','assignments-list','assignments-admin-list','assignment-download-url','assignment-gallery','assignment-my-submission','teacher-showcase-list','topic-choice-list','topic-choice-mine','topic-choice-admin-list','chapter-images-list','chapter-notes-list','get-quiz-progress','opc-list','opc-record','opc-gallery','opc-download','submit-quiz-answer']);
 function observer(){try{const auth=window.parent===window?JSON.parse(localStorage.getItem('ccm_auth_user_v2')||'{}'):(window.CCMHostAuth||window.CCMAuth||JSON.parse(localStorage.getItem('ccm_auth_user_v2')||'{}'));return auth.role==='observer'||auth.readOnly===true||String(auth.id||'').trim()==='stest';}catch{return false;}}
 const checkedState=new WeakMap();
 function lockedInput(input){return !!input&&input.matches('input:not([data-search]),textarea')&&!!input.closest('[data-tool="system-settings"]');}
 
-const originalFetch=window.fetch.bind(window);window.fetch=function(input,options){if(observer()&&/tencentscf\.com/.test(String(input?.url||input))&&options?.body){let body;try{body=JSON.parse(options.body);}catch{}if(body?.action==='track-event')return Promise.resolve(new Response(JSON.stringify({ok:true,preview:true}),{headers:{'Content-Type':'application/json'}}));if(body&&!reads.has(body.action))return Promise.resolve(new Response(JSON.stringify({ok:false,readOnly:true,message:'超级访客为只读观摩账号，不能修改或提交数据'}),{status:403,headers:{'Content-Type':'application/json'}}));}return originalFetch(input,options);};
+const originalFetch=window.fetch.bind(window);window.fetch=function(input,options){if(observer()&&/tencentscf\.com/.test(String(input?.url||input))&&options?.body){let body;try{body=JSON.parse(options.body);}catch{}if(body&&!reads.has(body.action))return Promise.resolve(new Response(JSON.stringify({ok:false,readOnly:true,message:'超级访客为只读观摩账号，不能修改或提交数据'}),{status:403,headers:{'Content-Type':'application/json'}}));}return originalFetch(input,options);};
 const mutationSelector='[data-material-rename],[data-material-move],[data-assignment-review],[data-submit-html],[data-submit-file],[data-submit-name],#showcase-add,#saveCloudDraft,#assChoose,#assignmentSubmitBtn,#caseWorkshopInfo .choose,[data-save-note]';
 function mutationButton(b){if(b.closest('#student-manager')&&b.dataset.action&&!['refresh','class-select','cancel-class','cancel-edit','cancel-import'].includes(b.dataset.action))return true;if(b.matches(mutationSelector)||b.closest('[data-review],[data-custom-review]'))return true;const settings=b.closest('[data-tool="system-settings"]');return !!settings&&(/保存|新增|添加|删除|移除|重命名|替换|编辑|公开|退回|重置|停用|启用|转班|归档|审核|发布|登记|上传|↑|↓/.test(b.textContent.trim()));}
 function paint(){if(!observer()){document.querySelectorAll('[data-observer-disabled]').forEach(e=>{e.disabled=false;e.removeAttribute('data-observer-disabled');});document.querySelectorAll('.observer-banner').forEach(e=>e.remove());return;}document.querySelectorAll('[data-tool="system-settings"]').forEach(win=>{if(!win.querySelector('.observer-banner')){const banner=document.createElement('div');banner.className='observer-banner';banner.textContent='超级访客 · 只读观摩 · 可查看真实内容，不能修改或提交';banner.style.cssText='padding:8px 14px;background:#153a62;color:#ffe5a1;font-size:13px;flex:none';win.querySelector('.floating-header')?.after(banner);}win.querySelectorAll('input:not([data-search]),textarea').forEach(disable);});document.querySelectorAll('[data-review] textarea,[data-review] select,[data-custom-review] textarea,[data-custom-review] select').forEach(disable);document.querySelectorAll('button,input').forEach(b=>{if(mutationButton(b))disable(b);});}
@@ -1950,7 +1950,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-10-24-v65';
+  const PLATFORM_VERSION = 'frontend-2026-10-24-v66';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -1971,8 +1971,8 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
   const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
   const interactiveChapterUrls = {
     1: './chapters/chapter1.html?v=20261015-4',
-    2: './chapters/chapter2.html?v=20261024-10',
-    3: './chapters/chapter3.html?v=20261024-15',
+    2: './chapters/chapter2.html?v=20261024-16',
+    3: './chapters/chapter3.html?v=20261024-16',
     4: './chapters/chapter4.html?v=20261024-14'
   };
   const aiProviderDefaults = {
@@ -3512,7 +3512,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
   function trackPlatformEvent(eventType, details) {
     const auth = getCurrentAuth();
     const inviteCode = localStorage.getItem('ccm_invite_code') || '';
-    if (!auth.id || !inviteCode || isObserver()) return;
+    if (!auth.id || !inviteCode || (isObserver() && eventType==='login')) return;
     fetch(TEACHER_SETTINGS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3750,11 +3750,21 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
         '<div class="analytics-source-note">行为数据按上方最近 7/30/90 天筛选；测试成绩为全部历史首次答案，不受该筛选影响。</div>';
     };
 
+    const renderObserverActivity = () => {
+      const data=payload.observerActivity;
+      if(!data)return '<div class="analytics-empty">观摩记录尚不可用，请确认已部署配套云函数。旧版未采集的数据不会自动补齐。</div>';
+      if(data.available===false)return '<div class="analytics-empty">'+escapeHtml(data.message||'观摩记录读取失败，请稍后刷新')+'</div>';
+      const labels={'login':'登录','chapter-open':'章节访问','material-open':'材料打开'};
+      const cards=[{label:'观摩登录次数',value:String(data.logins||0)},{label:'章节访问',value:String(data.chapterOpens||0)},{label:'材料打开',value:String(data.materialOpens||0)}];
+      const rows=(data.recentEvents||[]).map(e=>'<tr><td>'+escapeHtml(new Date(e.createdAt).toLocaleString())+'</td><td>stest · 超级访客</td><td>'+escapeHtml(labels[e.eventType]||e.eventType)+'</td><td>'+escapeHtml(e.title||e.chapter||'—')+'</td></tr>').join('')||'<tr><td colspan="4">本时间范围暂无观摩访问记录</td></tr>';
+      return '<p class="analytics-source-note">观摩共享账号单独统计，不计入学生行为或成绩；按上方7/30/90天筛选，独立于班级筛选。共享账号无法区分具体访客。仅记录升级后的访问，历史登录不会自动补齐。</p>'+renderMetricCards(cards)+'<p class="analytics-source-note">最近登录：'+(data.lastLoginAt?escapeHtml(new Date(data.lastLoginAt).toLocaleString()):'暂无记录')+(data.truncated?' · 记录量超过读取上限，当前统计不完整':'')+'</p><div class="analytics-table-wrap"><table class="analytics-table"><thead><tr><th>时间</th><th>账号</th><th>行为</th><th>访问对象</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    };
+
     container.innerHTML = '<div class="analytics-subnav" role="tablist" aria-label="用户行为看板子导航">' +
       '<button type="button" class="active" data-analytics-subview="overview">综合概览</button>' +
       '<button type="button" data-analytics-subview="results">测试成绩</button>' +
       '<button type="button" data-analytics-subview="questions">题目分析</button>' +
-      '<button type="button" data-analytics-subview="activity">学习行为</button></div>' +
+      '<button type="button" data-analytics-subview="activity">学习行为</button>' + (isTeacher()?'<button type="button" data-analytics-subview="observer">观摩访问记录</button>':'') + '</div>' +
       '<div class="analytics-shared-view" data-analytics-shared-view></div>';
     const sharedView = container.querySelector('[data-analytics-shared-view]');
     const renderView = view => {
@@ -3766,6 +3776,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
       if (view === 'results') sharedView.innerHTML = renderResults();
       else if (view === 'questions') sharedView.innerHTML = renderQuestions();
       else if (view === 'activity') sharedView.innerHTML = renderActivity();
+      else if (view === 'observer' && isTeacher()) sharedView.innerHTML = renderObserverActivity();
       else sharedView.innerHTML = renderOverview();
       sharedView.querySelectorAll('[data-quiz-download]').forEach(button => {
         button.addEventListener('click', () => {
@@ -6425,7 +6436,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
       saveCurrentAuth({ role: result.role, id: result.id || studentName, name: result.name || result.id || studentName, classId: result.classId || '', className: result.className || '', loginAt: Date.now() });
       localStorage.setItem('ccm_invite_code', inviteCode);
       localStorage.setItem('ccm_student_name', studentName);
-      trackPlatformEvent('login', { title: result.role === 'teacher' ? '管理员登录' : '学生登录' });
+      trackPlatformEvent('login', { title: result.role === 'observer' ? '观摩账号登录' : result.role === 'teacher' ? '管理员登录' : '学生登录' });
       try {
         await refreshMaterialsCatalogForRole(result.role);
       } catch (catalogError) {
