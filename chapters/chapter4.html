@@ -249,6 +249,7 @@
 /* Keep the existing draggable dialog inside narrow screens. */
 #dlgWin{max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}
 </style>
+<link rel="stylesheet" href="../assets/chapter4-work-five.css?v=20261024-14">
 </head>
 <body data-chapter-id="chapter-4">
 
@@ -996,6 +997,23 @@
 </section>
 
 <!-- ============ Slide 17: 4.1 小结 ============ -->
+<section class="slide" data-slide="work-five-steps" data-page-type="4.1 · 分组练习 Group Practice" data-work5>
+ <div class="section-label">4.1 · 方法与练习 · Method &amp; Practice</div>
+ <h1 class="slide-title work5-title anim" data-order="0"><span class="zh">布置工作五步法</span><span class="en">Five Steps for Assigning Work</span></h1>
+ <div class="work5-layout">
+  <div class="work5-left">
+   <div class="work5-video anim" data-order="1"><video controls playsinline preload="none" aria-label="布置工作五步法视频"><source src="https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter4/work-giveing.mp4" type="video/mp4"></video></div>
+   <div class="work5-method anim" data-order="2"><h2>布置工作五步法 · Five steps</h2><ol><li>交代清楚事项</li><li>要求复述事项</li><li>讨论事项目的</li><li>权限划分／做好应急预案</li><li>引导员工提出个人见解</li></ol></div>
+  </div>
+  <div class="work5-practice anim" data-order="3">
+   <div class="work5-audience" role="group" aria-label="选择学员类型"><button type="button" data-work5-audience="mba" aria-pressed="true">MBA学员</button><button type="button" data-work5-audience="undergraduate" aria-pressed="false">本科生</button></div>
+   <h2>布置工作五步法分组练习</h2>
+   <p class="work5-roles">三人一组：<strong>布置者、领取者、旁观者</strong>。</p>
+   <div class="work5-tasks" role="group" aria-label="选择任务"><button type="button" data-work5-task="0" aria-pressed="false">任务1</button><button type="button" data-work5-task="1" aria-pressed="false">任务2</button><button type="button" data-work5-task="2" aria-pressed="false">任务3</button><button type="button" data-work5-task="3" aria-pressed="false">任务4</button><button type="button" data-work5-task="4" aria-pressed="false">任务5</button></div>
+   <article class="work5-task-card" data-work5-card aria-live="polite" aria-atomic="true"></article>
+  </div>
+ </div>
+</section>
 <section class="slide" data-slide="18" data-page-type="4.1 · 小结 Summary">
   <div class="section-label">4.1 · 小结 · Summary</div>
   <h1 class="slide-title">
@@ -1033,6 +1051,9 @@
 </section>
 
 <!-- ============ Slide 18: 4.2 开场 ============ -->
+
+
+
 <section class="slide" data-slide="19" data-page-type="理论转场 · 4.2">
   <div class="section-label">4.2 · 跨文化团队类型 · Types of Cross-cultural Team</div>
   <h1 class="slide-title">
@@ -2393,8 +2414,9 @@
   for (let i = 0; i < TOTAL; i++) {
     let label = '第四章';
     for (const [idx, lab] of labelMap) {
-      if (i >= idx) label = lab;
+      if ((i < 17 ? i : i - 1) >= idx) label = lab;
     }
+    if (slides[i].dataset.slide === 'work-five-steps') label = '4.1 · 布置工作五步法';
     navLabels.push([i, label]);
   }
 
@@ -3290,6 +3312,7 @@ window.addEventListener('message', function(event) {
 </script>
 <link rel="stylesheet" href="../assets/chapter-notes.css?v=5">
 <script src="../assets/chapter-notes.js?v=6"></script>
+<script src="../assets/chapter4-work-five.js?v=20261024-14"></script>
 </body>
 </html>
 
