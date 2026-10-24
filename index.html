@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/pwa/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/pwa/favicon-32.png">
   <link rel="stylesheet" href="./assets/pwa.css">
-  <script src="./assets/pwa.js?v=20261024-16" defer></script>
+  <script src="./assets/pwa.js?v=20261025-1" defer></script>
   <link rel="stylesheet" href="./assets/student-manager.css?v=29">
   <script src="./assets/student-manager.js?v=29" defer></script>
   <script src="./assets/subtitle-json.js?v=30"></script>
@@ -1950,7 +1950,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
 
   const TEACHER_SETTINGS_API_URL = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
   const MATERIALS_CATALOG_COS_URL = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/system/materials.json';
-  const PLATFORM_VERSION = 'frontend-2026-10-24-v66';
+  const PLATFORM_VERSION = 'frontend-2026-10-25-v67';
   const AUTH_STORAGE_KEY = 'ccm_auth_user_v2';
   const SETTINGS_STORAGE_KEY = 'ccm_access_settings';
 
@@ -2040,7 +2040,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
     },
     'final': {
       title: '期末任务 · Final Assignment',
-      subtitle: '中英PDF + AI词汇窗试验模式 · Chinese-English PDF + AI glossary pilot',
+      subtitle: '分类浏览 · 项目MD · 选题与作品提交',
       pptLabelPrefix: 'Final Assignment PPT'
     }
   };
@@ -3153,7 +3153,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
 
 
   const aboutCourseApps = [
-    { id: 'opc-project-library', title: '跨文化 AI 应用项目库', subtitle: '选题名单 · 阶段开发 · 作品提交', icon: '🧩', color: '#176b87', url: 'ccm-opc-project-library.html' },
+    { id: 'opc-project-library', title: '跨文化 AI 应用项目库', subtitle: '分类浏览 · 项目MD · 选题与作品提交', icon: '🧩', color: '#176b87', url: 'ccm-opc-project-library.html?v=20261025-1' },
     { id: "ai-api-config", title: "系统登录", subtitle: "请输入邀请码", icon: "🤖", color: "linear-gradient(135deg, #0ea5e9, #2563eb)", mode: "api-config" },
     { id: "business-spss", title: "商务统计/Business-Spss", subtitle: "Business statistics tools", icon: "📊", color: "linear-gradient(135deg, #2563eb, #1d4ed8)", url: "https://steven2025.github.io/business-spss/" },
     { id: "hofstede-index", title: "文化指数", subtitle: "Culture dimensions reference", icon: "🌐", color: "linear-gradient(135deg, #7c3aed, #5b21b6)", url: "https://steven2025.github.io/Culture-dimention/" },
@@ -4035,14 +4035,14 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
         body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回作业 / Back</button></div><p class="material-tree-note">请选择学生姓名查看该学生的公开作品 / Select a student to view the published work.</p><div class="gallery-grid"></div>';
         body.querySelector('[data-back]').onclick=()=>renderAssignments(cid,ch);
         const g=body.querySelector('.gallery-grid');
-        items.forEach(item=>g.appendChild(card(item.name,'查看公开作品 / View published work',()=>renderOne(item))));
+        items.forEach(item=>g.appendChild(card(item.name+(String(item.assignmentId||'').startsWith('opc-project-')?' · '+(item.appName||item.fileName||''):''),'查看公开作品 / View published work',()=>renderOne(item))));
       }
       function renderOne(item){
         body.innerHTML='<div class="gallery-breadcrumb"><button class="btn-ghost" data-back>← 返回学生列表 / Back</button></div><div class="gallery-list"></div>';
         body.querySelector('[data-back]').onclick=()=>renderSubmissions(item.classId,item.chapterId,item.assignmentId);
         const article=document.createElement('article');article.className='gallery-item';
         article.innerHTML='<h3>'+escapeHtml(item.name)+'</h3><p>'+escapeHtml(item.appName || item.fileName)+' · '+new Date(item.submittedAt).toLocaleString()+'</p>';
-        if(item.assignmentId==='chapter3-interactive-case-video'){const note=document.createElement('p');note.className='material-tree-note';note.textContent='作品链接可能需要登录或不允许嵌入；无法显示时请使用“新窗口打开”。临时链接失效后请联系作者更新。';article.appendChild(note);}
+        if(item.assignmentId==='chapter3-interactive-case-video'||String(item.assignmentId||'').startsWith('opc-project-')){const note=document.createElement('p');note.className='material-tree-note';note.textContent='作品链接可能需要登录或不允许嵌入；无法显示时请使用“新窗口打开”。临时链接失效后请联系作者更新。';article.appendChild(note);}
         if(item.contentType==='video/mp4'){const v=document.createElement('video');v.controls=true;v.preload='metadata';v.src=item.fileUrl;article.appendChild(v);}else if(item.contentType==='text/html'||/\.html?(?:$|[?#])/i.test(item.fileName||'')){const wrap=document.createElement('div');wrap.className='html-work-preview';const tools=document.createElement('div');tools.className='gallery-preview-tools';const frame=document.createElement('iframe');frame.className='file-preview-iframe';frame.setAttribute('sandbox','allow-scripts allow-forms');frame.setAttribute('allowfullscreen','');frame.src=item.fileUrl;const full=document.createElement('button');full.className='btn-ghost';full.textContent='全屏 / Full screen';full.onclick=()=>{if(frame.requestFullscreen)frame.requestFullscreen().catch(()=>{frame.classList.toggle('preview-expanded');});else frame.classList.toggle('preview-expanded');};const open=document.createElement('a');open.className='btn-ghost';open.target='_blank';open.rel='noopener';open.href=item.fileUrl;open.textContent='新窗口打开 / Open';tools.append(full,open);wrap.append(tools,frame);article.appendChild(wrap);}else{const a=document.createElement('a');a.className='btn-ghost';a.target='_blank';a.rel='noopener';a.href=item.fileUrl;a.textContent='预览或下载 / Preview or download';article.appendChild(a);}
         const bar=document.createElement('div');bar.className='gallery-interactions';bar.innerHTML='<button type="button" class="btn-ghost" data-like>👍 <span>'+(item.likeCount||0)+'</span></button><span data-view>👁️ '+(item.viewCount||0)+'</span><button type="button" class="btn-ghost" data-comment-toggle>💬 <span>'+(item.commentCount||0)+'</span></button><div class="gallery-comments" hidden><div data-comments></div><input maxlength="500" placeholder="写评论 / Add a comment"><button type="button" class="btn-ghost" data-comment-send>发送 / Post</button></div>';article.appendChild(bar);body.querySelector('.gallery-list').appendChild(article);
         const update=data=>{bar.querySelector('[data-like] span').textContent=data.likeCount;bar.querySelector('[data-like]').classList.toggle('active',!!data.likedByMe);bar.querySelector('[data-comment-toggle] span').textContent=data.commentCount;bar.querySelector('[data-view]').textContent='👁️ '+data.viewCount;bar.querySelector('[data-comments]').innerHTML=(data.comments||[]).map(c=>'<p><b>'+escapeHtml(c.name)+'</b>：'+escapeHtml(c.text)+'</p>').join('');};
@@ -6563,7 +6563,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
     host.appendChild(toolbar);
     const frame = document.createElement('iframe');
     frame.title = '跨文化 AI 应用项目库';
-    frame.src = './ccm-opc-project-library.html';
+    frame.src = './ccm-opc-project-library.html?v=20261025-1';
     frame.loading = 'eager';
     frame.allow = 'clipboard-write';
     host.appendChild(frame);
