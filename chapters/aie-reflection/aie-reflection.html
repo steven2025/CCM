@@ -488,6 +488,8 @@ textarea:focus,input[type="text"]:focus{outline:3px solid rgba(199,139,69,.4);bo
   .report-block,.byram-card{break-inside:avoid;border:1px solid #ddd;box-shadow:none}
 }
 </style>
+<script src="../../assets/chapter3-aie-judgments.js?v=20261024-11"></script>
+<style>.card-action-tip{background:#ffe3a1;color:#442b0c;border-left:4px solid #c78b45;border-radius:8px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.6}.card-action-tip strong{font-weight:800}</style>
 </head>
 <body data-chapter-return="../chapter3.html">
 
@@ -1249,35 +1251,49 @@ function stageFirstJudgment(route, A){
 
 /* --- 阶段3：事实与推测 --- */
 function stageFacts(route, A){
-  const all = route.facts.map(f=>({id:f.id,t:f.t,kind:'fact',v:A.facts[f.id]}))
-    .concat(route.guesses.map(g=>({id:g.id,t:g.t,kind:'guess',v:A.facts[g.id]})));
+  const all = aieFactItems(route,A).map(x=>({...x,v:A.facts[x.id]}));
+  const judgment = route.firstJudgment.opts.find(x=>x.k===A.firstJudgment.pick);
+  const reasons = route.facts.filter(x=>(A.firstJudgment.reasons||[]).includes(x.id));
   const factChips = all.filter(x=>x.v==='fact');
   const guessChips = all.filter(x=>x.v==='guess');
+  const unsureChips = all.filter(x=>x.v==='unsure');
   const unpooled = all.filter(x=>!x.v);
-  return stageShell('STAGE 3','事实与推测','Facts and Interpretations','把候选陈述拖入下方两个框，判断哪些是画面中能直接看到的，哪些是你的推断。可来回拖动重新分类。')
-    + `<div class="panel">
-        <h4>候选内容 / Candidates</h4>
+  const classified = all.length-unpooled.length;
+  return stageShell('STAGE 3','事实与推测','Facts and Interpretations','这些卡片针对你的第一判断生成。请区分案例已提供的信息与仍需证据的推断；旁白或人物自述也属于案例信息，不等于对其动机的独立证明。')
+    + `<div class="panel" id="judgment-recap"><h4>回看你的第一判断 / Your first impression</h4>
+        <p>${esc(judgment ? judgment.k+'：'+judgment.t : '（未选择）')}</p>
+        <p>你选择的依据：${esc(reasons.map(x=>x.t).join('；') || '（未选择依据）')}</p>
+        ${A.firstJudgment.note?`<p>你的补充：${esc(A.firstJudgment.note)}</p>`:''}
+        <div class="hint">以下陈述包含针对本判断的案例信息与待检验解释，并纳入你选过的依据。它们不都代表你的观点，分类由你完成。</div></div>
+      <div class="panel">
+        <h4>与你的判断对应的辨析卡片 / Review these statements</h4>
+        <p class="card-action-tip"><strong>操作：</strong>拖动卡片到分类框；手机也可连续点击切换：案例信息 → 推测 → 暂时无法判断 → 未分类。</p>
         <div class="chip-pool dropzone" data-zone="pool" id="chip-pool">
-          ${unpooled.map(c=>`<button class="chip" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+          ${unpooled.map(c=>`<button class="chip" draggable="true" data-id="${c.id}">${esc(c.t)}</button>`).join('')}
           ${unpooled.length===0?'<span class="dz-empty">所有候选已分类 ✓</span>':''}
         </div>
         <div class="zone-row">
           <div class="zone fact-zone dropzone" data-zone="fact">
-            <h5>有证据支持的陈述 <span class="z-en">Direct Observations</span></h5>
-            ${factChips.map(c=>`<button class="chip selected-fact" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+            <h5>案例已提供的信息 <span class="z-en">Information in the story</span></h5>
+            ${factChips.map(c=>`<button class="chip selected-fact" draggable="true" data-id="${c.id}">${esc(c.t)}</button>`).join('')}
             ${factChips.length===0?'<span class="dz-empty">（拖到这里 / Drop here）</span>':''}
           </div>
           <div class="zone guess-zone dropzone" data-zone="guess">
             <h5>你的推断与解释 <span class="z-en">Your Interpretations</span></h5>
-            ${guessChips.map(c=>`<button class="chip selected-guess" draggable="true" data-id="${c.id}" data-kind="${c.kind}">${esc(c.t)}</button>`).join('')}
+            ${guessChips.map(c=>`<button class="chip selected-guess" draggable="true" data-id="${c.id}">${esc(c.t)}</button>`).join('')}
             ${guessChips.length===0?'<span class="dz-empty">（拖到这里 / Drop here）</span>':''}
           </div>
         </div>
-        <div class="hint">拖动即可分类 · 已分类的词也能拖到另一框或拖回候选池。</div>
+        <div class="zone dropzone" data-zone="unsure" style="margin-top:12px">
+          <h5>暂时无法判断 <span class="z-en">Not sure yet</span></h5>
+          ${unsureChips.map(c=>`<button class="chip" draggable="true" data-id="${c.id}">${esc(c.t)}</button>`).join('')}
+          ${unsureChips.length?'':'<span class="dz-empty">证据不足时可以放在这里 / Drop here if unsure</span>'}
+        </div>
+        <div class="hint" role="status">已分类 ${classified}/${all.length} · 至少分类3张即可继续，其余可稍后返回。</div>
       </div>
-      <div class="feedback">${esc(route.factsFeedback)}</div>
+      <details class="feedback" id="facts-hint"><summary>查看辨析提示 / View reflection</summary><p>${esc(aieJudgmentHint(route,A))}</p><p>提示用于反思，不是对第一判断或分类的自动判分。</p></details>
       <div class="form-actions">
-        <button class="btn btn-primary" id="btn-facts-next" ${all.some(x=>!x.v)?'disabled':''}>保存并下一步 / Save &amp; Continue</button>
+        <button class="btn btn-primary" id="btn-facts-next" ${classified<Math.min(3,all.length)?'disabled':''}>保存并下一步 / Save &amp; Continue</button>
       </div>`;
 }
 
@@ -1549,7 +1565,7 @@ function bindStageEvents(n){
       nextStage();
     });
   } else if(n===3){
-    const ids = [...route.facts.map(f=>f.id), ...route.guesses.map(g=>g.id)];
+    const ids = aieFactItems(route,A).map(x=>x.id);
     // 拖拽：dragstart 记录 chip id
     document.querySelectorAll('#overlay .chip[draggable="true"]').forEach(ch=>{
       ch.addEventListener('dragstart', e=>{
@@ -1562,7 +1578,7 @@ function bindStageEvents(n){
       ch.addEventListener('click', ()=>{
         const id = ch.dataset.id;
         const cur = A.facts[id];
-        A.facts[id] = cur==='fact' ? 'guess' : (cur==='guess' ? undefined : 'fact');
+        A.facts[id] = cur==='fact' ? 'guess' : (cur==='guess' ? 'unsure' : (cur==='unsure' ? undefined : 'fact'));
         save(); renderStage(3);
       });
     });
@@ -1575,14 +1591,14 @@ function bindStageEvents(n){
         dz.classList.remove('drag-over');
         const id = e.dataTransfer.getData('text/plain');
         const zone = dz.dataset.zone;
-        if(!id || ids.indexOf(id)<0) return;
+        if(!id || ids.indexOf(id)<0 || !['pool','fact','guess','unsure'].includes(zone)) return;
         A.facts[id] = (zone==='pool') ? undefined : zone;
         save(); renderStage(3);
       });
     });
     const next = $('btn-facts-next');
     if(next) next.addEventListener('click', ()=>{
-      if(!ids.every(id=>A.facts[id])){ toast('请把所有候选归入事实或推测 / Categorise all items first'); return; }
+      if(ids.filter(id=>A.facts[id]).length<Math.min(3,ids.length)){ toast('请至少分类3张卡片，也可选暂时无法判断 / Categorise at least 3 cards'); return; }
       nextStage();
     });
   } else if(n===4){
@@ -1755,8 +1771,8 @@ function buildReport(){
   const mine = A.mine;
   const fjOpt = A.firstJudgment.pick ? route.firstJudgment.opts.find(o=>o.k===A.firstJudgment.pick) : null;
   const fjReasonTexts = (A.firstJudgment.reasons||[]).map(id=>{const f=(route.facts||[]).find(x=>x.id===id);return f?f.t:''}).filter(Boolean);
-  const facts = route.facts.filter(f=>A.facts[f.id]==='fact').map(f=>f.t);
-  const guesses = [...route.facts, ...route.guesses].filter(g=>A.facts[g.id]==='guess').map(g=>g.t);
+  const facts = aieFactItems(route,A).filter(f=>A.facts[f.id]==='fact').map(f=>f.t);
+  const guesses = aieFactItems(route,A).filter(g=>A.facts[g.id]==='guess').map(g=>g.t);
   const blk = (t, en, body) => `<div class="report-block"><h5>${t}<span style="margin-left:auto;font-size:12px;color:rgba(18,59,70,.45)">${en}</span></h5><div class="rb-body">${body||'（未填写 / Not filled）'}</div></div>`;
   const list = arr => arr.length ? arr.map(x=>'• '+esc(x)).join('\n') : '（无 / None）';
   const parts = [];
@@ -1770,6 +1786,7 @@ function buildReport(){
   parts.push(blk('4. 情绪','Feelings', list(A.feelings)));
   parts.push(blk('5. 实际行动','Actions taken', hasVal(mine.steps.step3.do) ? esc(mine.steps.step3.do) : (hasVal(mine.steps.step3.think)?esc(mine.steps.step3.think):'（未填写）')));
   parts.push(blk('6. 主观推测','Interpretations', hasVal(mine.steps.step3.guesses) ? esc(mine.steps.step3.guesses) : list(guesses)));
+  parts.push(blk('案例卡片分类进度','Case card review', '已分类 '+aieFactItems(route,A).filter(x=>A.facts[x.id]).length+'/'+aieFactItems(route,A).length+'；未分类 '+aieFactItems(route,A).filter(x=>!A.facts[x.id]).length+' 张。\n暂时无法判断：'+list(aieFactItems(route,A).filter(x=>A.facts[x.id]==='unsure').map(x=>x.t))));
   parts.push(blk('7. 对方可能的视角','Their perspective', hasVal(A.perspectivePred) ? esc(A.perspectivePred) : '（未填写）'));
   parts.push(blk('8. 判断依据','Evidence', hasVal(mine.steps.step4.evidence) ? esc(mine.steps.step4.evidence) : '（未填写）'));
   parts.push(blk('9. 其他可能解释','Alternative explanations', hasVal(mine.steps.step4.alt) ? esc(mine.steps.step4.alt) : '（未填写）'));
@@ -1849,13 +1866,15 @@ function buildReportText(){
   lines.push('路线 / Route: ' + route.title);
   lines.push('--------------------------------------------------');
   lines.push('经历标题: ' + mineTitle());
-  lines.push('事件事实: ' + (hasVal(mine.steps.step3.facts) ? mine.steps.step3.facts : (route.facts.filter(f=>A.facts[f.id]==='fact').map(f=>f.t).join('；')||'（未填写）')));
+  lines.push('事件事实: ' + (hasVal(mine.steps.step3.facts) ? mine.steps.step3.facts : (aieFactItems(route,A).filter(f=>A.facts[f.id]==='fact').map(f=>f.t).join('；')||'（未填写）')));
   const fjOpt = A.firstJudgment.pick ? route.firstJudgment.opts.find(o=>o.k===A.firstJudgment.pick) : null;
   const fjRt = (A.firstJudgment.reasons||[]).map(id=>{const f=(route.facts||[]).find(x=>x.id===id);return f?f.t:''}).filter(Boolean).join('；');
   lines.push('第一判断: ' + (fjOpt ? fjOpt.k+' '+fjOpt.t + (fjRt?'（依据：'+fjRt+'）':'') + (A.firstJudgment.note?'（补充：'+A.firstJudgment.note+'）':'') : '（未选择）'));
   lines.push('情绪: ' + (A.feelings.join('、')||'（未填写）'));
   lines.push('实际行动: ' + (mine.steps.step3.do||'（未填写）'));
-  lines.push('主观推测: ' + (mine.steps.step3.guesses || [...route.facts,...route.guesses].filter(g=>A.facts[g.id]==='guess').map(g=>g.t).join('；') || '（未填写）'));
+  lines.push('主观推测: ' + (mine.steps.step3.guesses || aieFactItems(route,A).filter(g=>A.facts[g.id]==='guess').map(g=>g.t).join('；') || '（未填写）'));
+  lines.push('案例卡片进度：已分类 '+aieFactItems(route,A).filter(x=>A.facts[x.id]).length+'/'+aieFactItems(route,A).length+'；未分类 '+aieFactItems(route,A).filter(x=>!A.facts[x.id]).length+' 张');
+  lines.push('暂时无法判断：'+(aieFactItems(route,A).filter(x=>A.facts[x.id]==='unsure').map(x=>x.t).join('；')||'（无）'));
   lines.push('对方可能的视角: ' + (A.perspectivePred||'（未填写）'));
   lines.push('判断依据: ' + (mine.steps.step4.evidence||'（未填写）'));
   lines.push('其他可能解释: ' + (mine.steps.step4.alt||'（未填写）'));
@@ -1952,6 +1971,10 @@ function init(){
       const rid = c.dataset.route;
       // 若切换路线或首次进入，重置到阶段1；若已有存档则恢复
       if(!state.route || state.route!==rid){
+        // Keep each route's answers independent, including older current-route drafts.
+        state.routeAnswers = state.routeAnswers || {};
+        if(state.route) state.routeAnswers[state.route] = JSON.parse(JSON.stringify(state.answers));
+        state.answers = state.routeAnswers[rid] ? JSON.parse(JSON.stringify(state.routeAnswers[rid])) : defaultState().answers;
         state.route = rid; state.sceneIdx = 0; state.stage = 1;
         state.unlocked = [1];
       }
