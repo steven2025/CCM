@@ -1968,12 +1968,13 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
   let materialsCatalogReady = false;
   let availableCatalogModules = new Set();
   let catalogAssetLabels = { slides: {}, exercises: {} };
-  const pdfJsChapters = new Set([3, 4, 5, 6, 'final']);
+  const pdfJsChapters = new Set([3, 4, 6, 'final']);
   const interactiveChapterUrls = {
     1: './chapters/chapter1.html?v=20261015-4',
     2: './chapters/chapter2.html?v=20261024-16',
     3: './chapters/chapter3.html?v=20261024-16',
-    4: './chapters/chapter4.html?v=20261024-14'
+    4: './chapters/chapter4.html?v=20261024-14',
+    5: './chapters/chapter5.html?v=20261103-1'
   };
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
