@@ -188,7 +188,7 @@
   #sidBar a { color:#7ea7ff; cursor:pointer; margin-left:8px; text-decoration:underline; }
 </style>
 </head>
-<body>
+<body data-reflection-chapter="chapter-6-sihe-reflections">
 
 <!-- ==================== 开始页 ==================== -->
 <div id="startPage">
@@ -325,7 +325,7 @@ const subtitleMap = {
  * ============================================================ */
 // 媒体素材（jpg/wav）上传到 COS 后，把这里改成 COS 的公网前缀，末尾带斜杠。
 // 本地调试时留空字符串 '' 即可（走相对路径）。
-const MEDIA_BASE = 'https://ccm2025-1311686407.cos.ap-guangzhou.myqcloud.com/chapter6/dist-cos-media/';
+const MEDIA_BASE = 'https://ccm2025-1311686407.cos.ap-chongqing.myqcloud.com/chapter6/dist-cos-media/';
 function ia(folder, sceneImg, shotAudio) {
   return { type:'imageaudio', image: folder+'/'+sceneImg, audio: folder+'/'+shotAudio };
 }
@@ -550,34 +550,9 @@ const backBtn = $('backBtn');
  * ============================================================ */
 const API = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
 const SID_KEY = 'sihe_sid';
-function getSid() {
-  let sid = localStorage.getItem(SID_KEY) || '';
-  if (!sid) {
-    sid = prompt('请输入你的姓名/学号（用于云端保存学习记录，下次打开可续填）：', '');
-    if (!sid) sid = 'guest_' + Math.random().toString(36).slice(2, 8);
-    localStorage.setItem(SID_KEY, sid);
-  }
-  return sid;
-}
-async function saveOne(qid, text) {
-  const sid = getSid();
-  const r = await fetch(API, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ action:'save', sid, qid, text, ts: Date.now() })
-  });
-  return r.ok;
-}
-async function loadAll() {
-  const sid = localStorage.getItem(SID_KEY) || '';
-  if (!sid) return {};
-  try {
-    const r = await fetch(API + '?action=load&sid=' + encodeURIComponent(sid));
-    const j = await r.json();
-    // 兼容返回 {data:{...}} 或直接 {qid:text}
-    return j.data || j.records || j || {};
-  } catch(e) { return {}; }
-}
-
+function getSid(){return window.CCMReflection?.identity()?.id||'未登录';}
+async function saveOne(qid,text){if(!window.CCMReflection)throw Error('提交模块尚未加载');return window.CCMReflection.save(qid,text);}
+async function loadAll(){if(!window.CCMReflection)throw Error('提交模块尚未加载');return window.CCMReflection.load();}
 /* ============================================================
  *  开始页倒计时
  * ============================================================ */
@@ -896,10 +871,7 @@ async function showSummary() {
   // 展示 sid
   const sid = getSid();
   $('sidBar').innerHTML = `当前学号/姓名：<b style="color:#fff">${sid}</b><a href="javascript:void(0)" id="changeSid">更换</a>`;
-  $('changeSid').addEventListener('click', () => {
-    const n = prompt('输入新的学号/姓名：', '');
-    if (n) { localStorage.setItem(SID_KEY, n); location.reload(); }
-  });
+  $('changeSid').style.display='none';
   // 拉取历史答案
   $('submitMsg').className = '';
   $('submitMsg').textContent = '正在读取你的历史记录…';
@@ -964,5 +936,5 @@ backBtn.addEventListener('click', () => {
   loadScene(currentSceneIdx - 1);
 });
 </script>
-</body>
+<script src="../assets/reflection-cloud.js?v=20261106-3"></script></body>
 </html>

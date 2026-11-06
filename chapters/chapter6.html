@@ -73,7 +73,7 @@
   .hero-head .eyebrow{color:#d6a956;font-size:.85rem;letter-spacing:.3em;font-weight:700;margin-bottom:.4rem}
   .hero-head h2{font-size:1.9rem;font-weight:800;color:#fff;line-height:1.2}
   .hero-head h2 em{color:#d6a956;font-style:normal}
-  .hero-body{flex:1;position:relative;display:flex;align-items:center}
+  .hero-body{flex:1 0 auto;min-height:clamp(380px,64vh,760px);position:relative;display:flex;align-items:center}
   .hero-scene{position:absolute;inset:0;display:grid;grid-template-columns:1.05fr .95fr;gap:1rem;align-items:center;opacity:0;visibility:hidden;transform:translateX(30px) scale(1.02);transition:opacity .9s ease,transform 1.2s cubic-bezier(.22,.7,.2,1),visibility .9s;padding:0 3rem}
   .hero-scene.active{opacity:1;visibility:visible;transform:translateX(0) scale(1)}
   .hero-kicker{color:#d6a956;font-size:1rem;letter-spacing:.25em;font-weight:700;margin-bottom:1.2rem;opacity:0;transform:translateY(12px)}
@@ -561,7 +561,7 @@
   </h1>
   <!-- 本地调试：指向本地思和 index.html；部署到 GitHub 后改成 src="sihe/index.html" -->
   <div style="position:relative">
-    <iframe id="siheFrame" src="./sihe-tech.html"
+    <iframe id="siheFrame" src="./sihe-tech.html?v=20261106-3"
             style="width:100%;height:calc(100vh - 11rem);border:0;border-radius:10px;background:#0b1020;display:block"
             allow="autoplay; fullscreen; microphone"
             title="思和科技薪酬整合互动案例"></iframe>
@@ -1829,14 +1829,12 @@
         // 未接入时走演示流程：本地下载一份。
         try{
           if(typeof window.uploadVideoHook==='function'){
-            await window.uploadVideoHook(recordedBlob, filename);
+            var receipt=await window.uploadVideoHook(recordedBlob, filename);
           } else {
-            var a=document.createElement('a');
-            a.href=URL.createObjectURL(recordedBlob);
-            a.download=filename;
-            a.click();
+            throw new Error('云端上传模块未加载，请刷新课程页面后重试');
           }
-          status.textContent='✅ 提交成功！文件名：'+filename;
+          if(!receipt || !receipt.submissionId) throw new Error('未收到云端提交确认');
+          status.textContent='✅ COS 已确认提交成功！学生：'+receipt.name+'；提交时间：'+new Date(receipt.submittedAt).toLocaleString()+'；提交编号：'+receipt.submissionId+'。视频待教师审核后展示。';
           retakeBtn.style.display='none';
           submitBtn.style.display='none';
         }catch(err){
@@ -1893,5 +1891,5 @@
 
   show(0);
 </script>
-<script src="../assets/chapter6-integration.js?v=20261106-1"></script><link rel="stylesheet" href="../assets/chapter-notes.css?v=7"><script src="../assets/chapter-notes.js?v=7"></script></body>
+<script src="../assets/chapter6-integration.js?v=20261106-3"></script><link rel="stylesheet" href="../assets/chapter-notes.css?v=7"><script src="../assets/chapter-notes.js?v=7"></script></body>
 </html>

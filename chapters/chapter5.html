@@ -318,7 +318,7 @@
   .slide:not([data-slide="29"]) .slide-title{zoom:0.87}
 </style>
 </head>
-<body>
+<body data-reflection-chapter="chapter-5-reflections">
 <div class="topbar">
   <span id="navLabel">第五章 · 跨文化人力资源管理</span>
   <span id="pageNum" style="font-size:.85rem;color:var(--c-sub);margin:0 .5rem">1 / 30</span>
@@ -4302,69 +4302,7 @@ const slides = document.querySelectorAll('.slide');
 
   // ===== 课后思考：云函数保存 + localStorage 缓存 + 自动回显 =====
   (function(){
-    var CF='https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
-    var KEY='c5_hw_';
-    var SID='c5_sid';
-    var sid=localStorage.getItem(SID);
-    if(!sid){
-      sid='stu_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-      localStorage.setItem(SID,sid);
-    }
-    // 先从本地缓存秒回显
-    ['hw1','hw2','hw3'].forEach(function(id){
-      var ta=document.getElementById(id); if(!ta) return;
-      var saved=localStorage.getItem(KEY+id);
-      if(saved){ ta.value=saved; }
-    });
-    // 再从云端拉最新
-    fetch(CF+'?action=load&sid='+encodeURIComponent(sid))
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(!d) return;
-        ['hw1','hw2','hw3'].forEach(function(id){
-          if(d[id]){
-            var ta=document.getElementById(id);
-            ta.value=d[id];
-            localStorage.setItem(KEY+id, d[id]);
-            document.getElementById(id+'status').textContent='✓ 已保存（云端）';
-            document.getElementById(id+'status').classList.add('saved');
-          } else if(localStorage.getItem(KEY+id)){
-            document.getElementById(id+'status').textContent='✓ 已保存（本地）';
-            document.getElementById(id+'status').classList.add('saved');
-          }
-        });
-      }).catch(function(){});
 
-    ['hw1','hw2','hw3'].forEach(function(id){
-      var ta=document.getElementById(id); if(!ta) return;
-      ta.addEventListener('input',function(){
-        document.getElementById(id+'status').classList.remove('saved');
-      });
-    });
-    document.querySelectorAll('.reflect-submit').forEach(function(btn){
-      btn.onclick=function(){
-        var q=btn.dataset.q;
-        var ta=document.getElementById(q);
-        if(!ta.value.trim()){ ta.focus(); return; }
-        localStorage.setItem(KEY+q, ta.value);
-        var st=document.getElementById(q+'status');
-        st.textContent='提交中…'; st.classList.add('saved');
-        fetch(CF,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({action:'save', sid:sid, qid:q, text:ta.value, ts:Date.now()})
-        }).then(function(r){return r.json();})
-          .then(function(){
-            st.textContent='✓ 已保存到云端（'+new Date().toLocaleString('zh-CN',{hour12:false})+'）';
-            st.classList.add('saved');
-          })
-          .catch(function(){
-            st.textContent='⚠ 云端失败，已存本地';
-            st.style.color='#dc2626';
-            setTimeout(function(){ st.style.color=''; },2000);
-          });
-      };
-    });
   })();
 
   // ===== 翻牌卡片 =====
@@ -4473,5 +4411,5 @@ const slides = document.querySelectorAll('.slide');
   try { if (window.parent !== window) window.parent.postMessage({ type: 'CCM_AUTH_REQUEST' }, '*'); } catch (_) {}
 </script>
 <script src="../assets/chapter-notes.js?v=7"></script>
-</body>
+<script src="../assets/reflection-cloud.js?v=20261106-3"></script></body>
 </html>
