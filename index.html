@@ -1829,7 +1829,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
             <div id="pdfjs-canvas-wrap" class="pdfjs-canvas-wrap">
               <canvas id="pdfjs-canvas"></canvas>
             </div>
-            <iframe id="pdf-iframe" class="file-preview-iframe" style="display:none;" frameborder="0" allowfullscreen></iframe>
+            <iframe id="pdf-iframe" allow="camera; microphone; autoplay; fullscreen" class="file-preview-iframe" style="display:none;" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
 
@@ -1974,8 +1974,8 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
     2: './chapters/chapter2.html?v=20261024-16',
     3: './chapters/chapter3.html?v=20261024-16',
     4: './chapters/chapter4.html?v=20261024-14',
-    5: './chapters/chapter5.html?v=20261103-1',
-    6: './chapters/chapter6.html?v=20261106-1'
+    5: './chapters/chapter5.html?v=20261106-3',
+    6: './chapters/chapter6.html?v=20261106-3'
   };
   const aiProviderDefaults = {
     chatgpt: { baseUrl: 'https://api.openai.com/v1', model: 'gpt-4.1-mini' },
