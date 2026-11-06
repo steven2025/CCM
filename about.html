@@ -1709,6 +1709,7 @@
             <p>以下视频字幕已经内置在视频中，因此无需额外切换字幕。后续可以继续增加 Thai Student 2、Chinese Student 3 等。</p>
           </div>
           <div class="video-grid">${cards}</div>
+          <section class="content-section"><h3>班级课程感悟 / Class reflections</h3><button data-reflection-load>查看班级视频</button><div data-reflection-list></div></section>
         `
       });
 
@@ -1751,5 +1752,6 @@
     langSelect.addEventListener("change", () => applyLanguage(getLang()));
     applyLanguage("zh");
   </script>
+<script src="assets/course-reflections.js?v=20261106-1"></script>
 </body>
 </html>
