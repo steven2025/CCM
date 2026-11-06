@@ -1,0 +1,3001 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>海外派遣员工薪酬包设计工具</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script>
+    if (window.Chart && window.ChartDataLabels) {
+      Chart.register(window.ChartDataLabels);
+      Chart.defaults.plugins = Chart.defaults.plugins || {};
+      Chart.defaults.plugins.datalabels = {
+        color: "#e5e7eb",
+        font: { size: 11, weight: "600" },
+        anchor: "end",
+        align: "end",
+        offset: 8,
+        clamp: true,
+        formatter: (value, ctx) => {
+          try {
+            const arr = ctx.chart?.data?.datasets?.[0]?.data || [];
+            const total = arr.reduce((a, b) => a + b, 0) || 1;
+            const pct = (value / total) * 100;
+            return value > 0 ? pct.toFixed(1) + "%" : "";
+          } catch (e) {
+            return "";
+          }
+        },
+        display: (ctx) => {
+          const val = ctx?.dataset?.data?.[ctx.dataIndex] ?? 0;
+          return val > 0;
+        }
+      };
+    }
+  </script>
+  <style>
+    :root {
+      --bg-main: #020617;
+      --bg-card: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
+      --accent-strong: #0ea5e9;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --danger: #f97373;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617 55%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: radial-gradient(circle at top left, #020617, #020617 40%, #030712 100%);
+      border-radius: 24px;
+      padding: 20px 18px 16px;
+      box-shadow:
+        0 30px 80px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(148, 163, 184, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .app-shell {
+        padding: 24px 26px 20px;
+      }
+    }
+
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(56, 189, 248, 0.07), transparent 55%),
+        radial-gradient(circle at 85% 0%, rgba(129, 140, 248, 0.08), transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content-layer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 0 0 18px rgba(56, 189, 248, 0.45);
+    }
+
+    .app-title-chip {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,0.5);
+      color: var(--accent);
+      background: radial-gradient(circle, rgba(15,23,42,0.7), rgba(15,23,42,0.2));
+    }
+
+    .app-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Language selector */
+    .lang-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .lang-toggle {
+      background: radial-gradient(circle at 30% 0%, #38bdf8, #0f172a 60%);
+      border-radius: 999px;
+      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.75),
+        0 0 0 1px rgba(56, 189, 248, 0.4);
+      transition: all 0.2s ease;
+      font-size: 0.75rem;
+      color: #e5f4ff;
+    }
+
+    .lang-toggle:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow:
+        0 15px 35px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(56, 189, 248, 0.8);
+    }
+
+    .lang-toggle-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      background: radial-gradient(circle at 30% 30%, #e5f4ff, #0f172a 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #0f172a;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .lang-select {
+      position: absolute;
+      right: 0;
+      top: 32px;
+      min-width: 180px;
+      background: rgba(15,23,42,0.98);
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
+      padding: 6px;
+      display: none;
+      z-index: 10;
+    }
+
+    .lang-select.open {
+      display: block;
+    }
+
+    .lang-option {
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lang-option:hover {
+      background: rgba(15,23,42,0.9);
+    }
+
+    .lang-option.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+    }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .step-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: radial-gradient(circle, rgba(15,23,42,0.9), rgba(15,23,42,0.6));
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-pill span {
+      font-weight: 600;
+    }
+
+    .step-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Card / layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 992px) {
+      .main-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.95), rgba(15,23,42,0.9));
+      border-radius: 18px;
+      padding: 16px 14px 14px;
+      border: 1px solid rgba(30,64,175,0.7);
+      box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.8),
+        0 0 0 1px rgba(15, 23, 42, 1);
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 18px 18px 16px;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      font-size: 0.85rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label-main {
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .label-hint {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.97), rgba(15,23,42,0.92));
+      color: var(--text-main);
+      font-size: 0.8rem;
+      outline: none;
+      transition: all 0.16s ease;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow:
+        0 0 0 1px rgba(56, 189, 248, 0.8),
+        0 0 25px rgba(56, 189, 248, 0.25),
+        inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #4b5563;
+    }
+
+    .select {
+      appearance: none;
+    }
+    select option{background:#0f172a;color:#f8fafc}
+    #colaPct option{background:#172554;color:#ffffff;font-weight:700}
+
+    .section-separator {
+      height: 1px;
+      border-radius: 999px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(148, 163, 184, 0.5),
+        transparent
+      );
+      margin: 10px 0;
+    }
+
+    .small-tag {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--text-muted);
+    }
+
+    /* Steps */
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+      animation: fadeIn 0.22s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Buttons */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      position: relative;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: #e5f4ff;
+      cursor: pointer;
+      background-image: linear-gradient(135deg, #0ea5e9, #22c55e);
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.95);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+      transform: translateY(0);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px) scale(1.015);
+      box-shadow:
+        0 16px 36px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(34, 197, 94, 0.9);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow:
+        0 6px 16px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 1);
+    }
+
+    .btn-secondary {
+      background-image: linear-gradient(135deg, #111827, #1f2937);
+      color: var(--text-main);
+      box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(31, 41, 55, 1);
+    }
+
+    .btn-secondary:hover {
+      box-shadow:
+        0 12px 24px rgba(15, 23, 42, 1),
+        0 0 0 1px rgba(148, 163, 184, 0.9);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.75rem;
+    }
+
+    .btn-icon-left {
+      font-size: 0.85rem;
+    }
+
+    .btn-icon-right {
+      font-size: 0.85rem;
+    }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow:
+        0 0 0 rgba(15, 23, 42, 0.8),
+        0 0 0 1px rgba(31, 41, 55, 1);
+    }
+
+    /* Right side / results */
+    .result-summary {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .result-highlight {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.83rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .result-badge {
+      font-size: 0.7rem;
+      padding: 1px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.7);
+      color: #6ee7b7;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .chart-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .chart-card {
+      background: radial-gradient(circle at top, rgba(15,23,42,0.98), rgba(15,23,42,0.9));
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+    }
+
+    .chart-title {
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    .report-box {
+      margin-top: 10px;
+    }
+
+    #reportText {
+      width: 100%;
+      min-height: 180px;
+      max-height: 260px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,0.92));
+      color: var(--text-main);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+
+    .copy-hint {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(31, 41, 55, 1);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .footer span {
+      display: block;
+    }
+    /* 教学流程导航与数据确认 */
+    .step-nav-3d{display:flex;flex-wrap:nowrap;gap:10px;margin:14px 0 18px;overflow-x:auto;overflow-y:visible;padding:0 2px 10px;width:100%}
+    .step-nav-3d button{flex:0 0 160px;width:160px;min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(125,211,252,.35);border-radius:14px;padding:11px 10px;color:#dbeafe;background:linear-gradient(145deg,#172554,#0f172a);box-shadow:0 5px 0 #020617,0 10px 18px rgba(2,6,23,.25);cursor:pointer;font-weight:800;font-size:14px;transition:transform .15s,box-shadow .15s,background .15s;min-height:58px}
+    .step-nav-3d button:nth-child(2){background:linear-gradient(145deg,#164e63,#0f172a)}.step-nav-3d button:nth-child(3){background:linear-gradient(145deg,#312e81,#0f172a)}.step-nav-3d button:nth-child(4){background:linear-gradient(145deg,#14532d,#0f172a)}.step-nav-3d button:nth-child(5){background:linear-gradient(145deg,#7c2d12,#0f172a)}
+    .step-nav-3d button:hover{transform:translateY(-2px);box-shadow:0 7px 0 #020617,0 14px 22px rgba(2,6,23,.3)}.step-nav-3d button.active{outline:2px solid #fbbf24;transform:translateY(2px);box-shadow:0 3px 0 #020617,0 7px 15px rgba(2,6,23,.25)}
+    .step-nav-3d small{display:block;opacity:.75;font-weight:600;margin-top:3px}
+    .confirm-row{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:14px}.confirm-status{font-size:12px;color:#a7f3d0}.btn-confirm{background:linear-gradient(135deg,#22c55e,#0ea5e9);color:white;border:0}
+    .data-preview{margin:12px 0;padding:12px;border-radius:16px;border:1px solid rgba(96,165,250,.35);background:linear-gradient(135deg,rgba(30,41,59,.88),rgba(15,23,42,.72))}.data-preview h3{margin:0 0 7px}.preview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 14px;font-size:12px}.preview-grid div{padding:5px 0;border-bottom:1px solid rgba(148,163,184,.14);line-height:1.35}.preview-grid b{color:#93c5fd;margin-right:5px}.preview-empty{color:#94a3b8}
+    .teacher-prefilled{border-color:#fbbf24!important;box-shadow:0 0 0 3px rgba(251,191,36,.16),inset 0 0 18px rgba(251,191,36,.08)!important}.teacher-prefill-note{display:inline-block;margin-left:6px;color:#fde68a;font-size:11px;font-weight:700}.teacher-prefilled[readonly],.teacher-prefilled:disabled{opacity:.92;cursor:not-allowed}
+    .main-layout:not(.results-mode){display:block}
+    .main-layout:not(.results-mode)>.card:last-child{display:none}
+    .main-layout:not(.results-mode)>.card:first-child{width:100%;max-width:none}
+    .main-layout:not(.results-mode) .card-body{padding:22px 26px}
+    .main-layout:not(.results-mode) .card-title{font-size:22px}
+    .main-layout:not(.results-mode) .hint,.main-layout:not(.results-mode) .note{font-size:17px;line-height:1.75}
+    .main-layout:not(.results-mode) .label-main{font-size:17px;font-weight:650}
+    .main-layout:not(.results-mode) .label-hint{font-size:15px;line-height:1.5}
+    .main-layout:not(.results-mode) input,.main-layout:not(.results-mode) select{font-size:17px;padding:12px 14px;min-height:48px}
+    .main-layout:not(.results-mode) .form-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+    .main-layout:not(.results-mode) .form-row{padding:16px;border:1px solid rgba(148,163,184,.18);border-radius:14px;background:rgba(15,23,42,.35);min-width:0}
+    .main-layout:not(.results-mode) .preview-grid{grid-template-columns:repeat(2,minmax(0,1fr));font-size:17px;gap:16px}
+    .main-layout:not(.results-mode) .preview-grid>div{padding:16px;line-height:1.75;background:rgba(15,23,42,.32);border-radius:12px}
+    .main-layout:not(.results-mode) .small-tag{font-size:17px;margin:18px 0 12px}
+    .main-layout:not(.results-mode) .teacher-prefill-note{font-size:14px}
+    .main-layout:not(.results-mode) .nav-bar{padding:18px 24px;gap:14px;flex-wrap:wrap}
+    .main-layout:not(.results-mode) .btn{font-size:16px;padding:11px 18px}
+    @media(max-width:1000px){.main-layout:not(.results-mode) .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:650px){.main-layout:not(.results-mode) .form-grid,.main-layout:not(.results-mode) .preview-grid{grid-template-columns:1fr}.main-layout:not(.results-mode) .card-body{padding:16px}}
+    .main-layout.results-mode{display:block}.main-layout.results-mode>.card:first-child{display:none}.main-layout.results-mode>.card:last-child{width:100%;max-width:none}
+    .results-dashboard{display:grid;gap:16px}.result-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.result-kpi{padding:16px;border-radius:18px;color:#f8fafc;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px rgba(2,6,23,.22);position:relative;overflow:hidden}.result-kpi:after{content:"";position:absolute;width:100px;height:100px;right:-30px;top:-30px;border-radius:50%;background:rgba(255,255,255,.11)}.result-kpi.blue{background:linear-gradient(135deg,#0e7490,#1d4ed8)}.result-kpi.purple{background:linear-gradient(135deg,#6d28d9,#4338ca)}.result-kpi.orange{background:linear-gradient(135deg,#c2410c,#b45309)}.result-kpi.green{background:linear-gradient(135deg,#047857,#0f766e)}.result-kpi .kpi-label{font-size:12px;opacity:.86}.result-kpi .kpi-value{font-size:25px;font-weight:900;margin-top:7px;letter-spacing:.3px}.result-kpi .kpi-sub{font-size:11px;margin-top:4px;opacity:.8}.advanced-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.advanced-chart-card{border:1px solid rgba(148,163,184,.2);border-radius:18px;padding:14px;background:linear-gradient(145deg,rgba(30,41,59,.9),rgba(15,23,42,.78));box-shadow:0 10px 26px rgba(2,6,23,.2)}.advanced-chart-card h4{margin:0 0 8px;color:#e0f2fe}.advanced-chart-card canvas{max-height:270px}.allowance-card{border:1px solid rgba(251,191,36,.25);border-radius:18px;padding:14px;background:linear-gradient(145deg,rgba(69,35,10,.48),rgba(15,23,42,.78))}.allowance-card h4{margin:0 0 8px;color:#fde68a}.report-box.full-report{margin-top:0}.report-box.full-report textarea{min-height:300px;font-size:14px;line-height:1.65}
+    @media(max-width:900px){.result-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.advanced-chart-grid{grid-template-columns:1fr}}
+    @media(max-width:1100px){.preview-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:760px){.step-nav-3d button{flex-basis:145px;width:145px;min-width:145px;font-size:12px}.preview-grid{grid-template-columns:1fr}}
+    /* 全窗口布局；前六步采用紧凑教学排版 */
+    body{padding:0;display:block}
+    .app-shell{max-width:none;width:100%;min-height:100dvh;margin:0;border-radius:0;padding:12px 18px}
+    .top-bar{margin-bottom:8px}
+    .step-indicator{margin-top:0;margin-bottom:8px}
+    .step-nav-3d{margin:8px 0 10px;gap:8px}
+    .step-nav-3d button{padding:8px 10px;min-height:50px}
+    .main-layout:not(.results-mode) .card-header{padding:12px 18px}
+    .main-layout:not(.results-mode) .card-body{padding:12px 18px}
+    .main-layout:not(.results-mode) .card-title{font-size:20px}
+    .main-layout:not(.results-mode) .hint,.main-layout:not(.results-mode) .note{font-size:15px;line-height:1.5;margin-top:6px;margin-bottom:8px}
+    .main-layout:not(.results-mode) .label-main{font-size:15px}
+    .main-layout:not(.results-mode) .label-hint{font-size:13px;line-height:1.35}
+    .main-layout:not(.results-mode) input,.main-layout:not(.results-mode) select{font-size:15px;padding:8px 10px;min-height:38px}
+    .main-layout:not(.results-mode) .form-grid{gap:10px;grid-template-columns:repeat(4,minmax(0,1fr))}
+    .main-layout:not(.results-mode) .form-row{padding:10px}
+    .main-layout:not(.results-mode) .preview-grid{font-size:15px;gap:10px}
+    .main-layout:not(.results-mode) .preview-grid>div{padding:10px;line-height:1.5}
+    .main-layout:not(.results-mode) .data-preview{margin:8px 0;padding:10px}
+    .main-layout:not(.results-mode) .data-preview h3{font-size:17px;margin-bottom:6px}
+    .main-layout:not(.results-mode) .small-tag{font-size:15px;margin:10px 0 7px}
+    .main-layout:not(.results-mode) .teacher-prefill-note{font-size:12px}
+    .main-layout:not(.results-mode) .nav-bar{padding:10px 18px;gap:10px}
+    .main-layout:not(.results-mode) .btn{font-size:14px;padding:8px 14px}
+    .footer{margin-top:8px;font-size:11px}
+    @media(max-width:1100px){.main-layout:not(.results-mode) .form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:800px){.app-shell{padding:10px}.main-layout:not(.results-mode) .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:550px){.main-layout:not(.results-mode) .form-grid,.main-layout:not(.results-mode) .preview-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="content-layer">
+      <div class="top-bar">
+        <div class="title-block">
+          <div class="app-title">
+            <span data-i18n="appTitle">海外派遣员工薪酬包设计工具</span>
+            <span class="app-title-chip" data-i18n="appTitleChip">教学版 · Cost-based</span>
+          </div>
+          <div class="app-subtitle" data-i18n="appSubtitle">
+            基于公司薪酬成本视角的外派销售岗位薪酬模拟设计
+          </div>
+        </div>
+        <div class="lang-wrapper">
+          <button type="button" class="lang-toggle" id="langToggle">
+            <span class="lang-toggle-icon">🌐</span>
+            <span id="currentLangLabel">中文</span>
+          </button>
+          <div class="lang-select" id="langSelect">
+            <div class="lang-option active" data-lang="zh">
+              <span>中文</span><span>ZH</span>
+            </div>
+            <div class="lang-option" data-lang="en">
+              <span>English</span><span>EN</span>
+            </div>
+            <div class="lang-option" data-lang="fr">
+              <span>Français</span><span>FR</span>
+            </div>
+            <div class="lang-option" data-lang="th">
+              <span>ภาษาไทย</span><span>TH</span>
+            </div>
+            <div class="lang-option" data-lang="id">
+              <span>Bahasa Indonesia</span><span>ID</span>
+            </div>
+            <div class="lang-option" data-lang="ru">
+              <span>Русский</span><span>RU</span>
+            </div>
+            <div class="lang-option" data-lang="vi">
+              <span>Tiếng Việt</span><span>VI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-indicator">
+        <div class="step-pill">
+          <span id="stepNumber">1 / 5</span>
+          <span id="stepShortLabel" data-i18n="step1Title">基本信息</span>
+        </div>
+        <div class="step-label" id="stepLabelDetail" data-i18n="step1Desc">
+          说明本次模拟的员工岗位和派遣目的地
+        </div>
+      </div>
+
+      <nav class="step-nav-3d" id="stepNav3d" aria-label="教学步骤导航"></nav>
+
+      <div class="main-layout">
+        <!-- Left: Steps / Form -->
+        <div class="card">
+          <!-- Step 1: Background -->
+          <section class="step active" data-step="1">
+            <div class="card-header"><div class="card-title" id="introStep1Title">任务背景与作业目标</div><span class="card-badge" id="introStep1Badge">导入</span></div>
+            <div class="card-body" id="introStep1Body">
+              <div class="hint">本任务模拟企业为销售人员设计海外外派薪酬包。你需要先选择外派城市，再查询城市数据，最后完成薪酬计算、比较和报告分析。</div>
+              <div class="data-preview"><h3>你将完成的学习任务</h3><div class="preview-grid"><div><b>情境判断</b><br>理解为什么不同国家和城市需要不同的外派薪酬安排。</div><div><b>数据检索</b><br>使用指定网站查询生活成本、房租和 Crime Index。</div><div><b>薪酬设计</b><br>把已知数据和查询数据带入外派薪酬包模型。</div><div><b>成果交付</b><br>生成图表和报告，说明外派薪酬变化的原因。</div></div></div>
+              <div class="note">完成本步骤后，请点击“确认本步数据”，再进入下一步。</div>
+            </div>
+          </section>
+
+          <!-- Step 2: Structure and formulas -->
+          <section class="step" data-step="2">
+            <div class="card-header"><div class="card-title" id="introStep2Title">外派薪酬包构成与计算方法</div><span class="card-badge" id="introStep2Badge">知识准备</span></div>
+            <div class="card-body" id="introStep2Body">
+              <div class="hint">先理解每一项薪酬的含义，再开始选择城市和输入数据。</div>
+              <div class="data-preview"><h3>外派薪酬包构成</h3><div class="preview-grid"><div><b>Base Salary 基本工资</b><br>员工岗位价值的基础定价。本课程将其作为国内生活成本参考基数。</div><div><b>Foreign Service Premium 出国服务奖励</b><br>用于补偿跨国派遣、工作环境变化和额外责任。</div><div><b>Allowances 外派工作津贴</b><br>包括 COLA、住房、教育、艰苦与危险、交通、餐食等补贴。</div><div><b>Benefits & Welfare 福利政策</b><br>包括保险、探亲、医疗和其他公司福利项目。</div></div></div>
+              <div class="data-preview"><h3>本任务使用的核心公式</h3><div class="preview-grid"><div><b>COLA 生活成本补贴</b><br>国内基本工资 ×（外派生活成本指数 ÷ 国内生活成本指数 − 1）× COLA比例</div><div><b>Housing Allowance 住房补贴</b><br>国内典型房租 ×（外派房租指数 ÷ 国内房租指数 − 1）× 住房补贴比例</div><div><b>Hardship & Danger 艰苦与危险补贴</b><br>根据外派城市与国内城市 Crime Index 差值匹配补贴比例。</div><div><b>Education Allowance 教育补贴</b><br>根据家庭情况、子女情况和教育补贴比例估算。</div></div></div>
+              <div class="note">注：基本工资作为生活成本参考基数，是本课程的教学假设，不等同于员工全部实际生活支出。</div>
+            </div>
+          </section>
+
+          <!-- Step 3 -->
+          <section class="step" data-step="3">
+            <div class="card-header">
+              <div class="card-title">
+                <span data-i18n="step1Title">基本信息</span>
+              </div>
+              <span class="card-badge" data-i18n="stepBadgeBase">起点</span>
+            </div>
+            <div class="card-body">
+              <div class="hint" data-i18n="step1Hint">
+                说明该员工目前的国内岗位情况，以及未来拟外派的国家和城市。
+              </div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="jobTypeLabel">岗位类型</span>
+                    <span class="label-hint" data-i18n="jobTypeHint">本工具以销售岗位为主</span>
+                  </label>
+                  <select id="jobType">
+                    <option value="sales" selected data-i18n="jobTypeSales">销售岗位</option>
+                    <option value="functional" data-i18n="jobTypeFunctional">普通职能岗位</option>
+                    <option value="manager" data-i18n="jobTypeManager">管理/高管岗位</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="homeCityLabel">国内城市</span>
+                    <span class="label-hint" data-i18n="homeCityHint">例如：重庆、上海</span>
+                  </label>
+                  <input id="homeCity" type="text" data-i18n-placeholder="homeCityPlaceholder"
+                    placeholder="请输入国内城市" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostCountryLabel">外派国家</span>
+                    <span class="label-hint" data-i18n="hostCountryHint">例如：泰国</span>
+                  </label>
+                  <input id="hostCountry" type="text" data-i18n-placeholder="hostCountryPlaceholder"
+                    placeholder="请输入外派国家" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostCityLabel">外派城市</span>
+                    <span class="label-hint" data-i18n="hostCityHint">例如：曼谷</span>
+                  </label>
+                  <input id="hostCity" type="text" data-i18n-placeholder="hostCityPlaceholder"
+                    placeholder="请输入外派城市" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="familyStatusLabel">家庭情况</span>
+                    <span class="label-hint" data-i18n="familyStatusHint">影响教育补贴的假设</span>
+                  </label>
+                  <select id="familyStatus">
+                    <option value="single" data-i18n="familySingle">单身</option>
+                    <option value="married_no_kids" data-i18n="familyMarriedNoKids">已婚无子女</option>
+                    <option value="married_with_kids" data-i18n="familyMarriedWithKids">已婚有子女</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 4: Known data -->
+          <section class="step" data-step="4">
+            <div class="card-header">
+              <div class="card-title">
+                <span data-i18n="step2Title">国内薪酬结构（月度成本视角）</span>
+              </div>
+              <span class="card-badge" data-i18n="stepBadgeHome">国内基准</span>
+            </div>
+            <div class="card-body">
+              <div class="hint" data-i18n="step2Hint">
+                所有金额均按公司每月为该员工付出的综合薪酬成本填写（税前+社保+个税等已内含）。
+              </div>
+
+              <div class="small-tag" data-i18n="fixedTag">固定部分</div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domBaseSalaryLabel">国内基本工资（月）</span>
+                    <span class="label-hint" data-i18n="currencyUnitHint">单位：公司成本 / 月</span>
+                  </label>
+                  <input id="domBaseSalary" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domFixedAllowLabel">固定津贴合计（月）</span>
+                    <span class="label-hint" data-i18n="domFixedAllowHint">餐补、交通补、通讯等</span>
+                  </label>
+                  <input id="domFixedAllow" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="section-separator"></div>
+              <div class="small-tag" data-i18n="variableTag">变动部分：销售提成</div>
+
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domCollSalesLabel">已回款销售额（月）</span>
+                    <span class="label-hint" data-i18n="salesHint">国内销售（已回款）</span>
+                  </label>
+                  <input id="domCollSales" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domCollRateLabel">已回款提成比例（%）</span>
+                    <span class="label-hint" data-i18n="rateHint">例如：3 表示 3%</span>
+                  </label>
+                  <input id="domCollRate" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domUncollSalesLabel">未回款销售额（月）</span>
+                    <span class="label-hint" data-i18n="salesHint2">国内销售（未回款）</span>
+                  </label>
+                  <input id="domUncollSales" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domUncollRateLabel">未回款提成比例（%）</span>
+                    <span class="label-hint" data-i18n="rateHint">例如：1 表示 1%</span>
+                  </label>
+                  <input id="domUncollRate" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="section-separator"></div>
+              <div class="small-tag" data-i18n="otherVarTag">其他变动 / 福利成本</div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domOtherVarLabel">其他变动收入（月）</span>
+                    <span class="label-hint" data-i18n="domOtherVarHint">如绩效奖金等</span>
+                  </label>
+                  <input id="domOtherVar" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domOtherBenefitsLabel">其他福利成本（月）</span>
+                    <span class="label-hint" data-i18n="domOtherBenefitsHint">如公司承担的其他成本</span>
+                  </label>
+                  <input id="domOtherBenefits" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="hint" id="domMonthlySummary" style="margin-top:10px;">
+                <!-- Filled by JS -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 5: City data -->
+          <section class="step" data-step="5">
+            <div class="card-header">
+              <div class="card-title">
+                <span data-i18n="step3Title">外派城市数据 & 外派销售参数</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                <a class="btn btn-small" href="https://www.numbeo.com" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border-color:rgba(255,255,255,.35);box-shadow:0 3px 0 #7c2d12" data-i18n="numbeoLinkLabel">全球主要城市生活指数查询网站 ↗</a>
+                <span class="card-badge" data-i18n="stepBadgeHost">目的地</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="hint" data-i18n="step3Hint">
+                生活成本及房租指数可由学生从 Numbeo 等网站查找后手动输入。本工具不自动联网。
+              </div>
+
+              <div class="small-tag" data-i18n="cityIndexTag">生活成本 / 房租指数</div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="colIndexHomeLabel">国内城市生活成本指数</span>
+                    <span class="label-hint" data-i18n="indexHint">例如：重庆 40，上海 60（示例）</span>
+                  </label>
+                  <input id="colIndexHome" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="colIndexHostLabel">外派城市生活成本指数</span>
+                    <span class="label-hint" data-i18n="indexHint2">例如：曼谷 50（示例）</span>
+                  </label>
+                  <input id="colIndexHost" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="rentIndexHomeLabel">国内城市房租指数</span>
+                  </label>
+                  <input id="rentIndexHome" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="rentIndexHostLabel">外派城市房租指数</span>
+                  </label>
+                  <input id="rentIndexHost" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="form-grid" style="margin-top:10px;">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="domRentBaseLabel">国内典型房租（月）</span>
+                    <span class="label-hint" data-i18n="domRentBaseHint">可按公司标准或市中心一居估算</span>
+                  </label>
+                  <input id="domRentBase" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostAdjFactorLabel">外派固定工资调整系数</span>
+                    <span class="label-hint" data-i18n="hostAdjFactorHint">默认 1.0 表示与国内相同</span>
+                  </label>
+                  <input id="hostAdjFactor" type="number" min="0" step="0.01" value="1" />
+                </div>
+              </div>
+
+              <div class="section-separator"></div>
+              <div class="small-tag" data-i18n="hostSalesTag">外派销售参数（月度预期）</div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostCollSalesLabel">外派已回款销售额（月）</span>
+                  </label>
+                  <input id="hostCollSales" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostCollRateLabel">外派已回款提成比例（%）</span>
+                  </label>
+                  <input id="hostCollRate" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostUncollSalesLabel">外派未回款销售额（月）</span>
+                  </label>
+                  <input id="hostUncollSales" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hostUncollRateLabel">外派未回款提成比例（%）</span>
+                  </label>
+                  <input id="hostUncollRate" type="number" min="0" step="0.01" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 6: Policies and calculation -->
+          <section class="step" data-step="6">
+            <div class="card-header">
+              <div class="card-title">
+                <span data-i18n="step4Title">补贴政策设置（比例）</span>
+              </div>
+              <span class="card-badge" data-i18n="stepBadgePolicy">政策</span>
+            </div>
+            <div class="card-body">
+              <div class="hint" data-i18n="step4Hint">
+                所有补贴比例表示：公司对“成本差异部分”的补偿比例。例如 80% 表示承担 80% 差额。
+              </div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="colaPctLabel">生活成本补贴 COLA 比例</span>
+                  </label>
+                  <select id="colaPct" class="select">
+                    <option value="0">0%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80" selected>80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="housingPctLabel">住房补贴比例</span>
+                  </label>
+                  <select id="housingPct" class="select">
+                    <option value="0">0%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70" selected>70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="transportPctLabel">交通补贴比例</span>
+                  </label>
+                  <select id="transportPct" class="select">
+                    <option value="0">0%</option>
+                    <option value="50" selected>50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="mealPctLabel">餐食补贴比例</span>
+                  </label>
+                  <select id="mealPct" class="select">
+                    <option value="0">0%</option>
+                    <option value="50" selected>50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="eduPctLabel">教育补贴比例</span>
+                    <span class="label-hint" data-i18n="eduPctHint">仅在有子女时生效</span>
+                  </label>
+                  <select id="eduPct" class="select">
+                    <option value="0" selected>0%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <label>
+                    <span class="label-main" data-i18n="hardshipPctLabel">艰苦地区补贴比例</span>
+                  </label>
+                  <select id="hardshipPct" class="select">
+                    <option value="0" selected>0%</option>
+                    <option value="50">50%</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                    <option value="90">90%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+    <div class="form-row">
+      <label>
+        <span class="label-main">Crime Index 犯罪指数（派出城市 / 目的地城市）</span>
+      </label>
+      <div class="grid grid-cols-2 gap-2">
+        <input id="crimeHome" type="number" step="0.1" min="0" max="100" class="input" placeholder="派出城市，如 30">
+        <input id="crimeHost" type="number" step="0.1" min="0" max="100" class="input" placeholder="目的地城市，如 55">
+      </div>
+      <div class="hint">说明：仅补“向上差值”（目的地高于派出地），按 ΔCrime 分档 0/5/10/15/20/25%。</div>
+    </div>
+    
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 7: Results and report -->
+          <section class="step" data-step="7">
+            <div class="card-header">
+              <div class="card-title">
+                <span data-i18n="step5Title">年度总包 & 报告生成</span>
+              </div>
+              <span class="card-badge" data-i18n="stepBadgeReport">报告</span>
+            </div>
+            <div class="card-body">
+              <div class="hint" data-i18n="step5Hint">
+                点击“生成报告”后，将展示国内/外派年度总包、结构对比饼图以及可复制的计算说明。
+              </div>
+              <button type="button" class="btn btn-block" id="generateBtn">
+                <span class="btn-icon-left">⚙️</span>
+                <span data-i18n="generateBtnLabel">生成年度总包与报告</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Nav bar -->
+          <div class="nav-bar">
+            <div></div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div class="confirm-row" style="margin:0;justify-content:flex-end">
+                <button type="button" class="btn btn-confirm btn-small" id="confirmStepBtn">✓ 确认本步数据</button>
+                <span class="confirm-status" id="confirmStatus">本步尚未确认</span>
+              </div>
+              <button type="button" class="btn btn-secondary btn-small" id="prevBtn">
+                <span class="btn-icon-left">←</span>
+                <span data-i18n="prevBtnLabel">返回上一步</span>
+              </button>
+              <button type="button" class="btn btn-small" id="nextBtn">
+                <span data-i18n="nextBtnLabel">下一步</span>
+                <span class="btn-icon-right">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Results & Charts & Report -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span data-i18n="summaryTitle">年度总包概览 & 结构对比</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              <button type="button" class="btn btn-small" id="generateReportDashboardBtn" data-added-ui="generate" style="background:linear-gradient(135deg,#f59e0b,#e11d48);color:#fff;border-color:rgba(255,255,255,.35);box-shadow:0 3px 0 #7f1d1d">生成外派薪酬包对比报告</button>
+              <span class="card-badge" data-i18n="summaryBadge">动态更新</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="data-preview" id="dataPreview">
+              <h3>全部数据预览</h3>
+              <div class="preview-empty">完成并确认各步骤后，这里将集中显示已知数据、学生查询数据和计算参数。</div>
+            </div>
+            <div class="result-summary" data-i18n="summaryHint">
+              完成各步填写后，点击“生成年度总包与报告”，右侧区域将展示国内/外派年度总包、结构饼图以及文字说明。
+            </div>
+
+            <div class="results-dashboard">
+              <div class="result-kpis">
+                <div class="result-kpi blue"><div class="kpi-label" data-added-ui="home">国内年度总包 / Home package</div><div class="kpi-value" id="homeAnnualValue">-</div><div class="kpi-sub">公司年度成本</div></div>
+                <div class="result-kpi purple"><div class="kpi-label" data-added-ui="host">外派年度总包 / Host package</div><div class="kpi-value" id="hostAnnualValue">-</div><div class="kpi-sub">公司年度成本</div></div>
+                <div class="result-kpi orange"><div class="kpi-label" data-added-ui="difference">成本差额 / Difference</div><div class="kpi-value" id="deltaBadge">-</div><div class="kpi-sub">外派相对国内</div></div>
+                <div class="result-kpi green"><div class="kpi-label" data-added-ui="share">外派津贴占比 / Allowances</div><div class="kpi-value" id="allowanceShareValue">-</div><div class="kpi-sub">占外派年度总包</div></div>
+              </div>
+
+              <div class="advanced-chart-grid">
+                <div class="advanced-chart-card"><h4>国内年度总包结构 / Home package</h4><canvas id="homeChart" height="220"></canvas></div>
+                <div class="advanced-chart-card"><h4>外派年度总包结构 / Host package</h4><canvas id="hostChart" height="220"></canvas></div>
+              </div>
+              <div class="allowance-card"><h4>外派津贴构成 / Expatriate allowances</h4><canvas id="allowanceChart" height="120"></canvas></div>
+            </div>
+
+            <div class="report-box">
+              <div class="card-title" style="font-size:0.85rem;margin-bottom:6px;">
+                <span data-i18n="reportTitle">自动生成的说明文本（可复制到作业/报告中）</span>
+              </div>
+              <textarea id="reportText" placeholder="请先完成前面步骤，并点击“生成年度总包与报告”。"></textarea>
+              <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <button type="button" class="btn btn-secondary btn-small" id="copyReportBtn">
+                  <span class="btn-icon-left">📄</span>
+                  <span data-i18n="copyReportLabel">下载 PDF 报告</span>
+                </button>
+                <span class="copy-hint" data-i18n="copyHint">
+                  提示：复制后可粘贴到 Word / PPT / 课程报告中，学生可进一步润色和扩展分析。
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>程序开发：鄢清华（重庆工商大学）</span>
+        <span>Developed by Prof. Yan Qinghua, Chongqing Technology and Business University (CTBU)</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // Multi-language dictionary
+    // =========================
+    const translations = {
+      zh: {
+        appTitle: "海外派遣员工薪酬包设计工具",
+        appTitleChip: "教学版 · 基于公司成本",
+        appSubtitle: "基于公司薪酬成本视角的外派销售岗位薪酬模拟设计",
+        step1Title: "任务背景",
+        step2Title: "薪酬构成与公式",
+        step3Title: "外派城市选择",
+        step4Title: "已知数据",
+        step5Title: "城市数据查询",
+        step6Title: "补贴政策与计算",
+        step7Title: "结果分析与报告",
+        step1Desc: "说明本次模拟的员工岗位和派遣目的地",
+        step2Desc: "录入国内现有薪酬结构（全部按月度填写）",
+        step3Desc: "录入外派城市的指数及外派销售假设",
+        step4Desc: "设置各项补贴的补偿比例",
+        step6Desc: "设置补贴政策并完成薪酬包计算",
+        step7Desc: "查看结果、图表并下载报告",
+        step5Desc: "生成年度总包、结构对比与计算说明",
+        stepBadgeBase: "起点",
+        stepBadgeHome: "国内基准",
+        stepBadgeHost: "目的地",
+        stepBadgePolicy: "政策",
+        stepBadgeReport: "报告",
+        jobTypeLabel: "岗位类型",
+        jobTypeHint: "本工具以销售岗位为主",
+        jobTypeSales: "销售岗位",
+        jobTypeFunctional: "普通职能岗位",
+        jobTypeManager: "管理/高管岗位",
+        homeCityLabel: "国内城市",
+        homeCityHint: "例如：重庆、上海",
+        homeCityPlaceholder: "请输入国内城市",
+        hostCountryLabel: "外派国家",
+        hostCountryHint: "例如：泰国、越南",
+        hostCountryPlaceholder: "请输入外派国家",
+        hostCityLabel: "外派城市",
+        hostCityHint: "例如：曼谷、胡志明市",
+        hostCityPlaceholder: "请输入外派城市",
+        familyStatusLabel: "家庭情况",
+        familyStatusHint: "影响教育补贴的假设",
+        familySingle: "单身",
+        familyMarriedNoKids: "已婚无子女",
+        familyMarriedWithKids: "已婚有子女",
+        step1Hint: "说明该员工目前的国内岗位情况，以及拟外派的国家和城市。",
+        step2Hint: "所有金额均按公司每月为该员工付出的综合薪酬成本填写（税前+社保+个税等已内含）。",
+        fixedTag: "固定部分",
+        variableTag: "变动部分：销售提成",
+        otherVarTag: "其他变动 / 福利成本",
+        domBaseSalaryLabel: "国内基本工资（月）",
+        currencyUnitHint: "单位：公司成本 / 月",
+        domFixedAllowLabel: "固定津贴合计（月）",
+        domFixedAllowHint: "餐补、交通补、通讯等",
+        domCollSalesLabel: "已回款销售额（月）",
+        salesHint: "国内销售（已回款）",
+        domCollRateLabel: "已回款提成比例（%）",
+        rateHint: "例如：3 表示 3%",
+        domUncollSalesLabel: "未回款销售额（月）",
+        salesHint2: "国内销售（未回款）",
+        domUncollRateLabel: "未回款提成比例（%）",
+        domOtherVarLabel: "其他变动收入（月）",
+        domOtherVarHint: "如绩效奖金等",
+        domOtherBenefitsLabel: "其他福利成本（月）",
+        domOtherBenefitsHint: "如公司承担的其他成本",
+        step3Hint: "生活成本及房租指数可由学生从 Numbeo 等网站查找后手动输入。",
+        cityIndexTag: "生活成本 / 房租指数",
+        colIndexHomeLabel: "国内城市生活成本指数",
+        indexHint: "例如：重庆 40，上海 60（示例）",
+        colIndexHostLabel: "外派城市生活成本指数",
+        indexHint2: "例如：曼谷 50（示例）",
+        rentIndexHomeLabel: "国内城市房租指数",
+        rentIndexHostLabel: "外派城市房租指数",
+        domRentBaseLabel: "国内典型房租（月）",
+        domRentBaseHint: "可按公司标准或市中心一居估算",
+        hostAdjFactorLabel: "外派固定工资调整系数",
+        hostAdjFactorHint: "默认 1.0 表示与国内固定部分相同",
+        hostSalesTag: "外派销售参数（月度预期）",
+        hostCollSalesLabel: "外派已回款销售额（月）",
+        hostCollRateLabel: "外派已回款提成比例（%）",
+        hostUncollSalesLabel: "外派未回款销售额（月）",
+        hostUncollRateLabel: "外派未回款提成比例（%）",
+        step4Hint: "所有补贴比例表示：公司对“成本差异部分”的补偿比例。例如 80% 表示补偿 80% 差额。",
+        colaPctLabel: "生活成本补贴 COLA 比例",
+        housingPctLabel: "住房补贴比例",
+        transportPctLabel: "交通补贴比例",
+        mealPctLabel: "餐食补贴比例",
+        eduPctLabel: "教育补贴比例",
+        eduPctHint: "仅在有子女时生效",
+        hardshipPctLabel: "艰苦地区补贴比例",
+        step5Hint: "点击“生成年度总包与报告”，右侧区域将展示国内/外派年度总包、结构饼图以及计算说明。",
+        generateBtnLabel: "生成年度总包与报告",
+        prevBtnLabel: "返回上一步",
+        nextBtnLabel: "下一步",
+        summaryTitle: "年度总包概览 & 结构对比",
+        summaryBadge: "动态更新",
+        summaryHint: "完成各步填写后，点击“生成年度总包与报告”，右侧区域将展示国内/外派年度总包、结构饼图以及文字说明。",
+        homeAnnualLabel: "国内年度总包（公司成本）：",
+        hostAnnualLabel: "外派年度总包（公司成本）：",
+        homeChartTitle: "国内年度总包结构",
+        hostChartTitle: "外派年度总包结构",
+        chartLabelBaseFixed: "固定薪酬（基本+津贴）",
+        chartLabelVariable: "变动薪酬（提成/奖金）",
+        chartLabelExpat: "外派补贴",
+        chartLabelBenefits: "其他福利成本",
+        reportTitle: "自动生成的说明文本（可复制到作业/报告中）",
+        copyReportLabel: "下载 PDF 报告",
+        copyHint: "提示：复制后可粘贴到 Word / PPT / 课程报告中，学生可进一步润色和扩展分析。",
+        langName: "中文",
+        reportSectionBasicInfo: "一、基本信息",
+        reportSectionHome: "二、国内年度总包（公司成本）",
+        reportSectionHost: "三、外派年度总包（公司成本）",
+        reportSectionFormulas: "四、主要计算公式与示例",
+        reportSectionCharts: "五、结构差异与分析提示",
+        reportIntro: "以下为本次外派薪酬包设计的小结，供课程作业或课堂汇报参考。",
+        labelJobType: "岗位类型",
+        labelHomeCity: "国内城市",
+        labelHostCity: "外派国家/城市",
+        labelFamily: "家庭情况",
+        textFamilySingle: "单身",
+        textFamilyMarriedNoKids: "已婚无子女",
+        textFamilyMarriedWithKids: "已婚有子女",
+        labelHomeMonthlyTotal: "国内月度总成本",
+        labelHostMonthlyTotal: "外派月度总成本",
+        labelDeltaAnnual: "外派年度总包相对国内的增减",
+        textDeltaHigher: "高于国内年度总包",
+        textDeltaLower: "低于国内年度总包",
+        textDeltaEqual: "与国内年度总包基本相同",
+        labelHomeStructure: "国内年度总包结构：",
+        labelHostStructure: "外派年度总包结构：",
+        formulaCola: "1. 生活成本补贴 COLA（按月）：",
+        formulaColaDetail: "   COLA = 国内生活成本基数 × (外派生活成本指数 / 国内生活成本指数 − 1) × COLA补贴比例",
+        formulaHousing: "2. 住房补贴（按月）：",
+        formulaHousingDetail: "   住房补贴 = 国内典型房租 × (外派房租指数 / 国内房租指数 − 1) × 住房补贴比例",
+        formulaSales: "3. 销售提成（按月）：",
+        formulaSalesDetail: "   销售提成 = 已回款销售额 × 已回款提成率 + 未回款销售额 × 未回款提成率",
+        chartsHint: "从饼图可以看到：外派薪酬包中外派补贴占比显著上升，而固定薪酬和变动薪酬的占比发生了相应变化。学生可结合具体数字进一步分析该设计是否合理。"
+      },
+      en: {
+        appTitle: "Expat Assignment Compensation Package Designer",
+        appTitleChip: "Teaching · Cost-based",
+        appSubtitle: "Simulation tool for designing expat sales compensation based on company cost",
+        step1Title: "Basic Information",
+        step2Title: "Domestic Pay Structure (Monthly Cost)",
+        step3Title: "Host City Data & Expat Sales Assumptions",
+        step4Title: "Allowance Policy (Percentages)",
+        step5Title: "Yearly Package & Report",
+        step1Desc: "Describe the employee and the assignment destination",
+        step2Desc: "Enter current domestic pay structure (all monthly figures)",
+        step3Desc: "Enter host city indices and expat sales assumptions",
+        step4Desc: "Set allowance compensation percentages",
+        step5Desc: "Generate yearly packages, charts and explanation",
+        stepBadgeBase: "Start",
+        stepBadgeHome: "Home baseline",
+        stepBadgeHost: "Host",
+        stepBadgePolicy: "Policy",
+        stepBadgeReport: "Report",
+        jobTypeLabel: "Job type",
+        jobTypeHint: "This tool mainly targets sales roles",
+        jobTypeSales: "Sales position",
+        jobTypeFunctional: "Functional role",
+        jobTypeManager: "Manager / Executive",
+        homeCityLabel: "Home city",
+        homeCityHint: "e.g. Chongqing, Shanghai",
+        homeCityPlaceholder: "Enter home city",
+        hostCountryLabel: "Host country",
+        hostCountryHint: "e.g. Thailand, Vietnam",
+        hostCountryPlaceholder: "Enter host country",
+        hostCityLabel: "Host city",
+        hostCityHint: "e.g. Bangkok, Ho Chi Minh City",
+        hostCityPlaceholder: "Enter host city",
+        familyStatusLabel: "Family status",
+        familyStatusHint: "Used for education allowance assumptions",
+        familySingle: "Single",
+        familyMarriedNoKids: "Married, no children",
+        familyMarriedWithKids: "Married with children",
+        step1Hint: "Describe the employee's current domestic role and the intended host country/city.",
+        step2Hint: "All amounts should be entered as the company's monthly total cost for this employee (taxes and social security already embedded).",
+        fixedTag: "Fixed part",
+        variableTag: "Variable part: sales commission",
+        otherVarTag: "Other variable / benefit cost",
+        domBaseSalaryLabel: "Domestic base salary (per month)",
+        currencyUnitHint: "Unit: company cost / month",
+        domFixedAllowLabel: "Fixed allowances (per month)",
+        domFixedAllowHint: "Combined: meal, transport, phone etc.",
+        domCollSalesLabel: "Collected sales (per month)",
+        salesHint: "Domestic collected sales",
+        domCollRateLabel: "Collected commission rate (%)",
+        rateHint: "Example: 3 means 3%",
+        domUncollSalesLabel: "Uncollected sales (per month)",
+        salesHint2: "Domestic uncollected sales",
+        domUncollRateLabel: "Uncollected commission rate (%)",
+        domOtherVarLabel: "Other variable pay (per month)",
+        domOtherVarHint: "E.g. performance bonus",
+        domOtherBenefitsLabel: "Other benefit cost (per month)",
+        domOtherBenefitsHint: "Other employer-paid costs",
+        step3Hint: "Students can get cost-of-living / rent indices from Numbeo etc. and enter them here. The tool does not fetch data online.",
+        cityIndexTag: "Cost-of-living / Rent indices",
+        colIndexHomeLabel: "Home city cost-of-living index",
+        indexHint: "Example: Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "Host city cost-of-living index",
+        indexHint2: "Example: Bangkok 50",
+        rentIndexHomeLabel: "Home city rent index",
+        rentIndexHostLabel: "Host city rent index",
+        domRentBaseLabel: "Typical domestic rent (per month)",
+        domRentBaseHint: "Based on company standard or 1BR downtown",
+        hostAdjFactorLabel: "Host fixed-pay adjustment factor",
+        hostAdjFactorHint: "1.0 means same as domestic fixed pay",
+        hostSalesTag: "Host sales assumptions (monthly)",
+        hostCollSalesLabel: "Host collected sales (per month)",
+        hostCollRateLabel: "Host collected commission rate (%)",
+        hostUncollSalesLabel: "Host uncollected sales (per month)",
+        hostUncollRateLabel: "Host uncollected commission rate (%)",
+        step4Hint: "Each percentage shows how much of the cost difference the company compensates. E.g. 80% means the company covers 80% of the gap.",
+        colaPctLabel: "COLA (Cost of Living Allowance) percentage",
+        housingPctLabel: "Housing allowance percentage",
+        transportPctLabel: "Transport allowance percentage",
+        mealPctLabel: "Meal allowance percentage",
+        eduPctLabel: "Education allowance percentage",
+        eduPctHint: "Only applied if the employee has children",
+        hardshipPctLabel: "Hardship allowance percentage",
+        step5Hint: "Click “Generate yearly packages & report” to see totals, charts and explanations.",
+        generateBtnLabel: "Generate yearly packages & report",
+        prevBtnLabel: "Previous step",
+        nextBtnLabel: "Next step",
+        summaryTitle: "Yearly package overview & structure comparison",
+        summaryBadge: "Live",
+        summaryHint: "After completing the steps, click the generate button to see home/host yearly packages, pie charts and a draft explanation.",
+        homeAnnualLabel: "Home yearly package (company cost):",
+        hostAnnualLabel: "Host yearly package (company cost):",
+        homeChartTitle: "Home yearly package structure",
+        hostChartTitle: "Host yearly package structure",
+        chartLabelBaseFixed: "Fixed pay (base + allowances)",
+        chartLabelVariable: "Variable pay (commission/bonus)",
+        chartLabelExpat: "Expat allowances",
+        chartLabelBenefits: "Other benefit cost",
+        reportTitle: "Auto-generated explanation (you may copy into your report)",
+        copyReportLabel: "Copy report text",
+        copyHint: "Tip: paste into Word / PPT, then refine and expand your own analysis.",
+        langName: "English",
+        reportSectionBasicInfo: "I. Basic information",
+        reportSectionHome: "II. Home yearly package (company cost)",
+        reportSectionHost: "III. Host yearly package (company cost)",
+        reportSectionFormulas: "IV. Key formulas (simplified)",
+        reportSectionCharts: "V. Structure differences & reflection",
+        reportIntro: "Below is a short summary of this expat package design, for classroom use or coursework.",
+        labelJobType: "Job type",
+        labelHomeCity: "Home city",
+        labelHostCity: "Host country/city",
+        labelFamily: "Family status",
+        textFamilySingle: "Single",
+        textFamilyMarriedNoKids: "Married, no children",
+        textFamilyMarriedWithKids: "Married with children",
+        labelHomeMonthlyTotal: "Home monthly total cost",
+        labelHostMonthlyTotal: "Host monthly total cost",
+        labelDeltaAnnual: "Difference between host and home yearly package",
+        textDeltaHigher: "higher than the home yearly package",
+        textDeltaLower: "lower than the home yearly package",
+        textDeltaEqual: "roughly equal to the home yearly package",
+        labelHomeStructure: "Home yearly package structure:",
+        labelHostStructure: "Host yearly package structure:",
+        formulaCola: "1. COLA (Cost of Living Allowance, monthly):",
+        formulaColaDetail: "   COLA = Home living base × (Host COL index / Home COL index − 1) × COLA percentage",
+        formulaHousing: "2. Housing allowance (monthly):",
+        formulaHousingDetail: "   Housing allowance = Domestic typical rent × (Host rent index / Home rent index − 1) × housing percentage",
+        formulaSales: "3. Sales commission (monthly):",
+        formulaSalesDetail: "   Commission = Collected sales × collected rate + Uncollected sales × uncollected rate",
+        chartsHint: "From the pie charts you can see expat allowances take a larger share in the host package, while fixed and variable pay shares may adjust accordingly. Students can further discuss whether this design is reasonable."
+      },
+      // For other languages, we keep UI labels; report formulas remain mainly English.
+      fr: {
+        langName: "Français",
+        appTitle: "Concepteur de paquet salarial pour expatriés",
+        appTitleChip: "Version pédagogique",
+        appSubtitle: "Outil de simulation du paquet salarial d’un commercial expatrié (coût entreprise)",
+        step1Title: "Infos de base",
+        step2Title: "Structure salariale domestique (mensuelle)",
+        step3Title: "Données de la ville d’accueil & ventes",
+        step4Title: "Politique d’allocations (pourcentage)",
+        step5Title: "Paquet annuel & rapport",
+        step1Desc: "Définir le poste et le lieu d’expatriation",
+        step2Desc: "Saisir la structure salariale actuelle en Chine",
+        step3Desc: "Saisir les indices et hypothèses de ventes",
+        step4Desc: "Définir les pourcentages d’allocations",
+        step5Desc: "Générer les résultats et le rapport",
+        stepBadgeBase: "Départ",
+        stepBadgeHome: "Base Chine",
+        stepBadgeHost: "Pays hôte",
+        stepBadgePolicy: "Politique",
+        stepBadgeReport: "Rapport",
+        jobTypeLabel: "Type de poste",
+        jobTypeHint: "Principalement pour un poste commercial",
+        jobTypeSales: "Commercial",
+        jobTypeFunctional: "Fonction support",
+        jobTypeManager: "Manager / Direction",
+        homeCityLabel: "Ville en Chine",
+        homeCityHint: "Ex. Chongqing, Shanghai",
+        homeCityPlaceholder: "Saisir la ville en Chine",
+        hostCountryLabel: "Pays d’accueil",
+        hostCountryHint: "Ex. Thaïlande",
+        hostCountryPlaceholder: "Saisir le pays d’accueil",
+        hostCityLabel: "Ville d’accueil",
+        hostCityHint: "Ex. Bangkok",
+        hostCityPlaceholder: "Saisir la ville d’accueil",
+        familyStatusLabel: "Situation familiale",
+        familyStatusHint: "Utilisée pour l’allocation scolaire",
+        familySingle: "Célibataire",
+        familyMarriedNoKids: "Marié(e) sans enfant",
+        familyMarriedWithKids: "Marié(e) avec enfant(s)",
+        step1Hint: "Décrire la situation actuelle en Chine et le pays / la ville d’expatriation.",
+        step2Hint: "Tous les montants sont au niveau du coût mensuel pour l’entreprise (charges incluses).",
+        fixedTag: "Part fixe",
+        variableTag: "Part variable : commission",
+        otherVarTag: "Autres variables / avantages",
+        domBaseSalaryLabel: "Salaire de base en Chine (mois)",
+        currencyUnitHint: "Unité : coût entreprise / mois",
+        domFixedAllowLabel: "Allocations fixes (mois)",
+        domFixedAllowHint: "Cantine, transport, téléphone…",
+        domCollSalesLabel: "Ventes encaissées (mois)",
+        salesHint: "Ventes encaissées en Chine",
+        domCollRateLabel: "Taux de commission encaissée (%)",
+        rateHint: "Ex. 3 = 3%",
+        domUncollSalesLabel: "Ventes non encaissées (mois)",
+        salesHint2: "Ventes non encaissées en Chine",
+        domUncollRateLabel: "Taux de commission non encaissée (%)",
+        domOtherVarLabel: "Autres variables (mois)",
+        domOtherVarHint: "Bonus de performance, etc.",
+        domOtherBenefitsLabel: "Autres coûts d’avantages (mois)",
+        domOtherBenefitsHint: "Autres coûts pour l’employeur",
+        step3Hint: "Les indices peuvent être récupérés sur Numbeo, puis saisis ici manuellement.",
+        cityIndexTag: "Indices coût de la vie / loyer",
+        colIndexHomeLabel: "Indice coût de la vie (Chine)",
+        indexHint: "Exemple : Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "Indice coût de la vie (pays hôte)",
+        indexHint2: "Exemple : Bangkok 50",
+        rentIndexHomeLabel: "Indice de loyer (Chine)",
+        rentIndexHostLabel: "Indice de loyer (pays hôte)",
+        domRentBaseLabel: "Loyer typique en Chine (mois)",
+        domRentBaseHint: "Selon la norme interne ou 1BR centre-ville",
+        hostAdjFactorLabel: "Facteur d’ajustement salaire fixe (hôte)",
+        hostAdjFactorHint: "1.0 = identique à la Chine",
+        hostSalesTag: "Ventes hôte (hypothèses mensuelles)",
+        hostCollSalesLabel: "Ventes encaissées (hôte, mois)",
+        hostCollRateLabel: "Taux commission encaissée (hôte, %)",
+        hostUncollSalesLabel: "Ventes non encaissées (hôte, mois)",
+        hostUncollRateLabel: "Taux commission non encaissée (hôte, %)",
+        step4Hint: "Les pourcentages indiquent la part de l’écart de coût à compenser par l’entreprise.",
+        colaPctLabel: "Pourcentage COLA",
+        housingPctLabel: "Pourcentage allocation logement",
+        transportPctLabel: "Pourcentage allocation transport",
+        mealPctLabel: "Pourcentage allocation repas",
+        eduPctLabel: "Pourcentage allocation scolaire",
+        eduPctHint: "Valable seulement s’il y a des enfants",
+        hardshipPctLabel: "Pourcentage prime d’“hardship”",
+        step5Hint: "Cliquer pour générer les paquets annuels, les graphiques et un texte explicatif.",
+        generateBtnLabel: "Générer paquets annuels & rapport",
+        prevBtnLabel: "Étape précédente",
+        nextBtnLabel: "Étape suivante",
+        summaryTitle: "Vue d’ensemble & comparaison de structure",
+        summaryBadge: "Live",
+        summaryHint: "Après génération, vous verrez les deux paquets annuels, les graphiques et un texte à commenter.",
+        homeAnnualLabel: "Paquet annuel Chine (coût entreprise) :",
+        hostAnnualLabel: "Paquet annuel expatrié (coût entreprise) :",
+        homeChartTitle: "Structure annuelle en Chine",
+        hostChartTitle: "Structure annuelle en expatriation",
+        chartLabelBaseFixed: "Fixe (base + allocations)",
+        chartLabelVariable: "Variable (commissions / bonus)",
+        chartLabelExpat: "Allocations expatrié",
+        chartLabelBenefits: "Autres coûts d’avantages",
+        reportTitle: "Texte explicatif généré (copiable dans votre rapport)",
+        copyReportLabel: "Copier le texte",
+        copyHint: "Astuce : collez dans Word / PPT, puis enrichissez l’analyse.",
+        reportSectionBasicInfo: "I. Informations de base",
+        reportSectionHome: "II. Paquet annuel en Chine",
+        reportSectionHost: "III. Paquet annuel en poste expatrié",
+        reportSectionFormulas: "IV. Principales formules (simplifiées)",
+        reportSectionCharts: "V. Différences de structure & analyse",
+        reportIntro: "Résumé du paquet salarial d’expatriation conçu pour cet exercice.",
+        labelJobType: "Type de poste",
+        labelHomeCity: "Ville en Chine",
+        labelHostCity: "Pays / ville d’accueil",
+        labelFamily: "Situation familiale",
+        textFamilySingle: "Célibataire",
+        textFamilyMarriedNoKids: "Marié(e) sans enfant",
+        textFamilyMarriedWithKids: "Marié(e) avec enfant(s)",
+        labelHomeMonthlyTotal: "Coût mensuel total en Chine",
+        labelHostMonthlyTotal: "Coût mensuel total en poste expatrié",
+        labelDeltaAnnual: "Écart entre les paquets annuels",
+        textDeltaHigher: "supérieur au paquet annuel en Chine",
+        textDeltaLower: "inférieur au paquet annuel en Chine",
+        textDeltaEqual: "proche du paquet annuel en Chine",
+        labelHomeStructure: "Structure du paquet annuel en Chine :",
+        labelHostStructure: "Structure du paquet annuel en expatriation :",
+        formulaCola: "1. COLA (allocation coût de la vie, mensuel) :",
+        formulaColaDetail: "   COLA = Base de coût de vie Chine × (Indice coût de vie hôte / Chine − 1) × %COLA",
+        formulaHousing: "2. Allocation logement (mensuel) :",
+        formulaHousingDetail: "   Allocation logement = Loyer typique Chine × (Indice loyer hôte / Chine − 1) × %logement",
+        formulaSales: "3. Commission commerciale (mensuel) :",
+        formulaSalesDetail: "   Commission = Ventes encaissées × taux encaissé + ventes non encaissées × taux non encaissé",
+        chartsHint: "Les graphiques montrent souvent une hausse de la part des allocations expatrié dans le paquet hôte."
+      },
+      th: {
+        langName: "ภาษาไทย",
+        appTitle: "เครื่องมือออกแบบแพ็กเกจค่าตอบแทนพนักงานต่างประเทศ",
+        appTitleChip: "เวอร์ชันการสอน",
+        appSubtitle: "จำลองแพ็กเกจค่าตอบแทนของเซลส์ที่ถูกส่งไปทำงานต่างประเทศ (มุมมองต้นทุนบริษัท)",
+        step1Title: "ข้อมูลพื้นฐาน",
+        step2Title: "โครงสร้างค่าตอบแทนในประเทศ (ต่อเดือน)",
+        step3Title: "ข้อมูลเมืองปลายทาง & ยอดขายต่างประเทศ",
+        step4Title: "นโยบายค่าเบี้ยเลี้ยง (ร้อยละ)",
+        step5Title: "แพ็กเกจรายปี & รายงาน",
+        step1Desc: "ระบุประเภทงานและประเทศ/เมืองปลายทาง",
+        step2Desc: "กรอกโครงสร้างค่าตอบแทนในประเทศ",
+        step3Desc: "กรอกดัชนีค่าครองชีพและสมมติฐานยอดขายปลายทาง",
+        step4Desc: "ตั้งค่าร้อยละการชดเชยค่าใช้จ่าย",
+        step5Desc: "สร้างผลลัพธ์และรายงานอธิบาย",
+        stepBadgeBase: "เริ่มต้น",
+        stepBadgeHome: "ฐานในประเทศ",
+        stepBadgeHost: "ปลายทาง",
+        stepBadgePolicy: "นโยบาย",
+        stepBadgeReport: "รายงาน",
+        jobTypeLabel: "ประเภทงาน",
+        jobTypeHint: "มุ่งเน้นตำแหน่งงานขาย",
+        jobTypeSales: "พนักงานขาย",
+        jobTypeFunctional: "งานสนับสนุน",
+        jobTypeManager: "ผู้จัดการ / ผู้บริหาร",
+        homeCityLabel: "เมืองในประเทศ",
+        homeCityHint: "เช่น ฉงชิ่ง, เซี่ยงไฮ้",
+        homeCityPlaceholder: "กรอกเมืองในประเทศ",
+        hostCountryLabel: "ประเทศปลายทาง",
+        hostCountryHint: "เช่น ไทย",
+        hostCountryPlaceholder: "กรอกประเทศปลายทาง",
+        hostCityLabel: "เมืองปลายทาง",
+        hostCityHint: "เช่น กรุงเทพฯ",
+        hostCityPlaceholder: "กรอกเมืองปลายทาง",
+        familyStatusLabel: "สถานภาพครอบครัว",
+        familyStatusHint: "ใช้กำหนดสมมติฐานค่าเล่าเรียน",
+        familySingle: "โสด",
+        familyMarriedNoKids: "สมรส ไม่มีบุตร",
+        familyMarriedWithKids: "สมรส มีบุตร",
+        step1Hint: "อธิบายสถานการณ์พนักงานในประเทศ และประเทศ/เมืองที่จะไปทำงาน",
+        step2Hint: "กรอกจำนวนเงินในมุมมองต้นทุนต่อเดือนของบริษัท (รวมภาษีและประกันต่างๆ แล้ว)",
+        fixedTag: "ส่วนคงที่",
+        variableTag: "ส่วนผันแปร: ค่าคอมมิชชันขาย",
+        otherVarTag: "ค่าผันแปร / สวัสดิการอื่นๆ",
+        domBaseSalaryLabel: "เงินเดือนพื้นฐานในประเทศ (ต่อเดือน)",
+        currencyUnitHint: "หน่วย: ต้นทุนบริษัท / เดือน",
+        domFixedAllowLabel: "เบี้ยเลี้ยงคงที่รวม (ต่อเดือน)",
+        domFixedAllowHint: "เช่น ค่าอาหาร, ค่าเดินทาง, ค่าโทรศัพท์",
+        domCollSalesLabel: "ยอดขายที่รับเงินแล้ว (ต่อเดือน)",
+        salesHint: "ยอดขายเก็บเงินแล้วในประเทศ",
+        domCollRateLabel: "อัตราคอมมิชชันยอดขายที่รับเงินแล้ว (%)",
+        rateHint: "เช่น 3 หมายถึง 3%",
+        domUncollSalesLabel: "ยอดขายที่ยังไม่รับเงิน (ต่อเดือน)",
+        salesHint2: "ยอดขายยังไม่รับเงินในประเทศ",
+        domUncollRateLabel: "อัตราคอมมิชชันยอดขายยังไม่รับเงิน (%)",
+        domOtherVarLabel: "ค่าตอบแทนผันแปรอื่น (ต่อเดือน)",
+        domOtherVarHint: "เช่น โบนัสผลงาน",
+        domOtherBenefitsLabel: "ต้นทุนสวัสดิการอื่น (ต่อเดือน)",
+        domOtherBenefitsHint: "ต้นทุนอื่นที่บริษัทจ่ายเพิ่ม",
+        step3Hint: "นักศึกษาสามารถหาดัชนีจาก Numbeo แล้วกรอกเอง เครื่องมือนี้ไม่ดึงข้อมูลอัตโนมัติ",
+        cityIndexTag: "ดัชนีค่าครองชีพ / ค่าเช่า",
+        colIndexHomeLabel: "ดัชนีค่าครองชีพ (เมืองต้นทาง)",
+        indexHint: "ตัวอย่าง: Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "ดัชนีค่าครองชีพ (เมืองปลายทาง)",
+        indexHint2: "ตัวอย่าง: Bangkok 50",
+        rentIndexHomeLabel: "ดัชนีค่าเช่า (เมืองต้นทาง)",
+        rentIndexHostLabel: "ดัชนีค่าเช่า (เมืองปลายทาง)",
+        domRentBaseLabel: "ค่าเช่าต้นแบบในประเทศ (ต่อเดือน)",
+        domRentBaseHint: "เช่น มาตรฐานบริษัท หรือห้อง 1BR กลางเมือง",
+        hostAdjFactorLabel: "ตัวคูณปรับเงินเดือนคงที่ที่ปลายทาง",
+        hostAdjFactorHint: "1.0 หมายถึงเท่ากับในประเทศ",
+        hostSalesTag: "สมมติฐานยอดขายปลายทาง (ต่อเดือน)",
+        hostCollSalesLabel: "ยอดขายที่รับเงินแล้ว (ปลายทาง)",
+        hostCollRateLabel: "อัตราคอมมิชชันยอดขายที่รับเงินแล้ว (ปลายทาง, %)",
+        hostUncollSalesLabel: "ยอดขายที่ยังไม่รับเงิน (ปลายทาง)",
+        hostUncollRateLabel: "อัตราคอมมิชชันยอดขายยังไม่รับเงิน (ปลายทาง, %)",
+        step4Hint: "ร้อยละแต่ละรายการคือสัดส่วนของ ‘ส่วนต่างค่าใช้จ่าย’ ที่บริษัทช่วยชดเชย",
+        colaPctLabel: "ร้อยละค่า COLA (ค่าครองชีพ)",
+        housingPctLabel: "ร้อยละค่าเช่าบ้าน",
+        transportPctLabel: "ร้อยละค่าเดินทาง",
+        mealPctLabel: "ร้อยละค่าอาหาร",
+        eduPctLabel: "ร้อยละค่าเล่าเรียน",
+        eduPctHint: "ใช้เมื่อมีบุตรเท่านั้น",
+        hardshipPctLabel: "ร้อยละเบี้ยเลี้ยงพื้นที่กันดาร",
+        step5Hint: "กดปุ่มเพื่อคำนวณแพ็กเกจรายปี, กราฟวงกลม และข้อความอธิบาย",
+        generateBtnLabel: "สร้างแพ็กเกจรายปี & รายงาน",
+        prevBtnLabel: "กลับ",
+        nextBtnLabel: "ถัดไป",
+        summaryTitle: "ภาพรวมแพ็กเกจรายปี & โครงสร้าง",
+        summaryBadge: "อัปเดตอัตโนมัติ",
+        summaryHint: "หลังกรอกข้อมูลครบ กดปุ่มเพื่อดูผลรวมประจำปีและกราฟเปรียบเทียบ",
+        homeAnnualLabel: "แพ็กเกจรายปีในประเทศ (ต้นทุนบริษัท):",
+        hostAnnualLabel: "แพ็กเกจรายปีปลายทาง (ต้นทุนบริษัท):",
+        homeChartTitle: "โครงสร้างแพ็กเกจรายปีในประเทศ",
+        hostChartTitle: "โครงสร้างแพ็กเกจรายปีปลายทาง",
+        chartLabelBaseFixed: "ค่าตอบแทนคงที่",
+        chartLabelVariable: "ค่าตอบแทนผันแปร",
+        chartLabelExpat: "ค่าเบี้ยเลี้ยงต่างประเทศ",
+        chartLabelBenefits: "สวัสดิการอื่น",
+        reportTitle: "ข้อความอธิบาย (คัดลอกไปใช้ในรายงานได้)",
+        copyReportLabel: "คัดลอกข้อความ",
+        copyHint: "คำแนะนำ: วางลงใน Word / PPT แล้วเขียนวิเคราะห์ต่อเอง",
+        reportSectionBasicInfo: "I. ข้อมูลพื้นฐาน",
+        reportSectionHome: "II. แพ็กเกจรายปีในประเทศ",
+        reportSectionHost: "III. แพ็กเกจรายปีปลายทาง",
+        reportSectionFormulas: "IV. สูตรการคำนวณหลัก (อย่างง่าย)",
+        reportSectionCharts: "V. ความแตกต่างของโครงสร้าง & ข้อคิด",
+        reportIntro: "ข้อความสรุปสำหรับแบบฝึกหัดออกแบบแพ็กเกจพนักงานต่างประเทศ",
+        labelJobType: "ประเภทงาน",
+        labelHomeCity: "เมืองในประเทศ",
+        labelHostCity: "ประเทศ/เมืองปลายทาง",
+        labelFamily: "สถานภาพครอบครัว",
+        textFamilySingle: "โสด",
+        textFamilyMarriedNoKids: "สมรส ไม่มีบุตร",
+        textFamilyMarriedWithKids: "สมรส มีบุตร",
+        labelHomeMonthlyTotal: "ต้นทุนรวมต่อเดือนในประเทศ",
+        labelHostMonthlyTotal: "ต้นทุนรวมต่อเดือนปลายทาง",
+        labelDeltaAnnual: "ส่วนต่างแพ็กเกจรายปี",
+        textDeltaHigher: "มากกว่าแพ็กเกจในประเทศ",
+        textDeltaLower: "น้อยกว่าแพ็กเกจในประเทศ",
+        textDeltaEqual: "ใกล้เคียงแพ็กเกจในประเทศ",
+        labelHomeStructure: "โครงสร้างแพ็กเกจรายปีในประเทศ:",
+        labelHostStructure: "โครงสร้างแพ็กเกจรายปีปลายทาง:",
+        formulaCola: "1. ค่า COLA (ต่อเดือน):",
+        formulaColaDetail: "   COLA = ฐานค่าครองชีพในประเทศ × (ดัชนีค่าครองชีพปลายทาง / ดัชนีในประเทศ − 1) × ร้อยละ COLA",
+        formulaHousing: "2. ค่าเช่าบ้าน (ต่อเดือน):",
+        formulaHousingDetail: "   ค่าเช่าบ้าน = ค่าเช่าต้นแบบในประเทศ × (ดัชนีเช่าปลายทาง / ดัชนีเช่าในประเทศ − 1) × ร้อยละค่าเช่าบ้าน",
+        formulaSales: "3. ค่าคอมมิชชันขาย (ต่อเดือน):",
+        formulaSalesDetail: "   ค่าคอมมิชชัน = ยอดขายที่รับเงินแล้ว × อัตราส่วน + ยอดขายยังไม่รับเงิน × อัตราส่วน",
+        chartsHint: "นักศึกษาสามารถสังเกตสัดส่วนค่าเบี้ยเลี้ยงต่างประเทศที่เพิ่มขึ้นในแพ็กเกจปลายทาง แล้วอภิปรายความเหมาะสมได้"
+      },
+      id: {
+        langName: "Bahasa Indonesia",
+        appTitle: "Alat Desain Paket Kompensasi Penugasan Luar Negeri",
+        appTitleChip: "Versi pembelajaran",
+        appSubtitle: "Simulasi paket kompensasi sales ekspatriat dari sudut pandang biaya perusahaan",
+        step1Title: "Info dasar",
+        step2Title: "Struktur gaji domestik (bulanan)",
+        step3Title: "Data kota tujuan & penjualan",
+        step4Title: "Kebijakan tunjangan (persentase)",
+        step5Title: "Paket tahunan & laporan",
+        step1Desc: "Tentukan jenis jabatan dan negara/kota tujuan",
+        step2Desc: "Input struktur gaji domestik",
+        step3Desc: "Input indeks kota tujuan dan asumsi penjualan",
+        step4Desc: "Atur persentase tunjangan",
+        step5Desc: "Hasilkan paket tahunan dan laporan",
+        stepBadgeBase: "Mulai",
+        stepBadgeHome: "Dasar domestik",
+        stepBadgeHost: "Negara tujuan",
+        stepBadgePolicy: "Kebijakan",
+        stepBadgeReport: "Laporan",
+        jobTypeLabel: "Jenis jabatan",
+        jobTypeHint: "Fokus pada jabatan sales",
+        jobTypeSales: "Sales",
+        jobTypeFunctional: "Fungsional",
+        jobTypeManager: "Manajer / Eksekutif",
+        homeCityLabel: "Kota domestik",
+        homeCityHint: "Misalnya: Chongqing, Shanghai",
+        homeCityPlaceholder: "Masukkan kota domestik",
+        hostCountryLabel: "Negara tujuan",
+        hostCountryHint: "Misalnya: Thailand",
+        hostCountryPlaceholder: "Masukkan negara tujuan",
+        hostCityLabel: "Kota tujuan",
+        hostCityHint: "Misalnya: Bangkok",
+        hostCityPlaceholder: "Masukkan kota tujuan",
+        familyStatusLabel: "Status keluarga",
+        familyStatusHint: "Berpengaruh pada tunjangan pendidikan",
+        familySingle: "Lajang",
+        familyMarriedNoKids: "Menikah tanpa anak",
+        familyMarriedWithKids: "Menikah dengan anak",
+        step1Hint: "Jelaskan situasi karyawan di negara asal dan negara/kota tujuan penugasan.",
+        step2Hint: "Semua angka adalah biaya bulanan untuk perusahaan (termasuk pajak & jaminan sosial).",
+        fixedTag: "Bagian tetap",
+        variableTag: "Bagian variabel: komisi penjualan",
+        otherVarTag: "Variabel lain / biaya benefit",
+        domBaseSalaryLabel: "Gaji pokok domestik (per bulan)",
+        currencyUnitHint: "Unit: biaya perusahaan / bulan",
+        domFixedAllowLabel: "Tunjangan tetap (per bulan)",
+        domFixedAllowHint: "Makan, transport, pulsa, dll.",
+        domCollSalesLabel: "Penjualan sudah tertagih (per bulan)",
+        salesHint: "Penjualan tertagih domestik",
+        domCollRateLabel: "Persentase komisi penjualan tertagih (%)",
+        rateHint: "Misal: 3 berarti 3%",
+        domUncollSalesLabel: "Penjualan belum tertagih (per bulan)",
+        salesHint2: "Penjualan belum tertagih domestik",
+        domUncollRateLabel: "Persentase komisi penjualan belum tertagih (%)",
+        domOtherVarLabel: "Variabel lain (per bulan)",
+        domOtherVarHint: "Misalnya bonus kinerja",
+        domOtherBenefitsLabel: "Biaya benefit lain (per bulan)",
+        domOtherBenefitsHint: "Biaya tambahan lain untuk perusahaan",
+        step3Hint: "Mahasiswa dapat mengambil indeks dari Numbeo, lalu input manual di sini.",
+        cityIndexTag: "Indeks biaya hidup / sewa",
+        colIndexHomeLabel: "Indeks biaya hidup kota domestik",
+        indexHint: "Contoh: Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "Indeks biaya hidup kota tujuan",
+        indexHint2: "Contoh: Bangkok 50",
+        rentIndexHomeLabel: "Indeks sewa kota domestik",
+        rentIndexHostLabel: "Indeks sewa kota tujuan",
+        domRentBaseLabel: "Sewa domestik tipikal (per bulan)",
+        domRentBaseHint: "Standar perusahaan atau 1BR pusat kota",
+        hostAdjFactorLabel: "Faktor penyesuaian gaji tetap di negara tujuan",
+        hostAdjFactorHint: "1.0 = sama dengan domestik",
+        hostSalesTag: "Asumsi penjualan di negara tujuan (bulanan)",
+        hostCollSalesLabel: "Penjualan tertagih (tujuan, per bulan)",
+        hostCollRateLabel: "Persentase komisi tertagih (tujuan, %)",
+        hostUncollSalesLabel: "Penjualan belum tertagih (tujuan, per bulan)",
+        hostUncollRateLabel: "Persentase komisi belum tertagih (tujuan, %)",
+        step4Hint: "Persentase menunjukkan seberapa besar selisih biaya yang dikompensasi oleh perusahaan.",
+        colaPctLabel: "Persentase COLA",
+        housingPctLabel: "Persentase tunjangan perumahan",
+        transportPctLabel: "Persentase tunjangan transport",
+        mealPctLabel: "Persentase tunjangan makan",
+        eduPctLabel: "Persentase tunjangan pendidikan",
+        eduPctHint: "Hanya berlaku jika ada anak",
+        hardshipPctLabel: "Persentase tunjangan hardship",
+        step5Hint: "Klik tombol untuk menghasilkan paket tahunan, grafik, dan teks penjelasan.",
+        generateBtnLabel: "Hasilkan paket tahunan & laporan",
+        prevBtnLabel: "Sebelumnya",
+        nextBtnLabel: "Berikutnya",
+        summaryTitle: "Ringkasan paket tahunan & struktur",
+        summaryBadge: "Live",
+        summaryHint: "Setelah selesai, klik tombol generate untuk melihat paket tahunan dan grafik pai.",
+        homeAnnualLabel: "Paket tahunan domestik (biaya perusahaan):",
+        hostAnnualLabel: "Paket tahunan luar negeri (biaya perusahaan):",
+        homeChartTitle: "Struktur paket tahunan domestik",
+        hostChartTitle: "Struktur paket tahunan luar negeri",
+        chartLabelBaseFixed: "Gaji tetap",
+        chartLabelVariable: "Gaji variabel",
+        chartLabelExpat: "Tunjangan ekspatriat",
+        chartLabelBenefits: "Benefit lain",
+        reportTitle: "Teks penjelasan otomatis (bisa disalin ke laporan)",
+        copyReportLabel: "Salin teks laporan",
+        copyHint: "Tip: tempel ke Word / PPT lalu kembangkan analisis sendiri.",
+        reportSectionBasicInfo: "I. Informasi dasar",
+        reportSectionHome: "II. Paket tahunan di negara asal",
+        reportSectionHost: "III. Paket tahunan di negara tujuan",
+        reportSectionFormulas: "IV. Rumus utama (sederhana)",
+        reportSectionCharts: "V. Perbedaan struktur & diskusi",
+        reportIntro: "Ringkasan singkat desain paket ekspatriat untuk latihan kelas.",
+        labelJobType: "Jenis jabatan",
+        labelHomeCity: "Kota domestik",
+        labelHostCity: "Negara/kota tujuan",
+        labelFamily: "Status keluarga",
+        textFamilySingle: "Lajang",
+        textFamilyMarriedNoKids: "Menikah tanpa anak",
+        textFamilyMarriedWithKids: "Menikah dengan anak",
+        labelHomeMonthlyTotal: "Total biaya bulanan domestik",
+        labelHostMonthlyTotal: "Total biaya bulanan luar negeri",
+        labelDeltaAnnual: "Selisih paket tahunan",
+        textDeltaHigher: "lebih tinggi dari paket tahunan domestik",
+        textDeltaLower: "lebih rendah dari paket tahunan domestik",
+        textDeltaEqual: "kurang lebih sama dengan paket tahunan domestik",
+        labelHomeStructure: "Struktur paket tahunan domestik:",
+        labelHostStructure: "Struktur paket tahunan luar negeri:",
+        formulaCola: "1. COLA (tunjangan biaya hidup, bulanan):",
+        formulaColaDetail: "   COLA = basis biaya hidup domestik × (indeks biaya hidup tujuan / domestik − 1) × persentase COLA",
+        formulaHousing: "2. Tunjangan perumahan (bulanan):",
+        formulaHousingDetail: "   Tunjangan perumahan = sewa domestik tipikal × (indeks sewa tujuan / domestik − 1) × persentase perumahan",
+        formulaSales: "3. Komisi penjualan (bulanan):",
+        formulaSalesDetail: "   Komisi = penjualan tertagih × rate tertagih + penjualan belum tertagih × rate belum tertagih",
+        chartsHint: "Grafik pai membantu melihat porsi tunjangan ekspatriat yang meningkat pada paket luar negeri."
+      },
+      ru: {
+        langName: "Русский",
+        appTitle: "Конструктор компенсационного пакета для экспатов",
+        appTitleChip: "Учебная версия",
+        appSubtitle: "Моделирование пакета вознаграждения продавца-экспата с точки зрения затрат компании",
+        step1Title: "Базовая информация",
+        step2Title: "Структура оплаты в стране (в месяц)",
+        step3Title: "Данные города назначения и продажи",
+        step4Title: "Политика надбавок (проценты)",
+        step5Title: "Годовой пакет и отчет",
+        step1Desc: "Определите должность и страну/город назначения",
+        step2Desc: "Введите структуру оплаты в стране",
+        step3Desc: "Введите индексы и предположения по продажам",
+        step4Desc: "Настройте проценты компенсации",
+        step5Desc: "Сформируйте результаты и текст отчета",
+        stepBadgeBase: "Старт",
+        stepBadgeHome: "База (дом)",
+        stepBadgeHost: "Страна назначения",
+        stepBadgePolicy: "Политика",
+        stepBadgeReport: "Отчет",
+        jobTypeLabel: "Тип должности",
+        jobTypeHint: "Основной акцент — должность продавца",
+        jobTypeSales: "Продавец",
+        jobTypeFunctional: "Функциональная роль",
+        jobTypeManager: "Менеджер / Руководитель",
+        homeCityLabel: "Город в стране",
+        homeCityHint: "Напр.: Чунцин, Шанхай",
+        homeCityPlaceholder: "Введите город в стране",
+        hostCountryLabel: "Страна назначения",
+        hostCountryHint: "Напр.: Таиланд",
+        hostCountryPlaceholder: "Введите страну назначения",
+        hostCityLabel: "Город назначения",
+        hostCityHint: "Напр.: Бангкок",
+        hostCityPlaceholder: "Введите город назначения",
+        familyStatusLabel: "Семейное положение",
+        familyStatusHint: "Влияет на доплату за образование",
+        familySingle: "Холост/не замужем",
+        familyMarriedNoKids: "Женат/замужем без детей",
+        familyMarriedWithKids: "Женат/замужем с детьми",
+        step1Hint: "Опишите ситуацию сотрудника в стране и планируемую страну/город назначения.",
+        step2Hint: "Все суммы — это месячные затраты компании на сотрудника (налоги и взносы уже включены).",
+        fixedTag: "Фиксированная часть",
+        variableTag: "Переменная часть: комиссия",
+        otherVarTag: "Другая переменная / льготы",
+        domBaseSalaryLabel: "Базовый оклад в стране (в месяц)",
+        currencyUnitHint: "Ед.: затраты компании / месяц",
+        domFixedAllowLabel: "Фиксированные надбавки (в месяц)",
+        domFixedAllowHint: "Питание, транспорт, связь и т.п.",
+        domCollSalesLabel: "Продажи с оплатой (в месяц)",
+        salesHint: "Продажи с оплатой в стране",
+        domCollRateLabel: "Ставка комиссии по оплаченным продажам (%)",
+        rateHint: "Напр.: 3 означает 3%",
+        domUncollSalesLabel: "Продажи без оплаты (в месяц)",
+        salesHint2: "Продажи без оплаты в стране",
+        domUncollRateLabel: "Ставка комиссии по неоплаченным продажам (%)",
+        domOtherVarLabel: "Другие переменные выплаты (в месяц)",
+        domOtherVarHint: "Напр.: премии",
+        domOtherBenefitsLabel: "Другие затраты на льготы (в месяц)",
+        domOtherBenefitsHint: "Другие расходы работодателя",
+        step3Hint: "Студенты могут взять индексы с Numbeo и ввести их вручную.",
+        cityIndexTag: "Индексы стоимости жизни / аренды",
+        colIndexHomeLabel: "Индекс стоимости жизни (дом)",
+        indexHint: "Пример: Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "Индекс стоимости жизни (страна назначения)",
+        indexHint2: "Пример: Bangkok 50",
+        rentIndexHomeLabel: "Индекс аренды (дом)",
+        rentIndexHostLabel: "Индекс аренды (страна назначения)",
+        domRentBaseLabel: "Типичная аренда в стране (в месяц)",
+        domRentBaseHint: "Стандарт компании или 1BR в центре",
+        hostAdjFactorLabel: "Коэффициент корректировки фиксированной части в стране назначения",
+        hostAdjFactorHint: "1.0 = как в стране",
+        hostSalesTag: "Продажи в стране назначения (месячные предположения)",
+        hostCollSalesLabel: "Оплаченные продажи (в месяц)",
+        hostCollRateLabel: "Ставка комиссии по оплаченным продажам (страна назначения, %)",
+        hostUncollSalesLabel: "Неоплаченные продажи (в месяц)",
+        hostUncollRateLabel: "Ставка комиссии по неоплаченным продажам (страна назначения, %)",
+        step4Hint: "Процент показывает долю разницы в стоимости, которую компенсирует компания.",
+        colaPctLabel: "Процент COLA (надбавка за стоимость жизни)",
+        housingPctLabel: "Процент надбавки за жилье",
+        transportPctLabel: "Процент надбавки за транспорт",
+        mealPctLabel: "Процент надбавки за питание",
+        eduPctLabel: "Процент надбавки за образование",
+        eduPctHint: "Только если есть дети",
+        hardshipPctLabel: "Процент надбавки за сложный регион",
+        step5Hint: "Нажмите кнопку, чтобы получить годовые пакеты, диаграммы и текст отчета.",
+        generateBtnLabel: "Сформировать годовой пакет и отчет",
+        prevBtnLabel: "Назад",
+        nextBtnLabel: "Далее",
+        summaryTitle: "Обзор годовых пакетов и структуры",
+        summaryBadge: "Live",
+        summaryHint: "После генерации вы увидите годовые пакеты, диаграммы и черновик объяснения.",
+        homeAnnualLabel: "Годовой пакет в стране (затраты компании):",
+        hostAnnualLabel: "Годовой пакет в стране назначения (затраты компании):",
+        homeChartTitle: "Структура годового пакета (дом)",
+        hostChartTitle: "Структура годового пакета (страна назначения)",
+        chartLabelBaseFixed: "Фиксированная часть",
+        chartLabelVariable: "Переменная часть",
+        chartLabelExpat: "Надбавки экспату",
+        chartLabelBenefits: "Прочие льготы",
+        reportTitle: "Автоматически сгенерированный текст (можно скопировать в отчет)",
+        copyReportLabel: "Скопировать текст отчета",
+        copyHint: "Подсказка: вставьте в Word / PPT и дополните собственным анализом.",
+        reportSectionBasicInfo: "I. Базовая информация",
+        reportSectionHome: "II. Годовой пакет в стране",
+        reportSectionHost: "III. Годовой пакет в стране назначения",
+        reportSectionFormulas: "IV. Основные формулы (упрощенно)",
+        reportSectionCharts: "V. Различия структуры и обсуждение",
+        reportIntro: "Краткое резюме разработанного пакета для экспата.",
+        labelJobType: "Тип должности",
+        labelHomeCity: "Город в стране",
+        labelHostCity: "Страна/город назначения",
+        labelFamily: "Семейное положение",
+        textFamilySingle: "Холост/не замужем",
+        textFamilyMarriedNoKids: "Женат/замужем без детей",
+        textFamilyMarriedWithKids: "Женат/замужем с детьми",
+        labelHomeMonthlyTotal: "Месячные суммарные затраты (дом)",
+        labelHostMonthlyTotal: "Месячные суммарные затраты (страна назначения)",
+        labelDeltaAnnual: "Разница между годовыми пакетами",
+        textDeltaHigher: "выше годового пакета в стране",
+        textDeltaLower: "ниже годового пакета в стране",
+        textDeltaEqual: "приблизительно равно годовому пакету в стране",
+        labelHomeStructure: "Структура годового пакета (дом):",
+        labelHostStructure: "Структура годового пакета (страна назначения):",
+        formulaCola: "1. COLA (надбавка за стоимость жизни, в месяц):",
+        formulaColaDetail: "   COLA = База стоимости жизни (дом) × (индекс стоимости жизни хост / дом − 1) × процент COLA",
+        formulaHousing: "2. Надбавка за жилье (в месяц):",
+        formulaHousingDetail: "   Надбавка за жилье = Типичная аренда (дом) × (индекс аренды хост / дом − 1) × процент за жилье",
+        formulaSales: "3. Комиссия по продажам (в месяц):",
+        formulaSalesDetail: "   Комиссия = Оплаченные продажи × ставка + неоплаченные продажи × ставка",
+        chartsHint: "Диаграммы помогают увидеть долю надбавок экспату в структуре пакета."
+      },
+      vi: {
+        langName: "Tiếng Việt",
+        appTitle: "Công cụ thiết kế gói lương phái cử ra nước ngoài",
+        appTitleChip: "Bản dùng cho giảng dạy",
+        appSubtitle: "Mô phỏng gói lương cho nhân viên kinh doanh được phái cử (góc nhìn chi phí DN)",
+        step1Title: "Thông tin cơ bản",
+        step2Title: "Cấu trúc lương trong nước (theo tháng)",
+        step3Title: "Dữ liệu thành phố nước ngoài & doanh số",
+        step4Title: "Chính sách phụ cấp (tỷ lệ)",
+        step5Title: "Gói lương năm & báo cáo",
+        step1Desc: "Xác định loại vị trí và nước/thành phố phái cử",
+        step2Desc: "Nhập cấu trúc lương hiện tại trong nước",
+        step3Desc: "Nhập chỉ số chi phí sống và giả định doanh số",
+        step4Desc: "Thiết lập tỷ lệ phụ cấp",
+        step5Desc: "Tạo kết quả và báo cáo",
+        stepBadgeBase: "Bắt đầu",
+        stepBadgeHome: "Cơ sở trong nước",
+        stepBadgeHost: "Nước đến",
+        stepBadgePolicy: "Chính sách",
+        stepBadgeReport: "Báo cáo",
+        jobTypeLabel: "Loại vị trí",
+        jobTypeHint: "Tập trung vào vị trí kinh doanh",
+        jobTypeSales: "Nhân viên kinh doanh",
+        jobTypeFunctional: "Vị trí chức năng",
+        jobTypeManager: "Quản lý / Lãnh đạo",
+        homeCityLabel: "Thành phố trong nước",
+        homeCityHint: "Ví dụ: Trùng Khánh, Thượng Hải",
+        homeCityPlaceholder: "Nhập thành phố trong nước",
+        hostCountryLabel: "Quốc gia đến",
+        hostCountryHint: "Ví dụ: Thái Lan",
+        hostCountryPlaceholder: "Nhập quốc gia đến",
+        hostCityLabel: "Thành phố đến",
+        hostCityHint: "Ví dụ: Bangkok",
+        hostCityPlaceholder: "Nhập thành phố đến",
+        familyStatusLabel: "Tình trạng gia đình",
+        familyStatusHint: "Ảnh hưởng đến phụ cấp giáo dục",
+        familySingle: "Độc thân",
+        familyMarriedNoKids: "Đã kết hôn, chưa có con",
+        familyMarriedWithKids: "Đã kết hôn, có con",
+        step1Hint: "Mô tả vị trí hiện tại trong nước và quốc gia/thành phố phái cử.",
+        step2Hint: "Tất cả số liệu là chi phí hàng tháng cho DN (đã bao gồm thuế và BHXH).",
+        fixedTag: "Phần cố định",
+        variableTag: "Phần biến đổi: hoa hồng",
+        otherVarTag: "Biến đổi khác / phúc lợi",
+        domBaseSalaryLabel: "Lương cơ bản trong nước (tháng)",
+        currencyUnitHint: "Đơn vị: chi phí DN / tháng",
+        domFixedAllowLabel: "Phụ cấp cố định (tháng)",
+        domFixedAllowHint: "Ăn trưa, đi lại, điện thoại, v.v.",
+        domCollSalesLabel: "Doanh số đã thu tiền (tháng)",
+        salesHint: "Doanh số đã thu tiền trong nước",
+        domCollRateLabel: "Tỷ lệ hoa hồng doanh số đã thu (%)",
+        rateHint: "Ví dụ: 3 = 3%",
+        domUncollSalesLabel: "Doanh số chưa thu tiền (tháng)",
+        salesHint2: "Doanh số chưa thu trong nước",
+        domUncollRateLabel: "Tỷ lệ hoa hồng doanh số chưa thu (%)",
+        domOtherVarLabel: "Thu nhập biến đổi khác (tháng)",
+        domOtherVarHint: "Ví dụ: thưởng hiệu suất",
+        domOtherBenefitsLabel: "Chi phí phúc lợi khác (tháng)",
+        domOtherBenefitsHint: "Chi phí DN gánh thêm",
+        step3Hint: "Sinh viên có thể lấy chỉ số từ Numbeo rồi nhập vào đây.",
+        cityIndexTag: "Chỉ số chi phí sống / thuê nhà",
+        colIndexHomeLabel: "Chỉ số chi phí sống (trong nước)",
+        indexHint: "Ví dụ: Chongqing 40, Shanghai 60",
+        colIndexHostLabel: "Chỉ số chi phí sống (nước đến)",
+        indexHint2: "Ví dụ: Bangkok 50",
+        rentIndexHomeLabel: "Chỉ số thuê nhà (trong nước)",
+        rentIndexHostLabel: "Chỉ số thuê nhà (nước đến)",
+        domRentBaseLabel: "Tiền thuê nhà điển hình trong nước (tháng)",
+        domRentBaseHint: "Chuẩn công ty hoặc 1BR trung tâm",
+        hostAdjFactorLabel: "Hệ số điều chỉnh lương cố định ở nước đến",
+        hostAdjFactorHint: "1.0 = giống trong nước",
+        hostSalesTag: "Giả định doanh số ở nước đến (tháng)",
+        hostCollSalesLabel: "Doanh số đã thu tiền (nước đến)",
+        hostCollRateLabel: "Tỷ lệ hoa hồng đã thu (nước đến, %)",
+        hostUncollSalesLabel: "Doanh số chưa thu (nước đến)",
+        hostUncollRateLabel: "Tỷ lệ hoa hồng chưa thu (nước đến, %)",
+        step4Hint: "Tỷ lệ thể hiện phần chênh lệch chi phí mà DN bù đắp.",
+        colaPctLabel: "Tỷ lệ COLA (chi phí sống)",
+        housingPctLabel: "Tỷ lệ phụ cấp nhà ở",
+        transportPctLabel: "Tỷ lệ phụ cấp đi lại",
+        mealPctLabel: "Tỷ lệ phụ cấp ăn uống",
+        eduPctLabel: "Tỷ lệ phụ cấp giáo dục",
+        eduPctHint: "Chỉ áp dụng nếu có con",
+        hardshipPctLabel: "Tỷ lệ phụ cấp vùng khó khăn",
+        step5Hint: "Bấm nút để tạo gói lương năm, biểu đồ và đoạn giải thích.",
+        generateBtnLabel: "Tạo gói lương năm & báo cáo",
+        prevBtnLabel: "Quay lại",
+        nextBtnLabel: "Tiếp theo",
+        summaryTitle: "Tổng quan gói lương năm & cấu trúc",
+        summaryBadge: "Cập nhật trực tiếp",
+        summaryHint: "Sau khi tạo, bạn sẽ thấy gói lương năm trong nước / nước ngoài và 2 biểu đồ hình tròn.",
+        homeAnnualLabel: "Gói lương năm trong nước (chi phí DN):",
+        hostAnnualLabel: "Gói lương năm ở nước đến (chi phí DN):",
+        homeChartTitle: "Cấu trúc gói lương năm trong nước",
+        hostChartTitle: "Cấu trúc gói lương năm ở nước đến",
+        chartLabelBaseFixed: "Lương cố định",
+        chartLabelVariable: "Lương biến đổi",
+        chartLabelExpat: "Phụ cấp phái cử",
+        chartLabelBenefits: "Phúc lợi khác",
+        reportTitle: "Đoạn giải thích tự sinh (có thể sao chép vào báo cáo)",
+        copyReportLabel: "Sao chép văn bản",
+        copyHint: "Gợi ý: dán vào Word / PPT, rồi viết phân tích chi tiết hơn.",
+        reportSectionBasicInfo: "I. Thông tin cơ bản",
+        reportSectionHome: "II. Gói lương năm trong nước",
+        reportSectionHost: "III. Gói lương năm ở nước đến",
+        reportSectionFormulas: "IV. Công thức chính (đơn giản hóa)",
+        reportSectionCharts: "V. Khác biệt cấu trúc & thảo luận",
+        reportIntro: "Tóm tắt ngắn gọn cho bài tập thiết kế gói lương phái cử.",
+        labelJobType: "Loại vị trí",
+        labelHomeCity: "Thành phố trong nước",
+        labelHostCity: "Quốc gia/thành phố nước đến",
+        labelFamily: "Tình trạng gia đình",
+        textFamilySingle: "Độc thân",
+        textFamilyMarriedNoKids: "Đã kết hôn, chưa có con",
+        textFamilyMarriedWithKids: "Đã kết hôn, có con",
+        labelHomeMonthlyTotal: "Tổng chi phí theo tháng trong nước",
+        labelHostMonthlyTotal: "Tổng chi phí theo tháng ở nước đến",
+        labelDeltaAnnual: "Chênh lệch gói lương năm",
+        textDeltaHigher: "cao hơn gói lương năm trong nước",
+        textDeltaLower: "thấp hơn gói lương năm trong nước",
+        textDeltaEqual: "xấp xỉ bằng gói lương năm trong nước",
+        labelHomeStructure: "Cấu trúc gói lương năm trong nước:",
+        labelHostStructure: "Cấu trúc gói lương năm ở nước đến:",
+        formulaCola: "1. COLA (phụ cấp chi phí sống, theo tháng):",
+        formulaColaDetail: "   COLA = cơ sở chi phí sống trong nước × (chỉ số chi phí sống nước đến / trong nước − 1) × tỷ lệ COLA",
+        formulaHousing: "2. Phụ cấp nhà ở (theo tháng):",
+        formulaHousingDetail: "   Phụ cấp nhà ở = tiền thuê nhà điển hình trong nước × (chỉ số thuê nhà nước đến / trong nước − 1) × tỷ lệ nhà ở",
+        formulaSales: "3. Hoa hồng doanh số (theo tháng):",
+        formulaSalesDetail: "   Hoa hồng = doanh số đã thu × tỷ lệ + doanh số chưa thu × tỷ lệ",
+        chartsHint: "Biểu đồ giúp thấy rõ phần phụ cấp phái cử tăng lên trong gói lương ở nước đến."
+      }
+    };
+
+    let currentLang = "zh";
+
+    const workflowTitles = {
+      zh:['任务背景','薪酬构成与公式','外派城市选择','已知数据','城市数据查询','补贴政策与计算','结果分析与报告'],
+      en:['Task background','Structure & formulas','Select host city','Known data','Research city data','Policies & calculation','Results & report'],
+      th:['ความเป็นมา','โครงสร้างและสูตร','เลือกเมืองปลายทาง','ข้อมูลที่ทราบ','ค้นข้อมูลเมือง','นโยบายและคำนวณ','ผลลัพธ์และรายงาน'],
+      fr:['Contexte','Structure et formules','Ville de destination','Données connues','Recherche des données','Politiques et calcul','Résultats et rapport'],
+      id:['Latar belakang','Struktur dan rumus','Pilih kota tujuan','Data yang diketahui','Riset data kota','Kebijakan dan hitung','Hasil dan laporan'],
+      ru:['Контекст задания','Структура и формулы','Выбор города','Исходные данные','Поиск данных города','Политика и расчёт','Результаты и отчёт'],
+      vi:['Bối cảnh','Cấu trúc và công thức','Chọn thành phố','Dữ liệu cho sẵn','Tra cứu dữ liệu','Chính sách và tính toán','Kết quả và báo cáo']
+    };
+
+    function applyTranslations() {
+      const dict = translations[currentLang] || translations["en"];
+
+      document.documentElement.lang = currentLang;
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (dict[key]) {
+          el.placeholder = dict[key];
+        }
+      });
+
+      const langLabel = document.getElementById("currentLangLabel");
+      if (langLabel) {
+        langLabel.textContent = dict.langName || currentLang.toUpperCase();
+      }
+
+      // update step detail label according to current step
+      updateStepLabelDetail();
+      // re-generate report summary texts if already computed
+      if (lastComputed) {
+        generateReport(true);
+      }
+      applyAddedUiLanguage();
+    }
+
+    function addedUiText() {
+      if (currentLang === 'zh') return {pending:'待确认',confirmed:'已确认',preview:'全部数据预览',previewEn:'Full Data Preview',known:'已知数据',pendingValue:'待填写',home:'国内年度总包',host:'外派年度总包',difference:'成本差额',share:'外派津贴占比',generate:'生成外派薪酬包对比报告',updated:'报告已更新'};
+      if (currentLang === 'th') return {pending:'รอยืนยัน',confirmed:'ยืนยันแล้ว',preview:'ดูข้อมูลทั้งหมด',previewEn:'Full Data Preview',known:'ข้อมูลที่ทราบ',pendingValue:'รอกรอก',home:'แพ็กเกจในประเทศ',host:'แพ็กเกจต่างประเทศ',difference:'ส่วนต่างต้นทุน',share:'สัดส่วนเบี้ยเลี้ยง',generate:'สร้างรายงานเปรียบเทียบแพ็กเกจ',updated:'อัปเดตรายงานแล้ว'};
+      return {pending:'Pending',confirmed:'Confirmed',preview:'Full Data Preview',previewEn:'Full Data Preview',known:'Known data',pendingValue:'Pending input',home:'Home package',host:'Host package',difference:'Cost difference',share:'Allowance share',generate:'Generate compensation comparison report',updated:'Report updated'};
+    }
+
+    function applyAddedUiLanguage() {
+      const t = addedUiText();
+      document.querySelectorAll('[data-added-ui]').forEach(el => { const key=el.getAttribute('data-added-ui'); if(t[key]) el.textContent=t[key]; });
+      const b1=document.getElementById('introStep1Body'), b2=document.getElementById('introStep2Body');
+      if (currentLang === 'zh') {
+        document.getElementById('introStep1Title')?.replaceChildren(document.createTextNode('任务背景与作业目标')); document.getElementById('introStep1Badge')?.replaceChildren(document.createTextNode('导入')); document.getElementById('introStep2Title')?.replaceChildren(document.createTextNode('外派薪酬包构成与计算方法')); document.getElementById('introStep2Badge')?.replaceChildren(document.createTextNode('知识准备'));
+        if (b1) b1.innerHTML='<div class="hint">本任务模拟企业为销售人员设计海外外派薪酬包。你需要先选择外派城市，再查询城市数据，最后完成薪酬计算、比较和报告分析。</div><div class="data-preview"><h3>你将完成的学习任务</h3><div class="preview-grid"><div><b>情境判断</b><br>理解为什么不同国家和城市需要不同的外派薪酬安排。</div><div><b>数据检索</b><br>使用指定网站查询生活成本、房租和 Crime Index。</div><div><b>薪酬设计</b><br>把已知数据和查询数据带入外派薪酬包模型。</div><div><b>成果交付</b><br>生成图表和报告，说明外派薪酬变化的原因。</div></div></div><div class="note">完成本步骤后，请点击“确认本步数据”，再进入下一步。</div>';
+        if (b2) b2.innerHTML='<div class="hint">先理解每一项薪酬的含义，再开始选择城市和输入数据。</div><div class="data-preview"><h3>外派薪酬包构成</h3><div class="preview-grid"><div><b>Base Salary 基本工资</b><br>员工岗位价值的基础定价。本课程将其作为国内生活成本参考基数。</div><div><b>Foreign Service Premium 出国服务奖励</b><br>用于补偿跨国派遣、工作环境变化和额外责任。</div><div><b>Allowances 外派工作津贴</b><br>包括 COLA、住房、教育、艰苦与危险、交通、餐食等补贴。</div><div><b>Benefits & Welfare 福利政策</b><br>包括保险、探亲、医疗和其他公司福利项目。</div></div></div><div class="data-preview"><h3>本任务使用的核心公式</h3><div class="preview-grid"><div><b>COLA 生活成本补贴</b><br>国内基本工资 ×（外派生活成本指数 ÷ 国内生活成本指数 − 1）× COLA比例</div><div><b>Housing Allowance 住房补贴</b><br>国内典型房租 ×（外派房租指数 ÷ 国内房租指数 − 1）× 住房补贴比例</div><div><b>Hardship & Danger 艰苦与危险补贴</b><br>根据外派城市与国内城市 Crime Index 差值匹配补贴比例。</div><div><b>Education Allowance 教育补贴</b><br>根据家庭情况、子女情况和教育补贴比例估算。</div></div></div><div class="note">注：基本工资作为生活成本参考基数，是本课程的教学假设，不等同于员工全部实际生活支出。</div>';
+      } else {
+        document.getElementById('introStep1Title')?.replaceChildren(document.createTextNode('Task background and objectives')); document.getElementById('introStep1Badge')?.replaceChildren(document.createTextNode('Start')); document.getElementById('introStep2Title')?.replaceChildren(document.createTextNode('Package structure and formulas')); document.getElementById('introStep2Badge')?.replaceChildren(document.createTextNode('Preparation'));
+        if (b1) b1.innerHTML='<div class="hint">This exercise simulates an overseas compensation package for a sales employee. Select a host city, research city data, calculate the package, compare the results and produce a report.</div><div class="data-preview"><h3>Learning tasks</h3><div class="preview-grid"><div><b>Scenario</b><br>Understand why host cities require different compensation arrangements.</div><div><b>Data research</b><br>Use the specified website to find cost-of-living, rent and Crime Index data.</div><div><b>Compensation design</b><br>Bring known data and researched data into the package model.</div><div><b>Deliverable</b><br>Generate charts and explain the drivers of the compensation difference.</div></div></div><div class="note">Confirm this step before continuing.</div>';
+        if (b2) b2.innerHTML='<div class="hint">Understand each compensation component before selecting a city and entering data.</div><div class="data-preview"><h3>Expatriate compensation package</h3><div class="preview-grid"><div><b>Base Salary</b><br>Base job-value pricing. This exercise uses it as a reference for the home-country cost-of-living base.</div><div><b>Foreign Service Premium</b><br>Compensates for cross-border assignment and additional responsibility.</div><div><b>Allowances</b><br>COLA, housing, education, hardship and danger, transport and meals.</div><div><b>Benefits & Welfare</b><br>Insurance, home visits, medical and other company benefits.</div></div></div><div class="data-preview"><h3>Core formulas</h3><div class="preview-grid"><div><b>COLA</b><br>Home base salary × (host COL index ÷ home COL index − 1) × COLA ratio</div><div><b>Housing allowance</b><br>Home typical rent × (host rent index ÷ home rent index − 1) × housing ratio</div><div><b>Hardship & danger</b><br>Match a ratio using the Crime Index difference between host and home cities.</div><div><b>Education allowance</b><br>Estimate from family status, children and the education ratio.</div></div></div><div class="note">Base salary is a teaching reference for the cost-of-living base and does not represent total living expenses.</div>';
+      }
+      if (b2) {
+        const walker = document.createTreeWalker(b2, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          node.nodeValue = node.nodeValue
+            .replace('国内基本工资 ×（外派生活成本指数 ÷ 国内生活成本指数 − 1）× COLA比例', 'MAX(0,（国内基本工资 × 40% + 固定津贴）× 家庭生活成本系数 ×（外派生活成本指数 ÷ 国内生活成本指数 − 1）× COLA比例)')
+            .replace('Home base salary × (host COL index ÷ home COL index − 1) × COLA ratio', 'MAX(0, (home base salary × 40% + fixed allowances) × family living factor × (host COL index ÷ home COL index − 1) × COLA ratio)')
+            .replace('国内典型房租 ×（外派房租指数 ÷ 国内房租指数 − 1）× 住房补贴比例', 'MAX(0, 国内典型房租 × 家庭住房系数 ×（外派房租指数 ÷ 国内房租指数 − 1）× 住房补贴比例)')
+            .replace('Home typical rent × (host rent index ÷ home rent index − 1) × housing ratio', 'MAX(0, home typical rent × family housing factor × (host rent index ÷ home rent index − 1) × housing ratio)');
+        }
+      }
+      renderStepNav();
+      renderDataPreview();
+      localizeResults();
+    }
+
+    function localizeResults() {
+      const dict=translations[currentLang]||translations.en;
+      const root=document.querySelector('.main-layout>.card:last-child');
+      if(!root)return;
+      const pairs=[
+        ['公司年度成本','Annual company cost','ต้นทุนรายปีของบริษัท'],['外派相对国内','Host versus home','ต่างประเทศเทียบกับในประเทศ'],['占外派年度总包','Share of host package','สัดส่วนของแพ็กเกจต่างประเทศ'],
+        ['国内年度总包结构 / Home package',dict.homeChartTitle,dict.homeChartTitle],['外派年度总包结构 / Host package',dict.hostChartTitle,dict.hostChartTitle],['外派津贴构成 / Expatriate allowances','Expatriate allowance breakdown','องค์ประกอบเบี้ยเลี้ยงต่างประเทศ'],
+        ['国内城市',dict.homeCityLabel,dict.homeCityLabel],['外派国家',dict.hostCountryLabel,dict.hostCountryLabel],['外派城市',dict.hostCityLabel,dict.hostCityLabel],['岗位类型',dict.jobTypeLabel,dict.jobTypeLabel],['家庭情况',dict.familyStatusLabel,dict.familyStatusLabel],
+        ['国内基本工资/月',dict.domBaseSalaryLabel,dict.domBaseSalaryLabel],['固定津贴/月',dict.domFixedAllowLabel,dict.domFixedAllowLabel],['国内生活成本指数',dict.colIndexHomeLabel,dict.colIndexHomeLabel],['外派生活成本指数',dict.colIndexHostLabel,dict.colIndexHostLabel],['国内房租指数',dict.rentIndexHomeLabel,dict.rentIndexHomeLabel],['外派房租指数',dict.rentIndexHostLabel,dict.rentIndexHostLabel],['国内典型房租/月',dict.domRentBaseLabel,dict.domRentBaseLabel],['外派固定工资调整系数',dict.hostAdjFactorLabel,dict.hostAdjFactorLabel],['外派已回款销售额/月',dict.hostCollSalesLabel,dict.hostCollSalesLabel],['外派未回款销售额/月',dict.hostUncollSalesLabel,dict.hostUncollSalesLabel],['COLA比例',dict.colaPctLabel,dict.colaPctLabel],['住房补贴比例',dict.housingPctLabel,dict.housingPctLabel],['交通补贴比例',dict.transportPctLabel,dict.transportPctLabel],['餐食补贴比例',dict.mealPctLabel,dict.mealPctLabel],['教育补贴比例',dict.eduPctLabel,dict.eduPctLabel],['艰苦地区补贴比例',dict.hardshipPctLabel,dict.hardshipPctLabel]
+      ];
+      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+      while((n=walker.nextNode())){
+        if(!n.parentElement||n.parentElement.closest('textarea,script,style'))continue;
+        if(!n._sourceText)n._sourceText=n.nodeValue;
+        const source=n._sourceText.trim();const pair=pairs.find(p=>p[0]===source);
+        if(pair)n.nodeValue=currentLang==='zh'?pair[0]:(pair[currentLang==='th'?2:1]||pair[1]);
+      }
+      const download=root.querySelector('#copyReportBtn span:last-child');
+      if(download)download.textContent=currentLang==='zh'?'下载 PDF 报告':currentLang==='th'?'ดาวน์โหลดรายงาน PDF':'Download PDF report';
+      const hint=root.querySelector('.copy-hint');if(hint)hint.textContent=currentLang==='zh'?'点击后在打印窗口中选择“另存为 PDF”，报告包含图表及计算过程。':currentLang==='th'?'เลือกบันทึกเป็น PDF ในหน้าต่างพิมพ์ รายงานประกอบด้วยกราฟและการคำนวณ':'Choose Save as PDF in the print window. Charts and calculations are included.';
+      const selects={sales:'jobTypeSales',functional:'jobTypeFunctional',manager:'jobTypeManager',single:'familySingle',married_no_kids:'familyMarriedNoKids',married_with_kids:'familyMarriedWithKids'};
+      root.querySelectorAll('.preview-grid div>span').forEach(el=>{if(selects[el.textContent])el.textContent=dict[selects[el.textContent]]||el.textContent;});
+    }
+
+    // =========================
+    // Step navigation
+    // =========================
+    let currentStep = 1;
+    const maxStep = 7;
+    const confirmedSteps = new Set();
+
+    function renderStepNav() {
+      const nav = document.getElementById("stepNav3d");
+      if (!nav) return;
+      const dict = translations[currentLang] || translations["en"];
+      nav.innerHTML = Array.from({length:maxStep}, (_, i) => {
+        const step = i + 1;
+        const done = confirmedSteps.has(step) ? " ✓" : "";
+        const t = addedUiText();
+        const title=(workflowTitles[currentLang]||workflowTitles.en)[i];
+        return `<button type="button" title="${title}" data-step-jump="${step}" class="${step===currentStep?'active':''}">${step}. ${title}${done}<small>${confirmedSteps.has(step) ? t.confirmed : t.pending}</small></button>`;
+      }).join('');
+      nav.querySelectorAll('[data-step-jump]').forEach(btn => btn.addEventListener('click', () => showStep(Number(btn.dataset.stepJump))));
+    }
+
+    function renderDataPreview() {
+      const box = document.getElementById('dataPreview');
+      if (!box) return;
+      const items = [
+        ['国内城市', strVal('homeCity')], ['外派国家', strVal('hostCountry')], ['外派城市', strVal('hostCity')],
+        ['岗位类型', strVal('jobType')], ['家庭情况', strVal('familyStatus')],
+        ['国内基本工资/月', valNum('domBaseSalary')], ['固定津贴/月', valNum('domFixedAllow')],
+        ['国内生活成本指数', valNum('colIndexHome')], ['外派生活成本指数', valNum('colIndexHost')],
+        ['国内房租指数', valNum('rentIndexHome')], ['外派房租指数', valNum('rentIndexHost')],
+        ['国内典型房租/月', valNum('domRentBase')], ['外派固定工资调整系数', valNum('hostAdjFactor')],
+        ['外派已回款销售额/月', valNum('hostCollSales')], ['外派未回款销售额/月', valNum('hostUncollSales')],
+        ['COLA比例', valNum('colaPct') + '%'], ['住房补贴比例', valNum('housingPct') + '%'],
+        ['交通补贴比例', valNum('transportPct') + '%'], ['餐食补贴比例', valNum('mealPct') + '%'],
+        ['教育补贴比例', valNum('eduPct') + '%'], ['艰苦地区补贴比例', valNum('hardshipPct') + '%']
+      ];
+      const t = addedUiText();
+      const previewTitle = currentLang === 'zh' ? `${t.preview} / ${t.previewEn}` : t.preview;
+      box.innerHTML = `<h3>${previewTitle}</h3><div class="preview-grid">` + items.map(([k,v]) => `<div><b>${k}</b><span>${v === '' || v === 0 ? `<span class="preview-empty">${t.pendingValue}</span>` : v}</span></div>`).join('') + '</div>';
+      localizeResults();
+    }
+
+    function applyTeacherPrefill() {
+      const values = {
+        jobType:'sales', domBaseSalary:5000,
+        domFixedAllow:3000, domOtherVar:2000, domOtherBenefits:1200,
+        domCollSales:150000, domCollRate:2, domUncollSales:150000, domUncollRate:1,
+        hostCollSales:100000, hostCollRate:4, hostUncollSales:100000, hostUncollRate:2,
+        housingPct:100, transportPct:100, mealPct:100, eduPct:100, hardshipPct:100,
+        hostAdjFactor:1
+      };
+      Object.entries(values).forEach(([id,value]) => {
+        const el=document.getElementById(id); if(!el) return; el.value=String(value); el.classList.add('teacher-prefilled');
+        if (el.tagName === 'SELECT') el.disabled = true; else el.readOnly = true;
+        const label=el.closest('.form-row')?.querySelector('label');
+        if(label && !label.querySelector('.teacher-prefill-note')) { const note=document.createElement('span'); note.className='teacher-prefill-note'; note.textContent='已知数据'; label.appendChild(note); }
+      });
+      // 保留家庭情况的全部选项；Excel示例默认值为“已婚有子女”，但学生仍可选择其他家庭情形，系统会据此改变教育补贴计算。
+      const familySelect = document.getElementById('familyStatus');
+      if (familySelect) familySelect.value = 'married_with_kids';
+      renderDataPreview();
+    }
+
+    function showStep(step) {
+      currentStep = step;
+      const mainLayout = document.querySelector('.main-layout');
+      if (mainLayout) mainLayout.classList.toggle('results-mode', step === 7);
+      document.querySelectorAll(".step").forEach((sec) => {
+        const s = parseInt(sec.getAttribute("data-step"), 10);
+        sec.classList.toggle("active", s === step);
+      });
+
+      const stepNumEl = document.getElementById("stepNumber");
+      if (stepNumEl) {
+        stepNumEl.textContent = step + " / " + maxStep;
+      }
+
+      const stepShortLabel = document.getElementById("stepShortLabel");
+      const dict = translations[currentLang] || translations["en"];
+      const titleKey = "step" + step + "Title";
+      if (stepShortLabel && dict[titleKey]) {
+        stepShortLabel.textContent = dict[titleKey];
+      }
+
+      updateStepLabelDetail();
+      renderStepNav();
+      const confirmStatus = document.getElementById('confirmStatus');
+      if (confirmStatus) confirmStatus.textContent = confirmedSteps.has(step) ? '本步已确认 / Confirmed' : '本步尚未确认 / Pending';
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      if (prevBtn) {
+        prevBtn.disabled = step === 1;
+        prevBtn.classList.toggle("btn-disabled", step === 1);
+      }
+      if (nextBtn) {
+        nextBtn.disabled = step === maxStep;
+        nextBtn.classList.toggle("btn-disabled", step === maxStep);
+      }
+      renderDataPreview();
+    }
+
+    function updateStepLabelDetail() {
+      const labelDetail = document.getElementById("stepLabelDetail");
+      const dict = translations[currentLang] || translations["en"];
+      const key = "step" + currentStep + "Desc";
+      if (labelDetail && dict[key]) {
+        labelDetail.textContent = dict[key];
+      }
+    }
+
+    // =========================
+    // Calculation logic
+    // =========================
+    let homeChartInstance = null;
+    let hostChartInstance = null;
+    let allowanceChartInstance = null;
+    let lastComputed = false;
+
+    function valNum(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const v = parseFloat(el.value);
+      return isNaN(v) ? 0 : v;
+    }
+
+    function strVal(id) {
+      const el = document.getElementById(id);
+      return el ? (el.value || "") : "";
+    }
+
+    function computeAll() {
+      const jobType = strVal("jobType");
+      const homeCity = strVal("homeCity");
+      const hostCountry = strVal("hostCountry");
+      const hostCity = strVal("hostCity");
+      const familyStatus = strVal("familyStatus");
+
+      // Domestic monthly components
+      const domBaseSalary = valNum("domBaseSalary");
+      const domFixedAllow = valNum("domFixedAllow");
+      const domCollSales = valNum("domCollSales");
+      const domCollRate = valNum("domCollRate") / 100;
+      const domUncollSales = valNum("domUncollSales");
+      const domUncollRate = valNum("domUncollRate") / 100;
+      const domOtherVar = valNum("domOtherVar");
+      const domOtherBenefits = valNum("domOtherBenefits");
+
+      const domSalesCommission =
+        (Number.isFinite(domCollSales) ? domCollSales : 0) * (Number.isFinite(domCollRate) ? domCollRate : 0)
+      + (Number.isFinite(domUncollSales) ? domUncollSales : 0) * (Number.isFinite(domUncollRate) ? domUncollRate : 0);
+
+      const domFixedMonthly = domBaseSalary + domFixedAllow;
+      const domVariableMonthly = domSalesCommission + domOtherVar;
+      const domMonthlyTotal =
+        domFixedMonthly + domVariableMonthly + domOtherBenefits;
+
+      // Display domestic monthly summary
+      const summaryEl = document.getElementById("domMonthlySummary");
+      if (summaryEl) {
+        const dict = translations[currentLang] || translations["en"];
+        const labelHomeMonthlyTotal = dict.labelHomeMonthlyTotal || "Home monthly total cost";
+        summaryEl.textContent =
+          labelHomeMonthlyTotal +
+          " ≈ " +
+          domMonthlyTotal.toFixed(2) +
+          " （含固定、提成、其他变动与福利成本）";
+      }
+
+      // Host city / indices
+      const colIndexHome = valNum("colIndexHome");
+      const colIndexHost = valNum("colIndexHost");
+      const rentIndexHome = valNum("rentIndexHome");
+      const rentIndexHost = valNum("rentIndexHost");
+      const domRentBase = valNum("domRentBase");
+      const hostAdjFactor = valNum("hostAdjFactor") || 1;
+
+      const hostCollSales = valNum("hostCollSales");
+      const hostCollRate = valNum("hostCollRate") / 100;
+      const hostUncollSales = valNum("hostUncollSales");
+      const hostUncollRate = valNum("hostUncollRate") / 100;
+
+      const hostSalesCommission =
+        (Number.isFinite(hostCollSales) ? hostCollSales : 0) * (Number.isFinite(hostCollRate) ? hostCollRate : 0)
+      + (Number.isFinite(hostUncollSales) ? hostUncollSales : 0) * (Number.isFinite(hostUncollRate) ? hostUncollRate : 0);
+
+      // Allowance percentages
+      const colaPct = valNum("colaPct") / 100;
+      const housingPct = valNum("housingPct") / 100;
+      const transportPct = valNum("transportPct") / 100;
+      const mealPct = valNum("mealPct") / 100;
+      const eduPct = valNum("eduPct") / 100;
+      const hardshipPct = valNum("hardshipPct") / 100;
+
+      // 家庭情境教学参数：家庭成员越多，生活成本与住房参考需求越高。
+      const familyFactors = {
+        single: { living: 1.00, housing: 1.00, children: 0 },
+        married_no_kids: { living: 1.20, housing: 1.25, children: 0 },
+        married_with_kids: { living: 1.35, housing: 1.50, children: 1 }
+      };
+      const familyFactor = familyFactors[familyStatus] || familyFactors.single;
+
+      // 国内生活成本参考基数：基本工资的40% + 固定生活津贴。
+      // 这是本课程的教学假设，不等同于员工全部实际生活支出。
+      const livingBaseBeforeFamily = domBaseSalary * 0.40 + domFixedAllow;
+      const livingBase = livingBaseBeforeFamily * familyFactor.living;
+
+      let costRatio =
+        colIndexHome > 0 ? colIndexHost / colIndexHome : 1.0;
+      if (!isFinite(costRatio) || costRatio < 0) costRatio = 1.0;
+
+      const colaRaw = livingBase * (costRatio - 1);
+      const colaMonthly = colaRaw > 0 ? colaRaw * colaPct : 0;
+
+      // Housing
+      const rentRatio =
+        rentIndexHome > 0 ? rentIndexHost / rentIndexHome : costRatio;
+      const domesticRentBase =
+        (domRentBase > 0 ? domRentBase : domMonthlyTotal * 0.3) * familyFactor.housing;
+      const housingRaw = domesticRentBase * (rentRatio - 1);
+      const housingMonthly = housingRaw > 0 ? housingRaw * housingPct : 0;
+
+      // Transport & meal & education use overall cost ratio
+      const domesticTransportBase = domMonthlyTotal * 0.05 * familyFactor.living;
+      const domesticMealBase = domMonthlyTotal * 0.1 * familyFactor.living;
+      const domesticEduBase = domMonthlyTotal * 0.1;
+
+      const transportRaw = domesticTransportBase * (costRatio - 1);
+      const transportMonthly =
+        transportRaw > 0 ? transportRaw * transportPct : 0;
+
+      const mealRaw = domesticMealBase * (costRatio - 1);
+      const mealMonthly = mealRaw > 0 ? mealRaw * mealPct : 0;
+
+      let educationMonthly = 0;
+      if (familyStatus === "married_with_kids") {
+        const eduRaw = domesticEduBase * (costRatio - 1);
+        educationMonthly = eduRaw > 0 ? eduRaw * eduPct : 0;
+      }
+
+      // Hardship: simplified as 10% of domestic total times hardshipPct
+      // === Hardship allowance (Scheme B: relative Crime Index) ===
+      const crimeHome = parseFloat(document.getElementById("crimeHome")?.value || "");
+      const crimeHost = parseFloat(document.getElementById("crimeHost")?.value || "");
+      const ciHome = Number.isFinite(crimeHome) ? crimeHome : 0;
+      const ciHost = Number.isFinite(crimeHost) ? crimeHost : 0;
+      const deltaCrime = Math.max(0, ciHost - ciHome);
+      let computedHardshipPct = 0;
+      if (deltaCrime >= 40) computedHardshipPct = 0.25;
+      else if (deltaCrime >= 30) computedHardshipPct = 0.20;
+      else if (deltaCrime >= 20) computedHardshipPct = 0.15;
+      else if (deltaCrime >= 10) computedHardshipPct = 0.10;
+      else if (deltaCrime >= 5) computedHardshipPct = 0.05;
+      else computedHardshipPct = 0.0;
+      const hardshipMonthly = domBaseSalary * computedHardshipPct;
+
+      // Host fixed pay
+      const hostFixedMonthly = domFixedMonthly * hostAdjFactor;
+
+      // Host monthly total
+      const hostExpatMonthly =
+        colaMonthly +
+        housingMonthly +
+        transportMonthly +
+        mealMonthly +
+        educationMonthly +
+        hardshipMonthly;
+
+      const hostOtherBenefitsMonthly = domOtherBenefits;
+      const hostMonthlyTotal =
+        hostFixedMonthly + hostSalesCommission + hostExpatMonthly + hostOtherBenefitsMonthly;
+
+      const homeAnnual = domMonthlyTotal * 12;
+      const hostAnnual = hostMonthlyTotal * 12;
+
+      return {
+        jobType,
+        homeCity,
+        hostCountry,
+        hostCity,
+        familyStatus,
+        domMonthlyTotal,
+        domFixedMonthly,
+        domVariableMonthly,
+        domOtherBenefits,
+        domSalesCommission,
+        hostMonthlyTotal,
+        hostFixedMonthly,
+        hostSalesCommission,
+        hostExpatMonthly,
+        colaMonthly,
+        housingMonthly,
+        transportMonthly,
+        mealMonthly,
+        educationMonthly,
+        hardshipMonthly,
+        computedHardshipPct,
+        hostOtherBenefitsMonthly,
+        domBaseSalary,
+        domFixedAllow,
+        colIndexHome,
+        colIndexHost,
+        rentIndexHome,
+        rentIndexHost,
+        domRentBase,
+        livingBaseBeforeFamily,
+        livingBase,
+        familyLivingFactor: familyFactor.living,
+        familyHousingFactor: familyFactor.housing,
+        rentRatio,
+        costRatio,
+        deltaCrime,
+        homeAnnual,
+        hostAnnual
+      };
+    }
+
+    function updateChartsAndNumbers(data) {
+      const dict = translations[currentLang] || translations["en"];
+
+      const homeAnnualValue = document.getElementById("homeAnnualValue");
+      const hostAnnualValue = document.getElementById("hostAnnualValue");
+      const deltaBadge = document.getElementById("deltaBadge");
+
+      if (homeAnnualValue) {
+        homeAnnualValue.textContent = data.homeAnnual.toFixed(2);
+      }
+      if (hostAnnualValue) {
+        hostAnnualValue.textContent = data.hostAnnual.toFixed(2);
+      }
+      if (deltaBadge) {
+        const delta = data.hostAnnual - data.homeAnnual;
+        const dir =
+          Math.abs(delta) < 1e-6
+            ? (dict.textDeltaEqual || "roughly equal")
+            : delta > 0
+            ? (dict.textDeltaHigher || "higher")
+            : (dict.textDeltaLower || "lower");
+        deltaBadge.textContent =
+          "Δ " + delta.toFixed(2) + " (" + dir + ")";
+      }
+
+      // Pie chart data
+      const homeBase = data.domFixedMonthly * 12;
+      const homeVar = (data.domVariableMonthly) * 12;
+      const homeExpat = 0;
+      const homeBenefits = (data.domOtherBenefits) * 12;
+
+      const hostBase = data.hostFixedMonthly * 12;
+      const hostVar = data.hostSalesCommission * 12;
+      const hostExpat = data.hostExpatMonthly * 12;
+      const hostBenefits = (data.hostOtherBenefitsMonthly) * 12;
+
+      const homeTotal = homeBase + homeVar + homeExpat + homeBenefits || 1;
+      const hostTotal = hostBase + hostVar + hostExpat + hostBenefits || 1;
+      const allowanceShare = hostTotal ? (hostExpat / hostTotal) * 100 : 0;
+      const allowanceShareEl = document.getElementById('allowanceShareValue');
+      if (allowanceShareEl) allowanceShareEl.textContent = allowanceShare.toFixed(1) + '%';
+
+      const labels = [
+        dict.chartLabelBaseFixed || "Fixed",
+        dict.chartLabelVariable || "Variable",
+        dict.chartLabelExpat || "Expat allowances",
+        dict.chartLabelBenefits || "Other benefits"
+      ];
+
+      const homeLabels = [labels[0], labels[1], labels[3]];
+      const hostLabels = labels;
+      const homeData = [homeBase, homeVar, homeBenefits];
+      const hostData = [hostBase, hostVar, hostExpat, hostBenefits];
+
+      const homeCtx = document.getElementById("homeChart").getContext("2d");
+      const hostCtx = document.getElementById("hostChart").getContext("2d");
+
+      if (homeChartInstance) homeChartInstance.destroy();
+      if (hostChartInstance) hostChartInstance.destroy();
+
+      homeChartInstance = new Chart(homeCtx, {
+        type: "doughnut",
+        data: {
+          labels: homeLabels,
+          datasets: [
+            {
+              data: homeData,
+              backgroundColor: [
+                "#0ea5e9",
+                "#22c55e",
+                "#64748b"
+              ]
+            }
+          ]
+        },
+        options: {
+          cutout: '64%', plugins: { datalabels: { anchor:'center', align:'center', offset:0, clamp:false, clip:false, color:'#ffffff', font:{size:12,weight:'800'} }, legend: { position:'right', labels: { color: "#e5e7eb", font: { size: 11 } } } }
+        }
+      });
+
+      hostChartInstance = new Chart(hostCtx, {
+        type: "doughnut",
+        data: {
+          labels: hostLabels,
+          datasets: [
+            {
+              data: hostData,
+              backgroundColor: [
+                "#38bdf8",
+                "#4ade80",
+                "#f59e0b",
+                "#94a3b8"
+              ]
+            }
+          ]
+        },
+        options: {
+          cutout: '64%', plugins: { datalabels: { anchor:'center', align:'center', offset:0, clamp:false, clip:false, color:'#ffffff', font:{size:12,weight:'800'} }, legend: { position:'right', labels: { color: "#e5e7eb", font: { size: 11 } } } }
+        }
+      });
+      const allowanceCtx = document.getElementById('allowanceChart');
+      if (allowanceCtx) {
+        if (allowanceChartInstance) allowanceChartInstance.destroy();
+        allowanceChartInstance = new Chart(allowanceCtx.getContext('2d'), {type:'bar',data:{labels:['COLA','住房','交通','餐食','教育','Hardship'],datasets:[{label:'年度金额',data:[data.colaMonthly*12,data.housingMonthly*12,data.transportMonthly*12,data.mealMonthly*12,data.educationMonthly*12,data.hardshipMonthly*12],backgroundColor:['#38bdf8','#a78bfa','#22c55e','#f59e0b','#fb7185','#facc15'],borderRadius:8}]},options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#cbd5e1'},grid:{color:'rgba(148,163,184,.12)'}},y:{ticks:{color:'#e2e8f0'},grid:{display:false}}}}});
+      }
+    }
+
+    function generateReport(skipScroll) {
+      const data = computeAll();
+      lastComputed = true;
+
+      updateChartsAndNumbers(data);
+
+      const dict = translations[currentLang] || translations["en"];
+
+      const jobTypeMap = {
+        sales: dict.jobTypeSales || "Sales",
+        functional: dict.jobTypeFunctional || "Functional",
+        manager: dict.jobTypeManager || "Manager"
+      };
+
+      let familyText = "";
+      if (data.familyStatus === "single") {
+        familyText = dict.textFamilySingle || "Single";
+      } else if (data.familyStatus === "married_no_kids") {
+        familyText = dict.textFamilyMarriedNoKids || "Married, no children";
+      } else if (data.familyStatus === "married_with_kids") {
+        familyText = dict.textFamilyMarriedWithKids || "Married with children";
+      }
+
+      const lines = [];
+
+      lines.push((dict.reportIntro || "").trim());
+      lines.push("");
+
+      lines.push(dict.reportSectionBasicInfo || "Basic information");
+      lines.push("----------------------------------------");
+      lines.push(
+        (dict.labelJobType || "Job type") +
+          ": " +
+          (jobTypeMap[data.jobType] || data.jobType)
+      );
+      lines.push(
+        (dict.labelHomeCity || "Home city") + ": " + (data.homeCity || "-")
+      );
+      lines.push(
+        (dict.labelHostCity || "Host country/city") +
+          ": " +
+          (strVal("hostCountry") || "-") +
+          (data.hostCity ? " / " + data.hostCity : "")
+      );
+      lines.push(
+        (dict.labelFamily || "Family status") + ": " + (familyText || "-")
+      );
+      lines.push("");
+
+      lines.push(dict.reportSectionHome || "Home yearly package");
+      lines.push("----------------------------------------");
+      lines.push(
+        (dict.labelHomeMonthlyTotal || "Home monthly total cost") +
+          " ≈ " +
+          data.domMonthlyTotal.toFixed(2)
+      );
+      lines.push(
+        (dict.homeAnnualLabel || "Home yearly package") +
+          " " +
+          data.homeAnnual.toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelBaseFixed || "Fixed") +
+          " ≈ " +
+          (data.domFixedMonthly * 12).toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelVariable || "Variable") +
+          " ≈ " +
+          (data.domVariableMonthly * 12).toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelBenefits || "Benefits") +
+          " ≈ " +
+          (data.domOtherBenefits * 12).toFixed(2)
+      );
+      lines.push("");
+
+      lines.push(dict.reportSectionHost || "Host yearly package");
+      lines.push("----------------------------------------");
+      lines.push(
+        (dict.labelHostMonthlyTotal || "Host monthly total cost") +
+          " ≈ " +
+          data.hostMonthlyTotal.toFixed(2)
+      );
+      lines.push(
+        (dict.hostAnnualLabel || "Host yearly package") +
+          " " +
+          data.hostAnnual.toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelBaseFixed || "Fixed") +
+          " ≈ " +
+          (data.hostFixedMonthly * 12).toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelVariable || "Variable") +
+          " ≈ " +
+          (data.hostSalesCommission * 12).toFixed(2)
+      );
+      lines.push(
+        (dict.chartLabelExpat || "Expat allowances") +
+          " ≈ " +
+          (data.hostExpatMonthly * 12).toFixed(2)
+      );
+      lines.push("");
+
+      const delta = data.hostAnnual - data.homeAnnual;
+      let deltaText = "";
+      if (Math.abs(delta) < 1e-6) {
+        deltaText = dict.textDeltaEqual || "roughly equal to home yearly package";
+      } else if (delta > 0) {
+        deltaText =
+          (dict.textDeltaHigher || "higher than home yearly package") +
+          " (" +
+          delta.toFixed(2) +
+          ")";
+      } else {
+        deltaText =
+          (dict.textDeltaLower || "lower than home yearly package") +
+          " (" +
+          delta.toFixed(2) +
+          ")";
+      }
+      lines.push(
+        (dict.labelDeltaAnnual || "Difference between host and home yearly package") +
+          ": " +
+          deltaText
+      );
+      lines.push("");
+
+      lines.push(dict.reportSectionFormulas || "Key formulas");
+      lines.push("----------------------------------------");
+      lines.push("一、COLA生活成本补贴（按月）");
+      lines.push(`国内生活成本参考基数 = 国内基本工资 ${data.domBaseSalary.toFixed(2)} × 40% + 固定津贴 ${data.domFixedAllow.toFixed(2)} = ${(data.domBaseSalary*0.4+data.domFixedAllow).toFixed(2)} 元/月`);
+      lines.push(`家庭情境生活成本系数 = ${data.familyLivingFactor.toFixed(2)}；调整后参考基数 = ${data.livingBase.toFixed(2)} 元/月`);
+      lines.push(`COLA = ${data.livingBase.toFixed(2)} ×（${data.colIndexHost.toFixed(2)} ÷ ${data.colIndexHome.toFixed(2)} − 1）× ${valNum("colaPct").toFixed(0)}% = ${data.colaMonthly.toFixed(2)} 元/月；年度 = ${(data.colaMonthly*12).toFixed(2)} 元`);
+      lines.push("");
+      lines.push("二、住房补贴（按月）");
+      lines.push(`家庭情境住房系数 = ${data.familyHousingFactor.toFixed(2)}；住房参考基数 = ${data.domRentBase.toFixed(2)} × ${data.familyHousingFactor.toFixed(2)} = ${(data.domRentBase*data.familyHousingFactor).toFixed(2)} 元/月`);
+      lines.push(`住房补贴 = ${(data.domRentBase*data.familyHousingFactor).toFixed(2)} ×（${data.rentIndexHost.toFixed(2)} ÷ ${data.rentIndexHome.toFixed(2)} − 1）× ${valNum("housingPct").toFixed(0)}% = ${data.housingMonthly.toFixed(2)} 元/月；年度 = ${(data.housingMonthly*12).toFixed(2)} 元`);
+      lines.push("");
+      lines.push("三、交通、餐食与教育补贴");
+      lines.push(`交通补贴 = ${data.transportMonthly.toFixed(2)} 元/月；餐食补贴 = ${data.mealMonthly.toFixed(2)} 元/月`);
+      lines.push(`教育补贴 = ${data.educationMonthly.toFixed(2)} 元/月；家庭状态为“${familyText || data.familyStatus}”时${data.familyStatus === "married_with_kids" ? "生效" : "不计入"}`);
+      lines.push("");
+      lines.push("四、Hardship艰苦与危险补贴");
+      lines.push(`Crime Index差值 = 外派城市 ${data.deltaCrime.toFixed(2)} − 国内城市 = ${data.deltaCrime.toFixed(2)}；匹配比例 = ${(data.computedHardshipPct*100).toFixed(0)}%`);
+      lines.push(`Hardship补贴 = 国内基本工资 ${data.domBaseSalary.toFixed(2)} × ${ (data.computedHardshipPct*100).toFixed(0)}% = ${data.hardshipMonthly.toFixed(2)} 元/月；年度 = ${(data.hardshipMonthly*12).toFixed(2)} 元`);
+      lines.push("");
+      lines.push("五、外派年度总包");
+      lines.push(`外派月度总成本 = 固定薪酬 ${data.hostFixedMonthly.toFixed(2)} + 外派销售提成 ${data.hostSalesCommission.toFixed(2)} + 外派津贴 ${data.hostExpatMonthly.toFixed(2)} + 其他福利 ${data.hostOtherBenefitsMonthly.toFixed(2)} = ${data.hostMonthlyTotal.toFixed(2)} 元/月`);
+      lines.push(`外派年度总包 = ${data.hostMonthlyTotal.toFixed(2)} × 12 = ${data.hostAnnual.toFixed(2)} 元/年`);
+      lines.push("");
+      lines.push(dict.formulaCola || "1. COLA (monthly):");
+      lines.push(dict.formulaColaDetail || "");
+      lines.push("");
+      lines.push(dict.formulaHousing || "2. Housing allowance (monthly):");
+      lines.push(dict.formulaHousingDetail || "");
+      lines.push("");
+      lines.push(dict.formulaSales || "3. Sales commission (monthly):");
+      lines.push(dict.formulaSalesDetail || "");
+      lines.push("");
+
+      lines.push(dict.reportSectionCharts || "Structure differences");
+      lines.push("----------------------------------------");
+      lines.push(dict.chartsHint || "");
+      lines.push("");
+
+      const reportEl = document.getElementById("reportText");
+      if (reportEl) {
+        reportEl.value = lines.join("\n");
+      }
+
+      if (!skipScroll) {
+        const app = document.querySelector(".app-shell");
+        if (app && app.scrollIntoView) {
+          app.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    }
+
+    function downloadPdfReport() {
+      const reportText = document.getElementById('reportText')?.value || '';
+      const homeImage = document.getElementById('homeChart')?.toDataURL('image/png', 1.0) || '';
+      const hostImage = document.getElementById('hostChart')?.toDataURL('image/png', 1.0) || '';
+      const allowanceImage = document.getElementById('allowanceChart')?.toDataURL('image/png', 1.0) || '';
+      const data = lastComputed ? computeAll() : null;
+      const popup = window.open('', '_blank', 'width=1100,height=850');
+      if (!popup) { alert('浏览器阻止了报告窗口，请允许弹出窗口后重试。'); return; }
+      const esc = (s) => String(s || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      popup.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>外派薪酬包对比报告</title><style>
+        @page{size:A4;margin:14mm}*{box-sizing:border-box}body{font-family:Arial,"Microsoft YaHei",sans-serif;color:#172033;margin:0;background:#fff;font-size:12px;line-height:1.55}.report{max-width:185mm;margin:auto}.title{text-align:center;border-bottom:3px solid #2563eb;padding-bottom:10px;margin-bottom:14px}.title h1{font-size:23px;margin:0 0 4px;color:#0f2b5b}.title p{margin:0;color:#64748b}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.kpi{border-radius:8px;padding:9px;color:#fff;min-height:62px}.kpi b{display:block;font-size:16px;margin-top:4px}.blue{background:#2563eb}.purple{background:#7c3aed}.orange{background:#c2410c}.green{background:#047857}.section{border:1px solid #dbe3ef;border-radius:8px;padding:10px;margin:10px 0;break-inside:avoid}.section h2{font-size:15px;color:#1d4ed8;margin:0 0 7px;border-bottom:1px solid #dbeafe;padding-bottom:4px}.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.charts img{width:100%;height:190px;object-fit:contain}.formula{white-space:pre-wrap;background:#f8fafc;border-left:4px solid #f59e0b;padding:9px;font-family:Arial,"Microsoft YaHei",sans-serif}.data{white-space:pre-wrap;font-size:11px;background:#f8fafc;padding:9px}.footer{margin-top:16px;text-align:center;color:#64748b;font-size:10px}@media print{.section{break-inside:avoid}}
+      </style></head><body><main class="report"><div class="title"><h1>外派薪酬包对比报告</h1><p>Expatriate Compensation Package Comparison Report</p><p>生成时间：${new Date().toLocaleString()}</p></div>
+      ${data ? `<div class="summary"><div class="kpi blue">国内年度总包<b>${data.homeAnnual.toFixed(2)}</b></div><div class="kpi purple">外派年度总包<b>${data.hostAnnual.toFixed(2)}</b></div><div class="kpi orange">成本差额<b>${(data.hostAnnual-data.homeAnnual).toFixed(2)}</b></div><div class="kpi green">外派津贴占比<b>${data.hostAnnual ? (data.hostExpatMonthly*12/data.hostAnnual*100).toFixed(1)+'%' : '0%'}</b></div></div>` : ''}
+      <section class="section"><h2>薪酬结构可视化</h2><div class="charts"><div><b>国内年度总包结构</b><img src="${homeImage}"/></div><div><b>外派年度总包结构</b><img src="${hostImage}"/></div></div><div><b>外派津贴构成</b><img src="${allowanceImage}" style="height:170px"/></div></section>
+      <section class="section"><h2>完整计算报告</h2><div class="formula">${esc(reportText)}</div></section>
+      <div class="footer">本报告由海外派遣员工薪酬包设计工具生成</div></main><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+      popup.document.close();
+    }
+
+    // =========================
+    // Event listeners
+    // =========================
+    document.addEventListener("DOMContentLoaded", () => {
+      // step nav
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const generateBtn = document.getElementById("generateBtn");
+      const copyBtn = document.getElementById("copyReportBtn");
+      const confirmBtn = document.getElementById("confirmStepBtn");
+      const dashboardGenerateBtn = document.getElementById("generateReportDashboardBtn");
+
+      if (dashboardGenerateBtn) {
+        dashboardGenerateBtn.addEventListener("click", () => {
+          generateReport(true);
+          dashboardGenerateBtn.textContent = addedUiText().updated;
+          setTimeout(() => { dashboardGenerateBtn.textContent = addedUiText().generate; }, 1800);
+        });
+      }
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener("click", () => {
+          confirmedSteps.add(currentStep);
+          renderDataPreview();
+          renderStepNav();
+          const status = document.getElementById('confirmStatus');
+          if (status) status.textContent = '本步已确认 / Confirmed';
+          alert('本步数据已确认。后续如需修改，请重新确认。\nThis step is confirmed. Reconfirm after editing.');
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          if (currentStep > 1) showStep(currentStep - 1);
+        });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          if (!confirmedSteps.has(currentStep)) {
+            alert('请先点击“确认本步数据”，再进入下一步。\nPlease confirm this step before continuing.');
+            return;
+          }
+          if (currentStep < maxStep) showStep(currentStep + 1);
+        });
+      }
+      if (generateBtn) {
+        generateBtn.addEventListener("click", () => {
+          showStep(7);
+          generateReport(false);
+        });
+      }
+      if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+          downloadPdfReport();
+        });
+      }
+
+      // language dropdown
+      const langToggle = document.getElementById("langToggle");
+      const langSelect = document.getElementById("langSelect");
+      if (langToggle && langSelect) {
+        langToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          langSelect.classList.toggle("open");
+        });
+        document.addEventListener("click", (e) => {
+          if (!langSelect.contains(e.target) && e.target !== langToggle) {
+            langSelect.classList.remove("open");
+          }
+        });
+        langSelect.querySelectorAll(".lang-option").forEach((opt) => {
+          opt.addEventListener("click", () => {
+            const lang = opt.getAttribute("data-lang");
+            if (!lang) return;
+            currentLang = lang;
+            langSelect
+              .querySelectorAll(".lang-option")
+              .forEach((o) => o.classList.remove("active"));
+            opt.classList.add("active");
+            langSelect.classList.remove("open");
+            applyTranslations();
+          });
+        });
+      }
+
+      applyTeacherPrefill();
+      showStep(1);
+      applyTranslations();
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第六章 · 全球薪酬体系的跨文化管理 / Global Compensation</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23162d4d'/%3E%3Ctext x='32' y='45' font-family='Segoe UI,Arial,sans-serif' font-size='38' font-weight='700' fill='%23f4884a' text-anchor='middle'%3E6%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --fs-base: clamp(17px, 1.15vw, 19px);
+    --c-primary:#162d4d;
+    --c-primary-light:#25528a;
+    --c-primary-bg:#e8f0fa;
+    --c-accent:#d95a1a;
+    --c-accent-light:#f4884a;
+    --c-accent-bg:#fde8d8;
+    --c-ink:#0f1b2d;
+    --c-sub:#3d4f63;
+    --c-line:#cbd5e1;
+    --c-shadow:0 1px 2px rgba(15,27,45,0.08);
+    --c-shadow-md:0 2px 8px rgba(15,27,45,0.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:var(--fs-base)}
+  body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f1f5f9;color:var(--c-ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--c-line);padding:.35rem 1.2rem;display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--c-sub)}
+  .topbar button{font-size:.72rem;padding:.22rem .7rem;border:none;background:var(--c-primary);color:#fff;border-radius:16px;cursor:pointer;transition:all .2s;font-weight:600}
+  .topbar button:hover{background:var(--c-primary-light)}
+  .topbar #pageNum{font-size:.85rem;color:var(--c-sub)}
+  .topbar select{padding:.25rem .5rem;border:1px solid var(--c-line);border-radius:6px;font-size:.78rem;background:#fff;cursor:pointer;max-width:340px}
+  .topbar .spacer{flex:1}
+  .topbar .mode-toggle{display:flex;gap:.2rem;background:#f1f5f9;padding:.2rem;border-radius:20px}
+  .topbar .mode-toggle button{background:transparent;color:var(--c-sub)}
+  .topbar .mode-toggle button.active{background:#fff;color:var(--c-primary);box-shadow:var(--c-shadow)}
+
+  .slide{margin:0 auto;padding:1.2rem 2.2rem 2.5rem;display:none;min-height:calc(100vh - 2.6rem)}
+  .slide.active{display:block}
+  .section-label{font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c-primary);border-left:4px solid var(--c-accent);padding-left:.5rem;margin-bottom:.4rem;font-weight:700}
+  .slide-title{font-size:clamp(1.5rem,2.2vw,1.9rem);line-height:1.15;color:var(--c-ink);margin-bottom:.4rem;font-weight:800}
+  .slide-title .en{display:block;font-weight:600}
+  .slide-title .zh{display:block;font-weight:400;color:var(--c-sub);margin-top:.15rem;font-size:.95rem}
+
+  .card{background:#fff;border-radius:10px;padding:.7rem .9rem;margin:.4rem 0;box-shadow:var(--c-shadow)}
+  .card.accent{background:linear-gradient(135deg,var(--c-accent-bg),#fff5ed)}
+  .card.primary{background:linear-gradient(135deg,var(--c-primary-bg),#f0f6fc)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.6rem 0}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin:.6rem 0}
+  .grid-2 .card,.grid-3 .card{margin:0}
+
+  .ph{border:2px dashed var(--c-line);border-radius:10px;background:repeating-linear-gradient(45deg,#f8fafc,#f8fafc 10px,#eef2f7 10px,#eef2f7 20px);display:flex;align-items:center;justify-content:center;color:var(--c-sub);padding:1.2rem;text-align:center;font-size:.85rem;min-height:120px}
+  .ph .ph-t{font-weight:700;color:var(--c-primary);display:block;margin-bottom:.2rem}
+
+  table.tbl{width:100%;border-collapse:collapse;font-size:.85rem;margin:.4rem 0;background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--c-shadow)}
+  table.tbl th,table.tbl td{border:1px solid var(--c-line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+  table.tbl th{background:var(--c-primary-bg);color:var(--c-primary);font-weight:700}
+
+  .concept{margin-top:.8rem;padding:.7rem 1rem;border-left:4px solid var(--c-accent);background:var(--c-accent-bg);border-radius:0 10px 10px 0;font-size:.92rem}
+  .concept .en{display:block;font-weight:600;color:#9a3412}
+  .concept .zh{display:block;color:#7c2d12;margin-top:.15rem}
+
+  .dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
+  .dlg-overlay.show{display:flex}
+  .dlg-win{background:#fff;border-radius:12px;width:860px;height:600px;max-width:94vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .dlg-titlebar{background:var(--c-primary);color:#fff;padding:.5rem .9rem;display:flex;align-items:center;gap:.5rem}
+  .dlg-titlebar button{margin-left:auto;background:transparent;border:none;color:#fff;font-size:1rem;cursor:pointer}
+  .dlg-body{flex:1}
+  .dlg-body iframe{width:100%;height:100%;border:none}
+
+  /* ===== Slide 1 hero animation ===== */
+  .hero{position:relative;background:radial-gradient(ellipse at 70% 30%,#123d4b 0%,#0a2634 60%,#061a24 100%);border-radius:14px;overflow:hidden;min-height:calc(100vh - 6rem);color:#f6f4ee;display:flex;flex-direction:column;padding:0}
+  .hero-head{flex:0 0 auto;text-align:center;padding:1.6rem 2rem 1rem;z-index:3}
+  .hero-head .eyebrow{color:#d6a956;font-size:.85rem;letter-spacing:.3em;font-weight:700;margin-bottom:.4rem}
+  .hero-head h2{font-size:1.9rem;font-weight:800;color:#fff;line-height:1.2}
+  .hero-head h2 em{color:#d6a956;font-style:normal}
+  .hero-body{flex:1;position:relative;display:flex;align-items:center}
+  .hero-scene{position:absolute;inset:0;display:grid;grid-template-columns:1.05fr .95fr;gap:1rem;align-items:center;opacity:0;visibility:hidden;transform:translateX(30px) scale(1.02);transition:opacity .9s ease,transform 1.2s cubic-bezier(.22,.7,.2,1),visibility .9s;padding:0 3rem}
+  .hero-scene.active{opacity:1;visibility:visible;transform:translateX(0) scale(1)}
+  .hero-kicker{color:#d6a956;font-size:1rem;letter-spacing:.25em;font-weight:700;margin-bottom:1.2rem;opacity:0;transform:translateY(12px)}
+  .hero-title{font-size:clamp(2.2rem,3.6vw,3.2rem);line-height:1.15;font-weight:800;color:#fff;margin-bottom:1.4rem;opacity:0;transform:translateY(16px)}
+  .hero-title em{color:#d6a956;font-style:normal}
+  .hero-desc{font-size:1.15rem;line-height:1.7;color:#c8d6da;max-width:620px;margin-bottom:1.5rem;opacity:0;transform:translateY(16px)}
+  .hero-tag{display:inline-block;padding:.45rem 1.1rem;border:1px solid #d6a956;border-radius:22px;color:#f0d59c;font-size:.95rem;opacity:0;transform:translateY(16px)}
+  .hero-scene.active .hero-kicker{animation:hero-rise 1s .2s forwards}
+  .hero-scene.active .hero-title{animation:hero-rise 1s .5s forwards}
+  .hero-scene.active .hero-desc{animation:hero-rise 1s .8s forwards}
+  .hero-scene.active .hero-tag{animation:hero-rise 1s 1.1s forwards}
+  @keyframes hero-rise{to{opacity:1;transform:translateY(0)}}
+  .hero-svg{width:100%;max-width:680px;height:auto;justify-self:center}
+  .hero-svg text{font-family:inherit;font-weight:600}
+  .hero-svg .ill-line{fill:none;stroke:#d6a956;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600}
+  .hero-scene.active .ill-line{animation:draw 2.2s .4s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .hero-svg .ill-fill{fill:rgba(214,169,86,.15);opacity:0}
+  .hero-scene.active .ill-fill{animation:fade-in 1.5s .8s forwards}
+  @keyframes fade-in{to{opacity:1}}
+  .hero-svg .ill-dot{fill:#d6a956;opacity:0}
+  .hero-scene.active .ill-dot{animation:fade-in 1s 1.2s forwards}
+  .hero-dots{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:5}
+  .hero-dots span{width:10px;height:10px;border-radius:50%;background:rgba(246,244,238,.25);cursor:pointer;transition:all .3s}
+  .hero-dots span.on{background:#d6a956;transform:scale(1.3)}
+  .hero-skip{position:absolute;bottom:1.2rem;right:1.5rem;z-index:5;background:transparent;border:1px solid rgba(246,244,238,.3);color:#c8d6da;padding:.35rem 1rem;border-radius:20px;font-size:.9rem;cursor:pointer}
+  .hero-skip:hover{background:rgba(214,169,86,.15);color:#f0d59c;border-color:#d6a956}
+  .hero-progress{position:absolute;top:0;left:0;height:3px;background:#d6a956;width:0;z-index:4}
+  .hero-scene.active .hero-progress{animation:hero-progress 5s linear forwards}
+  @keyframes hero-progress{to{width:100%}}
+
+  /* ===== Slide 9 knowledge mind map ===== */
+  .mm-chapters{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:.2rem 0 .7rem}
+  .mm-chbtn{padding:.45rem 1rem;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:.92rem;cursor:pointer;transition:transform .15s;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+  .mm-chbtn:hover{transform:translateY(-2px)}
+  .mm-chbtn.on{outline:3px solid #162d4d;outline-offset:2px;transform:translateY(-2px)}
+  .mm-stage{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:.4rem;min-height:420px;position:relative;overflow:hidden}
+  .mm-svg{width:100%;height:auto;display:block}
+  .mm-svg .mm-center{fill:#162d4d}
+  .mm-svg .mm-center-t{fill:#fff;font-weight:800;font-size:20px;text-anchor:middle;font-family:inherit}
+  .mm-svg .mm-center-s{fill:#cbd5e1;font-size:11px;text-anchor:middle;font-family:inherit}
+  .mm-svg .mm-branch{fill-opacity:.95;stroke-width:2.5}
+  .mm-svg .mm-branch-t{fill:#fff;font-weight:800;font-size:17px;text-anchor:middle;font-family:inherit}
+  .mm-svg .mm-leaf{fill:#fff;stroke:#475569;stroke-width:1.5}
+  .mm-svg .mm-leaf-t{fill:#0f172a;font-size:14px;text-anchor:middle;font-family:inherit;font-weight:700}
+  .mm-svg .mm-link{fill:none;stroke:#94a3b8;stroke-width:1.5;stroke-dasharray:3 3}
+
+  @media print{.topbar{display:none}}</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span id="navLabel" style="font-weight:700">第六章 · 全球薪酬体系</span>
+  <span id="pageNum">1 / 15</span>
+  <button id="btnPrev">← 上一页</button>
+  <button id="btnNext">下一页 →</button>
+  <select id="pageJump"><option value="-1">跳转…</option></select>
+  <span class="spacer"></span>
+  <div class="mode-toggle">
+    <button id="btnClass" class="active">课堂</button>
+    <button id="btnSelf">自主</button>
+  </div>
+</div>
+
+<!-- 1 封面 -->
+<section class="slide" data-slide="1">
+  <div class="hero" id="heroBox">
+    <div class="hero-progress" id="heroProgress"></div>
+    <div class="hero-head">
+      <div class="eyebrow">CHAPTER 6 · GLOBAL COMPENSATION SYSTEM</div>
+      <h2>全球薪酬体系的<em>跨文化管理</em></h2>
+    </div>
+    <div class="hero-body">
+
+    <!-- Scene 0: 开场 世界地图 -->
+    <div class="hero-scene active" data-hscene="0">
+      <div>
+        <div class="hero-kicker">ACT 00 · OPENING</div>
+        <h3 class="hero-title">从深圳到东京到曼谷，<br>薪酬是一门<em>翻译学</em></h3>
+        <p class="hero-desc">当一家企业走向世界，薪酬不再只是工资单——它是文化、制度与人心的跨文化翻译。</p>
+        <span class="hero-tag">5 幕 · 从案例到设计</span>
+      </div>
+      <svg class="hero-svg" viewBox="0 0 520 380">
+        <circle cx="260" cy="190" r="150" fill="none" stroke="rgba(214,169,86,.2)" stroke-width="1"/>
+        <ellipse cx="260" cy="190" rx="150" ry="60" fill="none" stroke="rgba(214,169,86,.15)" stroke-width="1"/>
+        <ellipse cx="260" cy="190" rx="60" ry="150" fill="none" stroke="rgba(214,169,86,.15)" stroke-width="1"/>
+        <path class="ill-line" d="M120 170 C180 110, 280 110, 340 150 S440 200, 460 180"/>
+        <path class="ill-line" d="M120 210 C200 260, 320 260, 400 220" style="animation-delay:.8s"/>
+        <circle class="ill-dot" cx="120" cy="170" r="7"/>
+        <circle class="ill-dot" cx="340" cy="150" r="7" style="animation-delay:1.4s"/>
+        <circle class="ill-dot" cx="460" cy="180" r="7" style="animation-delay:1.8s"/>
+        <text x="120" y="152" fill="#f0d59c" font-size="18" text-anchor="middle">深圳</text>
+        <text x="340" y="132" fill="#f0d59c" font-size="18" text-anchor="middle">东京</text>
+        <text x="460" y="162" fill="#f0d59c" font-size="18" text-anchor="middle">曼谷</text>
+      </svg>
+    </div>
+
+    <!-- Scene 1: 两次并购 -->
+    <div class="hero-scene" data-hscene="1">
+      <div>
+        <div class="hero-kicker">ACT 01 · TWO CASES</div>
+        <h3 class="hero-title">两次并购，<br>两种<em>融合难题</em></h3>
+        <p class="hero-desc">海尔并购三洋的双轨制选择，思和科技跨国并购的薪酬整合——文化差异如何决定薪酬方案的生死。</p>
+        <span class="hero-tag">文本案例 + 视频互动案例</span>
+      </div>
+      <svg class="hero-svg" viewBox="0 0 520 380">
+        <circle cx="180" cy="190" r="80" fill="rgba(214,169,86,.08)" stroke="#d6a956" stroke-width="2"/>
+        <circle cx="340" cy="190" r="80" fill="rgba(214,169,86,.08)" stroke="#d6a956" stroke-width="2"/>
+        <path class="ill-line" d="M260 190 L260 190" style="stroke-width:3"/>
+        <text x="180" y="185" fill="#f0d59c" font-size="22" text-anchor="middle" font-weight="700">海尔</text>
+        <text x="180" y="210" fill="#c8d6da" font-size="15" text-anchor="middle">三洋电器</text>
+        <text x="340" y="185" fill="#f0d59c" font-size="22" text-anchor="middle" font-weight="700">思和</text>
+        <text x="340" y="210" fill="#c8d6da" font-size="15" text-anchor="middle">跨国并购</text>
+        <path class="ill-line" d="M180 110 C180 80, 260 70, 260 100" style="animation-delay:.6s"/>
+        <path class="ill-line" d="M340 270 C340 300, 260 310, 260 280" style="animation-delay:.9s"/>
+      </svg>
+    </div>
+
+    <!-- Scene 2: 三类雇员 -->
+    <div class="hero-scene" data-hscene="2">
+      <div>
+        <div class="hero-kicker">ACT 02 · THREE EMPLOYEE TYPES</div>
+        <h3 class="hero-title">PCN · HCN · TCN<br>谁被<em>派出去</em>，谁被<em>留下来</em></h3>
+        <p class="hero-desc">母国外派、东道国本地、第三国国籍——三维分类决定了薪酬包的起点、税负极与回任安排。</p>
+        <span class="hero-tag">国籍 × 任期 × 雇主</span>
+      </div>
+      <svg class="hero-svg" viewBox="0 0 520 380">
+        <circle cx="260" cy="190" r="46" class="ill-fill" stroke="#d6a956" stroke-width="2"/>
+        <text x="260" y="196" fill="#f0d59c" font-size="18" text-anchor="middle" font-weight="700">企业</text>
+        <circle cx="130" cy="110" r="36" fill="rgba(59,130,246,.2)" stroke="#60a5fa" stroke-width="2.5"/>
+        <text x="130" y="108" fill="#93c5fd" font-size="16" text-anchor="middle" font-weight="700">PCN</text>
+        <text x="130" y="126" fill="#c8d6da" font-size="13" text-anchor="middle">母国外派</text>
+        <circle cx="390" cy="110" r="36" fill="rgba(34,197,94,.2)" stroke="#4ade80" stroke-width="2.5"/>
+        <text x="390" y="108" fill="#86efac" font-size="16" text-anchor="middle" font-weight="700">HCN</text>
+        <text x="390" y="126" fill="#c8d6da" font-size="13" text-anchor="middle">东道国本地</text>
+        <circle cx="260" cy="300" r="36" fill="rgba(249,115,22,.2)" stroke="#fb923c" stroke-width="2.5"/>
+        <text x="260" y="298" fill="#fdba74" font-size="16" text-anchor="middle" font-weight="700">TCN</text>
+        <text x="260" y="316" fill="#c8d6da" font-size="13" text-anchor="middle">第三国国籍</text>
+        <path class="ill-line" d="M160 130 L220 165" style="stroke:#60a5fa"/>
+        <path class="ill-line" d="M360 130 L300 165" style="stroke:#4ade80;animation-delay:.4s"/>
+        <path class="ill-line" d="M260 264 L260 236" style="stroke:#fb923c;animation-delay:.8s"/>
+      </svg>
+    </div>
+
+    <!-- Scene 3: 薪酬包 -->
+    <div class="hero-scene" data-hscene="3">
+      <div>
+        <div class="hero-kicker">ACT 03 · COMPENSATION PACKAGE</div>
+        <h3 class="hero-title">平衡表法：<br>每一项都<em>有讲究</em></h3>
+        <p class="hero-desc">基本工资、住房、COLA、税务平衡、探亲机票、艰苦津贴、回任安置——不是简单加薪，而是一整套跨文化算账。</p>
+        <span class="hero-tag">Balance Sheet Approach</span>
+      </div>
+      <svg class="hero-svg" viewBox="0 0 520 380">
+        <rect x="70" y="55" width="380" height="270" rx="12" fill="rgba(246,244,238,.05)" stroke="#d6a956" stroke-width="2"/>
+        <text x="260" y="88" fill="#f0d59c" font-size="18" text-anchor="middle" font-weight="700">外派薪酬包</text>
+        <rect x="90" y="108" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="170" y="137" fill="#f6f4ee" font-size="15" text-anchor="middle">基本工资</text>
+        <rect x="270" y="108" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="350" y="137" fill="#f6f4ee" font-size="15" text-anchor="middle">住房补贴</text>
+        <rect x="90" y="168" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="170" y="197" fill="#f6f4ee" font-size="15" text-anchor="middle">COLA 生活成本</text>
+        <rect x="270" y="168" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="350" y="197" fill="#f6f4ee" font-size="15" text-anchor="middle">税务平衡</text>
+        <rect x="90" y="228" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="170" y="257" fill="#f6f4ee" font-size="15" text-anchor="middle">探亲机票</text>
+        <rect x="270" y="228" width="160" height="46" rx="6" fill="rgba(214,169,86,.15)" stroke="#d6a956" stroke-width="1.2"/>
+        <text x="350" y="257" fill="#f6f4ee" font-size="15" text-anchor="middle">艰苦 / 回任</text>
+      </svg>
+    </div>
+
+    <!-- Scene 4: 收尾 -->
+    <div class="hero-scene" data-hscene="4">
+      <div>
+        <div class="hero-kicker">FINALE · FROM CASE TO DESIGN</div>
+        <h3 class="hero-title">为外派者，<br>设计一份<em>走得出去、回得来</em>的薪酬</h3>
+        <p class="hero-desc">两个案例、三维分类、一整套平衡表——最后，用你自己的感悟视频，为这门课收尾。</p>
+        <span class="hero-tag">开始本章之旅 →</span>
+      </div>
+      <svg class="hero-svg" viewBox="0 0 520 380">
+        <circle cx="260" cy="190" r="150" fill="none" stroke="rgba(214,169,86,.2)" stroke-width="1.5"/>
+        <path class="ill-line" d="M130 200 C180 140, 340 140, 390 200"/>
+        <text x="150" y="180" fill="#f0d59c" font-size="30" font-weight="700">¥</text>
+        <text x="230" y="148" fill="#f0d59c" font-size="30" font-weight="700">$</text>
+        <text x="310" y="180" fill="#f0d59c" font-size="30" font-weight="700">€</text>
+        <text x="380" y="230" fill="#f0d59c" font-size="30" font-weight="700">£</text>
+        <circle class="ill-dot" cx="260" cy="190" r="10"/>
+      </svg>
+    </div>
+
+    </div><!-- /.hero-body -->
+
+    <div class="hero-dots" id="heroDots"></div>
+    <button class="hero-skip" id="heroSkip">跳过动画 →</button>
+  </div>
+</section>
+
+<!-- 2 学习路径 -->
+<section class="slide" data-slide="2">
+  <div class="section-label">Learning Path · 学习路径</div>
+  <h1 class="slide-title">
+    <span class="en">Three steps from case to design</span>
+    <span class="zh">从案例到设计：三步走完本章</span>
+  </h1>
+  <div class="grid-3">
+    <div class="card primary"><b>6.1 案例</b><br><span style="color:var(--c-sub);font-size:.85rem">海尔并购三洋 · 思和科技跨国并购<br>薪酬整合难题</span></div>
+    <div class="card primary"><b>6.2 战略</b><br><span style="color:var(--c-sub);font-size:.85rem">独立核算 vs 全球统一<br>两种薪酬体系的优劣</span></div>
+    <div class="card primary"><b>6.3 外派包</b><br><span style="color:var(--c-sub);font-size:.85rem">Balance Sheet 资金平衡法<br>COLA / 住房 / 艰苦津贴计算</span></div>
+  </div>
+</section>
+
+<!-- 3 6.1 转场 -->
+<section class="slide" data-slide="3">
+  <div class="section-label">6.1 · 案例分析 · Case Studies</div>
+  <h1 class="slide-title">
+    <span class="en">Two M&amp;A compensation integration cases</span>
+    <span class="zh">两个并购后的薪酬整合案例</span>
+  </h1>
+  <div class="grid-2">
+    <div class="card accent"><b>案例 1 · 海尔并购三洋电器</b><br><span style="font-size:.85rem;color:var(--c-sub)">Haier's Compensation Incentive Reform after Acquiring Sanyo（文本案例）</span></div>
+    <div class="card accent"><b>案例 2 · 思和科技跨国并购</b><br><span style="font-size:.85rem;color:var(--c-sub)">Sihe Technology's Cross-border M&amp;A Compensation Integration（视频互动案例）</span></div>
+  </div>
+</section>
+
+<!-- 4 案例1 海尔三洋 -->
+<section class="slide" data-slide="4">
+  <div class="section-label"><span style="background:#fbbf24;padding:.1rem .4rem;border-radius:6px;margin-right:.3rem">案例 1</span>海尔并购三洋电器 · 薪酬激励变革</div>
+  <h1 class="slide-title">
+    <span class="en">Haier × Sanyo: Read the case, answer as you go</span>
+    <span class="zh">读案例 · 分段解锁</span>
+  </h1>
+
+  <style>
+    .sq-q{font-size:.9rem;font-weight:700;line-height:1.5;margin-bottom:.35rem;color:#162d4d}
+    .sq-opts{display:flex;flex-direction:column;gap:.28rem}
+    .sq-opt{padding:.35rem .6rem;border:1.5px solid #cbd5e1;border-radius:8px;cursor:pointer;font-size:.85rem;line-height:1.4;transition:all .15s;background:#fff}
+    .sq-opt:hover{border-color:#162d4d;background:#f1f5f9}
+    .sq-opt.picked{border-color:#162d4d;background:#dbeafe;font-weight:700}
+    .sq-opt.right{border-color:#059669;background:#d1fae5;font-weight:700}
+    .sq-opt.wrong{border-color:#dc2626;background:#fee2e2}
+    .match-row,.sort-row{display:grid;grid-template-columns:1fr 1.1fr;gap:.4rem;align-items:center;margin:.3rem 0;font-size:.83rem}
+    .match-row .term,.sort-row .item{background:#e8f0fa;color:#162d4d;padding:.32rem .55rem;border-radius:8px;font-weight:600;line-height:1.35}
+    .match-row select,.sort-row select{padding:.3rem .45rem;border:1.5px solid #cbd5e1;border-radius:8px;font-size:.82rem;background:#fff;cursor:pointer;font-family:inherit}
+    .match-row select.ok,.sort-row select.ok{border-color:#059669;background:#d1fae5}
+    .match-row select.bad,.sort-row select.bad{border-color:#dc2626;background:#fee2e2}
+    .hs-think{margin-top:.4rem}
+    .hs-think textarea{width:100%;min-height:72px;border:2px solid #cbd5e1;border-radius:10px;padding:.55rem .75rem;font-size:.98rem;line-height:1.7;font-family:inherit;resize:vertical;background:#f8fafc;color:#162d4d;font-weight:500;transition:border-color .2s,box-shadow .2s}
+    .hs-think textarea:focus{outline:none;border-color:#d95a1a;box-shadow:0 0 0 3px rgba(217,90,26,.15);background:#fff}
+    .hs-think-foot{display:flex;align-items:center;gap:.6rem;margin-top:.35rem}
+    .hs-think-submit{background:#d95a1a;color:#fff;border:none;border-radius:9px;padding:.35rem 1.1rem;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 3px 0 #a84310;transition:transform .1s,box-shadow .1s}
+    .hs-think-submit:active{transform:translateY(2px);box-shadow:0 1px 0 #a84310}
+    .hs-think-status{font-size:.76rem;color:#059669;font-weight:700;opacity:0;transition:opacity .3s}
+    .hs-think-status.saved{opacity:1}
+    .hs-think-hint{font-size:.74rem;color:#64748b;line-height:1.5;margin-top:.3rem}
+    .q-submit{margin-top:.5rem;background:#162d4d;color:#fff;border:none;border-radius:18px;padding:.32rem 1.1rem;font-size:.82rem;font-weight:700;cursor:pointer;box-shadow:var(--c-shadow);transition:all .2s}
+    .q-submit:hover{background:#25528a}
+    .q-fb{margin-top:.5rem;padding:.5rem .7rem;border-radius:10px;font-size:.83rem;line-height:1.55;display:none}
+    .q-fb.show{display:block}
+    .q-fb.good{background:linear-gradient(135deg,#d1fae5,#ecfdf5);color:#065f46}
+    .q-fb.try{background:linear-gradient(135deg,#fde8d8,#fff7ed);color:#9a3412}
+    .q-fb .ans{font-weight:700;display:block;margin-bottom:.2rem}
+    .r-tabs{display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0 .6rem}
+    .r-tab{padding:.3rem .8rem;border-radius:16px;border:1.5px solid #cbd5e1;background:#fff;cursor:pointer;font-size:.78rem;font-weight:700;color:#64748b;transition:all .15s}
+    .r-tab:hover{border-color:#162d4d;color:#162d4d}
+    .r-tab.active{background:#162d4d;color:#fff;border-color:#162d4d}
+    .r-pane{display:none}
+    .r-pane.active{display:block}
+    /* slide 6 3D 彩色大 tab */
+    .c6-bigtab{padding:.55rem 1.1rem;border:none;border-radius:10px;color:#fff;font-size:.92rem;font-weight:700;cursor:pointer;transition:transform .1s,box-shadow .1s;letter-spacing:.5px;opacity:.55}
+    .c6-bigtab.active{opacity:1;transform:translateY(2px)}
+    .c6-bigtab:hover{opacity:.85}
+    .c6-ev-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.55rem .7rem;font-size:.9rem;line-height:1.5;color:#162d4d;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.04);display:flex;align-items:center;gap:.5rem}
+    .c6-ev-card.cat-a{border-left:4px solid #3b82f6;background:#eff6ff}
+    .c6-ev-card.cat-b{border-left:4px solid #ef4444;background:#fef2f2}
+    .c6-ev-card.cat-c{border-left:4px solid #f59e0b;background:#fffbeb}
+    .c6-ev-card .ev-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+    .c6-ev-card .dd{position:static;flex-shrink:0}
+    .c6-ev-card .badge{display:inline-block;font-size:.7rem;padding:.05rem .35rem;border-radius:4px;margin-right:.3rem;font-weight:700}
+    .c6-cat-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:.5rem .65rem;font-size:.88rem;line-height:1.45;color:#162d4d;position:relative;display:flex;align-items:center;gap:.5rem;min-height:70px}
+    .c6-cat-card.is-true{border-color:#10b981;background:#ecfdf5}
+    .c6-cat-card.is-false{border-color:#cbd5e1;background:#f1f5f9;opacity:.75}
+    .c6-cat-card .cat-text{flex:1;min-width:0}
+    .c6-cat-card .dd{position:static;flex-shrink:0}
+    .c6-dd{position:relative;display:inline-block}
+    .c6-dd-btn{background:#162d4d;color:#fff;border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;padding:0}
+    .c6-dd-menu{position:absolute;bottom:30px;right:0;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.15);min-width:180px;z-index:50;display:none}
+    .c6-dd-menu button{display:block;width:100%;text-align:left;padding:.45rem .7rem;background:none;border:none;font-size:.8rem;color:#162d4d;cursor:pointer}
+    .c6-dd-menu button:hover{background:#eff6ff}
+    .c6-dd.open .c6-dd-menu{display:block}
+  </style>
+
+  <div style="display:flex;gap:.7rem;margin-top:.2rem;height:calc(100vh - 200px)">
+    <!-- 左：原文 -->
+    <div style="flex:1.35;display:flex;flex-direction:column">
+      <div style="display:flex;gap:.4rem;margin-bottom:.35rem">
+        <button class="hs6-stage" data-stage="1" style="flex:1;padding:.45rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#162d4d,#2d4a7a);box-shadow:0 4px 12px rgba(22,45,77,.35)">📖 一 · 两种基因的相遇与冲突</button>
+        <button class="hs6-stage" data-stage="2" style="flex:1;padding:.45rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#9a3412,#c2501d);box-shadow:0 4px 12px rgba(154,52,18,.35)">🔧 二 · 破局与薪酬改革</button>
+        <button class="hs6-stage" data-stage="3" style="flex:1;padding:.45rem;border-radius:12px;border:none;cursor:pointer;font-size:.82rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#5b21b6,#7c3aed);box-shadow:0 4px 12px rgba(91,33,182,.35)">🌟 三 · 淘汰退休与启示</button>
+      </div>
+      <div id="hs6Text" style="flex:1;border:2px solid #cbd5e1;border-radius:12px;padding:.8rem 1rem;overflow-y:auto;background:#fafbfc;line-height:1.8;font-size:.95rem;color:#0f1b2d">
+        <div id="hs6T1">
+          <b>① 并购背景：两种基因的相遇</b><br><br>
+          2012 年海尔从松下手中收购三洋在日本、印尼、马来西亚、菲律宾和越南的家电业务。三洋 1947 年由井植岁男创立，是日本二战后企业的典型——<b>终身雇佣制、平均主义、年功序列</b>，强调对员工的关怀。<br><br>
+          海尔这边，张瑞敏 2005 年提出"<b>人单合一</b>"：员工拥有现场决策权、用人权、分配权，是动态合伙人；"单"就是用户价值，"合一"指员工价值与用户价值合一，<b>薪酬取决于为用户创造的价值</b>，还配套小比例自我淘汰。<br><br>
+          <b>② 冲突：硬推行不通</b><br><br>
+          把人单合一直接搬到日本？日方员工<b>明确抵制</b>——他们觉得被收购了也该被一直"照顾"，不接受被淘汰。更难的是<b>日本工会</b>：它不仅关注福利，更关注"公平"，而工会要的公平是<b>"结果公平"</b>——"对企业贡献大的员工和贡献小的员工拿差不多的工资，这对贡献大的员工公平吗？"<br><br>
+          中方团队靠"居酒屋之行"才慢慢听懂日方的顾虑。但并非所有日方都反对：<b>年轻员工</b>反而支持，他们想凭本事获得公平的报酬和晋升。
+        </div>
+        <div id="hs6T2" style="display:none">
+          <b>③ 破局思路：沙拉式融合</b><br><br>
+          2013 年整合方案讨论会上，中方认定：直接移植不行，全守旧也不行。张瑞敏说这是<b>"沙拉式文化融合"</b>——蔬菜是各国文化，沙拉酱是统一的<b>人单合一</b>。<br><br>
+          第一招<b>双轨制</b>：日方员工<b>自愿选择</b>是否签约对赌，不签的照旧拿老薪酬（12 个月固定 + 4 个月固定奖金 = 16 薪）。先签约的人拿高回报，主动向同事分享经验，越来越多人跟着签。<br><br>
+          第二招<b>虚拟小微</b>：研发从按功能划分改为<b>项目制</b>，基层员工只要机会被认可，就能跨部门临时组队抢市场。冷藏保鲜技术就是在这种小微里长出来的。<br><br>
+          同时中方把"管理"改叫<b>"经营"</b>——管理者为员工提供资源，而不是居高临下下命令。<br><br>
+          <b>④ 数字：薪酬怎么改</b><br><br>
+          并购前三洋是<b>16 薪</b>（12 固定 + 4 固定），按资历发。日本链群改成：<b>14 个月工资 ÷ 12 作为月基本工资</b>，奖金包放大、上不封顶，<b>评价权交给用户</b>。<br><br>
+          2020 年，基层员工<b>小岛</b>为日本郊区 K 渠道（类似国美、五星）做定制方案，冷柜在 K 渠道销售增长 <b>234%</b>，他本人上半年薪酬增长 <b>126%</b>。"这在过去，日本员工是很难想象的。"
+        </div>
+        <div id="hs6T3" style="display:none">
+          <b>⑤ 淘汰与退休：不裁人，但有流动</b><br><br>
+          年功序列下，员工不用担心被解雇、也没动力创新。中方改革<b>不是直接解雇</b>：不适合岗位的员工<b>轮岗</b>，或根据业绩推荐到其他公司工作——"我们不能为了淘汰而淘汰，要从经营角度为员工考虑。"<br><br>
+          退休制度也改了：日方员工 60 岁退休后想留到 65 岁，原企业只能给很少工资。海尔日本链群尝试<b>返聘</b>退休员工，按其创造的价值发薪，高的可达退休前的 <b>80% 甚至 100%</b>——既保留经验，又在日本社会挣到好名声。<br><br>
+          <b>⑥ 尾声</b><br><br>
+          刘社长总结：人单合一作为"沙拉酱"，没有固定模式，要根据每个国家的文化制度、民族心理、经济状况选择适宜的整合方式。富士通等国际企业也开始引入人单合一。
+        </div>
+      </div>
+      <button id="hs6Read" style="margin-top:.35rem;padding:.45rem;border-radius:20px;border:none;background:var(--c-primary);color:#fff;cursor:pointer;font-size:.85rem">我读完这段了，去做题 📝</button>
+    </div>
+
+    <!-- 右：题目 -->
+    <div style="flex:1;border:2px solid #cbd5e1;border-radius:12px;padding:.7rem .9rem;background:#fff;overflow-y:auto">
+
+      <div id="hs6Q1" class="hs6-quiz" style="display:none">
+        <div style="font-size:.92rem;font-weight:800;color:#162d4d;margin-bottom:.2rem">📝 阶段一 · 背景与冲突</div>
+        <div class="r-tabs">
+          <button class="r-tab active" data-rp="q1">Q1 多选</button>
+          <button class="r-tab" data-rp="q2">Q2 单选</button>
+        </div>
+
+        <div class="r-pane active" data-rp="q1">
+          <div class="sq">
+            <div class="sq-q">Q1. 日方员工抵制"人单合一"，主要原因有哪些？（多选）</div>
+            <div class="sq-opts" data-multi="1" data-correct="A,B,C,E" data-expl="原文：日方员工认为被收购了也该被长期照顾、不接受淘汰；工会坚持'结果公平'；'被管理'在尊严上让他们抵触。D 选项'语言不通'原文未提。">
+              <div class="sq-opt" data-key="A">A. 终身雇佣信念：觉得被收购了也该被一直养着</div>
+              <div class="sq-opt" data-key="B">B. 年功序列习惯：不接受按用户价值付薪、按能力淘汰</div>
+              <div class="sq-opt" data-key="C">C. 工会立场：要"结果公平"，反对贡献拉开差距</div>
+              <div class="sq-opt" data-key="D">D. 语言不通：看不懂中文文件</div>
+              <div class="sq-opt" data-key="E">E. "被管理"伤尊严：对自上而下的改革有心理抵触</div>
+            </div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q2">
+          <div class="sq">
+            <div class="sq-q">Q2. 日本工会要的"公平"，本质是哪种？（单选）</div>
+            <div class="sq-opts" data-multi="0" data-correct="B" data-expl="原文：'工会所关注的公平是结果公平。在这种公平下，对企业贡献大的员工和贡献小的员工拿差不多的工资。'">
+              <div class="sq-opt" data-key="A">A. 机会公平：规则一致，多劳多得</div>
+              <div class="sq-opt" data-key="B">B. 结果公平：贡献大与贡献小的人拿差不多的钱</div>
+              <div class="sq-opt" data-key="C">C. 程序公平：只要流程合规就行</div>
+            </div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hs6Q2" class="hs6-quiz" style="display:none">
+        <div style="font-size:.92rem;font-weight:800;color:#9a3412;margin-bottom:.2rem">📝 阶段二 · 破局与薪酬改革</div>
+        <div class="r-tabs">
+          <button class="r-tab active" data-rp="q3">Q3 匹配</button>
+          <button class="r-tab" data-rp="q4">Q4 思考</button>
+          <button class="r-tab" data-rp="q5">Q5 单选</button>
+          <button class="r-tab" data-rp="q6">Q6 多选</button>
+        </div>
+
+        <div class="r-pane active" data-rp="q3">
+          <div class="sq">
+            <div class="sq-q">Q3. 把术语和解释对应起来：</div>
+            <div class="match-row" data-ans="0"><div class="term">双轨制</div><select><option value="">— 选解释 —</option><option>员工自愿签约对赌，不签的照旧拿老薪酬</option><option>研发改项目制，基层也能组队抢机会</option><option>各国文化是蔬菜，人单合一是沙拉酱</option><option>管理者给员工提供资源，而非居高临下</option></select></div>
+            <div class="match-row" data-ans="1"><div class="term">虚拟小微</div><select><option value="">— 选解释 —</option><option>员工自愿签约对赌，不签的照旧拿老薪酬</option><option>研发改项目制，基层也能组队抢机会</option><option>各国文化是蔬菜，人单合一是沙拉酱</option><option>管理者给员工提供资源，而非居高临下</option></select></div>
+            <div class="match-row" data-ans="2"><div class="term">沙拉式融合</div><select><option value="">— 选解释 —</option><option>员工自愿签约对赌，不签的照旧拿老薪酬</option><option>研发改项目制，基层也能组队抢机会</option><option>各国文化是蔬菜，人单合一是沙拉酱</option><option>管理者给员工提供资源，而非居高临下</option></select></div>
+            <div class="match-row" data-ans="3"><div class="term">"经营"而非"管理"</div><select><option value="">— 选解释 —</option><option>员工自愿签约对赌，不签的照旧拿老薪酬</option><option>研发改项目制，基层也能组队抢机会</option><option>各国文化是蔬菜，人单合一是沙拉酱</option><option>管理者给员工提供资源，而非居高临下</option></select></div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q4">
+          <div class="hs-think">
+            <div class="sq-q">Q4. 为什么海尔选"双轨制"自愿签约，而不是全员一次性推行人单合一？（引案例细节写几句）</div>
+            <textarea id="c6_hw1" placeholder="提示：①直接推会触发什么抵触？②工会与法律风险？③让先签约的人拿高回报有什么用？"></textarea>
+            <div class="hs-think-foot">
+              <button class="hs-think-submit" data-hw="c6_hw1">提交保存</button>
+              <span class="hs-think-status">已保存 ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q5">
+          <div class="sq">
+            <div class="sq-q">Q5. 小岛冷柜销售 +234%、个人薪酬 +126%，说明新薪酬制度的关键设计是？（单选）</div>
+            <div class="sq-opts" data-multi="0" data-correct="B" data-expl="原文：奖金上不封顶、围绕不同岗位定评价标准、把评价权交给用户。这正是'按用户价值付薪'的落地。">
+              <div class="sq-opt" data-key="A">A. 全员普涨工资</div>
+              <div class="sq-opt" data-key="B">B. 奖金与用户价值/业绩强挂钩，上不封顶，评价权交给用户</div>
+              <div class="sq-opt" data-key="C">C. 把 16 薪直接砍成 12 薪</div>
+              <div class="sq-opt" data-key="D">D. 给小岛个人发一次性红包</div>
+            </div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q6">
+          <div class="sq">
+            <div class="sq-q">Q6. 哪类日方员工最可能自愿签约双轨制对赌？（多选）</div>
+            <div class="sq-opts" data-multi="1" data-correct="A,B,E" data-expl="原文：年轻基层员工想凭本事拿公平报酬；看到样板后老员工主动加入；有能力没拿到公平报酬的技术骨干也是天然支持者。C（临近退休求稳）和 D（工会主张结果公平）是反方。">
+              <div class="sq-opt" data-key="A">A. 想干事、但被年功序列压着的基层年轻人</div>
+              <div class="sq-opt" data-key="B">B. 看到小岛 +126% 后心动、想改变固定薪资的老员工</div>
+              <div class="sq-opt" data-key="C">C. 临近退休、求稳的骨干</div>
+              <div class="sq-opt" data-key="D">D. 工会里主张"结果公平"的委员</div>
+              <div class="sq-opt" data-key="E">E. 有能力但一直没拿到公平报酬的技术骨干</div>
+            </div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hs6Q3" class="hs6-quiz" style="display:none">
+        <div style="font-size:.92rem;font-weight:800;color:#5b21b6;margin-bottom:.2rem">📝 阶段三 · 淘汰退休与启示</div>
+        <div class="r-tabs">
+          <button class="r-tab active" data-rp="q7">Q7 排序</button>
+          <button class="r-tab" data-rp="q8">Q8 短答</button>
+          <button class="r-tab" data-rp="q9">Q9 压轴</button>
+        </div>
+
+        <div class="r-pane active" data-rp="q7">
+          <div class="sq">
+            <div class="sq-q">Q7. 把下列四项改革按海尔实际推进的先后排序（1=最早，4=最晚）：</div>
+            <div class="sort-row" data-ans="1"><div class="item">双轨制：自愿签约对赌</div><select><option value="">顺序？</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+            <div class="sort-row" data-ans="2"><div class="item">虚拟小微：研发改项目制，基层组团队</div><select><option value="">顺序？</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+            <div class="sort-row" data-ans="3"><div class="item">薪酬制度：16薪 → 14薪÷12 + 上不封顶奖金</div><select><option value="">顺序？</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+            <div class="sort-row" data-ans="4"><div class="item">退休返聘：可达退休前 80%~100% 工资</div><select><option value="">顺序？</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+            <button class="q-submit">提交答案</button>
+            <div class="q-fb"></div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q8">
+          <div class="hs-think">
+            <div class="sq-q">Q8. "淘汰 = 轮岗 / 推荐其他公司，退休返聘拿 80~100% 工资"——这套设计化解了日方哪两个最大顾虑？（短答）</div>
+            <textarea id="c6_hw2_local" style="min-height:80px" placeholder="一两句话即可"></textarea>
+            <div class="hs-think-foot">
+              <button class="hs-think-submit" data-hw="c6_hw2_local">提交保存</button>
+              <span class="hs-think-status">已保存 ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="r-pane" data-rp="q9">
+          <div class="hs-think" style="border-top:2px solid #fde8d8;padding-top:.6rem">
+            <div class="sq-q" style="color:#9a3412">Q9. 压轴 · 跨国并购后的薪酬融合有时直接决定并购生死。从海尔三洋案例里，你提炼出哪些可迁移的破局原则？</div>
+            <textarea id="c6_hw3" style="min-height:140px" placeholder="自由写下你的观察……"></textarea>
+            <div class="hs-think-foot">
+              <button class="hs-think-submit" data-hw="c6_hw3">提交保存到云端</button>
+              <span class="hs-think-status">已保存 ✓</span>
+            </div>
+            <div class="hs-think-hint">本题为章节压轴思考题，提交后会同步到云端，下次打开自动回显。</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hs6Hint" style="color:#94a3b8;font-size:.85rem;text-align:center;margin-top:2rem">读完一段后点"我读完这段了"<br>右侧出现对应题目</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 案例2 思和科技 -->
+<section class="slide" data-slide="5">
+  <div class="section-label"><span style="background:#fbbf24;padding:.1rem .4rem;border-radius:6px;margin-right:.3rem">案例 2</span>思和科技跨国并购 · 薪酬整合</div>
+  <h1 class="slide-title">
+    <span class="en">Sihe Technology: video + interactive case</span>
+    <span class="zh">视频互动案例（独立 HTML，5 场景 · 策略选择 · 后果推演 · 反思题）</span>
+  </h1>
+  <!-- 本地调试：指向本地思和 index.html；部署到 GitHub 后改成 src="sihe/index.html" -->
+  <div style="position:relative">
+    <iframe id="siheFrame" src="./sihe-tech.html"
+            style="width:100%;height:calc(100vh - 11rem);border:0;border-radius:10px;background:#0b1020;display:block"
+            allow="autoplay; fullscreen; microphone"
+            title="思和科技薪酬整合互动案例"></iframe>
+    <button onclick="var f=document.getElementById('siheFrame'); if(f.requestFullscreen) f.requestFullscreen(); else if(f.webkitRequestFullscreen) f.webkitRequestFullscreen();"
+            title="全屏"
+            style="position:absolute;top:10px;right:10px;z-index:5;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">
+      ⛶ 全屏
+    </button>
+  </div>
+</section>
+
+<!-- 6 6.1 案例复盘与反思 -->
+<section class="slide" data-slide="6">
+  <div class="section-label">6.1 · 两案复盘 · Post-M&A Reflection</div>
+  <h1 class="slide-title">
+    <span class="en">Why compensation integration decides M&A success</span>
+    <span class="zh">为什么跨国并购后薪酬整合至关重要？</span>
+  </h1>
+
+  <!-- 顶部 3D 彩色导航 -->
+  <div style="display:flex;gap:.6rem;margin:.4rem 0 .7rem">
+    <button class="c6-bigtab active" data-c6tab="t1" style="background:linear-gradient(145deg,#3b82f6,#1e40af);box-shadow:0 4px 0 #1e3a8a,0 6px 12px rgba(30,64,175,.4)">
+      🔍 后果证据归类
+    </button>
+    <button class="c6-bigtab" data-c6tab="t3" style="background:linear-gradient(145deg,#f59e0b,#b45309);box-shadow:0 4px 0 #92400e,0 6px 12px rgba(180,83,9,.4)">
+      💭 HR 总监开放题
+    </button>
+  </div>
+
+  <!-- Pane 1: 后果证据归类 -->
+  <div class="c6-pane active" data-c6pane="t1" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:.8rem 1rem">
+    <div style="font-size:.85rem;color:#475569;margin-bottom:.5rem">
+      💡 两个案例里"炸雷"的真实后果，下拉把它归到三类原因：<b>A 标准不一致</b> / <b>B 公平感被破坏</b> / <b>C 节奏与沟通失误</b>
+    </div>
+    <div id="c6-evidence" style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem"></div>
+    <div id="c6-evidence-fb" style="margin-top:.6rem;padding:.5rem .8rem;background:#eff6ff;border-left:3px solid #1e40af;border-radius:4px;font-size:.85rem;color:#162d4d;display:none"></div>
+  </div>
+
+  <!-- Pane 2: 开放反思 -->
+  <div class="c6-pane" data-c6pane="t3" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1rem 1.2rem;display:none">
+    <div style="font-size:1rem;color:#162d4d;line-height:1.6;margin-bottom:.6rem">
+      🎯 <b>情境：</b>你是公司 HR 总监，你们公司并购了海外一家企业。在针对这起收购的薪酬方案设计时，<b>第一件事该做什么？</b>
+    </div>
+    <textarea id="c6_hw4" style="width:100%;min-height:110px;padding:.6rem .8rem;border:1.5px solid #f59e0b;border-radius:8px;font-size:1.12rem;line-height:1.75;color:#78350f;background:#fefce8;resize:vertical;font-weight:500" placeholder="写下你的判断、优先级排序和理由。"></textarea>
+    <div style="margin-top:.5rem;display:flex;align-items:center;gap:.8rem">
+      <button class="hs-think-submit" data-hw="c6_hw4" style="padding:.5rem 1.4rem;background:linear-gradient(145deg,#f59e0b,#b45309);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:700;box-shadow:0 3px 0 #92400e">提交保存到云端</button>
+      <span class="hs-think-status" style="font-size:.85rem;color:#16a34a"></span>
+    </div>
+  </div>
+</section>
+
+<!-- 7 6.2 跨国雇员三轴分类 -->
+<section class="slide" data-slide="7">
+  <div class="section-label">6.2 · 跨国雇员分类 · Who Are We Paying?</div>
+  <h1 class="slide-title">
+    <span class="en">Three axes: nationality × assignment duration × legal employer</span>
+    <span class="zh">同一个人，从三个维度切一刀，薪酬设计完全不同</span>
+  </h1>
+
+  <div style="display:flex;gap:.5rem;margin:.3rem 0 .6rem;flex-wrap:wrap">
+    <button class="c6-bigtab active" data-c7tab="t1" style="background:linear-gradient(145deg,#3b82f6,#1e40af);box-shadow:0 3px 0 #1e3a8a">🌍 维度1 · 国籍</button>
+    <button class="c6-bigtab" data-c7tab="t2" style="background:linear-gradient(145deg,#10b981,#065f46);box-shadow:0 3px 0 #064e3b">⏱️ 维度2 · 任期</button>
+    <button class="c6-bigtab" data-c7tab="t3" style="background:linear-gradient(145deg,#f59e0b,#b45309);box-shadow:0 3px 0 #92400e">🏢 维度3 · 雇主</button>
+    <button class="c6-bigtab" data-c7tab="t4" style="background:linear-gradient(145deg,#a855f7,#6b21a8);box-shadow:0 3px 0 #581c87">🎯 三维度定位练习</button>
+    <button class="c6-bigtab" data-c7tab="t5" style="background:linear-gradient(145deg,#0ea5e9,#0c4a6e);box-shadow:0 3px 0 #082f49">🗺️ 全景图</button>
+    <button class="c6-bigtab" data-c7tab="t6" style="background:linear-gradient(145deg,#64748b,#1e293b);box-shadow:0 3px 0 #0f172a">💰 薪酬项目对照</button>
+  </div>
+
+  <!-- Pane 1: 国籍轴 -->
+  <div class="c6-pane" data-c7pane="t1">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.6rem">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.55rem .7rem;font-size:.82rem;line-height:1.55;color:#1e3a8a">
+        <b>PCN 母国员工</b><br><span style="color:#475569">Parent Country National<br>持有母国国籍（中国籍），无论在哪工作</span>
+      </div>
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:.55rem .7rem;font-size:.82rem;line-height:1.55;color:#064e3b">
+        <b>HCN 东道国员工</b><br><span style="color:#475569">Host Country National<br>持有东道国国籍（德国籍），在当地工作</span>
+      </div>
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:.55rem .7rem;font-size:.82rem;line-height:1.55;color:#78350f">
+        <b>TCN 第三国员工</b><br><span style="color:#475569">Third Country National<br>既非母国也非东道国国籍（希腊籍）</span>
+      </div>
+    </div>
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.3rem">💡 热身：下列 9 张卡片，哪些是<b>真正按国籍划分的雇员类别</b>？</div>
+    <div id="c7-cats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem"></div>
+    <div id="c7-cats-fb" style="margin-top:.4rem;padding:.4rem .7rem;background:#eff6ff;border-left:3px solid #1e40af;border-radius:4px;font-size:.82rem;color:#162d4d;display:none"></div>
+  </div>
+
+  <!-- Pane 2: 任期轴 -->
+  <div class="c6-pane" data-c7pane="t2" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.4rem;margin-bottom:.5rem;font-size:.78rem">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#1e40af">LTA 长期外派</b><br><span style="color:#64748b">2-5 年，举家搬迁</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#1e40af">STA 短期外派</b><br><span style="color:#64748b">3-12 月，单人赴任</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#1e40af">通勤外派</b><br><span style="color:#64748b">住邻国，每周往返</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#1e40af">轮班制</b><br><span style="color:#64748b">油田矿山，做4休4</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#065f46">虚拟外派</b><br><span style="color:#64748b">不搬迁，远程管海外</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#065f46">高频差旅</b><br><span style="color:#64748b">单次&lt;3月，不算外派</span></div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#b45309">回任 Repatriate</b><br><span style="color:#64748b">外派结束回母国</span></div>
+      <div style="background:#fef3c7;border:1px dashed #fde68a;border-radius:6px;padding:.4rem .5rem;line-height:1.45"><b style="color:#b45309">内派 Inpatriate</b><br><span style="color:#64748b">HCN/TCN 派到母国总部</span></div>
+    </div>
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.3rem">💡 练习：下列场景属于哪种任期？</div>
+    <div id="c7-tenure" style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem"></div>
+    <div id="c7-tenure-fb" style="margin-top:.4rem;padding:.4rem .7rem;background:#ecfdf5;border-left:3px solid #065f46;border-radius:4px;font-size:.82rem;color:#064e3b;display:none"></div>
+  </div>
+
+  <!-- Pane 3: 雇主轴 -->
+  <div class="c6-pane" data-c7pane="t3" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;font-size:.82rem">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.5rem .7rem;line-height:1.5"><b>① 母公司直接雇佣</b><br><span style="color:#475569">中国总部签合同、发工资、交社保。典型：总部招的中国籍员工。</span></div>
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:.5rem .7rem;line-height:1.5"><b>② 东道国子公司直接雇佣</b><br><span style="color:#475569">德国子公司自己招、自己签当地合同。典型：德国 Olaf。</span></div>
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:.5rem .7rem;line-height:1.5"><b>③ 集团内部跨境派遣 Secondment</b><br><span style="color:#475569">合同在 A 国实体，人派到 B 国；工资 A 发 B 补，社保走双边协议。</span></div>
+      <div style="background:#fce7f3;border:1px solid #fbcfe8;border-radius:8px;padding:.5rem .7rem;line-height:1.5"><b>④ 第三方名义雇主 EOR / PEO</b><br><span style="color:#475569">法律上雇佣你的是第三方，实际干活在本公司；常见于新市场没设子公司。</span></div>
+    </div>
+    <div style="font-size:.82rem;color:#475569;margin-bottom:.3rem">💡 练习：下列棘手场景，法律上该用哪种雇主关系？</div>
+    <div id="c7-employer" style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem"></div>
+    <div id="c7-employer-fb" style="margin-top:.4rem;padding:.4rem .7rem;background:#fef3c7;border-left:3px solid #b45309;border-radius:4px;font-size:.82rem;color:#78350f;display:none"></div>
+  </div>
+
+  <!-- Pane 4: 三轴综合定位 -->
+  <div class="c6-pane" data-c7pane="t4" style="display:none">
+    <div style="font-size:.85rem;color:#475569;margin-bottom:.4rem">💡 给每个真实场景，在三个维度上各选一个值（下拉菜单）。选完自动判分。</div>
+    <div id="c7-tri" style="display:flex;flex-direction:column;gap:.4rem"></div>
+    <div id="c7-tri-fb" style="margin-top:.5rem;padding:.5rem .8rem;background:#faf5ff;border-left:3px solid #6b21a8;border-radius:4px;font-size:.85rem;color:#581c87;display:none"></div>
+  </div>
+
+  <!-- Pane 5: 全景图 -->
+  <div class="c6-pane" data-c7pane="t5" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:.5rem;align-items:stretch">
+      <!-- 列1 国籍 -->
+      <div style="background:linear-gradient(180deg,#eff6ff,#dbeafe);border-radius:10px;padding:.5rem .6rem;border:1px solid #bfdbfe">
+        <div style="font-size:1rem;font-weight:700;color:#1e40af;margin-bottom:.35rem">🌍 维度1 · 国籍</div>
+        <div style="display:flex;flex-direction:column;gap:.3rem;font-size:.88rem">
+          <div style="background:#fff;border-radius:5px;padding:.3rem .5rem;border-left:3px solid #3b82f6"><b>PCN</b> 母国国籍</div>
+          <div style="background:#fff;border-radius:5px;padding:.3rem .5rem;border-left:3px solid #10b981"><b>HCN</b> 东道国国籍</div>
+          <div style="background:#fff;border-radius:5px;padding:.3rem .5rem;border-left:3px solid #f59e0b"><b>TCN</b> 第三国国籍</div>
+        </div>
+      </div>
+      <!-- 中心：一个人 -->
+      <div style="background:linear-gradient(180deg,#1e293b,#0f172a);border-radius:10px;padding:.5rem .6rem;color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center">
+        <div style="font-size:2rem;margin-bottom:.15rem">👤</div>
+        <div style="font-size:.8rem;color:#94a3b8;margin-bottom:.3rem">同一个人，三维度同时定位</div>
+        <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:.35rem .55rem;font-size:.88rem;line-height:1.65;width:100%">
+          <div style="color:#60a5fa">● 国籍：<b>PCN</b></div>
+          <div style="color:#34d399">● 任期：<b>LTA 3年</b></div>
+          <div style="color:#fbbf24">● 雇主：<b>母公司直雇</b></div>
+        </div>
+        <div style="margin-top:.3rem;font-size:.78rem;color:#94a3b8">= 王岩驻德国</div>
+      </div>
+      <!-- 列3 雇主 -->
+      <div style="background:linear-gradient(180deg,#fef3c7,#fde68a);border-radius:10px;padding:.5rem .6rem;border:1px solid #fde68a">
+        <div style="font-size:1rem;font-weight:700;color:#92400e;margin-bottom:.35rem">🏢 维度3 · 雇主</div>
+        <div style="display:flex;flex-direction:column;gap:.25rem;font-size:.85rem">
+          <div style="background:#fff;border-radius:5px;padding:.25rem .5rem"><b>①</b> 母公司直雇</div>
+          <div style="background:#fff;border-radius:5px;padding:.25rem .5rem"><b>②</b> 东道国直雇</div>
+          <div style="background:#fff;border-radius:5px;padding:.25rem .5rem"><b>③</b> 集团内部派遣</div>
+          <div style="background:#fff;border-radius:5px;padding:.25rem .5rem"><b>④</b> EOR 第三方名义雇主</div>
+        </div>
+      </div>
+    </div>
+    <!-- 底部任期横条 -->
+    <div style="margin-top:.45rem;background:linear-gradient(90deg,#ecfdf5,#d1fae5);border-radius:10px;padding:.45rem .6rem;border:1px solid #a7f3d0">
+      <div style="font-size:.92rem;font-weight:700;color:#065f46;margin-bottom:.3rem">⏱️ 维度2 · 任期</div>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:.25rem;font-size:.8rem;text-align:center">
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>LTA</b><br><span style="color:#64748b;font-size:.72rem">2-5年</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>STA</b><br><span style="color:#64748b;font-size:.72rem">3-12月</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>通勤</b><br><span style="color:#64748b;font-size:.72rem">每周往返</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>轮班</b><br><span style="color:#64748b;font-size:.72rem">做4休4</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>虚拟</b><br><span style="color:#64748b;font-size:.72rem">不搬迁</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>差旅</b><br><span style="color:#64748b;font-size:.72rem">小于3月</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>回任</b><br><span style="color:#64748b;font-size:.72rem">外派结束</span></div>
+        <div style="background:#fff;border-radius:4px;padding:.25rem .15rem"><b>内派</b><br><span style="color:#64748b;font-size:.72rem">派到总部</span></div>
+      </div>
+    </div>
+    <div style="margin-top:.4rem;padding:.45rem .7rem;background:#0c4a6e;color:#fff;border-radius:6px;font-size:.92rem;text-align:center">
+      💡 薪酬设计 = <b>f(国籍, 任期, 雇主)</b>——三维组合不同，COLA、住房、税务、社保、补贴方案完全不同
+    </div>
+  </div>
+
+  <!-- Pane 6: 薪酬项目对照表 -->
+  <div class="c6-pane" data-c7pane="t6" style="display:none">
+    <div style="font-size:.85rem;color:#475569;margin-bottom:.4rem">💡 先在每个格子点一下，按你判断标 ✓/△/—，再点"对照答案"看自己漏了什么。</div>
+    <table id="c7-pay-table" style="width:100%;border-collapse:collapse;font-size:.85rem;color:#162d4d">
+      <thead>
+        <tr style="background:#162d4d;color:#fff">
+          <th style="padding:.4rem .5rem;text-align:left;border:1px solid #334155">薪酬项目</th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">PCN 长期外派<br><span style="font-weight:400;font-size:.72rem;opacity:.8">王岩式</span></th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">PCN 短期外派<br><span style="font-weight:400;font-size:.72rem;opacity:.8">3-12月</span></th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">HCN 当地员工<br><span style="font-weight:400;font-size:.72rem;opacity:.8">Olaf式</span></th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">TCN 第三国<br><span style="font-weight:400;font-size:.72rem;opacity:.8">希腊工程师</span></th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">虚拟外派<br><span style="font-weight:400;font-size:.72rem;opacity:.8">远程管理</span></th>
+          <th style="padding:.4rem .4rem;border:1px solid #334155">EOR 雇佣<br><span style="font-weight:400;font-size:.72rem;opacity:.8">新市场入场</span></th>
+        </tr>
+      </thead>
+      <tbody id="c7-pay-body"></tbody>
+    </table>
+    <div style="margin-top:.4rem;display:flex;gap:.5rem;align-items:center">
+      <button id="c7-pay-check" style="padding:.4rem 1.1rem;background:#162d4d;color:#fff;border:none;border-radius:18px;cursor:pointer;font-weight:700">对照答案</button>
+      <button id="c7-pay-clear" style="padding:.4rem 1rem;background:#fff;color:#162d4d;border:1.5px solid #162d4d;border-radius:18px;cursor:pointer">清空</button>
+      <span id="c7-pay-fb" style="font-size:.85rem;color:#162d4d"></span>
+    </div>
+    <div style="margin-top:.5rem;background:#f1f5f9;border-radius:8px;padding:.5rem .7rem;font-size:.8rem;line-height:1.65;color:#334155">
+      <b>📖 术语解释</b>
+      <div style="margin-top:.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.15rem .8rem">
+        <div><b>COLA</b>（Cost of Living Adjustment）：生活成本调整补贴。派驻国物价比母国高时，公司补差，保证外派员工实际购买力不下滑。</div>
+        <div><b>税务平衡</b>（Tax Equalization）：员工在母国本来该交多少税，公司就补到那个数；东道国多退少补都由公司承担，员工不因外派变穷或变富。</div>
+        <div><b>平衡表法</b>（Balance Sheet）：外派薪酬设计主流方法——以母国工资为"基准表"，再补海外差价（住房、COLA、税差、艰苦），让员工愿意去。</div>
+        <div><b>艰苦津贴</b>（Hardship Premium）：派驻国局势动荡、医疗差、气候恶劣时给的额外补贴，通常按母国工资 10-25%。</div>
+        <div><b>回任安置费</b>（Repatriation）：外派结束回国时给的一次性费用，用于重新找房、孩子转学、岗位衔接——很多公司漏这块导致回任流失。</div>
+        <div><b>EOR</b>（Employer of Record）：名义雇主。公司在新市场还没设子公司，通过第三方合规雇佣当地员工，工资社保由 EOR 代发，本公司实际管理。</div>
+      </div>
+    </div>
+    <div style="margin-top:.4rem;font-size:.8rem;color:#475569">
+      📌 规律：<b>PCN 长期外派最贵</b>（平衡表法，一堆补贴）；<b>HCN 最便宜</b>（纯当地市场）；<b>TCN 最麻烦</b>（按哪国基准吵不清）；<b>EOR 是用钱买入场速度</b>。
+    </div>
+  </div>
+</section>
+
+<!-- 8 实战：泰国外派薪酬包设计工具 -->
+<section class="slide" data-slide="8">
+  <div class="section-label"><span style="background:#38bdf8;padding:.1rem .4rem;border-radius:6px;margin-right:.3rem">实战</span>6.3 · 外派薪酬包设计 · Thailand Case</div>
+  <h1 class="slide-title">
+    <span class="en">Design a real expat package for Thailand</span>
+    <span class="zh">为外派雇员设计外派薪酬包（拖动参数 · 实时算总账）</span>
+  </h1>
+  <!-- 本地调试：指向本地练习；部署到 GitHub 后改成 src="expat-package/index.html" -->
+  <div id="pkgWrap" style="position:relative">
+    <iframe id="pkgFrame" src="./haiwai-xinchoubao.html"
+            style="width:100%;height:calc(100vh - 11rem);border:0;border-radius:10px;background:#020617;display:block"
+            allow="fullscreen"
+            title="外派薪酬包设计工具"></iframe>
+    <button id="pkgFsBtn"
+            onclick="var w=document.getElementById('pkgWrap'); if(!document.fullscreenElement){ if(w.requestFullscreen) w.requestFullscreen(); else if(w.webkitRequestFullscreen) w.webkitRequestFullscreen(); } else { if(document.exitFullscreen) document.exitFullscreen(); else if(document.webkitExitFullscreen) document.webkitExitFullscreen(); }"
+            title="全屏 / 退出全屏"
+            style="position:absolute;top:10px;left:10px;z-index:5;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer">
+      ⛶ 全屏
+    </button>
+  </div>
+  <script>
+    (function(){
+      var btn=document.getElementById('pkgFsBtn');
+      function upd(){
+        if(!btn) return;
+        var fs=document.fullscreenElement||document.webkitFullscreenElement;
+        btn.textContent=fs?'✕ 退出全屏':'⛶ 全屏';
+        // 全屏时让 iframe 撑满整个 wrap
+        var f=document.getElementById('pkgFrame');
+        if(f) f.style.height=fs?'calc(100vh - 48px)':'calc(100vh - 11rem)';
+      }
+      document.addEventListener('fullscreenchange',upd);
+      document.addEventListener('webkitfullscreenchange',upd);
+    })();
+  </script>
+</section>
+
+<!-- 9 课程回顾：脑图 + 感悟视频 -->
+<section class="slide" data-slide="9">
+  <div class="section-label">Course Reflection · 课程总结</div>
+  <h1 class="slide-title">
+    <span class="en">Course mind map + your reflection video</span>
+    <span class="zh">整门课脑图 · 课程感悟视频作业</span>
+  </h1>
+
+  <div style="display:flex;gap:.5rem;margin:.3rem 0 .6rem;flex-wrap:wrap">
+    <button class="c6-bigtab active" data-rvtap="t1" style="background:linear-gradient(145deg,#3b82f6,#1e40af);box-shadow:0 3px 0 #1e3a8a">🗺️ 课程知识图谱</button>
+    <button class="c6-bigtab" data-rvtap="t2" style="background:linear-gradient(145deg,#f59e0b,#b45309);box-shadow:0 3px 0 #92400e">🎥 课程感悟视频</button>
+  </div>
+
+  <!-- Pane 1: 脑图 -->
+  <div class="c6-pane" data-rvpane="t1">
+    <div class="mm-chapters" id="mmChapters">
+      <button class="mm-chbtn on" data-mm="ch1" style="background:linear-gradient(145deg,#3b82f6,#1e40af)">第1章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">跨文化沟通基础</small></button>
+      <button class="mm-chbtn" data-mm="ch2" style="background:linear-gradient(145deg,#14b8a6,#0f766e)">第2章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">文化维度理论</small></button>
+      <button class="mm-chbtn" data-mm="ch3" style="background:linear-gradient(145deg,#8b5cf6,#5b21b6)">第3章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">语言沟通深化</small></button>
+      <button class="mm-chbtn" data-mm="ch4" style="background:linear-gradient(145deg,#22c55e,#15803d)">第4章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">跨文化团队</small></button>
+      <button class="mm-chbtn" data-mm="ch5" style="background:linear-gradient(145deg,#f97316,#c2410c)">第5章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">跨文化HRM</small></button>
+      <button class="mm-chbtn" data-mm="ch6" style="background:linear-gradient(145deg,#ef4444,#b91c1c)">第6章<br><small style="font-weight:400;font-size:.72rem;opacity:.9">全球薪酬</small></button>
+    </div>
+    <div class="mm-stage" id="mmStage">
+
+      <!-- Ch1 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch1" viewBox="0 0 1200 480">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第1章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">跨文化沟通基础</text>
+        <g>
+          <circle cx="330" cy="120" r="42" class="mm-branch" stroke="#3b82f6" fill="#3b82f6"/>
+          <text x="330" y="118" class="mm-branch-t">沟通模型</text>
+          <text x="330" y="135" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">编码-漏斗</text>
+          <circle cx="870" cy="120" r="42" class="mm-branch" stroke="#3b82f6" fill="#3b82f6"/>
+          <text x="870" y="118" class="mm-branch-t">语言差异</text>
+          <text x="870" y="135" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">口头五维</text>
+          <circle cx="330" cy="360" r="42" class="mm-branch" stroke="#3b82f6" fill="#3b82f6"/>
+          <text x="330" y="358" class="mm-branch-t">非语言</text>
+          <text x="330" y="375" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">语调/距离</text>
+          <circle cx="870" cy="360" r="42" class="mm-branch" stroke="#3b82f6" fill="#3b82f6"/>
+          <text x="870" y="358" class="mm-branch-t">文化维度</text>
+          <text x="870" y="375" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">权力/时间</text>
+          <circle cx="600" cy="435" r="36" class="mm-branch" stroke="#3b82f6" fill="#3b82f6"/>
+          <text x="600" y="433" class="mm-branch-t" style="font-size:13px">跨越障碍</text>
+          <text x="600" y="448" class="mm-branch-t" style="font-size:9px;font-weight:400;opacity:.9">CQ/Byram</text>
+        </g>
+        <path d="M540 225 Q430 170 370 140" class="mm-link"/>
+        <path d="M660 225 Q770 170 830 140" class="mm-link"/>
+        <path d="M540 255 Q430 310 370 340" class="mm-link"/>
+        <path d="M660 255 Q770 310 830 340" class="mm-link"/>
+        <path d="M600 285 L600 400" class="mm-link"/>
+        <g>
+          <rect x="100" y="50" width="130" height="26" rx="13" class="mm-leaf"/><text x="165" y="68" class="mm-leaf-t" style="font-size:12px">沟通漏斗游戏</text>
+          <rect x="100" y="82" width="130" height="26" rx="13" class="mm-leaf"/><text x="165" y="100" class="mm-leaf-t" style="font-size:12px">中国经理在波士顿</text>
+          <rect x="970" y="50" width="130" height="26" rx="13" class="mm-leaf"/><text x="1035" y="68" class="mm-leaf-t" style="font-size:12px">直接 vs 委婉</text>
+          <rect x="970" y="82" width="130" height="26" rx="13" class="mm-leaf"/><text x="1035" y="100" class="mm-leaf-t" style="font-size:12px">高/低语境</text>
+          <rect x="970" y="114" width="130" height="26" rx="13" class="mm-leaf"/><text x="1035" y="132" class="mm-leaf-t" style="font-size:12px">三秒沉默</text>
+          <rect x="100" y="330" width="130" height="26" rx="13" class="mm-leaf"/><text x="165" y="348" class="mm-leaf-t" style="font-size:12px">对话距离测试</text>
+          <rect x="100" y="362" width="130" height="26" rx="13" class="mm-leaf"/><text x="165" y="380" class="mm-leaf-t" style="font-size:12px">一个手势五含义</text>
+          <rect x="970" y="330" width="140" height="26" rx="13" class="mm-leaf"/><text x="1040" y="348" class="mm-leaf-t" style="font-size:12px">关系 vs 任务</text>
+          <rect x="970" y="362" width="140" height="26" rx="13" class="mm-leaf"/><text x="1040" y="380" class="mm-leaf-t" style="font-size:12px">单/多向时间</text>
+          <rect x="970" y="394" width="140" height="26" rx="13" class="mm-leaf"/><text x="1040" y="412" class="mm-leaf-t" style="font-size:12px">名片/称谓/礼物</text>
+          <rect x="470" y="400" width="110" height="24" rx="12" class="mm-leaf"/><text x="525" y="416" class="mm-leaf-t" style="font-size:11px">民族中心主义</text>
+          <rect x="620" y="400" width="100" height="24" rx="12" class="mm-leaf"/><text x="670" y="416" class="mm-leaf-t" style="font-size:11px">刻板印象</text>
+        </g>
+      </svg>
+
+      <!-- Ch2 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch2" viewBox="0 0 1200 480" style="display:none">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第2章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">文化维度理论</text>
+        <circle cx="300" cy="150" r="50" class="mm-branch" stroke="#14b8a6" fill="#14b8a6"/>
+        <text x="300" y="148" class="mm-branch-t">Hofstede</text>
+        <text x="300" y="165" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">六维价值观</text>
+        <circle cx="900" cy="150" r="50" class="mm-branch" stroke="#14b8a6" fill="#14b8a6"/>
+        <text x="900" y="148" class="mm-branch-t">Trompenaars</text>
+        <text x="900" y="165" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">工作情境七维</text>
+        <circle cx="600" cy="400" r="45" class="mm-branch" stroke="#14b8a6" fill="#14b8a6"/>
+        <text x="600" y="398" class="mm-branch-t" style="font-size:14px">GLOBE</text>
+        <text x="600" y="413" class="mm-branch-t" style="font-size:10px;font-weight:400;opacity:.9">9维·62文化</text>
+        <path d="M535 225 Q420 185 350 165" class="mm-link"/>
+        <path d="M665 225 Q780 185 850 165" class="mm-link"/>
+        <path d="M600 285 L600 355" class="mm-link"/>
+        <g>
+          <rect x="80" y="60" width="120" height="24" rx="12" class="mm-leaf"/><text x="140" y="76" class="mm-leaf-t" style="font-size:11px">权力距离</text>
+          <rect x="80" y="90" width="120" height="24" rx="12" class="mm-leaf"/><text x="140" y="106" class="mm-leaf-t" style="font-size:11px">个体/集体</text>
+          <rect x="80" y="120" width="120" height="24" rx="12" class="mm-leaf"/><text x="140" y="136" class="mm-leaf-t" style="font-size:11px">阳刚/阴柔</text>
+          <rect x="80" y="180" width="120" height="24" rx="12" class="mm-leaf"/><text x="140" y="196" class="mm-leaf-t" style="font-size:11px">不确定规避</text>
+          <rect x="80" y="210" width="120" height="24" rx="12" class="mm-leaf"/><text x="140" y="226" class="mm-leaf-t" style="font-size:11px">长/短期导向</text>
+          <rect x="1000" y="60" width="130" height="24" rx="12" class="mm-leaf"/><text x="1065" y="76" class="mm-leaf-t" style="font-size:11px">普遍 vs 特殊</text>
+          <rect x="1000" y="90" width="130" height="24" rx="12" class="mm-leaf"/><text x="1065" y="106" class="mm-leaf-t" style="font-size:11px">中立 vs 情感</text>
+          <rect x="1000" y="120" width="130" height="24" rx="12" class="mm-leaf"/><text x="1065" y="136" class="mm-leaf-t" style="font-size:11px">特定 vs 扩散</text>
+          <rect x="1000" y="180" width="130" height="24" rx="12" class="mm-leaf"/><text x="1065" y="196" class="mm-leaf-t" style="font-size:11px">成就 vs 归属</text>
+          <rect x="1000" y="210" width="130" height="24" rx="12" class="mm-leaf"/><text x="1065" y="226" class="mm-leaf-t" style="font-size:11px">内在/外在控制</text>
+          <rect x="430" y="350" width="120" height="24" rx="12" class="mm-leaf"/><text x="490" y="366" class="mm-leaf-t" style="font-size:11px">绩效导向</text>
+          <rect x="560" y="350" width="120" height="24" rx="12" class="mm-leaf"/><text x="620" y="366" class="mm-leaf-t" style="font-size:11px">团队导向</text>
+          <rect x="700" y="350" width="120" height="24" rx="12" class="mm-leaf"/><text x="760" y="366" class="mm-leaf-t" style="font-size:11px">实践 vs 理想</text>
+        </g>
+      </svg>
+
+      <!-- Ch3 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch3" viewBox="0 0 1200 480" style="display:none">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第3章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">语言沟通深化</text>
+        <circle cx="330" cy="130" r="45" class="mm-branch" stroke="#8b5cf6" fill="#8b5cf6"/>
+        <text x="330" y="132" class="mm-branch-t" style="font-size:13px">直接 vs 委婉</text>
+        <circle cx="870" cy="130" r="45" class="mm-branch" stroke="#8b5cf6" fill="#8b5cf6"/>
+        <text x="870" y="132" class="mm-branch-t" style="font-size:13px">高/低语境</text>
+        <circle cx="330" cy="350" r="45" class="mm-branch" stroke="#8b5cf6" fill="#8b5cf6"/>
+        <text x="330" y="352" class="mm-branch-t" style="font-size:13px">沉默与节奏</text>
+        <circle cx="870" cy="350" r="45" class="mm-branch" stroke="#8b5cf6" fill="#8b5cf6"/>
+        <text x="870" y="352" class="mm-branch-t" style="font-size:13px">案例解码</text>
+        <path d="M540 225 Q430 175 370 150" class="mm-link"/>
+        <path d="M660 225 Q770 175 830 150" class="mm-link"/>
+        <path d="M540 255 Q430 305 370 330" class="mm-link"/>
+        <path d="M660 255 Q770 305 830 330" class="mm-link"/>
+        <g>
+          <rect x="100" y="60" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="78" class="mm-leaf-t" style="font-size:12px">售票员说不出口</text>
+          <rect x="100" y="92" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="110" class="mm-leaf-t" style="font-size:12px">三轮拉锯对话</text>
+          <rect x="100" y="160" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="178" class="mm-leaf-t" style="font-size:12px">职场话解码练习</text>
+          <rect x="960" y="60" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="78" class="mm-leaf-t" style="font-size:12px">前10分钟聊什么</text>
+          <rect x="960" y="92" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="110" class="mm-leaf-t" style="font-size:12px">关系 vs 任务导向</text>
+          <rect x="960" y="160" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="178" class="mm-leaf-t" style="font-size:12px">中国之行成功吗</text>
+          <rect x="100" y="300" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="318" class="mm-leaf-t" style="font-size:12px">那三秒沉默</text>
+          <rect x="100" y="380" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="398" class="mm-leaf-t" style="font-size:12px">三种对话节奏</text>
+          <rect x="960" y="300" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="318" class="mm-leaf-t" style="font-size:12px">谁先办入住</text>
+          <rect x="960" y="332" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="350" class="mm-leaf-t" style="font-size:12px">日程配对练习</text>
+          <rect x="960" y="390" width="140" height="26" rx="13" class="mm-leaf"/><text x="1030" y="408" class="mm-leaf-t" style="font-size:12px">五维综合判断</text>
+        </g>
+      </svg>
+
+      <!-- Ch4 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch4" viewBox="0 0 1200 480" style="display:none">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第4章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">跨文化团队</text>
+        <circle cx="330" cy="130" r="45" class="mm-branch" stroke="#22c55e" fill="#22c55e"/>
+        <text x="330" y="132" class="mm-branch-t" style="font-size:13px">RSCC 模型</text>
+        <circle cx="870" cy="130" r="45" class="mm-branch" stroke="#22c55e" fill="#22c55e"/>
+        <text x="870" y="132" class="mm-branch-t" style="font-size:13px">团队类型</text>
+        <circle cx="330" cy="350" r="45" class="mm-branch" stroke="#22c55e" fill="#22c55e"/>
+        <text x="330" y="352" class="mm-branch-t" style="font-size:13px">整合模式</text>
+        <circle cx="870" cy="350" r="45" class="mm-branch" stroke="#22c55e" fill="#22c55e"/>
+        <text x="870" y="352" class="mm-branch-t" style="font-size:13px">打造团队</text>
+        <path d="M540 225 Q430 175 370 150" class="mm-link"/>
+        <path d="M660 225 Q770 175 830 150" class="mm-link"/>
+        <path d="M540 255 Q430 305 370 330" class="mm-link"/>
+        <path d="M660 255 Q770 305 830 330" class="mm-link"/>
+        <g>
+          <rect x="100" y="70" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="88" class="mm-leaf-t" style="font-size:12px">贝尔宾九角色</text>
+          <rect x="100" y="102" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="120" class="mm-leaf-t" style="font-size:12px">房谋杜断/取经团</text>
+          <rect x="960" y="60" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="78" class="mm-leaf-t" style="font-size:12px">象征性文化团队</text>
+          <rect x="960" y="92" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="110" class="mm-leaf-t" style="font-size:12px">双文化/多文化团队</text>
+          <rect x="960" y="124" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="142" class="mm-leaf-t" style="font-size:12px">校友两案例</text>
+          <rect x="100" y="290" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="308" class="mm-leaf-t" style="font-size:12px">Berry 四模式</text>
+          <rect x="100" y="322" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="340" class="mm-leaf-t" style="font-size:12px">雷诺日产/联想</text>
+          <rect x="100" y="370" width="140" height="26" rx="13" class="mm-leaf"/><text x="170" y="388" class="mm-leaf-t" style="font-size:12px">福耀/吉利沃尔沃</text>
+          <rect x="960" y="290" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="308" class="mm-leaf-t" style="font-size:12px">张雪机车泰国会</text>
+          <rect x="960" y="322" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="340" class="mm-leaf-t" style="font-size:12px">Q公司小组案例</text>
+          <rect x="960" y="380" width="150" height="26" rx="13" class="mm-leaf"/><text x="1035" y="398" class="mm-leaf-t" style="font-size:12px">多样性优势/代价</text>
+        </g>
+      </svg>
+
+      <!-- Ch5 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch5" viewBox="0 0 1200 480" style="display:none">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第5章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">跨文化HRM</text>
+        <circle cx="320" cy="150" r="50" class="mm-branch" stroke="#f97316" fill="#f97316"/>
+        <text x="320" y="152" class="mm-branch-t" style="font-size:14px">并购案例</text>
+        <circle cx="880" cy="150" r="50" class="mm-branch" stroke="#f97316" fill="#f97316"/>
+        <text x="880" y="152" class="mm-branch-t" style="font-size:14px">HR 尽调</text>
+        <circle cx="600" cy="400" r="50" class="mm-branch" stroke="#f97316" fill="#f97316"/>
+        <text x="600" y="402" class="mm-branch-t" style="font-size:14px">本地化策略</text>
+        <path d="M535 225 Q420 185 370 165" class="mm-link"/>
+        <path d="M665 225 Q780 185 830 165" class="mm-link"/>
+        <path d="M600 285 L600 350" class="mm-link"/>
+        <g>
+          <rect x="90" y="60" width="150" height="26" rx="13" class="mm-leaf"/><text x="165" y="78" class="mm-leaf-t" style="font-size:12px">澳优×海普诺凯</text>
+          <rect x="90" y="92" width="150" height="26" rx="13" class="mm-leaf"/><text x="165" y="110" class="mm-leaf-t" style="font-size:12px">TCL×汤姆逊</text>
+          <rect x="90" y="124" width="150" height="26" rx="13" class="mm-leaf"/><text x="165" y="142" class="mm-leaf-t" style="font-size:12px">维格娜丝×甜维你</text>
+          <rect x="90" y="180" width="150" height="26" rx="13" class="mm-leaf"/><text x="165" y="198" class="mm-leaf-t" style="font-size:12px">四段影像·11问</text>
+          <rect x="960" y="60" width="160" height="26" rx="13" class="mm-leaf"/><text x="1040" y="78" class="mm-leaf-t" style="font-size:12px">美世整合问题象限</text>
+          <rect x="960" y="92" width="160" height="26" rx="13" class="mm-leaf"/><text x="1040" y="110" class="mm-leaf-t" style="font-size:12px">尽调三模块20项</text>
+          <rect x="960" y="124" width="160" height="26" rx="13" class="mm-leaf"/><text x="1040" y="142" class="mm-leaf-t" style="font-size:12px">三层交付物</text>
+          <rect x="960" y="180" width="160" height="26" rx="13" class="mm-leaf"/><text x="1040" y="198" class="mm-leaf-t" style="font-size:12px">签约前查什么</text>
+          <rect x="380" y="330" width="140" height="26" rx="13" class="mm-leaf"/><text x="450" y="348" class="mm-leaf-t" style="font-size:12px">四达时代非洲</text>
+          <rect x="530" y="330" width="140" height="26" rx="13" class="mm-leaf"/><text x="600" y="348" class="mm-leaf-t" style="font-size:12px">海信南非</text>
+          <rect x="680" y="330" width="140" height="26" rx="13" class="mm-leaf"/><text x="750" y="348" class="mm-leaf-t" style="font-size:12px">鹏飞巴基斯坦</text>
+          <rect x="380" y="430" width="140" height="26" rx="13" class="mm-leaf"/><text x="450" y="448" class="mm-leaf-t" style="font-size:12px">中信戴卡墨西哥</text>
+          <rect x="560" y="430" width="180" height="26" rx="13" class="mm-leaf"/><text x="650" y="448" class="mm-leaf-t" style="font-size:12px">九条本地化策略</text>
+        </g>
+      </svg>
+
+      <!-- Ch6 -->
+      <svg class="mm-svg mm-panel" data-mm-panel="ch6" viewBox="0 0 1200 480" style="display:none">
+        <ellipse cx="600" cy="240" rx="80" ry="45" class="mm-center"/>
+        <text x="600" y="237" class="mm-center-t">第6章</text>
+        <text x="600" y="257" class="mm-center-t" style="font-size:14px">全球薪酬</text>
+        <circle cx="330" cy="130" r="45" class="mm-branch" stroke="#ef4444" fill="#ef4444"/>
+        <text x="330" y="132" class="mm-branch-t" style="font-size:13px">两并购案例</text>
+        <circle cx="870" cy="130" r="45" class="mm-branch" stroke="#ef4444" fill="#ef4444"/>
+        <text x="870" y="132" class="mm-branch-t" style="font-size:13px">雇员三维分类</text>
+        <circle cx="330" cy="350" r="45" class="mm-branch" stroke="#ef4444" fill="#ef4444"/>
+        <text x="330" y="352" class="mm-branch-t" style="font-size:13px">平衡表设计</text>
+        <circle cx="870" cy="350" r="45" class="mm-branch" stroke="#ef4444" fill="#ef4444"/>
+        <text x="870" y="352" class="mm-branch-t" style="font-size:13px">实战与反思</text>
+        <path d="M540 225 Q430 175 370 150" class="mm-link"/>
+        <path d="M660 225 Q770 175 830 150" class="mm-link"/>
+        <path d="M540 255 Q430 305 370 330" class="mm-link"/>
+        <path d="M660 255 Q770 305 830 330" class="mm-link"/>
+        <g>
+          <rect x="100" y="70" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="88" class="mm-leaf-t" style="font-size:12px">海尔×三洋双轨制</text>
+          <rect x="100" y="102" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="120" class="mm-leaf-t" style="font-size:12px">思和科技并购</text>
+          <rect x="100" y="150" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="168" class="mm-leaf-t" style="font-size:12px">后果证据归类</text>
+          <rect x="100" y="182" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="200" class="mm-leaf-t" style="font-size:12px">HR总监开放题</text>
+          <rect x="950" y="70" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="88" class="mm-leaf-t" style="font-size:12px">PCN 母国外派</text>
+          <rect x="950" y="102" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="120" class="mm-leaf-t" style="font-size:12px">HCN 东道国本地</text>
+          <rect x="950" y="134" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="152" class="mm-leaf-t" style="font-size:12px">TCN 第三国国籍</text>
+          <rect x="950" y="170" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="188" class="mm-leaf-t" style="font-size:12px">国籍×任期×雇主</text>
+          <rect x="100" y="290" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="308" class="mm-leaf-t" style="font-size:12px">基本工资/住房</text>
+          <rect x="100" y="322" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="340" class="mm-leaf-t" style="font-size:12px">COLA/税务平衡</text>
+          <rect x="100" y="370" width="150" height="26" rx="13" class="mm-leaf"/><text x="175" y="388" class="mm-leaf-t" style="font-size:12px">探亲/艰苦/回任</text>
+          <rect x="950" y="290" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="308" class="mm-leaf-t" style="font-size:12px">泰国薪酬包设计</text>
+          <rect x="950" y="322" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="340" class="mm-leaf-t" style="font-size:12px">拖动参数算总账</text>
+          <rect x="950" y="380" width="150" height="26" rx="13" class="mm-leaf"/><text x="1025" y="398" class="mm-leaf-t" style="font-size:12px">课程感悟视频</text>
+        </g>
+      </svg>
+
+    </div>
+  </div>
+
+  <!-- Pane 2: 感悟视频 -->
+  <div class="c6-pane" data-rvpane="t2" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:.8rem;align-items:start">
+      <!-- 左：提示上半 -->
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.8rem .9rem;font-size:.95rem;line-height:1.75;color:#78350f">
+        <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-bottom:.4rem">💡 请录制视频回顾本门课程</div>
+        <div style="margin-bottom:.5rem">作为平时作业环节，视频将展示在课程平台。</div>
+        <div style="font-weight:700;color:#92400e;margin:.3rem 0 .2rem">录前想想：</div>
+        <ol style="margin:0;padding-left:1.2rem">
+          <li>这门课和你想象中的"跨文化管理"有什么不同？</li>
+          <li>哪个理论 / 工具 / 观点 / 案例对你触动最大？为什么？</li>
+          <li>本门课的 AI 实训部分对你有没有帮助？</li>
+        </ol>
+      </div>
+
+      <!-- 中：录制区（居中，顶部对齐标题） -->
+      <div style="background:#0f172a;border-radius:10px;padding:.7rem;display:flex;flex-direction:column;gap:.5rem;align-items:center;margin-top:-7.5rem">
+        <div style="position:relative;background:#000;border-radius:8px;width:100%;height:420px;overflow:hidden">
+          <video id="rvVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:contain;display:block"></video>
+          <video id="rvRaw" autoplay playsinline muted style="display:none"></video>
+          <canvas id="rvCanvas" width="1280" height="720" style="display:none"></canvas>
+          <div id="rvPlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:.9rem;text-align:center;padding:1rem">
+            点击下方"开始录制"按钮<br>浏览器会请求摄像头和麦克风权限
+          </div>
+          <div id="rvTimer" style="position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);color:#f87171;font-weight:700;padding:2px 10px;border-radius:12px;font-size:.85rem;display:none">00:00</div>
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:center">
+          <span style="color:#94a3b8;font-size:.8rem">滤镜：</span>
+          <button class="rv-filter" data-f="none" style="padding:.25rem .7rem;background:#1e293b;color:#e2e8f0;border:1.5px solid #38bdf8;border-radius:14px;cursor:pointer;font-size:.8rem">原相机</button>
+          <button class="rv-filter" data-f="bright" style="padding:.25rem .7rem;background:#1e293b;color:#94a3b8;border:1.5px solid transparent;border-radius:14px;cursor:pointer;font-size:.8rem">☀️ 明亮</button>
+          <button class="rv-filter" data-f="beauty" style="padding:.25rem .7rem;background:#1e293b;color:#94a3b8;border:1.5px solid transparent;border-radius:14px;cursor:pointer;font-size:.8rem">✨ 自然美颜</button>
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:center">
+          <button id="rvStart" style="padding:.45rem 1rem;background:#dc2626;color:#fff;border:none;border-radius:18px;cursor:pointer;font-weight:700">● 开始录制</button>
+          <button id="rvStop" style="padding:.45rem 1rem;background:#475569;color:#fff;border:none;border-radius:18px;cursor:pointer;font-weight:700;display:none">■ 停止</button>
+          <button id="rvRetake" style="padding:.45rem 1rem;background:#fff;color:#dc2626;border:1.5px solid #dc2626;border-radius:18px;cursor:pointer;display:none">↺ 重录</button>
+          <button id="rvSubmit" style="padding:.45rem 1rem;background:#16a34a;color:#fff;border:none;border-radius:18px;cursor:pointer;font-weight:700;display:none">✓ 确认提交</button>
+          <span id="rvStatus" style="color:#94a3b8;font-size:.82rem"></span>
+        </div>
+      </div>
+
+      <!-- 右：提示下半 -->
+      <div style="display:flex;flex-direction:column;gap:.6rem">
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.7rem .9rem;font-size:.95rem;line-height:1.7;color:#78350f">
+          <div style="font-weight:700;color:#92400e;margin-bottom:.25rem">⏱️ 时长</div>
+          <div>建议 <b>3-5 分钟</b>，不用写稿，像跟同事聊天一样说就行。</div>
+        </div>
+        <div style="background:#fef3c7;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:10px;padding:.7rem .9rem;font-size:.95rem;line-height:1.7">
+          <div style="font-weight:700;color:#92400e;margin-bottom:.25rem">开头话术</div>
+          <div style="color:#b45309;font-weight:700;font-size:1rem">"大家好，我是重庆工商大学 XX 班级的 XXX（你的姓名）……"</div>
+        </div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.7rem .9rem;font-size:.9rem;line-height:1.65;color:#92400e">
+          💡 注意光线和音量；录完可预览、可重录，确认后提交。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dlg-overlay" id="dlgOverlay">
+  <div class="dlg-win">
+    <div class="dlg-titlebar">
+      <span id="dlgTitle">案例</span>
+      <button id="dlgClose">✕</button>
+    </div>
+    <div class="dlg-body"><iframe id="dlgFrame" src="about:blank"></iframe></div>
+  </div>
+</div>
+
+<script>
+  const slides=document.querySelectorAll('.slide');
+  const TOTAL=slides.length;
+  let cur=0;
+  const labelMap=[
+    [0,'第六章 · 封面'],
+    [1,'第六章 · 学习路径'],
+    [2,'6.1 · 案例转场'],
+    [3,'6.1 · 海尔三洋案例'],
+    [4,'6.1 · 思和科技案例'],
+    [5,'6.1 · 两案复盘'],
+    [6,'6.2 · 雇员三维分类'],
+    [7,'6.3 · 实战·泰国薪酬包'],
+    [8,'课程总结 · 感悟视频']
+  ];
+  const navLabels=[];
+  for(let i=0;i<TOTAL;i++){let lab='第六章';for(const [idx,l] of labelMap) if(i>=idx) lab=l;navLabels.push(lab);}
+  const pageNumEl=document.getElementById('pageNum');
+  const navLabelEl=document.getElementById('navLabel');
+  const pageJump=document.getElementById('pageJump');
+  slides.forEach((s,i)=>{
+    const zh=s.querySelector('.slide-title .zh');
+    const o=document.createElement('option');o.value=i;o.textContent=(i+1)+'. '+(zh?zh.textContent.trim():'页面');pageJump.appendChild(o);
+  });
+  function show(i){
+    if(i<0||i>=TOTAL) return;
+    document.querySelectorAll('video').forEach(v=>{try{v.pause()}catch(e){}});
+    slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
+    pageNumEl.textContent=(cur+1)+' / '+TOTAL;
+    navLabelEl.textContent=navLabels[cur];
+    pageJump.value=String(cur);
+    window.scrollTo(0,0);
+  }
+  document.getElementById('btnPrev').onclick=()=>show(cur-1);
+  document.getElementById('btnNext').onclick=()=>show(cur+1);
+  pageJump.onchange=()=>{if(pageJump.value!=='-1') show(+pageJump.value);};
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1);});
+
+  // ===== slide 4: 阶段切换 + "我读完这段了"解锁题板 =====
+  (function(){
+    var cur=1;
+    function showStage(n){
+      cur=n;
+      document.querySelectorAll('.hs6-stage').forEach(function(b){
+        b.style.outline=(+b.dataset.stage===n?'3px solid #fbbf24':'none');
+      });
+      [1,2,3].forEach(function(i){
+        document.getElementById('hs6T'+i).style.display=(i===n?'block':'none');
+      });
+    }
+    document.querySelectorAll('.hs6-stage').forEach(function(b){
+      b.addEventListener('click',function(){ showStage(+b.dataset.stage); });
+    });
+    showStage(1);
+
+    document.getElementById('hs6Read').addEventListener('click',function(){
+      var q=document.getElementById('hs6Q'+cur);
+      if(q){
+        q.style.display='block';
+        var hint=document.getElementById('hs6Hint');
+        if(hint && cur===3) hint.style.display='none';
+        q.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    });
+  })();
+
+  // ===== slide 4: 右栏 r-tabs 切换 =====
+  document.querySelectorAll('.hs6-quiz').forEach(function(qz){
+    qz.querySelectorAll('.r-tab').forEach(function(t){
+      t.addEventListener('click',function(){
+        qz.querySelectorAll('.r-tab').forEach(function(x){x.classList.remove('active');});
+        qz.querySelectorAll('.r-pane').forEach(function(x){x.classList.remove('active');});
+        t.classList.add('active');
+        var rp=t.dataset.rp;
+        qz.querySelectorAll('.r-pane').forEach(function(p){ if(p.dataset.rp===rp) p.classList.add('active'); });
+      });
+    });
+  });
+
+  // ===== slide 4: 选项点选即回显（支持取消） =====
+  document.querySelectorAll('.sq-opts').forEach(function(box){
+    var multi=box.dataset.multi==='1';
+    box.querySelectorAll('.sq-opt').forEach(function(o){
+      o.addEventListener('click',function(){
+        if(box.parentElement.querySelector('.q-fb.show')) return; // 已判分，锁定
+        if(multi){
+          o.classList.toggle('picked');
+        }else{
+          var was=o.classList.contains('picked');
+          box.querySelectorAll('.sq-opt').forEach(function(x){x.classList.remove('picked');});
+          if(!was) o.classList.add('picked');
+        }
+      });
+    });
+  });
+
+  // ===== slide 4: 选择/匹配/排序题提交判分 =====
+  document.querySelectorAll('.q-submit').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var card=btn.closest('.sq'); if(!card) return;
+      var fb=card.querySelector('.q-fb');
+
+      // 选择题
+      var opts=card.querySelector('.sq-opts');
+      if(opts){
+        var correct=(opts.dataset.correct||'').split(',').filter(Boolean);
+        var picked=[];
+        opts.querySelectorAll('.sq-opt').forEach(function(o){
+          if(o.classList.contains('picked')) picked.push(o.dataset.key);
+        });
+        opts.querySelectorAll('.sq-opt').forEach(function(o){
+          o.style.pointerEvents='none';
+          o.classList.remove('picked');
+          if(correct.indexOf(o.dataset.key)>=0) o.classList.add('right');
+          else if(picked.indexOf(o.dataset.key)>=0) o.classList.add('wrong');
+        });
+        var ok = picked.slice().sort().join()===correct.slice().sort().join();
+        fb.className='q-fb show '+(ok?'good':'try');
+        fb.innerHTML='<span class="ans">'+(ok?'✓ 回答正确':'✗ 正确答案：'+correct.join('、'))+'</span>'+opts.dataset.expl;
+        return;
+      }
+
+      // 匹配题
+      var mrows=card.querySelectorAll('.match-row');
+      if(mrows.length){
+        var allOk=true;
+        mrows.forEach(function(r){
+          var sel=r.querySelector('select');
+          var v=sel.selectedIndex-1; // option 0 是占位
+          sel.classList.remove('ok','bad');
+          if(v===+r.dataset.ans){ sel.classList.add('ok'); }
+          else { sel.classList.add('bad'); allOk=false; }
+        });
+        fb.className='q-fb show '+(allOk?'good':'try');
+        fb.innerHTML='<span class="ans">'+(allOk?'✓ 全部对应正确':'✗ 红框为错误对应')+'</span>正确：双轨制→自愿签约对赌；虚拟小微→研发改项目制；沙拉式融合→各国文化是蔬菜、人单合一是沙拉酱；经营→管理者给员工提供资源。';
+        return;
+      }
+
+      // 排序题
+      var srows=card.querySelectorAll('.sort-row');
+      if(srows.length){
+        var ok2=true;
+        srows.forEach(function(r){
+          var sel=r.querySelector('select');
+          var v=sel.value;
+          sel.classList.remove('ok','bad');
+          if(+v===+r.dataset.ans){ sel.classList.add('ok'); }
+          else { sel.classList.add('bad'); ok2=false; }
+        });
+        fb.className='q-fb show '+(ok2?'good':'try');
+        fb.innerHTML='<span class="ans">'+(ok2?'✓ 顺序正确':'✗ 红框为错误顺序')+'</span>实际推进顺序：①双轨制（先自愿签约、让样板说话）→ ②虚拟小微（研发项目化）→ ③薪酬制度改革（16薪→14薪÷12+上不封顶）→ ④退休返聘（后期补充的人才保留措施）。';
+      }
+    });
+  });
+
+  // ===== slide 4: Q8 本地短答 =====
+  (function(){
+    var ta=document.getElementById('c6_hw2_local'); if(!ta) return;
+    var saved=localStorage.getItem('c6_hw2_local'); if(saved) ta.value=saved;
+  })();
+
+  // ===== slide 4: Q4 / Q9 云函数；Q8 仅本地 =====
+  (function(){
+
+  })();
+
+  // ===== slide 6: 顶部 3D 大 tab 切换 =====
+  (function(){
+    var tabs=document.querySelectorAll('.c6-bigtab');
+    tabs.forEach(function(t){
+      t.addEventListener('click',function(){
+        var target=t.dataset.c6tab;
+        tabs.forEach(function(x){x.classList.remove('active');});
+        t.classList.add('active');
+        document.querySelectorAll('.c6-pane').forEach(function(p){
+          if(p.dataset.c6pane===target){ p.classList.add('active'); p.style.display='block'; }
+          else { p.classList.remove('active'); p.style.display='none'; }
+        });
+      });
+    });
+  })();
+
+  // ===== slide 6 Pane 1: 后果证据归类 =====
+  (function(){
+    var ev=[
+      {t:'思和德国 Olaf："只给中国员工涨薪，不给德国员工涨薪，这有失公平。"',ans:'b'},
+      {t:'思和国内员工："国外一闹就涨 15%，那我们以后是不是也闹一闹？"',ans:'b'},
+      {t:'思和 Olaf："我们要的是公平制度，不是一次性施舍。"（涨薪后人没回来）',ans:'c'},
+      {t:'思和：涨薪诉求 2017 年提出，全球薪酬委员会被搁置半年，2018 年爆离职潮。',ans:'c'},
+      {t:'海尔三洋双轨制：同岗中国/日本员工因选择不同体系，出现同岗不同酬。',ans:'a'},
+      {t:'海尔三洋：日本老员工对年功序列被打破、退休返聘争议强烈抵触。',ans:'a'}
+    ];
+    var wrap=document.getElementById('c6-evidence'); if(!wrap) return;
+    var pick={};
+    ev.forEach(function(e,i){
+      var div=document.createElement('div');
+      div.className='c6-ev-card';
+      div.innerHTML='<span class="ev-text"><span style="color:#94a3b8">#'+(i+1)+'</span> '+e.t+'</span>'+
+        '<div class="c6-dd"><button class="c6-dd-btn">⋯</button>'+
+        '<div class="c6-dd-menu">'+
+        '<button data-cat="a">A · 薪酬标准不一致</button>'+
+        '<button data-cat="b">B · 公平感被破坏</button>'+
+        '<button data-cat="c">C · 节奏/沟通失误</button>'+
+        '<button data-cat="">清空归类</button>'+
+        '</div></div>';
+      div.querySelector('.c6-dd-btn').addEventListener('click',function(ev){
+        ev.stopPropagation();
+        document.querySelectorAll('.c6-dd.open').forEach(function(m){if(m!==div.querySelector('.c6-dd'))m.classList.remove('open');});
+        div.querySelector('.c6-dd').classList.toggle('open');
+      });
+      div.querySelectorAll('.c6-dd-menu button').forEach(function(b){
+        b.addEventListener('click',function(){
+          var c=b.dataset.cat;
+          pick[i]=c;
+          div.classList.remove('cat-a','cat-b','cat-c');
+          if(c){ div.classList.add('cat-'+c); div.querySelector('.c6-dd-btn').textContent=c.toUpperCase(); }
+          else { div.querySelector('.c6-dd-btn').textContent='⋯'; }
+          div.querySelector('.c6-dd').classList.remove('open');
+          checkDone();
+        });
+      });
+      wrap.appendChild(div);
+    });
+    function checkDone(){
+      var done=Object.keys(pick).filter(function(k){return pick[k];}).length;
+      var fb=document.getElementById('c6-evidence-fb');
+      if(done===ev.length){
+        var right=0;
+        var rows=ev.map(function(e,i){
+          var ok=(pick[i]===e.ans);
+          if(ok)right++;
+          var label={a:'A 标准不一致',b:'B 公平感',c:'C 节奏/沟通'}[e.ans];
+          return '<div style="margin-top:.25rem;font-size:.82rem"><span style="color:#94a3b8">#'+(i+1)+'</span> '+
+            (ok?'✅':'❌ 你选的是 {'+({a:'A',b:'B',c:'C'}[pick[i]]||'?')+'}，正确答案是')+
+            ' <b style="color:#1e40af">'+label+'</b></div>';
+        }).join('');
+        fb.style.display='block';
+        fb.innerHTML='<b>📊 你答对 '+right+'/'+ev.length+'。</b>'+rows+
+          '<div style="margin-top:.4rem;padding-top:.35rem;border-top:1px dashed #bfdbfe"><b>核心结论：</b>两个案例里"炸雷"几乎都不是钱不够——而是<b>公平感被破坏（B）</b>和<b>节奏/沟通失误（C）</b>。后面要讲的 COLA、平衡表、外派政策，本质上是在<b>同时</b>解决标准对齐和程序公平。</div>';
+      }
+    }
+    document.addEventListener('click',function(){document.querySelectorAll('.c6-dd.open').forEach(function(m){m.classList.remove('open');});});
+  })();
+
+  // ===== slide 7: 三轴分类 =====
+  (function(){
+    // tab 切换
+    var tabs=document.querySelectorAll('.c6-bigtab[data-c7tab]');
+    tabs.forEach(function(t){
+      t.addEventListener('click',function(){
+        var target=t.dataset.c7tab;
+        tabs.forEach(function(x){x.classList.remove('active');});
+        t.classList.add('active');
+        document.querySelectorAll('[data-c7pane]').forEach(function(p){
+          if(p.dataset.c7pane===target){ p.style.display='block'; }
+          else { p.style.display='none'; }
+        });
+      });
+    });
+
+    // --- Tab1: 国籍 9 卡 ---
+    var cats=[
+      {t:'母公司外派员工（PCN）',h:'如思和王岩、海尔派往三洋的中方干部',ans:true},
+      {t:'总部 HR 派驻 3 个月做薪酬审计',h:'短期差旅，非外派',ans:false},
+      {t:'东道国当地雇员（HCN）',h:'如德国 Olaf、日本三洋老员工',ans:true},
+      {t:'外包公司派到产线的工人',h:'第三方用工，非企业雇员',ans:false},
+      {t:'母公司雇佣、派驻第三国的 TCN',h:'中国总部派到德国公司管厂',ans:true},
+      {t:'被收购后留用的退休返聘日本老专家',h:'用工形式，非国籍类别',ans:false},
+      {t:'东道国子公司自雇的第三国员工',h:'德国公司在当地招的希腊籍工程师',ans:true},
+      {t:'持德国绿卡、原是中国籍的研发组长',h:'法律身份已是 HCN',ans:false},
+      {t:'合资方派驻的董事',h:'治理层，非雇员',ans:false}
+    ];
+    var cwrap=document.getElementById('c7-cats');
+    var pick1={};
+    cats.forEach(function(c,i){
+      var d=document.createElement('div');
+      d.className='c6-cat-card';
+      d.innerHTML='<div class="cat-text"><b style="font-size:.88rem">'+c.t+'</b><br><span style="color:#64748b;font-size:.76rem">'+c.h+'</span></div>'+
+        '<div class="c6-dd"><button class="c6-dd-btn">⋯</button><div class="c6-dd-menu">'+
+        '<button data-v="1">✅ 是真正的国籍类别</button>'+
+        '<button data-v="0">❌ 不是</button>'+
+        '<button data-v="">清空</button></div></div>';
+      d.querySelector('.c6-dd-btn').addEventListener('click',function(e){e.stopPropagation();
+        document.querySelectorAll('.c6-dd.open').forEach(function(m){if(m!==d.querySelector('.c6-dd'))m.classList.remove('open');});
+        d.querySelector('.c6-dd').classList.toggle('open');});
+      d.querySelectorAll('.c6-dd-menu button').forEach(function(b){
+        b.addEventListener('click',function(){
+          pick1[i]=b.dataset.v;
+          d.classList.remove('is-true','is-false');
+          if(b.dataset.v==='1'){d.classList.add('is-true');d.querySelector('.c6-dd-btn').textContent='✓';}
+          else if(b.dataset.v==='0'){d.classList.add('is-false');d.querySelector('.c6-dd-btn').textContent='✗';}
+          else d.querySelector('.c6-dd-btn').textContent='⋯';
+          d.querySelector('.c6-dd').classList.remove('open');
+          check1();
+        });
+      });
+      cwrap.appendChild(d);
+    });
+    function check1(){
+      var done=Object.keys(pick1).filter(function(k){return pick1[k]!=='';}).length;
+      if(done===cats.length){
+        var right=0;
+        cats.forEach(function(c,i){if((pick1[i]==='1')===c.ans)right++;});
+        var fb=document.getElementById('c7-cats-fb');
+        fb.style.display='block';
+        fb.innerHTML=right===cats.length
+          ?'✅ <b>满分！</b> 真正按国籍划分的就是 PCN / HCN / TCN 三类。注意：<b>国籍 ≠ 雇佣地</b>——中国籍员工被德国子公司签合同，国籍上仍是 PCN。'
+          :'你答对 '+right+'/'+cats.length+'。真正的国籍类别只有 PCN/HCN/TCN；短期差旅、外包、退休返聘、绿卡身份、董事都不是国籍维度。';
+      }
+    }
+
+    // --- Tab2: 任期场景 ---
+    var ten=[
+      {t:'重庆总部派你去德国管厂，一做 3 年，全家搬过去',ans:'lta'},
+      {t:'派德国帮忙建厂 8 个月，你一个人去，家属留重庆',ans:'sta'},
+      {t:'你住荷兰阿姆斯特丹，每天坐火车去德国杜塞尔多夫上班',ans:'commuter'},
+      {t:'人不搬，仍住重庆，远程领导德国子公司 HR 团队',ans:'virtual'},
+      {t:'季度审计师，每次去德国待 3 周就回来',ans:'travel'}
+    ];
+    var twrap=document.getElementById('c7-tenure');
+    var pick2={};
+    ten.forEach(function(s,i){
+      var d=document.createElement('div');
+      d.className='c6-ev-card';
+      d.innerHTML='<span class="ev-text"><span style="color:#94a3b8">#'+(i+1)+'</span> '+s.t+'</span>'+
+        '<div class="c6-dd"><button class="c6-dd-btn">⋯</button><div class="c6-dd-menu">'+
+        '<button data-v="lta">LTA 长期外派(2-5年)</button>'+
+        '<button data-v="sta">STA 短期外派(3-12月)</button>'+
+        '<button data-v="commuter">通勤外派</button>'+
+        '<button data-v="virtual">虚拟外派/远程</button>'+
+        '<button data-v="travel">高频差旅(不算外派)</button>'+
+        '</div></div>';
+      d.querySelector('.c6-dd-btn').addEventListener('click',function(e){e.stopPropagation();
+        document.querySelectorAll('.c6-dd.open').forEach(function(m){if(m!==d.querySelector('.c6-dd'))m.classList.remove('open');});
+        d.querySelector('.c6-dd').classList.toggle('open');});
+      d.querySelectorAll('.c6-dd-menu button').forEach(function(b){
+        b.addEventListener('click',function(){
+          pick2[i]=b.dataset.v;
+          d.querySelector('.c6-dd-btn').textContent={'lta':'LTA','sta':'STA','commuter':'通勤','virtual':'虚拟','travel':'差旅'}[b.dataset.v];
+          d.querySelector('.c6-dd').classList.remove('open');
+          check2();
+        });
+      });
+      twrap.appendChild(d);
+    });
+    function check2(){
+      var done=Object.keys(pick2).filter(function(k){return pick2[k];}).length;
+      if(done===ten.length){
+        var right=0;
+        ten.forEach(function(s,i){if(pick2[i]===s.ans)right++;});
+        var fb=document.getElementById('c7-tenure-fb');
+        fb.style.display='block';
+        fb.innerHTML=right===ten.length
+          ?'✅ <b>全对！</b> 任期不同，薪酬包完全不同：LTA 要 COLA+住房+教育补贴；STA 走津贴+探亲假；虚拟外派只报差旅、不发外派补贴。'
+          :'你答对 '+right+'/'+ten.length+'。重点区分：举家搬迁=LTA；单人短期=STA；住邻国每周往返=通勤；不搬迁远程=虚拟；单次小于3月=差旅不算外派。';
+      }
+    }
+
+    // --- Tab3: 雇主场景 ---
+    var emp=[
+      {t:'我们要进日本市场但还没设子公司，想立刻雇一个日本销售总监，怎么签？',ans:'eor'},
+      {t:'德国 Olaf 是思和德国子公司在当地招聘网站上招的，合同也是德国子公司签',ans:'host'},
+      {t:'王岩是重庆总部招的中国籍员工，派到德国工作 3 年，工资由总部发',ans:'parent'},
+      {t:'希腊籍工程师实际上和思和德国子公司签合同，但汇报线在中国总部，人常驻希腊工厂',ans:'secondment'}
+    ];
+    var ewrap=document.getElementById('c7-employer');
+    var pick3={};
+    emp.forEach(function(s,i){
+      var d=document.createElement('div');
+      d.className='c6-ev-card';
+      d.innerHTML='<span class="ev-text"><span style="color:#94a3b8">#'+(i+1)+'</span> '+s.t+'</span>'+
+        '<div class="c6-dd"><button class="c6-dd-btn">⋯</button><div class="c6-dd-menu">'+
+        '<button data-v="parent">① 母公司直接雇佣</button>'+
+        '<button data-v="host">② 东道国子公司直接雇佣</button>'+
+        '<button data-v="secondment">③ 集团内部跨境派遣</button>'+
+        '<button data-v="eor">④ 第三方名义雇主 EOR</button>'+
+        '</div></div>';
+      d.querySelector('.c6-dd-btn').addEventListener('click',function(e){e.stopPropagation();
+        document.querySelectorAll('.c6-dd.open').forEach(function(m){if(m!==d.querySelector('.c6-dd'))m.classList.remove('open');});
+        d.querySelector('.c6-dd').classList.toggle('open');});
+      d.querySelectorAll('.c6-dd-menu button').forEach(function(b){
+        b.addEventListener('click',function(){
+          pick3[i]=b.dataset.v;
+          d.querySelector('.c6-dd-btn').textContent={'parent':'母公司','host':'东道国','secondment':'派遣','eor':'EOR'}[b.dataset.v];
+          d.querySelector('.c6-dd').classList.remove('open');
+          check3();
+        });
+      });
+      ewrap.appendChild(d);
+    });
+    function check3(){
+      var done=Object.keys(pick3).filter(function(k){return pick3[k];}).length;
+      if(done===emp.length){
+        var right=0;
+        emp.forEach(function(s,i){if(pick3[i]===s.ans)right++;});
+        var fb=document.getElementById('c7-employer-fb');
+        fb.style.display='block';
+        fb.innerHTML=right===emp.length
+          ?'✅ <b>全对！</b> 法律雇主决定了工资谁发、社保交哪国、谁做绩效。EOR 是新市场最快的入场方式，但成本比设子公司高。'
+          :'你答对 '+right+'/'+emp.length+'。注意：希腊工程师和德国子公司签合同=东道国直接雇佣；他人在希腊工作是另一回事（那是国籍/工作地维度）。';
+      }
+    }
+
+    // --- Tab4: 三轴综合 ---
+    var tri=[
+      {t:'思和王岩：重庆总部招的中国籍，派德国工作 3 年',nat:'pcn',dur:'lta',emp:'parent'},
+      {t:'德国 Olaf：德国籍，思和德国子公司在当地招聘，长期在德国工作',nat:'hcn',dur:'lta',emp:'host'},
+      {t:'希腊籍工程师：思和德国子公司签合同，常驻希腊工厂',nat:'tcn',dur:'lta',emp:'host'},
+      {t:'3 个月建厂顾问：总部派出，德国待 3 个月就回重庆',nat:'pcn',dur:'sta',emp:'parent'},
+      {t:'日本销售总监：公司还没在日本设子公司，通过第三方雇佣',nat:'hcn',dur:'lta',emp:'eor'}
+    ];
+    var tw=document.getElementById('c7-tri');
+    var pick4={};
+    tri.forEach(function(s,i){
+      var row=document.createElement('div');
+      row.style.cssText='background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.7rem .8rem;font-size:.95rem;line-height:1.5;color:#162d4d;display:flex;align-items:center;gap:.7rem;min-height:58px';
+      row.innerHTML='<div style="flex:1"><span style="color:#94a3b8"># '+(i+1)+' · </span>'+s.t+'</div>'+
+        '<select data-axis="nat" style="padding:.4rem .5rem;font-size:.88rem;border:1.5px solid #cbd5e1;border-radius:6px;background:#fff;min-width:110px">'+
+          '<option value="">国籍?</option><option value="pcn">PCN 母国</option><option value="hcn">HCN 东道国</option><option value="tcn">TCN 第三国</option></select>'+
+        '<select data-axis="dur" style="padding:.4rem .5rem;font-size:.88rem;border:1.5px solid #cbd5e1;border-radius:6px;background:#fff;min-width:110px">'+
+          '<option value="">任期?</option><option value="lta">LTA</option><option value="sta">STA</option><option value="virtual">虚拟/远程</option></select>'+
+        '<select data-axis="emp" style="padding:.4rem .5rem;font-size:.88rem;border:1.5px solid #cbd5e1;border-radius:6px;background:#fff;min-width:130px">'+
+          '<option value="">雇主?</option><option value="parent">母公司直雇</option><option value="host">东道国直雇</option><option value="secondment">集团派遣</option><option value="eor">EOR</option></select>';
+      row.querySelectorAll('select').forEach(function(sel){
+        sel.addEventListener('change',function(){
+          pick4[i]=pick4[i]||{};
+          pick4[i][sel.dataset.axis]=sel.value;
+          // 即时上色
+          var exp=s[sel.dataset.axis];
+          sel.style.borderColor=(sel.value===exp)?'#10b981':'#ef4444';
+          check4();
+        });
+      });
+      tw.appendChild(row);
+    });
+    function check4(){
+      var all=tri.every(function(s,i){
+        var p=pick4[i];
+        return p&&p.nat===s.nat&&p.dur===s.dur&&p.emp===s.emp;
+      });
+      if(all){
+        var fb=document.getElementById('c7-tri-fb');
+        fb.style.display='block';
+        fb.innerHTML='✅ <b>全部正确！</b> 同一个人在三个维度上各取一个值，薪酬设计完全不同。这就是后面 COLA、平衡表、外派政策要解决的事。';
+      }
+    }
+
+    // --- Tab6: 薪酬项目互动表 ---
+    (function(){
+      var rows=[
+        {name:'基本工资',ans:['母国','母国','当地','母国','母国','当地'],lock:true},
+        {name:'COLA 生活成本补贴',ans:['y','d','n','y','n','n']},
+        {name:'住房补贴',ans:['y','y','n','y','n','n'],lock:true},
+        {name:'子女教育补贴',ans:['y','n','n','y','n','n'],lock:true},
+        {name:'探亲假/往返机票',ans:['y','d','n','y','d','n']},
+        {name:'税务平衡 Tax Equalization',ans:['y','d','n','y','n','n']},
+        {name:'社保/公积金缴纳地',ans:['母国','母国','东道国','母国/东道国','母国','EOR'],lock:true},
+        {name:'艰苦/外派津贴',ans:['d','d','n','d','n','n']},
+        {name:'回任/安置费',ans:['y','d','n','d','n','n']}
+      ];
+      var body=document.getElementById('c7-pay-body'); if(!body) return;
+      // y=标配 ✓, d=视情况 △, n=不涉及 —
+      var cycle=['','y','d','n'];
+      var markTxt={y:'✓',d:'△',n:'—'};
+      var markColor={y:'#16a34a',d:'#ca8a04',n:'#94a3b8'};
+      rows.forEach(function(r,ri){
+        var tr=document.createElement('tr');
+        if(ri%2===1) tr.style.background='#f8fafc';
+        var html='<td style="padding:.35rem .5rem;border:1px solid #e2e8f0"><b>'+r.name+'</b></td>';
+        r.ans.forEach(function(a,ci){
+          // 文本类行（基本工资、社保）或 lock=true 的行：直接印答案
+          if(a.length>1 || r.lock){
+            var txt={y:'✓',d:'△',n:'—'}[a]||a;
+            var col={y:'#16a34a',d:'#ca8a04',n:'#94a3b8'}[a]||'#162d4d';
+            html+='<td style="text-align:center;border:1px solid #e2e8f0;font-size:.85rem;color:'+col+';font-weight:600">'+txt+'</td>';
+          } else {
+            html+='<td data-ri="'+ri+'" data-ci="'+ci+'" data-ans="'+a+'" style="text-align:center;border:1px solid #e2e8f0;padding:.2rem">'+
+              '<select data-ans="'+a+'" style="padding:.15rem .3rem;font-size:.82rem;border:1.5px solid #cbd5e1;border-radius:5px;background:#fff;cursor:pointer">'+
+              '<option value="">— 请选择 —</option>'+
+              '<option value="y">✓ 标配</option>'+
+              '<option value="d">△ 视情况</option>'+
+              '<option value="n">— 不涉及</option>'+
+              '</select></td>';
+          }
+        });
+        tr.innerHTML=html;
+        body.appendChild(tr);
+      });
+      // 选择事件：即时上色
+      body.querySelectorAll('select').forEach(function(sel){
+        sel.addEventListener('change',function(){
+          var v=sel.value;
+          sel.style.borderColor=(v===sel.dataset.ans)?'#10b981':(v?'#ef4444':'#cbd5e1');
+        });
+      });
+      // 对照答案
+      document.getElementById('c7-pay-check').addEventListener('click',function(){
+        var right=0,total=0;
+        body.querySelectorAll('select').forEach(function(sel){
+          var ans=sel.dataset.ans;
+          var mine=sel.value;
+          total++;
+          var td=sel.parentElement;
+          if(mine===ans){ right++; sel.style.borderColor='#10b981'; td.style.background='#dcfce7'; }
+          else {
+            sel.style.borderColor='#ef4444';
+            td.style.background='#fee2e2';
+            sel.value=ans; // 显示正确答案
+            sel.style.borderColor='#10b981';
+          }
+        });
+        document.getElementById('c7-pay-fb').textContent='你答对 '+right+'/'+total+'（红格是你错的，已自动显示正确答案）';
+      });
+      // 清空
+      document.getElementById('c7-pay-clear').addEventListener('click',function(){
+        body.querySelectorAll('select').forEach(function(sel){
+          sel.value='';
+          sel.style.borderColor='#cbd5e1';
+          sel.parentElement.style.background='';
+        });
+        document.getElementById('c7-pay-fb').textContent='';
+      });
+    })();
+
+    document.addEventListener('click',function(){document.querySelectorAll('.c6-dd.open').forEach(function(m){m.classList.remove('open');});});
+
+    // --- 课程回顾：tab 切换 + 视频录制 ---
+    (function(){
+      var tabs=document.querySelectorAll('[data-rvtap]');
+      if(!tabs.length) return;
+      tabs.forEach(function(btn){
+        btn.addEventListener('click',function(){
+          var k=btn.dataset.rvtap;
+          tabs.forEach(function(b){b.classList.remove('active');});
+          btn.classList.add('active');
+          document.querySelectorAll('[data-rvpane]').forEach(function(p){
+            p.style.display=(p.dataset.rvpane===k)?'block':'none';
+          });
+        });
+      });
+
+      // 知识脑图：章节切换
+      var mmBtns=document.querySelectorAll('.mm-chbtn');
+      if(mmBtns.length){
+        mmBtns.forEach(function(b){
+          b.addEventListener('click',function(){
+            mmBtns.forEach(function(x){x.classList.remove('on');});
+            b.classList.add('on');
+            var k=b.dataset.mm;
+            document.querySelectorAll('.mm-panel').forEach(function(s){
+              s.style.display=(s.dataset.mmPanel===k)?'block':'none';
+            });
+          });
+        });
+      }
+
+      // 视频录制（720p + 可选滤镜）
+      var video=document.getElementById('rvVideo');      // 预览/回放
+      var raw=document.getElementById('rvRaw');         // 隐藏的原始摄像头
+      var canvas=document.getElementById('rvCanvas');
+      var ctx=canvas.getContext('2d');
+      var ph=document.getElementById('rvPlaceholder');
+      var timerEl=document.getElementById('rvTimer');
+      var startBtn=document.getElementById('rvStart');
+      var stopBtn=document.getElementById('rvStop');
+      var retakeBtn=document.getElementById('rvRetake');
+      var submitBtn=document.getElementById('rvSubmit');
+      var status=document.getElementById('rvStatus');
+      if(!startBtn) return;
+
+      var mediaStream=null, recorder=null, chunks=[], timerId=null, seconds=0, recordedBlob=null;
+      var rafId=null, currentFilter='none';
+
+      var FILTERS={
+        none:   'none',
+        bright: 'brightness(1.15) saturate(1.1) contrast(1.05)',
+        beauty: 'brightness(1.08) saturate(1.15) contrast(1.05) blur(0.4px)'
+      };
+
+      function fmt(s){var m=Math.floor(s/60),ss=s%60;return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+      function tick(){seconds++;timerEl.textContent=fmt(seconds);if(seconds>=300){stopRec();}}
+
+      function drawLoop(){
+        if(!raw.videoWidth){ rafId=requestAnimationFrame(drawLoop); return; }
+        // 保持比例画到 1280x720 canvas
+        var cw=canvas.width, ch=canvas.height;
+        var vr=raw.videoWidth/raw.videoHeight, cr=cw/ch;
+        var dw,dh,dx,dy;
+        if(vr>cr){ dh=ch; dw=ch*vr; dx=(cw-dw)/2; dy=0; }
+        else { dw=cw; dh=cw/vr; dx=0; dy=(ch-dh)/2; }
+        ctx.filter=FILTERS[currentFilter]||'none';
+        ctx.fillStyle='#000';
+        ctx.fillRect(0,0,cw,ch);
+        ctx.drawImage(raw,dx,dy,dw,dh);
+        rafId=requestAnimationFrame(drawLoop);
+      }
+
+      // 滤镜按钮切换
+      document.querySelectorAll('.rv-filter').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          currentFilter=btn.dataset.f;
+          document.querySelectorAll('.rv-filter').forEach(function(b){
+            b.style.borderColor='transparent'; b.style.color='#94a3b8';
+          });
+          btn.style.borderColor='#38bdf8'; btn.style.color='#e2e8f0';
+        });
+      });
+
+      startBtn.addEventListener('click',async function(){
+        try{
+          mediaStream=await navigator.mediaDevices.getUserMedia({
+            video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30}},
+            audio:{echoCancellation:true,noiseSuppression:true}
+          });
+          raw.srcObject=mediaStream;
+          await raw.play();
+          ph.style.display='none';
+          video.srcObject=null;
+          video.src='';
+          video.controls=false;
+          // 启动 canvas 绘制循环
+          cancelAnimationFrame(rafId);
+          drawLoop();
+          // 录制流 = canvas 视频轨 + 原始音频轨
+          var canvasStream=canvas.captureStream(30);
+          var audioTracks=mediaStream.getAudioTracks();
+          var recStream=new MediaStream();
+          canvasStream.getVideoTracks().forEach(function(t){recStream.addTrack(t);});
+          audioTracks.forEach(function(t){recStream.addTrack(t);});
+          // 预览也走 canvas（学生能实时看到滤镜效果）
+          video.srcObject=canvasStream;
+
+          chunks=[];
+          var opts={mimeType:'video/webm;codecs=vp9,opus',videoBitsPerSecond:1500000};
+          try{ recorder=new MediaRecorder(recStream,opts); }
+          catch(e){
+            try{ recorder=new MediaRecorder(recStream,{mimeType:'video/webm;codecs=vp8,opus',videoBitsPerSecond:1500000}); }
+            catch(e2){ recorder=new MediaRecorder(recStream); }
+          }
+          recorder.ondataavailable=function(e){ if(e.data.size>0) chunks.push(e.data); };
+          recorder.onstop=function(){
+            cancelAnimationFrame(rafId);
+            recordedBlob=new Blob(chunks,{type:'video/webm'});
+            var url=URL.createObjectURL(recordedBlob);
+            // 关键：先清掉实时流，再挂回放 URL，否则 video 仍走 srcObject 不显示回放
+            video.srcObject=null;
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            video.src=url;
+            video.controls=true;
+            video.muted=false;
+            video.play().catch(function(){});
+            stopBtn.style.display='none';
+            retakeBtn.style.display='inline-block';
+            submitBtn.style.display='inline-block';
+            startBtn.style.display='none';
+            status.textContent='已录制 '+fmt(seconds)+'，大小 '+(recordedBlob.size/1024/1024).toFixed(1)+'MB（720p）';
+          };
+          recorder.start(2000); // 每2秒分片，防崩溃丢段
+          seconds=0;
+          timerEl.textContent='00:00';
+          timerEl.style.display='inline-block';
+          startBtn.style.display='none';
+          stopBtn.style.display='inline-block';
+          retakeBtn.style.display='none';
+          submitBtn.style.display='none';
+          status.textContent='录制中… 720p · 建议 3-5 分钟';
+          timerId=setInterval(tick,1000);
+        }catch(err){
+          status.textContent='❌ 无法访问摄像头/麦克风：'+err.message;
+        }
+      });
+
+      function stopRec(){
+        if(recorder&&recorder.state!=='inactive') recorder.stop();
+        if(mediaStream){ mediaStream.getTracks().forEach(function(t){t.stop();}); }
+        clearInterval(timerId);
+        timerEl.style.display='none';
+      }
+      stopBtn.addEventListener('click',stopRec);
+
+      retakeBtn.addEventListener('click',function(){
+        URL.revokeObjectURL(video.src);
+        video.pause();
+        video.removeAttribute('src');
+        video.srcObject=null;
+        video.load();
+        video.controls=false;
+        video.muted=true;
+        recordedBlob=null;
+        ph.style.display='block';
+        startBtn.style.display='inline-block';
+        stopBtn.style.display='none';
+        retakeBtn.style.display='none';
+        submitBtn.style.display='none';
+        status.textContent='';
+      });
+
+      submitBtn.addEventListener('click',async function(){
+        if(!recordedBlob){ alert('请先录制视频'); return; }
+        var sid=localStorage.getItem('c6_sid')||'anonymous';
+        var ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+        var filename='c6_reflect_'+sid+'_'+ts+'.webm';
+        submitBtn.disabled=true;
+        status.textContent='上传中…';
+        // TODO: 接入主程序的 COS 上传通道。
+        // 主程序应提供 window.uploadVideoHook(blob, filename) 函数，返回 Promise。
+        // 未接入时走演示流程：本地下载一份。
+        try{
+          if(typeof window.uploadVideoHook==='function'){
+            await window.uploadVideoHook(recordedBlob, filename);
+          } else {
+            var a=document.createElement('a');
+            a.href=URL.createObjectURL(recordedBlob);
+            a.download=filename;
+            a.click();
+          }
+          status.textContent='✅ 提交成功！文件名：'+filename;
+          retakeBtn.style.display='none';
+          submitBtn.style.display='none';
+        }catch(err){
+          status.textContent='❌ 上传失败：'+err.message;
+          submitBtn.disabled=false;
+        }
+      });
+    })();
+  })();
+
+  // ===== Slide 1 hero animation =====
+  (function(){
+    var scenes=document.querySelectorAll('.hero-scene');
+    if(!scenes.length) return;
+    var dotsBox=document.getElementById('heroDots');
+    var cur=0, timerId=null, skipped=false;
+    scenes.forEach(function(s,i){
+      var d=document.createElement('span');
+      if(i===0) d.classList.add('on');
+      d.addEventListener('click',function(){ go(i); });
+      dotsBox.appendChild(d);
+    });
+    var dots=dotsBox.querySelectorAll('span');
+    function go(n){
+      if(skipped) return;
+      scenes[cur].classList.remove('active');
+      dots[cur].classList.remove('on');
+      cur=(n>=0?n:(cur+1)%scenes.length);
+      scenes[cur].classList.add('active');
+      dots[cur].classList.add('on');
+      clearTimeout(timerId);
+      timerId=setTimeout(function(){ go(cur+1); },5200);
+    }
+    document.getElementById('heroSkip').addEventListener('click',function(){
+      skipped=true;
+      clearTimeout(timerId);
+      // 跳到最后一幕，显示"开始本章之旅"
+      scenes[cur].classList.remove('active');
+      dots[cur].classList.remove('on');
+      cur=scenes.length-1;
+      scenes[cur].classList.add('active');
+      dots[cur].classList.add('on');
+      this.style.display='none';
+    });
+    // 切走 slide 1 时停，切回时继续
+    var origShow=show;
+    window.show=function(i){
+      origShow(i);
+      if(i!==0){ clearTimeout(timerId); }
+      else if(!skipped){ clearTimeout(timerId); timerId=setTimeout(function(){go(cur+1);},5200); }
+    };
+    timerId=setTimeout(function(){ go(cur+1); },5200);
+  })();
+
+  show(0);
+</script>
+<script src="../assets/chapter6-integration.js?v=20261106-1"></script><link rel="stylesheet" href="../assets/chapter-notes.css?v=7"><script src="../assets/chapter-notes.js?v=7"></script></body>
+</html>

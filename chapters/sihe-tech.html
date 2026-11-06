@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思和科技薪酬整合 · 跨文化管理互动案例</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#0b1020; color:#fff; overflow:hidden; }
+
+  /* ============ 开始页 ============ */
+  #startPage {
+    position:fixed; inset:0; z-index:100;
+    background:linear-gradient(135deg,#0f1b3d 0%,#1a2a5e 50%,#0f1b3d 100%);
+    display:flex; flex-direction:column; overflow-y:auto;
+  }
+  .author-bar {
+    background:#1e5fd6; color:#fff; padding:10px 24px; font-size:14px;
+    display:flex; justify-content:center; align-items:center; gap:48px;
+    box-shadow:0 2px 12px rgba(30,95,214,.5);
+  }
+  .author-bar span b { font-weight:600; }
+  .start-body { flex:1; display:flex; align-items:center; justify-content:center; padding:30px 40px; }
+  .start-card { width:100%; max-width:1100px; text-align:center; }
+  .start-card h1 { font-size:34px; margin-bottom:6px; letter-spacing:2px; }
+  .start-card .sub { font-size:15px; color:#aab6d8; margin-bottom:28px; }
+  .start-cols { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:30px; }
+  .start-col {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    border-radius:12px; padding:22px 20px; text-align:left;
+  }
+  .start-col h3 { font-size:17px; color:#7ea7ff; margin-bottom:10px; }
+  .start-col p { font-size:14px; line-height:1.8; color:#d8e0f5; }
+  .countdown-wrap { font-size:18px; margin-bottom:18px; color:#ffd54f; }
+  .countdown-wrap b { font-size:26px; color:#ffb300; margin:0 4px; }
+  #startBtn {
+    padding:14px 60px; font-size:20px; border:none; border-radius:30px;
+    background:linear-gradient(145deg,#4a6cf7,#2f4bd6); color:#fff; cursor:not-allowed;
+    opacity:.4; transition:all .3s; letter-spacing:2px;
+  }
+  #startBtn.ready { cursor:pointer; opacity:1; box-shadow:0 6px 20px rgba(74,108,247,.5); }
+  #startBtn.ready:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(74,108,247,.7); }
+
+  /* ============ 主布局 ============ */
+  #app { display:none; width:100%; height:100%; }
+  #app.active { display:flex; }
+
+  /* 左侧导航 */
+  #navPanel {
+    width:220px; min-width:220px; background:#111a33; border-right:1px solid #233055;
+    padding:20px 14px; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  }
+  #navPanel h2 { font-size:16px; color:#7ea7ff; margin-bottom:14px; padding-left:6px; }
+  .nav-btn {
+    padding:14px 16px; border-radius:10px; cursor:pointer; text-align:left;
+    background:#1a2547; border:1px solid #2a3a66; color:#c8d4f5;
+    transition:all .25s; font-size:14px; line-height:1.4;
+  }
+  .nav-btn:hover:not(.locked) { background:#243466; border-color:#4a6cf7; }
+  .nav-btn.current { background:linear-gradient(145deg,#4a6cf7,#2f4bd6); color:#fff; border-color:#4a6cf7; }
+  .nav-btn.locked { opacity:.38; cursor:not-allowed; color:#8892b0; }
+  .nav-btn .step { display:block; font-size:12px; color:#7ea7ff; margin-bottom:4px; }
+  .nav-btn.current .step { color:#cdd9ff; }
+  .nav-btn.locked .step { color:#5a6488; }
+
+  /* 播放区 */
+  #stage { flex:1; position:relative; background:#000; display:flex; align-items:center; justify-content:center; }
+  #stageImg {
+    width:100%; height:100%; object-fit:contain; background:#000;
+  }
+
+  /* 字幕条 */
+  #subtitleBar {
+    position:absolute; left:0; right:0; bottom:70px; padding:14px 60px;
+    background:rgba(0,0,0,.55); color:#fff; font-size:20px; line-height:1.6;
+    text-align:center; min-height:56px; backdrop-filter:blur(2px);
+  }
+  #subtitleText { display:inline; }
+  .cursor { display:inline-block; width:2px; height:20px; background:#fff; vertical-align:middle; margin-left:2px; animation:blink 1s infinite; }
+  @keyframes blink { 0%,50%{opacity:1;} 51%,100%{opacity:0;} }
+
+  /* 播放按钮 */
+  #playToggle {
+    position:absolute; right:24px; bottom:20px; width:54px; height:54px; border-radius:50%;
+    background:rgba(255,255,255,.15); border:2px solid rgba(255,255,255,.5); color:#fff;
+    font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .25s; backdrop-filter:blur(4px);
+  }
+  #playToggle:hover { background:rgba(255,255,255,.3); transform:scale(1.08); }
+
+  /* 场景标题 */
+  #sceneTitle {
+    position:absolute; left:24px; top:18px; font-size:15px; color:#fff;
+    background:rgba(0,0,0,.45); padding:8px 16px; border-radius:8px; backdrop-filter:blur(2px);
+  }
+  #backBtn {
+    position:absolute; right:24px; top:18px; font-size:14px; color:#fff;
+    background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.25);
+    padding:7px 14px; border-radius:8px; cursor:pointer; backdrop-filter:blur(2px);
+    transition:all .2s; display:none;
+  }
+  #backBtn:hover { background:rgba(255,255,255,.18); }
+  #backBtn.show { display:block; }
+
+  /* ============ 叠加层 ============ */
+  #overlay {
+    position:absolute; inset:0; z-index:50; display:none;
+    background:rgba(0,0,0,.55); backdrop-filter:blur(2px);
+    align-items:center; justify-content:center; flex-direction:column; padding:40px;
+  }
+  #overlay.show { display:flex; }
+  #overlayText {
+    font-size:24px; line-height:1.8; max-width:760px; text-align:center;
+    margin-bottom:36px; min-height:80px; color:#fff;
+  }
+  #overlayBtns { display:flex; flex-direction:column; gap:18px; align-items:center; width:100%; max-width:520px; }
+  .ov-btn {
+    width:100%; max-width:520px; padding:18px 26px; font-size:17px; line-height:1.5;
+    border:none; border-radius:12px; color:#fff; cursor:pointer; text-align:center;
+    transition:all .25s; font-family:inherit;
+  }
+  .ov-btn.blue { background:linear-gradient(145deg,#4a6cf7,#2f4bd6); box-shadow:0 6px 16px rgba(74,108,247,.4); }
+  .ov-btn.green { background:linear-gradient(145deg,#52c41a,#389e0d); box-shadow:0 6px 16px rgba(82,196,26,.4); }
+  .ov-btn.red { background:linear-gradient(145deg,#fa541c,#d4380d); box-shadow:0 6px 16px rgba(250,84,28,.4); }
+  .ov-btn.gray { background:linear-gradient(145deg,#4a5578,#333d5c); box-shadow:0 6px 16px rgba(0,0,0,.3); }
+  .ov-btn:hover { transform:translateY(-4px) scale(1.02); filter:brightness(1.1); }
+
+  /* ============ 反思题 ============ */
+  #quizBox {
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+    border-radius:14px; padding:28px 32px; max-width:680px; width:100%;
+    backdrop-filter:blur(6px);
+  }
+  #quizBox h3 { font-size:19px; margin-bottom:18px; line-height:1.6; color:#fff; }
+  .quiz-opt {
+    display:flex; align-items:flex-start; gap:10px; padding:12px 14px; margin-bottom:10px;
+    background:rgba(255,255,255,.06); border-radius:8px; cursor:pointer; transition:background .2s;
+    font-size:15px; line-height:1.6;
+  }
+  .quiz-opt:hover { background:rgba(255,255,255,.12); }
+  .quiz-opt input { margin-top:4px; transform:scale(1.2); cursor:pointer; }
+  #quizSubmit {
+    margin-top:18px; padding:12px 36px; font-size:16px; border:none; border-radius:24px;
+    background:linear-gradient(145deg,#4a6cf7,#2f4bd6); color:#fff; cursor:pointer;
+  }
+  #quizFeedback { margin-top:18px; font-size:16px; line-height:1.8; display:none; }
+  #quizFeedback.ok { color:#73d13d; }
+  #quizFeedback.bad { color:#ff7a45; }
+  #quizFeedback .explain { color:#d8e0f5; margin-top:8px; font-size:15px; }
+  #screenshotBtn, #nextSceneBtn {
+    display:none; margin-top:16px; padding:12px 28px; font-size:15px; border:none; border-radius:24px; cursor:pointer;
+  }
+  #screenshotBtn { background:linear-gradient(145deg,#13c2c2,#08979c); color:#fff; }
+  #nextSceneBtn { background:linear-gradient(145deg,#52c41a,#389e0d); color:#fff; }
+
+  /* ============ 总结页 ============ */
+  #summaryPage {
+    position:absolute; inset:0; z-index:60; display:none; overflow-y:auto;
+    background:linear-gradient(135deg,#0f1b3d,#1a2a5e); padding:50px 60px;
+  }
+  #summaryPage.show { display:block; }
+  #summaryPage h1 { font-size:30px; text-align:center; margin-bottom:10px; }
+  #summaryPage .sub { text-align:center; color:#aab6d8; margin-bottom:36px; font-size:15px; }
+  .sum-q {
+    background:rgba(255,255,255,.06); border-radius:12px; padding:22px 26px; margin-bottom:20px;
+  }
+  .sum-q h3 { font-size:17px; margin-bottom:12px; color:#7ea7ff; }
+  .sum-q textarea {
+    width:100%; min-height:80px; background:rgba(0,0,0,.3); border:1px solid #334477;
+    border-radius:8px; color:#fff; padding:12px; font-size:14px; font-family:inherit; resize:vertical;
+  }
+  #finishBtn {
+    display:block; margin:30px auto; padding:14px 60px; font-size:18px; border:none; border-radius:30px;
+    background:linear-gradient(145deg,#4a6cf7,#2f4bd6); color:#fff; cursor:pointer;
+  }
+  #backToSceneBtn {
+    display:block; margin:0 auto 20px; padding:10px 28px; font-size:14px; border:1px solid #557;
+    border-radius:20px; background:transparent; color:#aab6d8; cursor:pointer;
+  }
+  #backToSceneBtn:hover { background:rgba(255,255,255,.08); color:#fff; }
+  #submitMsg { text-align:center; margin:14px auto; font-size:15px; min-height:24px; }
+  #submitMsg.ok { color:#73d13d; }
+  #submitMsg.err { color:#ff7875; }
+  #sidBar {
+    text-align:center; color:#aab6d8; font-size:13px; margin-bottom:24px;
+  }
+  #sidBar a { color:#7ea7ff; cursor:pointer; margin-left:8px; text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 开始页 ==================== -->
+<div id="startPage">
+  <div class="author-bar">
+    <span>案例原文作者：<b>南京师范大学商学院</b></span>
+    <span>互动案例改编：<b>刘天玲（重庆工商大学2025级MBA4班）</b></span>
+  </div>
+  <div class="start-body">
+    <div class="start-card">
+      <h1>思和科技薪酬整合</h1>
+      <div class="sub">跨文化管理互动视频案例 · 2015—2019</div>
+      <div class="start-cols">
+        <div class="start-col">
+          <h3>📖 案例背景</h3>
+          <p>2015年起，中国民营企业思和科技先后收购德国Istech与芬兰Deadline两家海外公司。跨文化并购中，国内外薪酬体系的巨大差异引发了外派员工不满、国内员工攀比、海外员工离职等一系列连锁危机。HR经理王岩需要在不同文化、不同利益群体之间，逐步推动一场全球薪酬整合。</p>
+        </div>
+        <div class="start-col">
+          <h3>👤 主人公</h3>
+          <p><b>王岩</b>：思和科技HR经理，圆脸、短发、戴眼镜、深色西装。他全程主导薪酬整合决策，将在五个关键节点面临策略选择。你将代替王岩做出每一次决策，并看到不同策略带来的真实后果。</p>
+        </div>
+        <div class="start-col">
+          <h3>🎮 操作指引</h3>
+          <p>1. 观看每段视频与旁白，字幕与音频同步。<br>2. 关键节点会弹出两个策略按钮，请选择你认为正确的一个。<br>3. 你将看到所选策略的后果，以及另一条路径的对比。<br>4. 每个场景结束后完成一道多选反思题。<br>5. 完成全部5个场景后，回答3个开放性问题。</p>
+        </div>
+      </div>
+      <div class="countdown-wrap">请在 <b id="cdNum">60</b> 秒内阅读完毕，倒计时结束后可开始案例</div>
+      <button id="startBtn" disabled>开始案例</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 主应用 ==================== -->
+<div id="app">
+  <div id="navPanel">
+    <h2>案例场景</h2>
+    <!-- 场景按钮由JS生成 -->
+  </div>
+  <div id="stage">
+    <div id="sceneTitle"></div>
+    <img id="stageImg" src="" alt="">
+    <div id="subtitleBar"><span id="subtitleText"></span><span class="cursor" id="cursor"></span></div>
+    <button id="playToggle" title="播放/暂停">▶</button>
+    <button id="backBtn" title="返回上一场景">← 上一场景</button>
+  </div>
+
+  <!-- 叠加层 -->
+  <div id="overlay">
+    <div id="overlayText"><span id="overlayTextInner"></span><span class="cursor"></span></div>
+    <div id="overlayBtns"></div>
+  </div>
+
+  <!-- 总结页 -->
+  <div id="summaryPage">
+    <h1>🏁 案例学习完成</h1>
+    <div class="sub">恭喜你完成了思和科技薪酬整合的全部五个场景。请用几分钟思考以下开放性问题（提交后云端保存，下次登录可续填）。</div>
+    <div id="sidBar"></div>
+    <div class="sum-q"><h3>1. 哪个决策最出乎你意料？为什么？</h3><textarea id="sumQ1" placeholder="在此写下你的思考..."></textarea></div>
+    <div class="sum-q"><h3>2. 如果你是王岩，重来一次哪个策略会调整？</h3><textarea id="sumQ2" placeholder="在此写下你的思考..."></textarea></div>
+    <div class="sum-q"><h3>3. 全球薪酬整合中，"总部统一标准"与"当地自主选择"的边界应该划在哪？思和最后是怎么划这条线的？</h3><textarea id="sumQ3" placeholder="在此写下你的思考..."></textarea></div>
+    <div id="submitMsg"></div>
+    <button id="finishBtn">提交学习记录</button>
+    <button id="backToSceneBtn">← 返回场景5 复查</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+ *  字幕映射：key = 音频相对路径，value = 字幕文本
+ * ============================================================ */
+const subtitleMap = {
+  // ---- 场景1 ----
+  "s1-germany/s1_shot1_voice.mp3": "2015年3月，南京思和科技的技术主管程运抵达德国Istech公司，开始为期一年的海外技术交流。公司安排他住在联合创始人Olaf家附近。",
+  "s1-germany/s1_shot2_voice.mp3": "Olaf五十多岁，头发灰白，留着胡须，戴着眼镜，是德国纳米金属材料领域的资深专家。两人在Olaf家附近的咖啡馆初次见面握手。",
+  "s1-germany/s1_shot3_voice.mp3": "一天清晨，程运在餐桌旁无意间看到一张Olaf扔掉的税单。上面写着年工资收入二十五万六千欧元，约合一百八十万人民币。",
+  "s1-germany/s1_shot4_voice.mp3": "程运愣住了。他自己作为母公司外派的技术主管，年薪三十五万人民币，加上每月一万五的海外津贴，年收入也才五十三万。而Olaf是子公司的员工，薪酬竟然是自己的三倍多。",
+  "s1-germany/s1a_1_voice.mp3": "王岩向孙总汇报后，决定将程运的薪酬提高到与德国同级别员工相当的水平，约一百二十万人民币。这个数字甚至超过了国内副总经理的薪酬。",
+  "s1-germany/s1a_2_voice.mp3": "程运的薪酬调整后，其他即将外派的技术主管得知消息，纷纷要求按同样标准执行。三位老总陷入两难。",
+  "s1-germany/s1a_3_voice.mp3": "更糟糕的是，消息很快传到了国内员工耳中。大家议论纷纷：外派一年，收入就翻了一倍多，谁都想抢着去德国。",
+  "s1-germany/s1b_1_voice.mp3": "王岩与CFO赖总反复测算后，建议将程运的海外津贴从每年十八万提高到三十万。这个幅度既安抚了程运，又不至于让外派薪酬体系失控。",
+  "s1-germany/s1b_2_voice.mp3": "孙总特别交代，除了三位老总和王岩，不要让其他人知道这个决定。技术总监朱总单独找程运做了沟通。",
+  "s1-germany/s1b_3_voice.mp3": "程运的情绪逐渐平复，继续在德国开展技术工作。王岩把这次处理记入备忘，提醒自己全球薪酬体系是迟早要面对的课题。",
+
+  // ---- 场景2 ----
+  "s2-nanjing/s2_shot1_voice.mp3": "2016年7月，程运结束为期一年的海外派遣，回到南京母公司，继续主持研发中心工作。",
+  "s2-nanjing/s2_shot2_voice.mp3": "不再领取每年三十万的海外津贴，程运心里有些失落。他忍不住向几位关系好的同事抱怨，还透露了德国员工的薪酬水平。",
+  "s2-nanjing/s2_shot3_voice.mp3": "消息像长了翅膀一样传开。研发部门首先出现波动，大家工作积极性不高，与德国子公司做技术沟通时带着抵触情绪。",
+  "s2-nanjing/s2_shot4_voice.mp3": "到八月份，其他部门的员工也开始忿忿不平。有人说：中国公司赚的钱，都给德国员工发工资了。一场情绪的暴风雨，即将来临。",
+  "s2-nanjing/s2a_1_voice.mp3": "王岩决定公开所有薪酬数据。他把德国Istech公司和芬兰Deadline公司的员工薪酬表，连同国内的薪酬表一起发给了各部门。",
+  "s2-nanjing/s2a_2_voice.mp3": "这下子炸了锅。国内员工看到德国实验室助手的起薪就有六十万人民币，而自己作为资深研发才二十多万，更加不满。",
+  "s2-nanjing/s2a_3_voice.mp3": "德国员工那边也收到了消息，知道自己的薪酬被公开给了中国同事，感到隐私被侵犯。Olaf还专门打电话来询问这件事。",
+  "s2-nanjing/s2b_1_voice.mp3": "在收购芬兰Deadline公司的动员大会上，王岩面对大家的质疑，平静地解释：跨境并购是公司长远发展的决策，去年第一次并购确实没有提前考虑到薪酬差异。",
+  "s2-nanjing/s2b_2_voice.mp3": "孙总接过话头：未来我们将分步走，逐渐实现薪酬全球化。国外员工不必考虑薪酬差异来中国工作，国内员工也可以随时按需到国外工作。",
+  "s2-nanjing/s2b_3_voice.mp3": "九月份，王岩正式发布三年分步走调薪计划。国内关键岗位在未来三年内逐步涨薪，到2018年实现全球同岗同酬。方案全票通过，大家干劲高昂。",
+
+  // ---- 场景3 ----
+  "s3-salary/s3_shot1_voice.mp3": "2017年2月13日，思和科技新年工作大会在南京召开。一百零二名境内员工，以及德国Istech和芬兰Deadline的研发高管共同出席。",
+  "s3-salary/s3_shot2_voice.mp3": "孙总宣布了2016年的成绩：全球营收六点九亿，比上一年增长百分之三十五。但净利润不增反降，比上一年减少了百分之三十。",
+  "s3-salary/s3_shot3_voice.mp3": "翻译如实传递了这些数据。Olaf和芬兰研发主管Zellsis坐在下面，无意中了解到，中国研发员工已经连续三年大幅涨薪。",
+  "s3-salary/s3_shot4_voice.mp3": "会后，Olaf特意找孙总闲聊。他说：我们的协议规定不裁员不降薪，但德国子公司一直在提供新技术，公司发展好了，其他员工也可以分享红利吗？可以提高薪水吗？",
+  "s3-salary/s3a_1_voice.mp3": "孙总觉得Olaf说得有道理，当场就让王岩给德国和芬兰员工涨薪。王岩来不及做调研，只能按国内员工的涨薪幅度，给国外员工也涨了百分之十。",
+  "s3-salary/s3a_2_voice.mp3": "涨薪消息传到国内，员工们又不满了：我们刚涨完，国外也跟着涨，那以后是不是年年都要涨？财务压力越来越大。",
+  "s3-salary/s3a_3_voice.mp3": "德国员工那边也不满意。Olaf拿到涨薪后说：我们德国实验室助手起薪就六十万，你们涨的这一点，在德国根本不算什么。涨薪没有达到预期效果。",
+  "s3-salary/s3b_1_voice.mp3": "王岩挂了孙总的电话，心中充满自责。他没有急着答复国外员工，而是先梳理了2014到2016年的财务和薪酬数据。",
+  "s3-salary/s3b_2_voice.mp3": "王岩发现，2016年公司薪酬福利支出已经高达九千四百九十三万，比上一年增长了近百分之七十。国外员工薪酬增加和国内员工薪酬提高两个因素叠加，财务压力巨大。",
+  "s3-salary/s3b_3_voice.mp3": "王岩与CFO赖总重新测算后，保守估计2017年营收可达八点五亿。建议国外员工涨薪控制在百分之五以内，同时成立全球薪酬管理委员会来统筹这件事。然而公司高层忙于业绩扩张，委员会的事被搁置，这一拖就是半年。",
+
+  // ---- 场景4 ----
+  "s4-resign/s4_shot1_voice.mp3": "2017年11月，芬兰研发主管Zellsis任满回到芬兰。按照双向技术交流约定，下一位芬兰技术专家应该来中国工作。",
+  "s4-resign/s4_shot2_voice.mp3": "但这位专家拒绝来华，还直接提交了辞呈。技术总监朱总亲自飞到芬兰挽留，却发现Zellsis也在犹豫：如果不是创始人还保留股份，他自己也想辞职。",
+  "s4-resign/s4_shot3_voice.mp3": "消息传到德国，Olaf也表达了同样的想法。两天后，朱总的邮箱里又多了两位德国资深研发人员的辞呈。",
+  "s4-resign/s4_shot4_voice.mp3": "一周之内，芬兰公司又有一位研发人员和三位行政人员提出离职，德国公司也有两位行政人员提交辞呈。思和科技原本平稳的跨国技术整合，突然急转直下。",
+  "s4-resign/s4a_1_voice.mp3": "王岩分别约了Olaf上午九点面谈，又约了Zellsis下午两点电话沟通。他没有直接谈钱，而是先问他们对当前薪酬是否满意、对薪酬制度有什么期望。",
+  "s4-resign/s4a_2_voice.mp3": "两位专家都承认，当前薪酬略高于当地同行平均水平。但Olaf说：思和科技用德国技术实现了快速增长，只给中国员工涨薪，不给德国员工涨薪，这有失公平。",
+  "s4-resign/s4a_3_voice.mp3": "Zellsis补充道：现在国内外有不同的考核标准，芬兰研发团队的贡献可能无法得到公平确认。王岩意识到，核心问题不是涨薪多少，而是如何建设全球化的薪酬制度。他承诺研发员工调薪百分之三到十并补发差额。",
+  "s4-resign/s4b_1_voice.mp3": "王岩慌了神，直接给孙总打电话：要不我们给德国和芬兰员工涨薪百分之十五，先把人留住再说。孙总同意了。",
+  "s4-resign/s4b_2_voice.mp3": "消息传出去，离职的人确实回来了几个。但国内员工很快又听说了这件事：我们辛辛苦苦一年涨百分之十，国外一闹就涨百分之十五，那以后是不是也闹一闹？",
+  "s4-resign/s4b_3_voice.mp3": "更糟的是，德国员工并不买账。Olaf说：我们不是来讨价还价的，我们想要的是公平的制度，不是一次性的施舍。涨薪后离职的人并没有全部回来。",
+
+  // ---- 场景5 ----
+  "s5-committee/s5_shot1_voice.mp3": "2018年5月，思和科技新入职了一位国际HR——金鑫。她三十一岁，女性，在德国工作生活了十三年，拥有德累斯顿工业大学的应用化学学位和国际MBA。",
+  "s5-committee/s5_shot2_voice.mp3": "上任第三天，第三任外派德国主管钱明森就打来电话：Olaf希望德国子公司能够像中国母公司一样，统一绩效考核发放年终奖，否则就是区别对待不同国家的员工。",
+  "s5-committee/s5_shot3_voice.mp3": "王岩调出2015年以来国内外的薪酬数据和制度文本，和金鑫一起分析。金鑫发现，中国采用高杠杆薪酬策略，年终奖占比较高；而德国采用低风险策略，绩效占比低且没有年终奖。",
+  "s5-committee/s5_shot4_voice.mp3": "金鑫建议：不要由总部直接制定德国的薪酬制度，而是提供几套可选方案，由国外员工用民主方式自己选择。",
+  "s5-committee/s5a_1_voice.mp3": "王岩决定由总部直接给德国子公司制定薪酬方案。他按照中国模式，设计了一套年终奖制度，要求德国公司执行。",
+  "s5-committee/s5a_2_voice.mp3": "方案发到德国后，Olaf和其他员工都很抵触。他们说：我们德国的制度本来就很好，为什么要照搬中国的模式？这是文化入侵。",
+  "s5-committee/s5a_3_voice.mp3": "德国员工集体抗议，又有几个人提交了辞呈。王岩这才意识到，跨国薪酬整合不能只靠总部命令，必须考虑当地的文化和制度习惯。",
+  "s5-committee/s5b_1_voice.mp3": "金鑫的建议得到孙总批准。2018年5月31日，全球薪酬管理委员会正式增加了德国和芬兰员工代表。金鑫用流利的英文介绍了全球薪酬理念，提出了德国员工要求发放年终奖的议案。",
+  "s5-committee/s5b_2_voice.mp3": "会后，金鑫提供了四套可选方案：从年终奖一个月加涨薪百分之五，到维持现状不涨薪，涵盖不同风险和收益组合。",
+  "s5-committee/s5b_3_voice.mp3": "六月二十五日，德国员工代表回复选择了方案三——无年终奖、核心岗位薪酬不变、维持现有结构。芬兰员工也选择了同样的方案。他们主动放弃了高风险高收益的方案，选择了自己习惯的低风险模式。2019年，在更大涨薪幅度的吸引下，德芬员工才转向方案一。"
+};
+
+/* ============================================================
+ *  场景数据
+ * ============================================================ */
+// 媒体素材（jpg/wav）上传到 COS 后，把这里改成 COS 的公网前缀，末尾带斜杠。
+// 本地调试时留空字符串 '' 即可（走相对路径）。
+const MEDIA_BASE = 'https://ccm2025-1311686407.cos.ap-guangzhou.myqcloud.com/chapter6/dist-cos-media/';
+function ia(folder, sceneImg, shotAudio) {
+  return { type:'imageaudio', image: folder+'/'+sceneImg, audio: folder+'/'+shotAudio };
+}
+
+const scenes = [
+  {
+    id:'s1', name:'德国税单', title:'场景1 · 德国税单（2015年3月，德国Istech）',
+    folder:'s1-germany',
+    intro:[
+      ia('s1-germany','s1_scene1.jpg','s1_shot1_voice.mp3'),
+      ia('s1-germany','s1_scene2.jpg','s1_shot2_voice.mp3'),
+      ia('s1-germany','s1_scene3.jpg','s1_shot3_voice.mp3'),
+      ia('s1-germany','s1_scene4.jpg','s1_shot4_voice.mp3')
+    ],
+    guide:'程运发现德国员工薪酬远高于自己，王岩接下来会选择哪种策略？',
+    choices:[
+      { key:'A', label:'按德国同级别员工标准大幅提高程运薪酬，实现同岗同酬', outcome:'fail',
+        result:'这个决策导致：程运薪酬提到约120万，超过国内副总经理；其他即将外派的主管纷纷要求按同标准执行；消息传回国内，员工议论"外派一年收入翻倍"，都抢着要去德国。',
+        path:[
+          ia('s1-germany','s1_scene5.jpg','s1a_1_voice.mp3'),
+          ia('s1-germany','s1_scene6.jpg','s1a_2_voice.mp3'),
+          ia('s1-germany','s1_scene7.jpg','s1a_3_voice.mp3')
+        ]},
+      { key:'B', label:'适度提高程运海外津贴至三十万一年，严格控制知情范围', outcome:'success',
+        result:'这个决策带来：程运海外津贴从18万提到30万，情绪平复继续在德国工作；知情范围严格控制在三位老总和王岩；王岩把这次处理记入备忘，提醒自己全球薪酬体系是迟早要面对的课题。',
+        path:[
+          ia('s1-germany','s1_scene8.jpg','s1b_1_voice.mp3'),
+          ia('s1-germany','s1_scene9.jpg','s1b_2_voice.mp3'),
+          ia('s1-germany','s1_scene10.jpg','s1b_3_voice.mp3')
+        ]}
+    ],
+    reflect:{
+      question:'场景1中，王岩选择"适度提高海外津贴并严格保密"而不是"按德国标准大幅提高薪酬"，原因是什么？（多选）',
+      options:[
+        '德国同级别员工薪酬远高于国内，大幅提高外派薪酬会导致薪酬体系混乱',
+        '外派主管薪酬如果超过总经理，会引发新的内部不公平',
+        '保密是为了避免国内员工产生攀比心理',
+        '德国员工的薪酬数据是公司机密，不能对外透露'
+      ],
+      correct:[0,1,2],
+      explanation:'德国M3级别薪酬约120万人民币，而国内M2高管平均才35-50万。如果大幅提高外派主管薪酬，不仅会超过国内同级别，甚至会超过总经理，这显然不合理。同时保密是为了避免信息扩散引发更大范围的不满。'
+    }
+  },
+  {
+    id:'s2', name:'国内风暴', title:'场景2 · 国内风暴（2016年7月，南京思和）',
+    folder:'s2-nanjing',
+    intro:[
+      ia('s2-nanjing','s2_scene1.jpg','s2_shot1_voice.mp3'),
+      ia('s2-nanjing','s2_scene2.jpg','s2_shot2_voice.mp3'),
+      ia('s2-nanjing','s2_scene3.jpg','s2_shot3_voice.mp3'),
+      ia('s2-nanjing','s2_scene4.jpg','s2_shot4_voice.mp3')
+    ],
+    guide:'国内员工得知海外高薪后群情激愤，王岩接下来会选择哪种策略？',
+    choices:[
+      { key:'A', label:'立即向全体员工公开国内外所有岗位薪酬数据，透明化解释差异原因', outcome:'fail',
+        result:'这个决策导致：薪酬数据公开后，国内员工看到德国助手起薪60万而国内资深员工才20多万，情绪更激动；德国员工觉得隐私被侵犯，Olaf直接打电话来质问。',
+        path:[
+          ia('s2-nanjing','s2_scene5.jpg','s2a_1_voice.mp3'),
+          ia('s2-nanjing','s2_scene6.jpg','s2a_2_voice.mp3'),
+          ia('s2-nanjing','s2_scene7.jpg','s2a_3_voice.mp3')
+        ]},
+      { key:'B', label:'在动员大会上说明分步走薪酬整合计划，承诺一两个月内拿出具体方案', outcome:'success',
+        result:'这个决策带来：王岩在动员大会上解释了国内外物价和岗位差异；孙总宣布未来三年分步涨薪、2018年实现全球同岗同酬；方案全票通过，大家干劲重新高昂。',
+        path:[
+          ia('s2-nanjing','s2_scene8.jpg','s2b_1_voice.mp3'),
+          ia('s2-nanjing','s2_scene9.jpg','s2b_2_voice.mp3'),
+          ia('s2-nanjing','s2_scene10.jpg','s2b_3_voice.mp3')
+        ]}
+    ],
+    reflect:{
+      question:'场景2中，王岩为什么选择"分步走"而不是"立即拉平国内外薪酬"？（多选）',
+      options:[
+        '国内外物价水平和薪酬基线差异巨大，一步拉平会导致公司成本失控',
+        '分步走可以给财务留出缓冲空间，避免现金流断裂',
+        '国内员工只是一时情绪，不用出台正式方案，晾一晾就过去了',
+        '国内员工的诉求只是"知道公司有计划"，并不要求立刻同工同酬'
+      ],
+      correct:[0,1,3],
+      explanation:'2016年思和科技全球营收6.9亿，但净利润只有6163万，薪酬福利支出已经高达9493万。如果立即拉平国内外薪酬，成本会急剧上升，财务无法承受。分步走既给了国内员工希望和预期，又控制了成本节奏。'
+    }
+  },
+  {
+    id:'s3', name:'涨薪诉求', title:'场景3 · 涨薪诉求（2017年2-8月，德国/芬兰）',
+    folder:'s3-salary',
+    intro:[
+      ia('s3-salary','s3_scene1.jpg','s3_shot1_voice.mp3'),
+      ia('s3-salary','s3_scene2.jpg','s3_shot2_voice.mp3'),
+      ia('s3-salary','s3_scene3.jpg','s3_shot3_voice.mp3'),
+      ia('s3-salary','s3_scene4.jpg','s3_shot4_voice.mp3')
+    ],
+    guide:'国外员工主动提出涨薪诉求，王岩接下来会选择哪种策略？',
+    choices:[
+      { key:'A', label:'立即答应国外员工涨薪要求，趁热打铁稳住核心人才', outcome:'fail',
+        result:'这个决策导致：孙总当场答应涨薪10%；国内员工不满"刚涨完国外也涨"；德国员工仍嫌涨幅太少，情绪没有真正平息。',
+        path:[
+          ia('s3-salary','s3_scene5.jpg','s3a_1_voice.mp3'),
+          ia('s3-salary','s3_scene6.jpg','s3a_2_voice.mp3'),
+          ia('s3-salary','s3_scene7.jpg','s3a_3_voice.mp3')
+        ]},
+      { key:'B', label:'先做调研和测算，了解国外同行薪酬水平和公司财务承受能力，再制定方案', outcome:'success',
+        result:'这个决策带来：王岩自查发现2016年薪酬福利支出已达9493万、增长近70%；建议国外涨薪控制在5%以内；同时提议成立全球薪酬管理委员会来统筹——然而委员会被高层搁置了半年。',
+        path:[
+          ia('s3-salary','s3_scene8.jpg','s3b_1_voice.mp3'),
+          ia('s3-salary','s3_scene9.jpg','s3b_2_voice.mp3'),
+          ia('s3-salary','s3_scene10.jpg','s3b_3_voice.mp3')
+        ]}
+    ],
+    reflect:{
+      question:'场景3中，Olaf和Zellsis提出涨薪诉求的核心原因是什么？（多选）',
+      options:[
+        '他们了解到中国员工连续三年大幅涨薪，觉得自己被区别对待',
+        '德国和芬兰的生活成本本来就高，他们的实际购买力在下降',
+        '他们认为公司使用德国技术实现了快速增长，德国员工应该分享红利',
+        '他们听说国内员工年终奖很高，觉得自己的薪酬结构不合理'
+      ],
+      correct:[0,2],
+      explanation:'Olaf明确说"德国子公司除了股东以外的其他员工可以分享公司发展的红利吗"，Zellsis则问"什么时候可以大家一起涨薪"。他们的核心诉求不是绝对薪酬低，而是觉得中国员工在涨薪而德国员工不涨薪，这是不公平的待遇。'
+    }
+  },
+  {
+    id:'s4', name:'离职风波', title:'场景4 · 离职风波（2017年11月，芬兰/德国）',
+    folder:'s4-resign',
+    intro:[
+      ia('s4-resign','s4_scene1.jpg','s4_shot1_voice.mp3'),
+      ia('s4-resign','s4_scene2.jpg','s4_shot2_voice.mp3'),
+      ia('s4-resign','s4_scene3.jpg','s4_shot3_voice.mp3'),
+      ia('s4-resign','s4_scene4.jpg','s4_shot4_voice.mp3')
+    ],
+    guide:'多名国外研发人员提交辞呈，王岩接下来会选择哪种策略？',
+    choices:[
+      { key:'A', label:'紧急与Olaf和Zellsis分别面谈和电话沟通，了解他们的真实想法和核心诉求', outcome:'success',
+        result:'这个决策带来：王岩分别约谈Olaf（上午九点面谈）和Zellsis（下午两点电话）；两位专家承认薪酬略高于当地同行，但真正不满是"中国涨、德国不涨"的不公平和考核标准差异；王岩承诺研发员工调薪3%-10%并补发差额。',
+        path:[
+          ia('s4-resign','s4_scene5.jpg','s4a_1_voice.mp3'),
+          ia('s4-resign','s4_scene6.jpg','s4a_2_voice.mp3'),
+          ia('s4-resign','s4_scene7.jpg','s4a_3_voice.mp3')
+        ]},
+      { key:'B', label:'立即按最高标准满足国外员工涨薪要求，不惜一切代价留住核心人才', outcome:'fail',
+        result:'这个决策导致：王岩慌了，直接给国外研发涨薪15%；几个人暂时回来了，但国内员工觉得"闹就涨"；德国员工并不买账，他们要的是制度公平，不是施舍式涨薪。',
+        path:[
+          ia('s4-resign','s4_scene8.jpg','s4b_1_voice.mp3'),
+          ia('s4-resign','s4_scene9.jpg','s4b_2_voice.mp3'),
+          ia('s4-resign','s4_scene10.jpg','s4b_3_voice.mp3')
+        ]}
+    ],
+    reflect:{
+      question:'场景4中，王岩通过调研发现国外员工离职的真正原因是？（多选）',
+      options:[
+        '他们对绝对薪酬水平不满，觉得自己赚得太少',
+        '他们觉得中国员工涨薪而德国员工不涨薪，待遇不公平',
+        '他们担心国内外考核标准不同，自己的贡献无法被公平评价',
+        '他们想回自己国家工作，不想长期在海外'
+      ],
+      correct:[1,2],
+      explanation:'两位专家都承认当前薪酬略高于当地同行平均水平，说明绝对薪酬不是问题。Olaf的核心不满是"只给中国员工涨薪、不给德国员工涨薪，有失公平"；Zellsis的核心担忧是"国内外不同考核标准，芬兰研发团队贡献无法得到公平确认"。这说明他们要的是公平的制度，而不是更多的钱。'
+    }
+  },
+  {
+    id:'s5', name:'民主决策', title:'场景5 · 民主决策（2018-2019年，全球）',
+    folder:'s5-committee',
+    intro:[
+      ia('s5-committee','s5_scene1.jpg','s5_shot1_voice.mp3'),
+      ia('s5-committee','s5_scene2.jpg','s5_shot2_voice.mp3'),
+      ia('s5-committee','s5_scene3.jpg','s5_shot3_voice.mp3'),
+      ia('s5-committee','s5_scene4.jpg','s5_shot4_voice.mp3')
+    ],
+    guide:'德国员工要求统一年终奖制度，王岩接下来会选择哪种策略？',
+    choices:[
+      { key:'A', label:'由总部直接制定德国子公司薪酬方案，统一推行中国的高杠杆薪酬模式', outcome:'fail',
+        result:'这个决策导致：王岩按中国高杠杆模式设计方案；德国员工强烈抵触，认为这是"文化入侵"；集体抗议之下，又有人提交辞呈。',
+        path:[
+          ia('s5-committee','s5_scene5.jpg','s5a_1_voice.mp3'),
+          ia('s5-committee','s5_scene6.jpg','s5a_2_voice.mp3'),
+          ia('s5-committee','s5_scene7.jpg','s5a_3_voice.mp3')
+        ]},
+      { key:'B', label:'成立全球薪酬管理委员会，邀请德芬员工代表参与，提供四套方案由员工民主选择', outcome:'success',
+        result:'这个决策带来：全球薪酬委员会正式成立，德芬员工代表进入；四套方案民主投票，德国和芬兰都选了方案三（无年终奖、维持现状）；直到2019年更大涨薪幅度出现后，他们才转向方案一。',
+        path:[
+          ia('s5-committee','s5_scene8.jpg','s5b_1_voice.mp3'),
+          ia('s5-committee','s5_scene9.jpg','s5b_2_voice.mp3'),
+          ia('s5-committee','s5_scene10.jpg','s5b_3_voice.mp3')
+        ]}
+    ],
+    reflect:{
+      question:'场景5中，德国和芬兰员工最初为什么选择"无年终奖、维持现状"的方案？（多选）',
+      options:[
+        '他们本来就习惯低风险、高固定的薪酬模式，不愿意放弃安全感',
+        '他们不信任总部的绩效考核体系，担心浮动薪酬会被随意扣减',
+        '在整体涨薪幅度有限的情况下，他们宁愿选择熟悉的旧制度',
+        '他们觉得年终奖是中国公司的特色，不适合欧洲文化'
+      ],
+      correct:[0,2],
+      explanation:'案例原文明确说："在整体薪酬调整幅度较小的情形下，海外员工并不愿意放弃原来无风险或低风险的薪酬方案，但他们也期望能够像母公司员工那样按照真实贡献取得风险薪酬，而条件是提供更大幅度的涨薪。"这说明他们不是排斥年终奖本身，而是在涨薪幅度不够大时，宁愿保持熟悉的低风险模式。'
+    }
+  }
+];
+
+/* ============================================================
+ *  全局状态
+ * ============================================================ */
+let playGen = 0;            // 代际标记，防止快速切换时叠加层重复弹出
+let currentSceneIdx = 0;
+let unlockedCount = 1;      // 默认解锁第1个
+let audioCtx = null;
+const audio = new Audio();
+let typeTimer = null;
+let isPlaying = false;
+
+const $ = id => document.getElementById(id);
+const stageImg = $('stageImg');
+const sceneTitle = $('sceneTitle');
+const subtitleText = $('subtitleText');
+const cursor = $('cursor');
+const playToggle = $('playToggle');
+const overlay = $('overlay');
+const overlayTextInner = $('overlayTextInner');
+const overlayBtns = $('overlayBtns');
+const backBtn = $('backBtn');
+
+/* ============================================================
+ *  云函数 / SID
+ * ============================================================ */
+const API = 'https://1311686407-1ngfs1nlvf.ap-guangzhou.tencentscf.com';
+const SID_KEY = 'sihe_sid';
+function getSid() {
+  let sid = localStorage.getItem(SID_KEY) || '';
+  if (!sid) {
+    sid = prompt('请输入你的姓名/学号（用于云端保存学习记录，下次打开可续填）：', '');
+    if (!sid) sid = 'guest_' + Math.random().toString(36).slice(2, 8);
+    localStorage.setItem(SID_KEY, sid);
+  }
+  return sid;
+}
+async function saveOne(qid, text) {
+  const sid = getSid();
+  const r = await fetch(API, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'save', sid, qid, text, ts: Date.now() })
+  });
+  return r.ok;
+}
+async function loadAll() {
+  const sid = localStorage.getItem(SID_KEY) || '';
+  if (!sid) return {};
+  try {
+    const r = await fetch(API + '?action=load&sid=' + encodeURIComponent(sid));
+    const j = await r.json();
+    // 兼容返回 {data:{...}} 或直接 {qid:text}
+    return j.data || j.records || j || {};
+  } catch(e) { return {}; }
+}
+
+/* ============================================================
+ *  开始页倒计时
+ * ============================================================ */
+let cd = 60;
+const cdTimer = setInterval(() => {
+  cd--;
+  $('cdNum').textContent = cd;
+  if (cd <= 0) {
+    clearInterval(cdTimer);
+    $('cdNum').textContent = 0;
+    const btn = $('startBtn');
+    btn.disabled = false;
+    btn.classList.add('ready');
+  }
+}, 1000);
+$('startBtn').addEventListener('click', () => {
+  if ($('startBtn').disabled) return;
+  $('startPage').style.display = 'none';
+  $('app').classList.add('active');
+  renderNav();
+  loadScene(0);
+});
+
+/* ============================================================
+ *  左侧导航
+ * ============================================================ */
+function renderNav() {
+  const nav = $('navPanel');
+  // 清空旧按钮（保留h2）
+  nav.querySelectorAll('.nav-btn').forEach(b => b.remove());
+  scenes.forEach((s, i) => {
+    const b = document.createElement('div');
+    b.className = 'nav-btn' + (i === currentSceneIdx ? ' current' : '') + (i >= unlockedCount ? ' locked' : '');
+    b.innerHTML = `<span class="step">场景 ${i+1}${i >= unlockedCount ? ' 🔒' : ''}</span>${s.name}`;
+    if (i < unlockedCount) {
+      b.addEventListener('click', () => { loadScene(i); });
+    }
+    nav.appendChild(b);
+  });
+}
+
+/* ============================================================
+ *  打字机字幕
+ * ============================================================ */
+function typeSubtitle(text, done) {
+  clearInterval(typeTimer);
+  subtitleText.textContent = '';
+  cursor.style.display = 'inline-block';
+  let i = 0;
+  typeTimer = setInterval(() => {
+    if (i >= text.length) {
+      clearInterval(typeTimer);
+      cursor.style.display = 'none';
+      if (done) done();
+      return;
+    }
+    subtitleText.textContent += text[i];
+    i++;
+  }, 55);
+}
+
+/* ============================================================
+ *  播放一段 imageaudio
+ * ============================================================ */
+function playSegment(seg, onEnd) {
+  const gen = playGen;
+  stageImg.src = MEDIA_BASE + seg.image;
+  const sub = subtitleMap[seg.audio] || '';
+
+  audio.src = MEDIA_BASE + seg.audio;
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+  isPlaying = true;
+  playToggle.textContent = '⏸';
+
+  // 字幕与音频同步开始
+  typeSubtitle(sub, null);
+
+  audio.onended = () => {
+    if (gen !== playGen) return;
+    isPlaying = false;
+    playToggle.textContent = '▶';
+    if (onEnd) onEnd();
+  };
+  audio.onerror = () => {
+    if (gen !== playGen) return;
+    isPlaying = false;
+    playToggle.textContent = '▶';
+    if (onEnd) onEnd();
+  };
+}
+
+/* 顺序播放一个数组的 segments */
+function playSequence(segs, onAllEnd) {
+  const gen = playGen;
+  let idx = 0;
+  function next() {
+    if (gen !== playGen) return;
+    if (idx >= segs.length) { if (onAllEnd) onAllEnd(); return; }
+    playSegment(segs[idx], () => {
+      if (gen !== playGen) return;
+      idx++;
+      next();
+    });
+  }
+  next();
+}
+
+/* ============================================================
+ *  叠加层控制
+ * ============================================================ */
+function showOverlay(text, buttons, cb) {
+  const gen = playGen;
+  overlay.classList.add('show');
+  overlayTextInner.textContent = '';
+  cursor.style.display = 'none';
+
+  // 叠加层打字机
+  let i = 0;
+  const oc = setInterval(() => {
+    if (gen !== playGen) { clearInterval(oc); return; }
+    if (i >= text.length) { clearInterval(oc); return; }
+    overlayTextInner.textContent += text[i];
+    i++;
+  }, 50);
+
+  overlayBtns.innerHTML = '';
+  buttons.forEach(btn => {
+    const b = document.createElement('button');
+    b.className = 'ov-btn ' + (btn.color || 'blue');
+    b.textContent = btn.label;
+    b.addEventListener('click', () => {
+      if (gen !== playGen) return;
+      overlay.classList.remove('show');
+      overlayBtns.innerHTML = '';
+      if (cb) cb(btn.value);
+    });
+    overlayBtns.appendChild(b);
+  });
+}
+
+function hideOverlay() {
+  overlay.classList.remove('show');
+  overlayBtns.innerHTML = '';
+}
+
+/* ============================================================
+ *  场景主流程
+ * ============================================================ */
+function loadScene(idx) {
+  playGen++;
+  const gen = playGen;
+  currentSceneIdx = idx;
+  renderNav();
+  hideOverlay();
+  const sc = scenes[idx];
+  sceneTitle.textContent = sc.title;
+  // 上一场景按钮：第0场隐藏
+  if (idx > 0) backBtn.classList.add('show'); else backBtn.classList.remove('show');
+
+  // 状态记录
+  let pickedKey = null;
+  let pickedOutcome = null;
+  let pickedPath = null;
+  let pickedResult = '';
+  let otherPath = null;
+  let otherOutcome = null;
+
+  // Step 1: 播放引入段
+  playSequence(sc.intro, () => {
+    if (gen !== playGen) return;
+
+    // Step 2: 策略选择叠加层
+    showOverlay(sc.guide, [
+      { label:'A. ' + sc.choices[0].label, value: sc.choices[0], color:'blue' },
+      { label:'B. ' + sc.choices[1].label, value: sc.choices[1], color:'blue' }
+    ], (choice) => {
+      if (gen !== playGen) return;
+      pickedKey = choice.key;
+      pickedOutcome = choice.outcome;
+      pickedPath = choice.path;
+      pickedResult = choice.result || '';
+      // 另一条路径
+      otherPath = sc.choices.find(c => c.key !== pickedKey).path;
+      otherOutcome = sc.choices.find(c => c.key !== pickedKey).outcome;
+
+      // Step 3: 播放所选路径
+      playSequence(pickedPath, () => {
+        if (gen !== playGen) return;
+
+        // Step 4: 反馈叠加层
+        let btnLabel, btnColor;
+        if (pickedOutcome === 'success') {
+          btnLabel = '另一种策略会导致什么后果';
+          btnColor = 'green';
+        } else {
+          btnLabel = '我们再看看另一种策略';
+          btnColor = 'red';
+        }
+        showOverlay(pickedResult, [{ label: btnLabel, value:'other', color: btnColor }], () => {
+          if (gen !== playGen) return;
+
+          // Step 5: 播放另一条路径
+          playSequence(otherPath, () => {
+            if (gen !== playGen) return;
+
+            // Step 6: 反思题
+            showQuiz(sc, () => {
+              if (gen !== playGen) return;
+              // Step 8: 解锁下一场景
+              if (idx + 1 < scenes.length) {
+                unlockedCount = Math.max(unlockedCount, idx + 2);
+                renderNav();
+                loadScene(idx + 1);
+              } else {
+                // 全部完成 → 总结页
+                showSummary();
+              }
+            });
+          });
+        });
+      });
+    });
+  });
+}
+
+/* ============================================================
+ *  反思题
+ * ============================================================ */
+function showQuiz(sc, onNext) {
+  const gen = playGen;
+  overlay.classList.add('show');
+  overlayTextInner.innerHTML = '';
+  overlayTextInner.style.display = 'none';
+  overlayBtns.innerHTML = '';
+
+  const box = document.createElement('div');
+  box.id = 'quizBox';
+  box.innerHTML = `<h3>${sc.reflect.question}</h3>`;
+
+  sc.reflect.options.forEach((opt, i) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'quiz-opt';
+    lbl.innerHTML = `<input type="checkbox" value="${i}"><span>${String.fromCharCode(65+i)}. ${opt}</span>`;
+    box.appendChild(lbl);
+  });
+
+  const submit = document.createElement('button');
+  submit.id = 'quizSubmit';
+  submit.textContent = '提交答案';
+  box.appendChild(submit);
+
+  const fb = document.createElement('div');
+  fb.id = 'quizFeedback';
+  box.appendChild(fb);
+
+  const shotBtn = document.createElement('button');
+  shotBtn.id = 'screenshotBtn';
+  shotBtn.textContent = '📸 截图并下载学习记录';
+  box.appendChild(shotBtn);
+
+  const nextBtn = document.createElement('button');
+  nextBtn.id = 'nextSceneBtn';
+  nextBtn.textContent = '进入下一场景 →';
+  box.appendChild(nextBtn);
+
+  overlayBtns.appendChild(box);
+
+  submit.addEventListener('click', () => {
+    if (gen !== playGen) return;
+    const checked = Array.from(box.querySelectorAll('input:checked')).map(i => parseInt(i.value)).sort();
+    const correct = [...sc.reflect.correct].sort();
+    const ok = checked.length === correct.length && checked.every((v,i) => v === correct[i]);
+
+    fb.style.display = 'block';
+    if (ok) {
+      fb.className = 'ok';
+      fb.innerHTML = `<div>✓ 理解正确！</div><div class="explain">${sc.reflect.explanation}</div>`;
+    } else {
+      fb.className = 'bad';
+      const correctLabels = correct.map(i => String.fromCharCode(65+i)).join('、');
+      fb.innerHTML = `<div>✗ 再想想。正确答案是：${correctLabels}</div><div class="explain">${sc.reflect.explanation}</div>`;
+    }
+    shotBtn.style.display = 'inline-block';
+    nextBtn.style.display = 'inline-block';
+    nextBtn.textContent = (currentSceneIdx < scenes.length - 1) ? '进入下一场景 →' : '查看总结 →';
+    submit.style.display = 'none';
+  });
+
+  shotBtn.addEventListener('click', () => {
+    if (gen !== playGen) return;
+    html2canvas(document.body, { backgroundColor:'#0b1020' }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `思和科技-场景${currentSceneIdx+1}-学习记录.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (gen !== playGen) return;
+    overlay.classList.remove('show');
+    overlayBtns.innerHTML = '';
+    overlayTextInner.style.display = '';
+    if (onNext) onNext();
+  });
+}
+
+/* ============================================================
+ *  总结页
+ * ============================================================ */
+async function showSummary() {
+  $('summaryPage').classList.add('show');
+  playToggle.style.display = 'none';
+  backBtn.classList.remove('show');
+  // 展示 sid
+  const sid = getSid();
+  $('sidBar').innerHTML = `当前学号/姓名：<b style="color:#fff">${sid}</b><a href="javascript:void(0)" id="changeSid">更换</a>`;
+  $('changeSid').addEventListener('click', () => {
+    const n = prompt('输入新的学号/姓名：', '');
+    if (n) { localStorage.setItem(SID_KEY, n); location.reload(); }
+  });
+  // 拉取历史答案
+  $('submitMsg').className = '';
+  $('submitMsg').textContent = '正在读取你的历史记录…';
+  const data = await loadAll();
+  $('sumQ1').value = data['sihe_sum1'] || '';
+  $('sumQ2').value = data['sihe_sum2'] || '';
+  $('sumQ3').value = data['sihe_sum3'] || '';
+  $('submitMsg').textContent = '';
+}
+
+$('finishBtn').addEventListener('click', async () => {
+  const btn = $('finishBtn');
+  const msg = $('submitMsg');
+  btn.disabled = true; btn.textContent = '提交中…';
+  msg.className = ''; msg.textContent = '';
+  try {
+    await saveOne('sihe_sum1', $('sumQ1').value);
+    await saveOne('sihe_sum2', $('sumQ2').value);
+    await saveOne('sihe_sum3', $('sumQ3').value);
+    msg.className = 'ok';
+    msg.textContent = '✓ 已提交到云端，下次打开本案例会自动填入你的回答。';
+    btn.textContent = '重新提交';
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = '✗ 提交失败：' + e.message + '。请检查网络后重试。';
+    btn.disabled = false;
+    btn.textContent = '重试提交';
+  }
+});
+
+$('backToSceneBtn').addEventListener('click', () => {
+  audio.pause();
+  $('summaryPage').classList.remove('show');
+  playToggle.style.display = 'flex';
+  loadScene(scenes.length - 1);
+});
+
+/* ============================================================
+ *  播放/暂停
+ * ============================================================ */
+playToggle.addEventListener('click', () => {
+  if (!audio.src) return;
+  if (audio.paused) {
+    audio.play();
+    isPlaying = true;
+    playToggle.textContent = '⏸';
+  } else {
+    audio.pause();
+    isPlaying = false;
+    playToggle.textContent = '▶';
+  }
+});
+
+/* ============================================================
+ *  返回上一场景
+ * ============================================================ */
+backBtn.addEventListener('click', () => {
+  if (currentSceneIdx <= 0) return;
+  audio.pause();
+  playGen++;                 // 作废当前场景的所有回调
+  hideOverlay();
+  loadScene(currentSceneIdx - 1);
+});
+</script>
+</body>
+</html>
