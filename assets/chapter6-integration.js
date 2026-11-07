@@ -30,12 +30,29 @@
   }));
   window.uploadVideoHook=async blob=>{
     if(auth?.role!=='student')throw new Error('请使用学生账号提交');
+    if(!blob.size||blob.size>100*1024*1024)throw new Error('视频文件须大于0且不超过100MB');
     const type=blob.type.split(';')[0],ext=type==='video/mp4'?'mp4':'webm';
+    if(!['video/mp4','video/webm'].includes(type))throw new Error('仅支持MP4、WebM视频');
     const init=await api('assignment-upload-init',{assignmentId:'course-reflection-video',fileName:`${auth.name}_${auth.className||auth.classId}.${ext}`,size:blob.size,contentType:type});
-    const r=await fetch(init.uploadUrl,{method:'PUT',headers:init.requiredHeaders,body:blob});if(!r.ok)throw new Error('视频上传失败');
+    await new Promise((resolve,reject)=>{
+      const xhr=new XMLHttpRequest();xhr.open('PUT',init.uploadUrl);
+      Object.entries(init.requiredHeaders).forEach(([k,v])=>xhr.setRequestHeader(k,v));
+      xhr.upload.onprogress=e=>{const p=document.getElementById('rvUploadProgress');if(p){p.style.display='block';p.value=e.lengthComputable?e.loaded/e.total*100:0;}};
+      xhr.onload=()=>xhr.status>=200&&xhr.status<300?resolve():reject(new Error('视频上传失败 HTTP '+xhr.status));
+      xhr.onerror=()=>reject(new Error('网络错误，请重试'));xhr.timeout=600000;xhr.ontimeout=()=>reject(new Error('上传超时，请重试'));xhr.send(blob);
+    });
     const completed=await api('assignment-upload-complete',{submissionId:init.submissionId});
     const record=completed.submission;
     if(!record||record.submissionId!==init.submissionId||record.status!=='submitted'||!record.submittedAt)throw new Error('云端未返回有效提交确认，请重试');
     return {submissionId:record.submissionId,submittedAt:record.submittedAt,fileName:record.objectKey.split('/').pop(),name:record.name};
   };
+  const input=document.getElementById('rvFile'),button=document.getElementById('rvFileSubmit'),preview=document.getElementById('rvFilePreview'),info=document.getElementById('rvFileInfo'),status=document.getElementById('rvFileStatus');
+  let selected=null,url=null;
+  if(input)input.onchange=()=>{selected=null;button.disabled=true;if(url)URL.revokeObjectURL(url);preview.removeAttribute('src');preview.style.display='none';status.textContent='';const f=input.files[0];if(!f)return;
+    info.textContent=f.name+' · '+(f.size/1024/1024).toFixed(2)+'MB';
+    if(!f.size||f.size>100*1024*1024){status.textContent='文件须大于0且不超过100MB';return;}
+    if(!['video/mp4','video/webm'].includes(f.type)){status.textContent='请选择MP4或WebM视频';return;}
+    selected=f;url=URL.createObjectURL(f);preview.src=url;preview.style.display='block';button.disabled=false;
+  };
+  if(button)button.onclick=async()=>{if(!selected)return;button.disabled=true;input.disabled=true;status.textContent='正在上传，请勿关闭页面…';try{const r=await window.uploadVideoHook(selected);status.textContent='✓ COS已确认提交成功 · '+r.name+' · '+new Date(r.submittedAt).toLocaleString()+' · 提交编号：'+r.submissionId+'。待教师审核后展示。';selected=null;}catch(e){status.textContent='上传失败：'+e.message;button.disabled=false;}finally{input.disabled=false;}};
 })();
