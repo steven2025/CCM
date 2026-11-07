@@ -1092,6 +1092,16 @@
 
       <!-- 右：提示下半 -->
       <div style="display:flex;flex-direction:column;gap:.6rem">
+        <div style="background:#eff6ff;border:2px solid #38bdf8;border-radius:12px;padding:16px;color:#164e63">
+          <b>上传已有视频 / Upload video</b>
+          <p>建议3—5分钟，MP4或WebM，最大100MB。推荐720p。录制和上传任选一种。</p>
+          <input id="rvFile" type="file" accept="video/mp4,video/webm,.mp4,.webm">
+          <video id="rvFilePreview" controls playsinline style="display:none;width:100%;max-height:220px;margin-top:10px"></video>
+          <p id="rvFileInfo" role="status"></p>
+          <button id="rvFileSubmit" disabled style="padding:10px 18px;background:#0369a1;color:white;border:0;border-radius:12px">确认提交上传视频</button>
+          <progress id="rvUploadProgress" max="100" value="0" style="display:none;width:100%;margin-top:10px"></progress>
+          <p id="rvFileStatus" role="status" style="overflow-wrap:anywhere"></p>
+        </div>
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.7rem .9rem;font-size:.95rem;line-height:1.7;color:#78350f">
           <div style="font-weight:700;color:#92400e;margin-bottom:.25rem">⏱️ 时长</div>
           <div>建议 <b>3-5 分钟</b>，不用写稿，像跟同事聊天一样说就行。</div>
@@ -1819,6 +1829,7 @@
 
       submitBtn.addEventListener('click',async function(){
         if(!recordedBlob){ alert('请先录制视频'); return; }
+        if(recordedBlob.size>100*1024*1024){status.textContent='视频超过100MB，请缩短时长后重新录制。';return;}
         var sid=localStorage.getItem('c6_sid')||'anonymous';
         var ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
         var filename='c6_reflect_'+sid+'_'+ts+'.webm';
