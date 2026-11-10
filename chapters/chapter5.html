@@ -802,6 +802,10 @@
     <span class="en">Three modules, twenty items, their sources</span>
     <span class="zh">尽调总表：类别 × 具体内容 × 信息来源</span>
   </h1>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:.5rem 0">
+    <button type="button" class="btn" id="showBuiltInSources">显示内置信息来源 / Show Reference Sources</button>
+    <span style="font-size:.85rem;color:#64748b">内置参考来源，供比较讨论；不代表前页所选答案。</span>
+  </div>
   <div id="tblWrap"></div>
 </section>
 
@@ -4156,9 +4160,9 @@
         ['退休政策 Retirement',['H','I','L']]
       ]}
     ];
+    var sourcesVisible=false;
     function render(){
-      var done=false;
-      try{ done=localStorage.getItem('c5tbl_12')==='1'&&localStorage.getItem('c5tbl_13')==='1'&&localStorage.getItem('c5tbl_14')==='1'&&localStorage.getItem('c5tbl_15')==='1'; }catch(e){}
+      var done=sourcesVisible;
       var html='<table style="width:100%;border-collapse:collapse;font-size:.68rem;table-layout:fixed">';
       html+='<tr style="background:#162d4d;color:#fff"><th style="border:1px solid #475569;padding:.25rem .4rem;width:110px;text-align:center">尽调类别</th><th style="border:1px solid #475569;padding:.25rem .4rem;width:200px;text-align:left;white-space:nowrap">具体内容</th><th style="border:1px solid #475569;padding:.25rem .4rem;text-align:left">信息来源</th></tr>';
       ROWS.forEach(function(g){
@@ -4171,11 +4175,16 @@
         });
       });
       html+='</table>';
-      if(!done) html+='<div style="margin-top:.35rem;font-size:.72rem;color:#94a3b8">完成 12–15 页练习（点"参考答案"揭示）后，此表自动填充。</div>';
+      if(!done) html+='<div style="margin-top:.35rem;font-size:.85rem;color:#64748b">点击上方“显示内置信息来源”，查看20项内容的参考来源。</div>';
       wrap.innerHTML=html;
     }
-    var oldShow=window.show;
-    window.show=function(i){ oldShow(i); if(i===16) render(); };
+    document.getElementById('showBuiltInSources').addEventListener('click',function(){
+      sourcesVisible=!sourcesVisible;
+      this.textContent=sourcesVisible?'收起内置信息来源 / Hide Reference Sources':'显示内置信息来源 / Show Reference Sources';
+      render();
+    });
+    var page=wrap.closest('.slide');
+    new MutationObserver(function(){if(page.classList.contains('active'))render();}).observe(page,{attributes:true,attributeFilter:['class']});
     render();
   })();
 const slides = document.querySelectorAll('.slide');
