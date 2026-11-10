@@ -1,0 +1,25 @@
+/* Shared compact header: chapter position, navigation and utilities. */
+.topbar,.topbar:hover{display:grid;grid-template-columns:minmax(160px,.85fr) minmax(350px,1.4fr) auto;align-items:center;padding:7px 12px;gap:10px;height:auto}
+.topbar .chapter-location{grid-column:1;grid-row:1;min-width:0;width:auto}
+.topbar .topbar-title{font-size:11px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar #theoryPath{font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .navbar{grid-column:2;grid-row:1;position:static;display:flex;align-items:center;justify-content:center;width:100%;padding:0;gap:6px;border:0;flex-wrap:nowrap;min-width:0;background:transparent}
+.topbar .page-picker{flex:1 1 220px;min-width:0;font-size:0;gap:0}
+.topbar .page-picker select{font-size:13px;width:100%;min-width:0;padding:7px 8px;height:35px;border-radius:8px}
+.topbar .nav-btn{font-size:13px;white-space:nowrap;padding:7px 10px;height:35px}
+.topbar #stepStatus{display:none}
+.topbar .reader-actions{grid-column:3;grid-row:1;width:auto;display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;max-width:440px}
+.topbar .reader-actions button{font-size:12px;padding:6px 8px}
+.stage .slide{padding:14px 20px 18px}
+.stage .slide-inner{margin-top:0;margin-bottom:0}
+.chapter-two .slide-title,.slide-title{font-size:clamp(23px,2vw,30px)!important;line-height:1.25;margin-bottom:8px}
+.slide-subtitle{font-size:16px;line-height:1.45;margin-bottom:10px}
+.stage .card{padding:12px 14px;border-radius:11px}
+.stage .card h3,.stage .card-title{font-size:18px;margin-bottom:7px}
+.stage .card li,.stage .obj-list li,.stage .toc-list li,.stage .def-box,.stage .data-table{font-size:16px;line-height:1.5}
+.stage .card li .en,.stage .card li .zh,.stage .obj-list li .zh,.stage .def-box .zh{font-size:15px;line-height:1.5}
+.stage .def-box{padding:12px 14px;margin-top:8px;margin-bottom:10px}
+.stage .data-table th,.stage .data-table td{padding:8px 10px}
+.stage .page-foot{margin-top:10px;padding-top:7px}
+@media(max-width:1150px){.topbar,.topbar:hover{grid-template-columns:minmax(150px,.7fr) minmax(330px,1.3fr)}.topbar .reader-actions{grid-column:1/-1;grid-row:2;max-width:none;justify-content:flex-end}.topbar .chapter-location{grid-row:1}}
+@media(max-width:650px){.topbar,.topbar:hover{grid-template-columns:minmax(0,1fr);padding:7px 9px;gap:6px}.topbar .chapter-location{grid-column:1;grid-row:1}.topbar .navbar{grid-column:1;grid-row:2}.topbar .reader-actions{grid-column:1;grid-row:3;justify-content:flex-start}.stage .slide{padding:12px}.topbar .page-picker select{font-size:12px}.topbar .nav-btn{padding:6px 8px}}

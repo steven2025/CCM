@@ -7,6 +7,7 @@
   if(!languages[current])current='zh';
   const normalized=s=>s.replace(/\s+/g,' ').trim();
   const entries={th:Object.keys(packs.th).sort((a,b)=>b.length-a.length),ko:Object.keys(packs.ko).sort((a,b)=>b.length-a.length)};
+  window.addEventListener('ccm-language-pack-updated',()=>{for(const lang of ['th','ko'])entries[lang]=Object.keys(packs[lang]).sort((a,b)=>b.length-a.length);walk();});
   function translateText(source,lang){if(lang==='zh'||!/\p{Script=Han}/u.test(source))return source;const pack=packs[lang],key=normalized(source);if(pack[key])return source.replace(source.trim(),pack[key]);let output=source;for(const phrase of entries[lang])if(output.includes(phrase))output=output.replaceAll(phrase,pack[phrase]);return output;}
   function bilingual(source,translated,node){if(!node?.parentElement?.closest('button,[role="button"],.nav-btn')||/\s\/\s[A-Za-z]/.test(source))return translated;const sourceKey=normalized(source),match=Object.entries(buttonEnglish).find(([key])=>sourceKey.includes(key));return match?`${translated.trim()} / ${match[1]}`:translated;}
   function applyText(node){if(!node?.isConnected||node.parentElement?.closest('script,style,textarea,.ccm-language-switcher'))return;const now=node.data,isOwnTranslation=translatedValues.get(node)===now;if(/\p{Script=Han}/u.test(now)&&!isOwnTranslation)originals.set(node,now);const source=originals.get(node);if(source===undefined)return;const next=bilingual(source,translateText(source,current),node);translatedValues.set(node,next);if(now!==next)node.data=next;}
