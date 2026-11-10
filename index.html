@@ -7015,6 +7015,7 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
     grid.className = 'about-apps-grid';
 
     aboutCourseApps.forEach(app => {
+      if (app.id === 'multilingual-ai-interview' && !isTeacher()) return;
       const btn = document.createElement('button');
       btn.className = 'about-app-btn';
       btn.style.background = app.color;
@@ -7026,6 +7027,10 @@ window.CCMObserverSettings={mount(container,api,readOnly){let account=null,busy=
         </div>
       `;
       btn.addEventListener('click', () => {
+        if (app.id === 'multilingual-ai-interview' && !isTeacher()) {
+          alert('此应用仅限教师账号使用。 / Teacher access required.');
+          return;
+        }
         if (app.mode === 'api-config') {
           openAiConfigWindow();
         } else {
